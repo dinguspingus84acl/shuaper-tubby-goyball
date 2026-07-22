@@ -1,1 +1,2654 @@
-[]
+[
+  {
+    "generatedAt": "2026-07-22T22:24:56.146Z",
+    "dataSeason": 2024,
+    "ranks": {
+      "standard": [
+        {
+          "id": "rb-1-bijan-robinson",
+          "rank": 1,
+          "score": 99.9
+        },
+        {
+          "id": "rb-2-jahmyr-gibbs",
+          "rank": 2,
+          "score": 99.9
+        },
+        {
+          "id": "rb-8-jonathan-taylor",
+          "rank": 3,
+          "score": 98.1
+        },
+        {
+          "id": "rb-13-derrick-henry",
+          "rank": 4,
+          "score": 97.6
+        },
+        {
+          "id": "rb-4-omarion-hampton",
+          "rank": 5,
+          "score": 93.8
+        },
+        {
+          "id": "rb-7-de-von-achane",
+          "rank": 6,
+          "score": 93.5
+        },
+        {
+          "id": "rb-12-saquon-barkley",
+          "rank": 7,
+          "score": 92.9
+        },
+        {
+          "id": "rb-5-ashton-jeanty",
+          "rank": 8,
+          "score": 92.8
+        },
+        {
+          "id": "rb-31-chuba-hubbard",
+          "rank": 9,
+          "score": 92
+        },
+        {
+          "id": "te-3-colston-loveland",
+          "rank": 10,
+          "score": 90.2
+        },
+        {
+          "id": "rb-3-james-cook",
+          "rank": 11,
+          "score": 88.7
+        },
+        {
+          "id": "te-4-tyler-warren",
+          "rank": 12,
+          "score": 88.7
+        },
+        {
+          "id": "rb-20-d-andre-swift",
+          "rank": 13,
+          "score": 88.6
+        },
+        {
+          "id": "rb-11-josh-jacobs",
+          "rank": 14,
+          "score": 87.4
+        },
+        {
+          "id": "rb-18-kyren-williams",
+          "rank": 15,
+          "score": 86.3
+        },
+        {
+          "id": "rb-19-breece-hall",
+          "rank": 16,
+          "score": 86
+        },
+        {
+          "id": "wr-13-devonta-smith",
+          "rank": 17,
+          "score": 85.2
+        },
+        {
+          "id": "wr-9-drake-london",
+          "rank": 18,
+          "score": 84.1
+        },
+        {
+          "id": "rb-35-rico-dowdle",
+          "rank": 19,
+          "score": 84.1
+        },
+        {
+          "id": "rb-14-jeremayah-love",
+          "rank": 20,
+          "score": 84
+        },
+        {
+          "id": "rb-27-bucky-irving",
+          "rank": 21,
+          "score": 83.4
+        },
+        {
+          "id": "te-1-brock-bowers",
+          "rank": 22,
+          "score": 83.1
+        },
+        {
+          "id": "te-7-harold-fannin",
+          "rank": 23,
+          "score": 81.1
+        },
+        {
+          "id": "rb-16-cam-skattebo",
+          "rank": 24,
+          "score": 79.1
+        },
+        {
+          "id": "te-2-trey-mcbride",
+          "rank": 25,
+          "score": 79
+        },
+        {
+          "id": "rb-6-christian-mccaffrey",
+          "rank": 26,
+          "score": 78.8
+        },
+        {
+          "id": "rb-9-chase-brown",
+          "rank": 27,
+          "score": 78.8
+        },
+        {
+          "id": "rb-32-jordan-mason",
+          "rank": 28,
+          "score": 78.7
+        },
+        {
+          "id": "te-13-mark-andrews",
+          "rank": 29,
+          "score": 78.4
+        },
+        {
+          "id": "qb-1-josh-allen",
+          "rank": 30,
+          "score": 76.8
+        },
+        {
+          "id": "rb-15-javonte-williams",
+          "rank": 31,
+          "score": 76.4
+        },
+        {
+          "id": "wr-18-davante-adams",
+          "rank": 32,
+          "score": 76.3
+        },
+        {
+          "id": "qb-3-lamar-jackson",
+          "rank": 33,
+          "score": 76.1
+        },
+        {
+          "id": "te-14-travis-kelce",
+          "rank": 34,
+          "score": 76
+        },
+        {
+          "id": "rb-43-alvin-kamara",
+          "rank": 35,
+          "score": 75.6
+        },
+        {
+          "id": "rb-42-chris-rodriguez",
+          "rank": 36,
+          "score": 75.5
+        },
+        {
+          "id": "rb-23-bhayshul-tuten",
+          "rank": 37,
+          "score": 75.3
+        },
+        {
+          "id": "wr-6-a-j-brown",
+          "rank": 38,
+          "score": 75.2
+        },
+        {
+          "id": "rb-33-tony-pollard",
+          "rank": 39,
+          "score": 75.1
+        },
+        {
+          "id": "qb-9-justin-herbert",
+          "rank": 40,
+          "score": 74.7
+        },
+        {
+          "id": "qb-11-brock-purdy",
+          "rank": 41,
+          "score": 74.5
+        },
+        {
+          "id": "rb-24-jadarian-price",
+          "rank": 42,
+          "score": 74.3
+        },
+        {
+          "id": "rb-45-tyjae-spears",
+          "rank": 43,
+          "score": 74.1
+        },
+        {
+          "id": "wr-42-courtland-sutton",
+          "rank": 44,
+          "score": 73.8
+        },
+        {
+          "id": "wr-1-ja-marr-chase",
+          "rank": 45,
+          "score": 73.6
+        },
+        {
+          "id": "qb-16-kyler-murray",
+          "rank": 46,
+          "score": 73.6
+        },
+        {
+          "id": "rb-22-quinshon-judkins",
+          "rank": 47,
+          "score": 73.3
+        },
+        {
+          "id": "rb-26-treveyon-henderson",
+          "rank": 48,
+          "score": 72.4
+        },
+        {
+          "id": "rb-17-travis-etienne-jr",
+          "rank": 49,
+          "score": 72.2
+        },
+        {
+          "id": "rb-29-jk-dobbins",
+          "rank": 50,
+          "score": 71.9
+        },
+        {
+          "id": "wr-29-marvin-harrison-jr",
+          "rank": 51,
+          "score": 71.7
+        },
+        {
+          "id": "qb-15-baker-mayfield",
+          "rank": 52,
+          "score": 71.6
+        },
+        {
+          "id": "qb-4-joe-burrow",
+          "rank": 53,
+          "score": 71.5
+        },
+        {
+          "id": "wr-45-jakobi-meyers",
+          "rank": 54,
+          "score": 71.4
+        },
+        {
+          "id": "wr-24-carnell-tate",
+          "rank": 55,
+          "score": 70.4
+        },
+        {
+          "id": "rb-28-rj-harvey",
+          "rank": 56,
+          "score": 70.4
+        },
+        {
+          "id": "qb-13-patrick-mahomes",
+          "rank": 57,
+          "score": 70.3
+        },
+        {
+          "id": "wr-44-dk-metcalf",
+          "rank": 58,
+          "score": 70.3
+        },
+        {
+          "id": "wr-20-tetairoa-mcmillan",
+          "rank": 59,
+          "score": 70.2
+        },
+        {
+          "id": "wr-23-malik-nabers",
+          "rank": 60,
+          "score": 70.2
+        },
+        {
+          "id": "wr-39-alec-pierce",
+          "rank": 61,
+          "score": 70
+        },
+        {
+          "id": "wr-25-luther-burden",
+          "rank": 62,
+          "score": 69.7
+        },
+        {
+          "id": "wr-12-nico-collins",
+          "rank": 63,
+          "score": 69.6
+        },
+        {
+          "id": "qb-17-bo-nix",
+          "rank": 64,
+          "score": 69.5
+        },
+        {
+          "id": "qb-26-bryce-young",
+          "rank": 65,
+          "score": 69.4
+        },
+        {
+          "id": "wr-38-ricky-pearsall",
+          "rank": 66,
+          "score": 69.3
+        },
+        {
+          "id": "wr-30-dj-moore",
+          "rank": 67,
+          "score": 69.1
+        },
+        {
+          "id": "wr-26-emeka-egbuka",
+          "rank": 68,
+          "score": 69
+        },
+        {
+          "id": "wr-7-rashee-rice",
+          "rank": 69,
+          "score": 68.2
+        },
+        {
+          "id": "qb-8-caleb-williams",
+          "rank": 70,
+          "score": 68.2
+        },
+        {
+          "id": "wr-8-ceedee-lamb",
+          "rank": 71,
+          "score": 68.2
+        },
+        {
+          "id": "wr-2-puka-nacua",
+          "rank": 72,
+          "score": 68.1
+        },
+        {
+          "id": "qb-30-geno-smith",
+          "rank": 73,
+          "score": 68
+        },
+        {
+          "id": "rb-44-tyrone-tracy-jr",
+          "rank": 74,
+          "score": 67.8
+        },
+        {
+          "id": "rb-50-tyler-allgeier",
+          "rank": 75,
+          "score": 67.2
+        },
+        {
+          "id": "qb-7-dak-prescott",
+          "rank": 76,
+          "score": 66.8
+        },
+        {
+          "id": "wr-21-terry-mclaurin",
+          "rank": 77,
+          "score": 66.7
+        },
+        {
+          "id": "wr-10-ladd-mcconkey",
+          "rank": 78,
+          "score": 66.5
+        },
+        {
+          "id": "wr-37-quentin-johnston",
+          "rank": 79,
+          "score": 66.5
+        },
+        {
+          "id": "wr-5-justin-jefferson",
+          "rank": 80,
+          "score": 66
+        },
+        {
+          "id": "wr-48-parker-washington",
+          "rank": 81,
+          "score": 66
+        },
+        {
+          "id": "te-20-aj-barner",
+          "rank": 82,
+          "score": 65.3
+        },
+        {
+          "id": "rb-37-aaron-jones",
+          "rank": 83,
+          "score": 64.8
+        },
+        {
+          "id": "qb-14-matthew-stafford",
+          "rank": 84,
+          "score": 64.2
+        },
+        {
+          "id": "wr-33-makai-lemon",
+          "rank": 85,
+          "score": 64.2
+        },
+        {
+          "id": "rb-34-jaylen-warren",
+          "rank": 86,
+          "score": 64.2
+        },
+        {
+          "id": "qb-33-michael-penix-jr",
+          "rank": 87,
+          "score": 64.1
+        },
+        {
+          "id": "wr-4-amon-ra-st-brown",
+          "rank": 88,
+          "score": 63.5
+        },
+        {
+          "id": "rb-40-rachaad-white",
+          "rank": 89,
+          "score": 63.5
+        },
+        {
+          "id": "wr-52-xavier-worthy",
+          "rank": 90,
+          "score": 63.4
+        },
+        {
+          "id": "te-12-dallas-goedert",
+          "rank": 91,
+          "score": 63.3
+        },
+        {
+          "id": "te-18-juwan-johnson",
+          "rank": 92,
+          "score": 63.1
+        },
+        {
+          "id": "wr-35-kc-concepcion",
+          "rank": 93,
+          "score": 62.8
+        },
+        {
+          "id": "qb-28-tua-tagovailoa",
+          "rank": 94,
+          "score": 62.6
+        },
+        {
+          "id": "qb-20-jared-goff",
+          "rank": 95,
+          "score": 62.2
+        },
+        {
+          "id": "wr-32-jordyn-tyson",
+          "rank": 96,
+          "score": 61.9
+        },
+        {
+          "id": "te-24-brenton-strange",
+          "rank": 97,
+          "score": 61.5
+        },
+        {
+          "id": "wr-41-brian-thomas-jr",
+          "rank": 98,
+          "score": 61
+        },
+        {
+          "id": "qb-12-jaxson-dart",
+          "rank": 99,
+          "score": 60.9
+        },
+        {
+          "id": "rb-38-kyle-monangai",
+          "rank": 100,
+          "score": 60.7
+        },
+        {
+          "id": "qb-19-malik-willis",
+          "rank": 101,
+          "score": 60.6
+        },
+        {
+          "id": "qb-25-daniel-jones",
+          "rank": 102,
+          "score": 60.3
+        },
+        {
+          "id": "te-23-terrance-ferguson",
+          "rank": 103,
+          "score": 59.7
+        },
+        {
+          "id": "qb-5-jayden-daniels",
+          "rank": 104,
+          "score": 59.5
+        },
+        {
+          "id": "qb-6-jalen-hurts",
+          "rank": 105,
+          "score": 59.5
+        },
+        {
+          "id": "te-9-isaiah-likely",
+          "rank": 106,
+          "score": 59.3
+        },
+        {
+          "id": "wr-49-jayden-reed",
+          "rank": 107,
+          "score": 58.9
+        },
+        {
+          "id": "wr-63-calvin-ridley",
+          "rank": 108,
+          "score": 58.9
+        },
+        {
+          "id": "wr-14-tee-higgins",
+          "rank": 109,
+          "score": 58.8
+        },
+        {
+          "id": "rb-36-blake-corum",
+          "rank": 110,
+          "score": 58.6
+        },
+        {
+          "id": "wr-59-jalen-nailor",
+          "rank": 111,
+          "score": 58.6
+        },
+        {
+          "id": "te-15-chigoziem-okonkwo",
+          "rank": 112,
+          "score": 58
+        },
+        {
+          "id": "rb-49-keaton-mitchell",
+          "rank": 113,
+          "score": 57.9
+        },
+        {
+          "id": "qb-27-sam-darnold",
+          "rank": 114,
+          "score": 57.8
+        },
+        {
+          "id": "rb-41-jcory-cerskey-merritt",
+          "rank": 115,
+          "score": 57.8
+        },
+        {
+          "id": "te-5-george-kittle",
+          "rank": 116,
+          "score": 57.6
+        },
+        {
+          "id": "wr-17-zay-flowers",
+          "rank": 117,
+          "score": 57.3
+        },
+        {
+          "id": "wr-16-jaylen-waddle",
+          "rank": 118,
+          "score": 56.9
+        },
+        {
+          "id": "wr-19-garrett-wilson",
+          "rank": 119,
+          "score": 56.6
+        },
+        {
+          "id": "qb-24-c-j-stroud",
+          "rank": 120,
+          "score": 56.2
+        },
+        {
+          "id": "te-24-kenyon-sadiq",
+          "rank": 121,
+          "score": 55.3
+        },
+        {
+          "id": "wr-31-michael-pittman-jr",
+          "rank": 122,
+          "score": 55.3
+        },
+        {
+          "id": "qb-29-deshaun-watson",
+          "rank": 123,
+          "score": 55.2
+        },
+        {
+          "id": "qb-31-kirk-cousins",
+          "rank": 124,
+          "score": 54.9
+        },
+        {
+          "id": "qb-18-tyler-shough",
+          "rank": 125,
+          "score": 54.6
+        },
+        {
+          "id": "te-11-dalton-kincaid",
+          "rank": 126,
+          "score": 54.5
+        },
+        {
+          "id": "rb-48-george-holani",
+          "rank": 127,
+          "score": 53.7
+        },
+        {
+          "id": "rb-46-woody-marks",
+          "rank": 128,
+          "score": 52.9
+        },
+        {
+          "id": "wr-65-keon-coleman",
+          "rank": 129,
+          "score": 52.7
+        },
+        {
+          "id": "wr-11-chris-olave",
+          "rank": 130,
+          "score": 52.2
+        },
+        {
+          "id": "te-16-greg-dulcich",
+          "rank": 131,
+          "score": 52
+        },
+        {
+          "id": "rb-47-dylan-sampson",
+          "rank": 132,
+          "score": 52
+        },
+        {
+          "id": "wr-51-jayden-higgins",
+          "rank": 133,
+          "score": 51.7
+        },
+        {
+          "id": "qb-21-jordan-love",
+          "rank": 134,
+          "score": 51.1
+        },
+        {
+          "id": "rb-25-rhamondre-stevenson",
+          "rank": 135,
+          "score": 50.4
+        },
+        {
+          "id": "rb-39-kenneth-gainwell",
+          "rank": 136,
+          "score": 49
+        },
+        {
+          "id": "wr-55-antonio-williams",
+          "rank": 137,
+          "score": 49
+        },
+        {
+          "id": "qb-22-cam-ward",
+          "rank": 138,
+          "score": 48.8
+        },
+        {
+          "id": "wr-56-jack-bech",
+          "rank": 139,
+          "score": 48.3
+        },
+        {
+          "id": "te-17-hunter-henry",
+          "rank": 140,
+          "score": 47.7
+        },
+        {
+          "id": "wr-61-zachariah-branch",
+          "rank": 141,
+          "score": 46.3
+        },
+        {
+          "id": "wr-66-denzel-boston",
+          "rank": 142,
+          "score": 45.5
+        },
+        {
+          "id": "wr-28-christian-watson",
+          "rank": 143,
+          "score": 45.3
+        },
+        {
+          "id": "qb-2-drake-maye",
+          "rank": 144,
+          "score": 43.3
+        },
+        {
+          "id": "wr-64-travis-hunter",
+          "rank": 145,
+          "score": 42.5
+        },
+        {
+          "id": "qb-10-trevor-lawrence",
+          "rank": 146,
+          "score": 42.4
+        },
+        {
+          "id": "wr-58-rashid-shaheed",
+          "rank": 147,
+          "score": 41.6
+        },
+        {
+          "id": "wr-22-mike-evans",
+          "rank": 148,
+          "score": 41.2
+        },
+        {
+          "id": "te-8-kyle-pitts",
+          "rank": 149,
+          "score": 40.5
+        },
+        {
+          "id": "te-19-dalton-schultz",
+          "rank": 150,
+          "score": 39.9
+        },
+        {
+          "id": "te-6-tucker-kraft",
+          "rank": 151,
+          "score": 39.8
+        },
+        {
+          "id": "rb-21-david-montgomery",
+          "rank": 152,
+          "score": 39.5
+        },
+        {
+          "id": "rb-30-jonathon-brooks",
+          "rank": 153,
+          "score": 39.4
+        },
+        {
+          "id": "qb-32-fernando-mendoza",
+          "rank": 154,
+          "score": 39.2
+        },
+        {
+          "id": "qb-35-j-j-mccarthy",
+          "rank": 155,
+          "score": 39.2
+        },
+        {
+          "id": "wr-27-rome-odunze",
+          "rank": 156,
+          "score": 38.9
+        },
+        {
+          "id": "qb-34-shedeur-sanders",
+          "rank": 157,
+          "score": 38
+        },
+        {
+          "id": "te-10-sam-laporta",
+          "rank": 158,
+          "score": 35.7
+        },
+        {
+          "id": "wr-50-jalen-coker",
+          "rank": 159,
+          "score": 35.5
+        },
+        {
+          "id": "wr-36-chris-godwin",
+          "rank": 160,
+          "score": 33.2
+        },
+        {
+          "id": "rb-10-kenneth-walker-iii",
+          "rank": 161,
+          "score": 33.1
+        },
+        {
+          "id": "wr-15-george-pickens",
+          "rank": 162,
+          "score": 32.2
+        },
+        {
+          "id": "wr-34-josh-downs",
+          "rank": 163,
+          "score": 32.1
+        },
+        {
+          "id": "wr-60-chris-bell",
+          "rank": 164,
+          "score": 31.5
+        },
+        {
+          "id": "qb-23-jacoby-brissett",
+          "rank": 165,
+          "score": 31.3
+        },
+        {
+          "id": "wr-3-jaxon-smith-njigba",
+          "rank": 166,
+          "score": 31
+        },
+        {
+          "id": "wr-47-khalil-shakir",
+          "rank": 167,
+          "score": 31
+        },
+        {
+          "id": "te-21-jake-ferguson",
+          "rank": 168,
+          "score": 30.4
+        },
+        {
+          "id": "wr-57-tre-tucker",
+          "rank": 169,
+          "score": 28.2
+        },
+        {
+          "id": "te-22-t-j-hockenson",
+          "rank": 170,
+          "score": 27.7
+        },
+        {
+          "id": "wr-53-jordan-addison",
+          "rank": 171,
+          "score": 24.5
+        },
+        {
+          "id": "wr-46-romeo-doubs",
+          "rank": 172,
+          "score": 24.2
+        },
+        {
+          "id": "wr-54-michael-wilson",
+          "rank": 173,
+          "score": 23.6
+        },
+        {
+          "id": "wr-40-wan-dale-robinson",
+          "rank": 174,
+          "score": 23.2
+        },
+        {
+          "id": "wr-43-jameson-williams",
+          "rank": 175,
+          "score": 22.9
+        },
+        {
+          "id": "wr-62-jauan-jennings",
+          "rank": 176,
+          "score": 19
+        }
+      ],
+      "half_ppr": [
+        {
+          "id": "rb-1-bijan-robinson",
+          "rank": 1,
+          "score": 99.9
+        },
+        {
+          "id": "rb-2-jahmyr-gibbs",
+          "rank": 2,
+          "score": 99.9
+        },
+        {
+          "id": "rb-8-jonathan-taylor",
+          "rank": 3,
+          "score": 98
+        },
+        {
+          "id": "rb-13-derrick-henry",
+          "rank": 4,
+          "score": 97.7
+        },
+        {
+          "id": "rb-4-omarion-hampton",
+          "rank": 5,
+          "score": 93.8
+        },
+        {
+          "id": "rb-7-de-von-achane",
+          "rank": 6,
+          "score": 93
+        },
+        {
+          "id": "rb-5-ashton-jeanty",
+          "rank": 7,
+          "score": 92.8
+        },
+        {
+          "id": "rb-12-saquon-barkley",
+          "rank": 8,
+          "score": 92.7
+        },
+        {
+          "id": "rb-31-chuba-hubbard",
+          "rank": 9,
+          "score": 92.5
+        },
+        {
+          "id": "te-3-colston-loveland",
+          "rank": 10,
+          "score": 90.2
+        },
+        {
+          "id": "te-4-tyler-warren",
+          "rank": 11,
+          "score": 88.7
+        },
+        {
+          "id": "rb-20-d-andre-swift",
+          "rank": 12,
+          "score": 86.9
+        },
+        {
+          "id": "rb-18-kyren-williams",
+          "rank": 13,
+          "score": 86.4
+        },
+        {
+          "id": "wr-13-devonta-smith",
+          "rank": 14,
+          "score": 86.1
+        },
+        {
+          "id": "rb-19-breece-hall",
+          "rank": 15,
+          "score": 86.1
+        },
+        {
+          "id": "rb-3-james-cook",
+          "rank": 16,
+          "score": 85.9
+        },
+        {
+          "id": "rb-11-josh-jacobs",
+          "rank": 17,
+          "score": 85.9
+        },
+        {
+          "id": "wr-9-drake-london",
+          "rank": 18,
+          "score": 85.4
+        },
+        {
+          "id": "rb-14-jeremayah-love",
+          "rank": 19,
+          "score": 84
+        },
+        {
+          "id": "rb-35-rico-dowdle",
+          "rank": 20,
+          "score": 83.8
+        },
+        {
+          "id": "te-1-brock-bowers",
+          "rank": 21,
+          "score": 83.7
+        },
+        {
+          "id": "te-2-trey-mcbride",
+          "rank": 22,
+          "score": 83.3
+        },
+        {
+          "id": "rb-27-bucky-irving",
+          "rank": 23,
+          "score": 83.1
+        },
+        {
+          "id": "te-7-harold-fannin",
+          "rank": 24,
+          "score": 81.1
+        },
+        {
+          "id": "rb-9-chase-brown",
+          "rank": 25,
+          "score": 80.6
+        },
+        {
+          "id": "te-14-travis-kelce",
+          "rank": 26,
+          "score": 80.2
+        },
+        {
+          "id": "wr-1-ja-marr-chase",
+          "rank": 27,
+          "score": 80
+        },
+        {
+          "id": "rb-16-cam-skattebo",
+          "rank": 28,
+          "score": 79.1
+        },
+        {
+          "id": "te-13-mark-andrews",
+          "rank": 29,
+          "score": 79
+        },
+        {
+          "id": "wr-18-davante-adams",
+          "rank": 30,
+          "score": 78.2
+        },
+        {
+          "id": "rb-6-christian-mccaffrey",
+          "rank": 31,
+          "score": 77.7
+        },
+        {
+          "id": "rb-15-javonte-williams",
+          "rank": 32,
+          "score": 76.8
+        },
+        {
+          "id": "qb-1-josh-allen",
+          "rank": 33,
+          "score": 76.7
+        },
+        {
+          "id": "wr-7-rashee-rice",
+          "rank": 34,
+          "score": 76.5
+        },
+        {
+          "id": "rb-43-alvin-kamara",
+          "rank": 35,
+          "score": 76.2
+        },
+        {
+          "id": "qb-3-lamar-jackson",
+          "rank": 36,
+          "score": 75.9
+        },
+        {
+          "id": "rb-32-jordan-mason",
+          "rank": 37,
+          "score": 75.5
+        },
+        {
+          "id": "wr-2-puka-nacua",
+          "rank": 38,
+          "score": 75.4
+        },
+        {
+          "id": "rb-23-bhayshul-tuten",
+          "rank": 39,
+          "score": 75.3
+        },
+        {
+          "id": "wr-42-courtland-sutton",
+          "rank": 40,
+          "score": 75.1
+        },
+        {
+          "id": "wr-6-a-j-brown",
+          "rank": 41,
+          "score": 75
+        },
+        {
+          "id": "wr-45-jakobi-meyers",
+          "rank": 42,
+          "score": 75
+        },
+        {
+          "id": "qb-9-justin-herbert",
+          "rank": 43,
+          "score": 74.7
+        },
+        {
+          "id": "wr-37-quentin-johnston",
+          "rank": 44,
+          "score": 74.7
+        },
+        {
+          "id": "qb-11-brock-purdy",
+          "rank": 45,
+          "score": 74.5
+        },
+        {
+          "id": "rb-24-jadarian-price",
+          "rank": 46,
+          "score": 74.3
+        },
+        {
+          "id": "wr-30-dj-moore",
+          "rank": 47,
+          "score": 74.1
+        },
+        {
+          "id": "rb-45-tyjae-spears",
+          "rank": 48,
+          "score": 73.9
+        },
+        {
+          "id": "qb-16-kyler-murray",
+          "rank": 49,
+          "score": 73.5
+        },
+        {
+          "id": "rb-22-quinshon-judkins",
+          "rank": 50,
+          "score": 73.3
+        },
+        {
+          "id": "rb-42-chris-rodriguez",
+          "rank": 51,
+          "score": 73.3
+        },
+        {
+          "id": "wr-29-marvin-harrison-jr",
+          "rank": 52,
+          "score": 73
+        },
+        {
+          "id": "rb-26-treveyon-henderson",
+          "rank": 53,
+          "score": 72.4
+        },
+        {
+          "id": "wr-8-ceedee-lamb",
+          "rank": 54,
+          "score": 72.3
+        },
+        {
+          "id": "wr-12-nico-collins",
+          "rank": 55,
+          "score": 72.3
+        },
+        {
+          "id": "rb-17-travis-etienne-jr",
+          "rank": 56,
+          "score": 72.1
+        },
+        {
+          "id": "wr-21-terry-mclaurin",
+          "rank": 57,
+          "score": 72.1
+        },
+        {
+          "id": "rb-29-jk-dobbins",
+          "rank": 58,
+          "score": 72.1
+        },
+        {
+          "id": "wr-23-malik-nabers",
+          "rank": 59,
+          "score": 71.5
+        },
+        {
+          "id": "qb-15-baker-mayfield",
+          "rank": 60,
+          "score": 71.4
+        },
+        {
+          "id": "rb-33-tony-pollard",
+          "rank": 61,
+          "score": 71.4
+        },
+        {
+          "id": "wr-38-ricky-pearsall",
+          "rank": 62,
+          "score": 71.4
+        },
+        {
+          "id": "wr-24-carnell-tate",
+          "rank": 63,
+          "score": 70.4
+        },
+        {
+          "id": "rb-28-rj-harvey",
+          "rank": 64,
+          "score": 70.4
+        },
+        {
+          "id": "qb-4-joe-burrow",
+          "rank": 65,
+          "score": 70.3
+        },
+        {
+          "id": "qb-13-patrick-mahomes",
+          "rank": 66,
+          "score": 70.2
+        },
+        {
+          "id": "wr-20-tetairoa-mcmillan",
+          "rank": 67,
+          "score": 70.2
+        },
+        {
+          "id": "wr-44-dk-metcalf",
+          "rank": 68,
+          "score": 70
+        },
+        {
+          "id": "wr-25-luther-burden",
+          "rank": 69,
+          "score": 69.7
+        },
+        {
+          "id": "qb-17-bo-nix",
+          "rank": 70,
+          "score": 69.5
+        },
+        {
+          "id": "qb-26-bryce-young",
+          "rank": 71,
+          "score": 69.4
+        },
+        {
+          "id": "wr-39-alec-pierce",
+          "rank": 72,
+          "score": 69.4
+        },
+        {
+          "id": "wr-26-emeka-egbuka",
+          "rank": 73,
+          "score": 69
+        },
+        {
+          "id": "wr-10-ladd-mcconkey",
+          "rank": 74,
+          "score": 68.9
+        },
+        {
+          "id": "wr-4-amon-ra-st-brown",
+          "rank": 75,
+          "score": 68.1
+        },
+        {
+          "id": "te-20-aj-barner",
+          "rank": 76,
+          "score": 67.9
+        },
+        {
+          "id": "qb-30-geno-smith",
+          "rank": 77,
+          "score": 67.9
+        },
+        {
+          "id": "rb-37-aaron-jones",
+          "rank": 78,
+          "score": 67.4
+        },
+        {
+          "id": "te-18-juwan-johnson",
+          "rank": 79,
+          "score": 67.3
+        },
+        {
+          "id": "wr-52-xavier-worthy",
+          "rank": 80,
+          "score": 67
+        },
+        {
+          "id": "qb-8-caleb-williams",
+          "rank": 81,
+          "score": 66.6
+        },
+        {
+          "id": "rb-44-tyrone-tracy-jr",
+          "rank": 82,
+          "score": 66.5
+        },
+        {
+          "id": "rb-50-tyler-allgeier",
+          "rank": 83,
+          "score": 66.3
+        },
+        {
+          "id": "te-12-dallas-goedert",
+          "rank": 84,
+          "score": 66.1
+        },
+        {
+          "id": "wr-5-justin-jefferson",
+          "rank": 85,
+          "score": 66
+        },
+        {
+          "id": "qb-7-dak-prescott",
+          "rank": 86,
+          "score": 65.6
+        },
+        {
+          "id": "wr-41-brian-thomas-jr",
+          "rank": 87,
+          "score": 65.2
+        },
+        {
+          "id": "wr-48-parker-washington",
+          "rank": 88,
+          "score": 65.1
+        },
+        {
+          "id": "te-15-chigoziem-okonkwo",
+          "rank": 89,
+          "score": 64.4
+        },
+        {
+          "id": "wr-33-makai-lemon",
+          "rank": 90,
+          "score": 64.2
+        },
+        {
+          "id": "wr-22-mike-evans",
+          "rank": 91,
+          "score": 64
+        },
+        {
+          "id": "te-10-sam-laporta",
+          "rank": 92,
+          "score": 63.9
+        },
+        {
+          "id": "qb-33-michael-penix-jr",
+          "rank": 93,
+          "score": 63.9
+        },
+        {
+          "id": "te-24-brenton-strange",
+          "rank": 94,
+          "score": 63.2
+        },
+        {
+          "id": "wr-35-kc-concepcion",
+          "rank": 95,
+          "score": 62.8
+        },
+        {
+          "id": "rb-10-kenneth-walker-iii",
+          "rank": 96,
+          "score": 62.5
+        },
+        {
+          "id": "te-9-isaiah-likely",
+          "rank": 97,
+          "score": 62.1
+        },
+        {
+          "id": "qb-14-matthew-stafford",
+          "rank": 98,
+          "score": 62.1
+        },
+        {
+          "id": "wr-14-tee-higgins",
+          "rank": 99,
+          "score": 62
+        },
+        {
+          "id": "wr-32-jordyn-tyson",
+          "rank": 100,
+          "score": 61.9
+        },
+        {
+          "id": "wr-34-josh-downs",
+          "rank": 101,
+          "score": 61.6
+        },
+        {
+          "id": "wr-31-michael-pittman-jr",
+          "rank": 102,
+          "score": 61.5
+        },
+        {
+          "id": "qb-28-tua-tagovailoa",
+          "rank": 103,
+          "score": 61.3
+        },
+        {
+          "id": "qb-12-jaxson-dart",
+          "rank": 104,
+          "score": 60.9
+        },
+        {
+          "id": "wr-16-jaylen-waddle",
+          "rank": 105,
+          "score": 60.8
+        },
+        {
+          "id": "rb-38-kyle-monangai",
+          "rank": 106,
+          "score": 60.7
+        },
+        {
+          "id": "wr-19-garrett-wilson",
+          "rank": 107,
+          "score": 60.4
+        },
+        {
+          "id": "qb-20-jared-goff",
+          "rank": 108,
+          "score": 60.2
+        },
+        {
+          "id": "te-23-terrance-ferguson",
+          "rank": 109,
+          "score": 59.7
+        },
+        {
+          "id": "rb-40-rachaad-white",
+          "rank": 110,
+          "score": 59.5
+        },
+        {
+          "id": "qb-25-daniel-jones",
+          "rank": 111,
+          "score": 59
+        },
+        {
+          "id": "wr-63-calvin-ridley",
+          "rank": 112,
+          "score": 58.9
+        },
+        {
+          "id": "wr-59-jalen-nailor",
+          "rank": 113,
+          "score": 58.6
+        },
+        {
+          "id": "rb-41-jcory-cerskey-merritt",
+          "rank": 114,
+          "score": 57.8
+        },
+        {
+          "id": "qb-19-malik-willis",
+          "rank": 115,
+          "score": 57.7
+        },
+        {
+          "id": "wr-49-jayden-reed",
+          "rank": 116,
+          "score": 57.5
+        },
+        {
+          "id": "qb-6-jalen-hurts",
+          "rank": 117,
+          "score": 57.1
+        },
+        {
+          "id": "rb-34-jaylen-warren",
+          "rank": 118,
+          "score": 57.1
+        },
+        {
+          "id": "qb-5-jayden-daniels",
+          "rank": 119,
+          "score": 56.8
+        },
+        {
+          "id": "wr-36-chris-godwin",
+          "rank": 120,
+          "score": 56.8
+        },
+        {
+          "id": "rb-21-david-montgomery",
+          "rank": 121,
+          "score": 56.6
+        },
+        {
+          "id": "te-5-george-kittle",
+          "rank": 122,
+          "score": 56.5
+        },
+        {
+          "id": "wr-50-jalen-coker",
+          "rank": 123,
+          "score": 55.4
+        },
+        {
+          "id": "te-6-tucker-kraft",
+          "rank": 124,
+          "score": 55.3
+        },
+        {
+          "id": "te-24-kenyon-sadiq",
+          "rank": 125,
+          "score": 55.3
+        },
+        {
+          "id": "qb-27-sam-darnold",
+          "rank": 126,
+          "score": 55.3
+        },
+        {
+          "id": "qb-18-tyler-shough",
+          "rank": 127,
+          "score": 54.6
+        },
+        {
+          "id": "te-11-dalton-kincaid",
+          "rank": 128,
+          "score": 54.3
+        },
+        {
+          "id": "rb-36-blake-corum",
+          "rank": 129,
+          "score": 53.6
+        },
+        {
+          "id": "qb-24-c-j-stroud",
+          "rank": 130,
+          "score": 53.3
+        },
+        {
+          "id": "rb-46-woody-marks",
+          "rank": 131,
+          "score": 52.9
+        },
+        {
+          "id": "wr-17-zay-flowers",
+          "rank": 132,
+          "score": 52.8
+        },
+        {
+          "id": "qb-29-deshaun-watson",
+          "rank": 133,
+          "score": 52.7
+        },
+        {
+          "id": "qb-31-kirk-cousins",
+          "rank": 134,
+          "score": 52
+        },
+        {
+          "id": "rb-47-dylan-sampson",
+          "rank": 135,
+          "score": 52
+        },
+        {
+          "id": "wr-51-jayden-higgins",
+          "rank": 136,
+          "score": 51.7
+        },
+        {
+          "id": "wr-46-romeo-doubs",
+          "rank": 137,
+          "score": 51.6
+        },
+        {
+          "id": "te-19-dalton-schultz",
+          "rank": 138,
+          "score": 51.3
+        },
+        {
+          "id": "wr-65-keon-coleman",
+          "rank": 139,
+          "score": 51.1
+        },
+        {
+          "id": "rb-39-kenneth-gainwell",
+          "rank": 140,
+          "score": 49.5
+        },
+        {
+          "id": "wr-55-antonio-williams",
+          "rank": 141,
+          "score": 49
+        },
+        {
+          "id": "qb-22-cam-ward",
+          "rank": 142,
+          "score": 48.8
+        },
+        {
+          "id": "rb-49-keaton-mitchell",
+          "rank": 143,
+          "score": 48.8
+        },
+        {
+          "id": "wr-56-jack-bech",
+          "rank": 144,
+          "score": 48.3
+        },
+        {
+          "id": "wr-11-chris-olave",
+          "rank": 145,
+          "score": 47.9
+        },
+        {
+          "id": "te-8-kyle-pitts",
+          "rank": 146,
+          "score": 47.6
+        },
+        {
+          "id": "qb-21-jordan-love",
+          "rank": 147,
+          "score": 46.8
+        },
+        {
+          "id": "wr-61-zachariah-branch",
+          "rank": 148,
+          "score": 46.3
+        },
+        {
+          "id": "wr-66-denzel-boston",
+          "rank": 149,
+          "score": 45.5
+        },
+        {
+          "id": "rb-48-george-holani",
+          "rank": 150,
+          "score": 44.6
+        },
+        {
+          "id": "wr-27-rome-odunze",
+          "rank": 151,
+          "score": 44.2
+        },
+        {
+          "id": "wr-62-jauan-jennings",
+          "rank": 152,
+          "score": 43.5
+        },
+        {
+          "id": "wr-47-khalil-shakir",
+          "rank": 153,
+          "score": 42.5
+        },
+        {
+          "id": "wr-64-travis-hunter",
+          "rank": 154,
+          "score": 42.5
+        },
+        {
+          "id": "te-16-greg-dulcich",
+          "rank": 155,
+          "score": 41.1
+        },
+        {
+          "id": "wr-57-tre-tucker",
+          "rank": 156,
+          "score": 40.4
+        },
+        {
+          "id": "wr-54-michael-wilson",
+          "rank": 157,
+          "score": 40.2
+        },
+        {
+          "id": "qb-32-fernando-mendoza",
+          "rank": 158,
+          "score": 39.2
+        },
+        {
+          "id": "qb-35-j-j-mccarthy",
+          "rank": 159,
+          "score": 39.2
+        },
+        {
+          "id": "rb-25-rhamondre-stevenson",
+          "rank": 160,
+          "score": 38.9
+        },
+        {
+          "id": "qb-34-shedeur-sanders",
+          "rank": 161,
+          "score": 38
+        },
+        {
+          "id": "te-21-jake-ferguson",
+          "rank": 162,
+          "score": 37.8
+        },
+        {
+          "id": "wr-58-rashid-shaheed",
+          "rank": 163,
+          "score": 37.3
+        },
+        {
+          "id": "wr-43-jameson-williams",
+          "rank": 164,
+          "score": 37.2
+        },
+        {
+          "id": "te-17-hunter-henry",
+          "rank": 165,
+          "score": 36.8
+        },
+        {
+          "id": "wr-28-christian-watson",
+          "rank": 166,
+          "score": 35.2
+        },
+        {
+          "id": "qb-2-drake-maye",
+          "rank": 167,
+          "score": 34.6
+        },
+        {
+          "id": "qb-10-trevor-lawrence",
+          "rank": 168,
+          "score": 34
+        },
+        {
+          "id": "wr-60-chris-bell",
+          "rank": 169,
+          "score": 31.5
+        },
+        {
+          "id": "wr-3-jaxon-smith-njigba",
+          "rank": 170,
+          "score": 31.1
+        },
+        {
+          "id": "wr-15-george-pickens",
+          "rank": 171,
+          "score": 29.3
+        },
+        {
+          "id": "rb-30-jonathon-brooks",
+          "rank": 172,
+          "score": 28.8
+        },
+        {
+          "id": "te-22-t-j-hockenson",
+          "rank": 173,
+          "score": 27.8
+        },
+        {
+          "id": "wr-40-wan-dale-robinson",
+          "rank": 174,
+          "score": 23.7
+        },
+        {
+          "id": "qb-23-jacoby-brissett",
+          "rank": 175,
+          "score": 22.5
+        },
+        {
+          "id": "wr-53-jordan-addison",
+          "rank": 176,
+          "score": 21.6
+        }
+      ],
+      "ppr": [
+        {
+          "id": "rb-1-bijan-robinson",
+          "rank": 1,
+          "score": 99.9
+        },
+        {
+          "id": "rb-2-jahmyr-gibbs",
+          "rank": 2,
+          "score": 99.9
+        },
+        {
+          "id": "rb-8-jonathan-taylor",
+          "rank": 3,
+          "score": 98
+        },
+        {
+          "id": "rb-13-derrick-henry",
+          "rank": 4,
+          "score": 97.7
+        },
+        {
+          "id": "rb-4-omarion-hampton",
+          "rank": 5,
+          "score": 93.8
+        },
+        {
+          "id": "rb-5-ashton-jeanty",
+          "rank": 6,
+          "score": 92.8
+        },
+        {
+          "id": "rb-31-chuba-hubbard",
+          "rank": 7,
+          "score": 92.6
+        },
+        {
+          "id": "rb-12-saquon-barkley",
+          "rank": 8,
+          "score": 92.3
+        },
+        {
+          "id": "rb-7-de-von-achane",
+          "rank": 9,
+          "score": 92
+        },
+        {
+          "id": "te-3-colston-loveland",
+          "rank": 10,
+          "score": 90.2
+        },
+        {
+          "id": "te-4-tyler-warren",
+          "rank": 11,
+          "score": 88.7
+        },
+        {
+          "id": "wr-13-devonta-smith",
+          "rank": 12,
+          "score": 86.8
+        },
+        {
+          "id": "te-2-trey-mcbride",
+          "rank": 13,
+          "score": 86.5
+        },
+        {
+          "id": "rb-18-kyren-williams",
+          "rank": 14,
+          "score": 86.3
+        },
+        {
+          "id": "rb-19-breece-hall",
+          "rank": 15,
+          "score": 86.1
+        },
+        {
+          "id": "wr-9-drake-london",
+          "rank": 16,
+          "score": 86
+        },
+        {
+          "id": "rb-20-d-andre-swift",
+          "rank": 17,
+          "score": 84.7
+        },
+        {
+          "id": "wr-1-ja-marr-chase",
+          "rank": 18,
+          "score": 84.1
+        },
+        {
+          "id": "te-1-brock-bowers",
+          "rank": 19,
+          "score": 84
+        },
+        {
+          "id": "rb-14-jeremayah-love",
+          "rank": 20,
+          "score": 84
+        },
+        {
+          "id": "rb-11-josh-jacobs",
+          "rank": 21,
+          "score": 83.6
+        },
+        {
+          "id": "te-14-travis-kelce",
+          "rank": 22,
+          "score": 83.6
+        },
+        {
+          "id": "rb-35-rico-dowdle",
+          "rank": 23,
+          "score": 83
+        },
+        {
+          "id": "rb-3-james-cook",
+          "rank": 24,
+          "score": 82.4
+        },
+        {
+          "id": "rb-27-bucky-irving",
+          "rank": 25,
+          "score": 82.3
+        },
+        {
+          "id": "rb-9-chase-brown",
+          "rank": 26,
+          "score": 81.3
+        },
+        {
+          "id": "wr-7-rashee-rice",
+          "rank": 27,
+          "score": 81.2
+        },
+        {
+          "id": "te-7-harold-fannin",
+          "rank": 28,
+          "score": 81.1
+        },
+        {
+          "id": "wr-2-puka-nacua",
+          "rank": 29,
+          "score": 80.9
+        },
+        {
+          "id": "wr-18-davante-adams",
+          "rank": 30,
+          "score": 79.9
+        },
+        {
+          "id": "te-13-mark-andrews",
+          "rank": 31,
+          "score": 79.6
+        },
+        {
+          "id": "wr-37-quentin-johnston",
+          "rank": 32,
+          "score": 79.4
+        },
+        {
+          "id": "rb-16-cam-skattebo",
+          "rank": 33,
+          "score": 79.1
+        },
+        {
+          "id": "wr-30-dj-moore",
+          "rank": 34,
+          "score": 77.7
+        },
+        {
+          "id": "wr-45-jakobi-meyers",
+          "rank": 35,
+          "score": 77.6
+        },
+        {
+          "id": "rb-43-alvin-kamara",
+          "rank": 36,
+          "score": 77.1
+        },
+        {
+          "id": "rb-15-javonte-williams",
+          "rank": 37,
+          "score": 76.9
+        },
+        {
+          "id": "rb-6-christian-mccaffrey",
+          "rank": 38,
+          "score": 76.6
+        },
+        {
+          "id": "qb-1-josh-allen",
+          "rank": 39,
+          "score": 76.5
+        },
+        {
+          "id": "wr-21-terry-mclaurin",
+          "rank": 40,
+          "score": 75.9
+        },
+        {
+          "id": "wr-42-courtland-sutton",
+          "rank": 41,
+          "score": 75.9
+        },
+        {
+          "id": "qb-3-lamar-jackson",
+          "rank": 42,
+          "score": 75.8
+        },
+        {
+          "id": "wr-8-ceedee-lamb",
+          "rank": 43,
+          "score": 75.7
+        },
+        {
+          "id": "rb-23-bhayshul-tuten",
+          "rank": 44,
+          "score": 75.3
+        },
+        {
+          "id": "wr-6-a-j-brown",
+          "rank": 45,
+          "score": 74.6
+        },
+        {
+          "id": "qb-9-justin-herbert",
+          "rank": 46,
+          "score": 74.5
+        },
+        {
+          "id": "qb-11-brock-purdy",
+          "rank": 47,
+          "score": 74.4
+        },
+        {
+          "id": "wr-29-marvin-harrison-jr",
+          "rank": 48,
+          "score": 74.4
+        },
+        {
+          "id": "rb-24-jadarian-price",
+          "rank": 49,
+          "score": 74.3
+        },
+        {
+          "id": "wr-12-nico-collins",
+          "rank": 50,
+          "score": 73.8
+        },
+        {
+          "id": "wr-38-ricky-pearsall",
+          "rank": 51,
+          "score": 73.5
+        },
+        {
+          "id": "qb-16-kyler-murray",
+          "rank": 52,
+          "score": 73.4
+        },
+        {
+          "id": "rb-45-tyjae-spears",
+          "rank": 53,
+          "score": 73.4
+        },
+        {
+          "id": "rb-22-quinshon-judkins",
+          "rank": 54,
+          "score": 73.3
+        },
+        {
+          "id": "rb-10-kenneth-walker-iii",
+          "rank": 55,
+          "score": 72.8
+        },
+        {
+          "id": "wr-23-malik-nabers",
+          "rank": 56,
+          "score": 72.8
+        },
+        {
+          "id": "rb-26-treveyon-henderson",
+          "rank": 57,
+          "score": 72.4
+        },
+        {
+          "id": "rb-29-jk-dobbins",
+          "rank": 58,
+          "score": 72.2
+        },
+        {
+          "id": "rb-32-jordan-mason",
+          "rank": 59,
+          "score": 72
+        },
+        {
+          "id": "wr-4-amon-ra-st-brown",
+          "rank": 60,
+          "score": 71.4
+        },
+        {
+          "id": "rb-17-travis-etienne-jr",
+          "rank": 61,
+          "score": 71.1
+        },
+        {
+          "id": "qb-15-baker-mayfield",
+          "rank": 62,
+          "score": 71
+        },
+        {
+          "id": "rb-42-chris-rodriguez",
+          "rank": 63,
+          "score": 70.9
+        },
+        {
+          "id": "te-18-juwan-johnson",
+          "rank": 64,
+          "score": 70.7
+        },
+        {
+          "id": "wr-10-ladd-mcconkey",
+          "rank": 65,
+          "score": 70.6
+        },
+        {
+          "id": "wr-24-carnell-tate",
+          "rank": 66,
+          "score": 70.4
+        },
+        {
+          "id": "rb-28-rj-harvey",
+          "rank": 67,
+          "score": 70.4
+        },
+        {
+          "id": "wr-20-tetairoa-mcmillan",
+          "rank": 68,
+          "score": 70.2
+        },
+        {
+          "id": "qb-13-patrick-mahomes",
+          "rank": 69,
+          "score": 70.1
+        },
+        {
+          "id": "wr-52-xavier-worthy",
+          "rank": 70,
+          "score": 70.1
+        },
+        {
+          "id": "te-10-sam-laporta",
+          "rank": 71,
+          "score": 70
+        },
+        {
+          "id": "wr-22-mike-evans",
+          "rank": 72,
+          "score": 70
+        },
+        {
+          "id": "rb-37-aaron-jones",
+          "rank": 73,
+          "score": 69.9
+        },
+        {
+          "id": "te-20-aj-barner",
+          "rank": 74,
+          "score": 69.7
+        },
+        {
+          "id": "wr-25-luther-burden",
+          "rank": 75,
+          "score": 69.7
+        },
+        {
+          "id": "wr-44-dk-metcalf",
+          "rank": 76,
+          "score": 69.7
+        },
+        {
+          "id": "qb-17-bo-nix",
+          "rank": 77,
+          "score": 69.4
+        },
+        {
+          "id": "qb-26-bryce-young",
+          "rank": 78,
+          "score": 69.4
+        },
+        {
+          "id": "wr-26-emeka-egbuka",
+          "rank": 79,
+          "score": 69
+        },
+        {
+          "id": "qb-4-joe-burrow",
+          "rank": 80,
+          "score": 68.7
+        },
+        {
+          "id": "wr-41-brian-thomas-jr",
+          "rank": 81,
+          "score": 68.6
+        },
+        {
+          "id": "wr-34-josh-downs",
+          "rank": 82,
+          "score": 68.5
+        },
+        {
+          "id": "wr-39-alec-pierce",
+          "rank": 83,
+          "score": 68.5
+        },
+        {
+          "id": "qb-30-geno-smith",
+          "rank": 84,
+          "score": 67.8
+        },
+        {
+          "id": "rb-33-tony-pollard",
+          "rank": 85,
+          "score": 67.3
+        },
+        {
+          "id": "te-12-dallas-goedert",
+          "rank": 86,
+          "score": 66.8
+        },
+        {
+          "id": "te-15-chigoziem-okonkwo",
+          "rank": 87,
+          "score": 66.4
+        },
+        {
+          "id": "wr-5-justin-jefferson",
+          "rank": 88,
+          "score": 65.4
+        },
+        {
+          "id": "rb-44-tyrone-tracy-jr",
+          "rank": 89,
+          "score": 65.4
+        },
+        {
+          "id": "rb-50-tyler-allgeier",
+          "rank": 90,
+          "score": 65.2
+        },
+        {
+          "id": "wr-31-michael-pittman-jr",
+          "rank": 91,
+          "score": 64.9
+        },
+        {
+          "id": "qb-8-caleb-williams",
+          "rank": 92,
+          "score": 64.4
+        },
+        {
+          "id": "wr-33-makai-lemon",
+          "rank": 93,
+          "score": 64.2
+        },
+        {
+          "id": "wr-48-parker-washington",
+          "rank": 94,
+          "score": 64
+        },
+        {
+          "id": "qb-7-dak-prescott",
+          "rank": 95,
+          "score": 63.8
+        },
+        {
+          "id": "te-24-brenton-strange",
+          "rank": 96,
+          "score": 63.8
+        },
+        {
+          "id": "qb-33-michael-penix-jr",
+          "rank": 97,
+          "score": 63.8
+        },
+        {
+          "id": "wr-14-tee-higgins",
+          "rank": 98,
+          "score": 63.3
+        },
+        {
+          "id": "wr-35-kc-concepcion",
+          "rank": 99,
+          "score": 62.8
+        },
+        {
+          "id": "te-9-isaiah-likely",
+          "rank": 100,
+          "score": 62.6
+        },
+        {
+          "id": "wr-16-jaylen-waddle",
+          "rank": 101,
+          "score": 62
+        },
+        {
+          "id": "wr-36-chris-godwin",
+          "rank": 102,
+          "score": 62
+        },
+        {
+          "id": "wr-32-jordyn-tyson",
+          "rank": 103,
+          "score": 61.9
+        },
+        {
+          "id": "wr-19-garrett-wilson",
+          "rank": 104,
+          "score": 61.6
+        },
+        {
+          "id": "rb-21-david-montgomery",
+          "rank": 105,
+          "score": 61.6
+        },
+        {
+          "id": "qb-12-jaxson-dart",
+          "rank": 106,
+          "score": 60.9
+        },
+        {
+          "id": "rb-38-kyle-monangai",
+          "rank": 107,
+          "score": 60.7
+        },
+        {
+          "id": "wr-50-jalen-coker",
+          "rank": 108,
+          "score": 60.3
+        },
+        {
+          "id": "te-6-tucker-kraft",
+          "rank": 109,
+          "score": 60.2
+        },
+        {
+          "id": "te-23-terrance-ferguson",
+          "rank": 110,
+          "score": 59.7
+        },
+        {
+          "id": "qb-28-tua-tagovailoa",
+          "rank": 111,
+          "score": 59.6
+        },
+        {
+          "id": "qb-14-matthew-stafford",
+          "rank": 112,
+          "score": 59.5
+        },
+        {
+          "id": "wr-63-calvin-ridley",
+          "rank": 113,
+          "score": 59.2
+        },
+        {
+          "id": "wr-59-jalen-nailor",
+          "rank": 114,
+          "score": 58.2
+        },
+        {
+          "id": "rb-41-jcory-cerskey-merritt",
+          "rank": 115,
+          "score": 57.8
+        },
+        {
+          "id": "wr-46-romeo-doubs",
+          "rank": 116,
+          "score": 57.8
+        },
+        {
+          "id": "qb-20-jared-goff",
+          "rank": 117,
+          "score": 57.6
+        },
+        {
+          "id": "qb-25-daniel-jones",
+          "rank": 118,
+          "score": 57.2
+        },
+        {
+          "id": "te-5-george-kittle",
+          "rank": 119,
+          "score": 56.3
+        },
+        {
+          "id": "rb-40-rachaad-white",
+          "rank": 120,
+          "score": 55.7
+        },
+        {
+          "id": "wr-49-jayden-reed",
+          "rank": 121,
+          "score": 55.5
+        },
+        {
+          "id": "te-24-kenyon-sadiq",
+          "rank": 122,
+          "score": 55.3
+        },
+        {
+          "id": "wr-40-wan-dale-robinson",
+          "rank": 123,
+          "score": 55.1
+        },
+        {
+          "id": "te-11-dalton-kincaid",
+          "rank": 124,
+          "score": 54.9
+        },
+        {
+          "id": "qb-18-tyler-shough",
+          "rank": 125,
+          "score": 54.6
+        },
+        {
+          "id": "qb-19-malik-willis",
+          "rank": 126,
+          "score": 54.3
+        },
+        {
+          "id": "te-19-dalton-schultz",
+          "rank": 127,
+          "score": 53.9
+        },
+        {
+          "id": "qb-6-jalen-hurts",
+          "rank": 128,
+          "score": 52.9
+        },
+        {
+          "id": "rb-46-woody-marks",
+          "rank": 129,
+          "score": 52.9
+        },
+        {
+          "id": "qb-5-jayden-daniels",
+          "rank": 130,
+          "score": 52.6
+        },
+        {
+          "id": "qb-27-sam-darnold",
+          "rank": 131,
+          "score": 52.5
+        },
+        {
+          "id": "wr-62-jauan-jennings",
+          "rank": 132,
+          "score": 52.3
+        },
+        {
+          "id": "rb-47-dylan-sampson",
+          "rank": 133,
+          "score": 52
+        },
+        {
+          "id": "wr-51-jayden-higgins",
+          "rank": 134,
+          "score": 51.7
+        },
+        {
+          "id": "wr-43-jameson-williams",
+          "rank": 135,
+          "score": 51.2
+        },
+        {
+          "id": "rb-36-blake-corum",
+          "rank": 136,
+          "score": 50.3
+        },
+        {
+          "id": "te-8-kyle-pitts",
+          "rank": 137,
+          "score": 50.2
+        },
+        {
+          "id": "rb-34-jaylen-warren",
+          "rank": 138,
+          "score": 50.1
+        },
+        {
+          "id": "rb-39-kenneth-gainwell",
+          "rank": 139,
+          "score": 50.1
+        },
+        {
+          "id": "wr-17-zay-flowers",
+          "rank": 140,
+          "score": 49.9
+        },
+        {
+          "id": "qb-24-c-j-stroud",
+          "rank": 141,
+          "score": 49.9
+        },
+        {
+          "id": "wr-65-keon-coleman",
+          "rank": 142,
+          "score": 49.2
+        },
+        {
+          "id": "qb-29-deshaun-watson",
+          "rank": 143,
+          "score": 49.1
+        },
+        {
+          "id": "wr-55-antonio-williams",
+          "rank": 144,
+          "score": 49
+        },
+        {
+          "id": "qb-22-cam-ward",
+          "rank": 145,
+          "score": 48.8
+        },
+        {
+          "id": "qb-31-kirk-cousins",
+          "rank": 146,
+          "score": 48.8
+        },
+        {
+          "id": "wr-56-jack-bech",
+          "rank": 147,
+          "score": 48.3
+        },
+        {
+          "id": "wr-3-jaxon-smith-njigba",
+          "rank": 148,
+          "score": 46.7
+        },
+        {
+          "id": "wr-54-michael-wilson",
+          "rank": 149,
+          "score": 46.7
+        },
+        {
+          "id": "wr-61-zachariah-branch",
+          "rank": 150,
+          "score": 46.3
+        },
+        {
+          "id": "wr-27-rome-odunze",
+          "rank": 151,
+          "score": 46.1
+        },
+        {
+          "id": "wr-47-khalil-shakir",
+          "rank": 152,
+          "score": 46.1
+        },
+        {
+          "id": "wr-11-chris-olave",
+          "rank": 153,
+          "score": 45.9
+        },
+        {
+          "id": "wr-66-denzel-boston",
+          "rank": 154,
+          "score": 45.5
+        },
+        {
+          "id": "wr-57-tre-tucker",
+          "rank": 155,
+          "score": 45.2
+        },
+        {
+          "id": "wr-64-travis-hunter",
+          "rank": 156,
+          "score": 42.5
+        },
+        {
+          "id": "te-21-jake-ferguson",
+          "rank": 157,
+          "score": 41.8
+        },
+        {
+          "id": "qb-21-jordan-love",
+          "rank": 158,
+          "score": 41.6
+        },
+        {
+          "id": "rb-49-keaton-mitchell",
+          "rank": 159,
+          "score": 41.5
+        },
+        {
+          "id": "qb-32-fernando-mendoza",
+          "rank": 160,
+          "score": 39.2
+        },
+        {
+          "id": "qb-35-j-j-mccarthy",
+          "rank": 161,
+          "score": 39.2
+        },
+        {
+          "id": "te-22-t-j-hockenson",
+          "rank": 162,
+          "score": 38
+        },
+        {
+          "id": "qb-34-shedeur-sanders",
+          "rank": 163,
+          "score": 38
+        },
+        {
+          "id": "rb-48-george-holani",
+          "rank": 164,
+          "score": 37.3
+        },
+        {
+          "id": "te-16-greg-dulcich",
+          "rank": 165,
+          "score": 36.7
+        },
+        {
+          "id": "wr-58-rashid-shaheed",
+          "rank": 166,
+          "score": 35.4
+        },
+        {
+          "id": "rb-25-rhamondre-stevenson",
+          "rank": 167,
+          "score": 34.3
+        },
+        {
+          "id": "wr-15-george-pickens",
+          "rank": 168,
+          "score": 33.7
+        },
+        {
+          "id": "te-17-hunter-henry",
+          "rank": 169,
+          "score": 32.3
+        },
+        {
+          "id": "wr-60-chris-bell",
+          "rank": 170,
+          "score": 31.5
+        },
+        {
+          "id": "qb-2-drake-maye",
+          "rank": 171,
+          "score": 31.1
+        },
+        {
+          "id": "wr-28-christian-watson",
+          "rank": 172,
+          "score": 31.1
+        },
+        {
+          "id": "qb-10-trevor-lawrence",
+          "rank": 173,
+          "score": 29.3
+        },
+        {
+          "id": "rb-30-jonathon-brooks",
+          "rank": 174,
+          "score": 26.9
+        },
+        {
+          "id": "wr-53-jordan-addison",
+          "rank": 175,
+          "score": 26
+        },
+        {
+          "id": "qb-23-jacoby-brissett",
+          "rank": 176,
+          "score": 19.8
+        }
+      ]
+    }
+  }
+]

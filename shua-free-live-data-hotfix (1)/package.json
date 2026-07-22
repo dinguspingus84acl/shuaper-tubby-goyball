@@ -1,0 +1,8 @@
+{
+  "name": "shua-fantasy-rankings",
+  "private": true,
+  "version": "3.0.0",
+  "scripts": {
+    "update-rankings": "node scripts/update-rankings.cjs"
+  }
+}

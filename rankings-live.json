@@ -1,7 +1,7 @@
 {
   "generatedAt": "2026-07-22T21:39:22.821058+00:00",
-  "status": "baseline",
-  "message": "Baseline rankings are active. Configure live data credentials and run the updater to enable live projections, market, trend, and injury inputs.",
+  "status": "ready-for-free-refresh",
+  "message": "No credentials are required. Run the GitHub Action \u201cLoad Today's Free NFL Data\u201d once to import current Sleeper data and the latest nflverse season statistics.",
   "formats": {
     "standard": [
       {
@@ -126,7 +126,7 @@
       },
       {
         "id": "rb-7-de-von-achane",
-        "name": "De’Von Achane",
+        "name": "De\u2019Von Achane",
         "team": "MIA",
         "position": "RB",
         "positionRank": 7,
@@ -606,7 +606,7 @@
       },
       {
         "id": "rb-20-d-andre-swift",
-        "name": "D’Andre Swift",
+        "name": "D\u2019Andre Swift",
         "team": "CHI",
         "position": "RB",
         "positionRank": 20,
@@ -2526,7 +2526,7 @@
       },
       {
         "id": "wr-40-wan-dale-robinson",
-        "name": "Wan’Dale Robinson",
+        "name": "Wan\u2019Dale Robinson",
         "team": "TEN",
         "position": "WR",
         "positionRank": 40,
@@ -3648,7 +3648,7 @@
       },
       {
         "id": "rb-7-de-von-achane",
-        "name": "De’Von Achane",
+        "name": "De\u2019Von Achane",
         "team": "MIA",
         "position": "RB",
         "positionRank": 7,
@@ -4288,7 +4288,7 @@
       },
       {
         "id": "rb-20-d-andre-swift",
-        "name": "D’Andre Swift",
+        "name": "D\u2019Andre Swift",
         "team": "CHI",
         "position": "RB",
         "positionRank": 20,
@@ -5908,7 +5908,7 @@
       },
       {
         "id": "wr-40-wan-dale-robinson",
-        "name": "Wan’Dale Robinson",
+        "name": "Wan\u2019Dale Robinson",
         "team": "TEN",
         "position": "WR",
         "positionRank": 40,
@@ -7350,7 +7350,7 @@
       },
       {
         "id": "rb-7-de-von-achane",
-        "name": "De’Von Achane",
+        "name": "De\u2019Von Achane",
         "team": "MIA",
         "position": "RB",
         "positionRank": 7,
@@ -8050,7 +8050,7 @@
       },
       {
         "id": "rb-20-d-andre-swift",
-        "name": "D’Andre Swift",
+        "name": "D\u2019Andre Swift",
         "team": "CHI",
         "position": "RB",
         "positionRank": 20,
@@ -9230,7 +9230,7 @@
       },
       {
         "id": "wr-40-wan-dale-robinson",
-        "name": "Wan’Dale Robinson",
+        "name": "Wan\u2019Dale Robinson",
         "team": "TEN",
         "position": "WR",
         "positionRank": 40,

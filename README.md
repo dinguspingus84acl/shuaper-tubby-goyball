@@ -1,58 +1,22 @@
-# SHUA Live Fantasy Ranking Engine
+# Immediate free-data deployment
 
-## Dashboard formats
-The dashboard includes:
-- Standard
+No API keys or credentials are needed.
+
+## Get today's available data into the site
+
+1. Upload/replace these files in the repository.
+2. Go to **Settings → Actions → General → Workflow permissions**.
+3. Select **Read and write permissions** and save.
+4. Go to **Actions → Load Today's Free NFL Data → Run workflow**.
+5. Wait about 1–3 minutes and refresh the site.
+
+The workflow imports:
+- Current Sleeper teams, roster statuses, injury labels, and 72-hour adds/drops.
+- The latest completed-season player production from nflverse.
+
+Because it is July 2026, there are no 2026 regular-season game statistics yet. The production component will use the latest published completed season, while Sleeper roster/status/trend fields are current.
+
+Formats included:
+- Standard (default)
 - Half PPR
 - Full PPR
-
-Each format has its own overall score, overall order, position filters, movement, and player score breakdown.
-
-## Current state
-`rankings-live.json` initially contains deterministic baseline model results derived from the supplied SHUA position rankings. Those results are visibly labeled `baseline`.
-
-The updater immediately adds free live Sleeper status/team/trending data. A licensed projection/consensus JSON feed is required for a complete live model.
-
-## Run locally
-A web server is required because the dashboard loads JSON:
-
-```bash
-python3 -m http.server 8000
-```
-
-Open `http://localhost:8000`.
-
-Refresh rankings:
-
-```bash
-npm run update-rankings
-```
-
-## Projection feed contract
-Set `PROJECTION_FEED_URL` to an endpoint returning an array, or `{ "players": [...] }`.
-
-Supported fields:
-
-```json
-{
-  "name": "Player Name",
-  "team": "BUF",
-  "position": "QB",
-  "projected_standard": 300.2,
-  "projected_half_ppr": 300.2,
-  "projected_ppr": 300.2,
-  "consensus_rank": 4,
-  "injury_status": "Questionable"
-}
-```
-
-## Automatic refresh
-The included GitHub Actions workflow runs every three days and commits:
-- `rankings-live.json`
-- `ranking-history.json`
-
-Add these repository secrets:
-- `PROJECTION_FEED_URL`
-- `PROJECTION_FEED_API_KEY`
-
-The second secret is optional when the feed does not require authorization.

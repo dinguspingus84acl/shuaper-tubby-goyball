@@ -70,7 +70,10 @@ async function main(){
   ]);
   const allStats=csvParse(csv).filter(r=>["REG","POST",""].includes(r.season_type||""));
   const seasons=allStats.map(r=>num(r.season)).filter(Boolean);
-  const latestSeason=Math.max(...seasons);
+  let latestSeason=0;
+  for (const season of seasons) {
+    if (season > latestSeason) latestSeason = season;
+  }
   const stats=allStats.filter(r=>num(r.season)===latestSeason && (r.season_type==="REG"||!r.season_type));
   const statsByName=new Map(stats.map(r=>[norm(r.player_display_name||r.player_name),r]));
   const sleeperByName=new Map();

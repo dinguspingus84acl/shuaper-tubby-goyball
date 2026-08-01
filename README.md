@@ -20,3 +20,16 @@ Formats included:
 - Standard (default)
 - Half PPR
 - Full PPR
+
+
+## Update your personal Big Board
+
+Open `big-board.json` in GitHub and click the pencil icon.
+
+Keep the player names in the `players` array and rearrange them into your desired order. The first name is rank 1.
+
+After committing:
+1. Go to **Actions**.
+2. Run **Load Today's Free NFL Data**.
+3. Your exact order appears under **My Big Board**.
+4. The algorithm also uses your board as its editorial ranking input.

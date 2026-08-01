@@ -12,6 +12,7 @@ const ROOT=path.resolve(__dirname,"..");
 const PLAYERS=path.join(ROOT,"players.json");
 const OUTPUT=path.join(ROOT,"rankings-live.json");
 const HISTORY=path.join(ROOT,"ranking-history.json");
+const BIG_BOARD=path.join(ROOT,"big-board.json");
 
 const FORMATS=["standard","half_ppr","ppr"];
 const REPLACEMENT={QB:18,RB:36,WR:48,TE:18};
@@ -48,7 +49,12 @@ function fantasy(row,fmt){
   const misc=num(row.fantasy_points)-num(row.fantasy_points_ppr); // harmless fallback, generally 0
   return pass+rush+rec+catches+misc;
 }
-function baseline(p){
+function baseline(p,userRank=null){
+  if(userRank){
+    const boardSize=45;
+    const strength=clamp((boardSize+8-userRank)/(boardSize+7),0,1);
+    return clamp(56+42*strength,1,99);
+  }
   const rep=REPLACEMENT[p.position],strength=clamp((rep+12-p.positionRank)/(rep+11),0,1);
   return clamp(44+48*strength,1,99);
 }
@@ -61,6 +67,9 @@ function injuryPenalty(status=""){
 }
 async function main(){
   const board=JSON.parse(await fs.readFile(PLAYERS,"utf8"));
+  let bigBoard={players:[]};
+  try { bigBoard=JSON.parse(await fs.readFile(BIG_BOARD,"utf8")); } catch {}
+  const bigBoardRank=new Map((bigBoard.players||[]).map((name,index)=>[norm(name),index+1]));
   let previous={};try{previous=JSON.parse(await fs.readFile(OUTPUT,"utf8"))}catch{}
   const [directory,adds,drops,csv]=await Promise.all([
     getJson("https://api.sleeper.app/v1/players/nfl"),
@@ -80,7 +89,7 @@ async function main(){
   for(const [id,r] of Object.entries(directory)){const key=norm(r.full_name||`${r.first_name||""} ${r.last_name||""}`);if(key)sleeperByName.set(key,{...r,id})}
   const trend=new Map();for(const x of adds)trend.set(x.player_id,(trend.get(x.player_id)||0)+num(x.count));for(const x of drops)trend.set(x.player_id,(trend.get(x.player_id)||0)-num(x.count));
   const result={generatedAt:new Date().toISOString(),status:"live-free",dataSeason:latestSeason,
-    message:`Live free-data model: current Sleeper roster/status/trends plus ${latestSeason} nflverse production. No API credentials required.`,formats:{}};
+    message:`Live free-data model: your editable SHUA Big Board plus current Sleeper roster/status/trends and ${latestSeason} nflverse production. No API credentials required.`,bigBoard:bigBoard.players||[],formats:{}};
   for(const fmt of FORMATS){
     const pool=stats.map(r=>fantasy(r,fmt));
     const perGamePool=stats.map(r=>fantasy(r,fmt)/Math.max(1,num(r.games)));
@@ -88,17 +97,18 @@ async function main(){
     let rows=board.map(p=>{
       const sr=sleeperByName.get(norm(p.name));
       const st=statsByName.get(norm(p.name));
+      const userRank=bigBoardRank.get(norm(p.name))||null;
       const total=st?fantasy(st,fmt):null;
       const games=st?Math.max(1,num(st.games)):null;
       const pg=st?total/games:null;
-      const production=st?pct(pool,total):baseline(p);
-      const perGame=st?pct(perGamePool,pg):baseline(p);
+      const production=st?pct(pool,total):baseline(p,userRank);
+      const perGame=st?pct(perGamePool,pg):baseline(p,userRank);
       const t=sr?num(trend.get(sr.id)||0):0;
       const market=pct(trendPool,t);
       const avail=injuryPenalty(sr?.injury_status||sr?.status||"");
-      const editorial=baseline(p);
+      const editorial=baseline(p,userRank);
       const score=clamp((.35*production+.25*perGame+.25*editorial+.10*market+.05*50)*POS_SCARCITY[p.position]+avail,1,99.9);
-      return {...p,team:sr?.team||p.team,overallScore:+score.toFixed(1),scoreMode:"live-free",
+      return {...p,team:sr?.team||p.team,userRank,overallScore:+score.toFixed(1),scoreMode:"live-free",
         liveStatus:sr?.injury_status||sr?.status||null,statsSeason:latestSeason,
         stats:st?{games:num(st.games),fantasyPoints:+total.toFixed(1),fantasyPointsPerGame:+pg.toFixed(1),
           passingYards:num(st.passing_yards),passingTD:num(st.passing_tds),rushingYards:num(st.rushing_yards),

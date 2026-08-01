@@ -30,7 +30,7 @@ main{max-width:1400px;margin:auto;padding:22px 28px 60px}.metrics{display:grid;g
 <script>
 let db=null,format="standard",position="ALL",active=[];
 const $=s=>document.querySelector(s), names={standard:"Standard",half_ppr:"Half PPR",ppr:"Full PPR"};
-async function load(){try{const r=await fetch("rankings-live.json",{cache:"no-store"});if(!r.ok)throw Error("Could not load rankings-live.json");db=await r.json();render()}catch(e){$("#status").textContent="Error";$("#notice").textContent=e.message+" — open this dashboard through a web server, not file://.";}}
+async function load(){try{const [rankingsResponse,bigBoardResponse]=await Promise.all([fetch("rankings-live.json",{cache:"no-store"}),fetch("big-board.json",{cache:"no-store"})]);if(!rankingsResponse.ok)throw Error("Could not load rankings-live.json");db=await rankingsResponse.json();if(bigBoardResponse.ok){const bigBoardFile=await bigBoardResponse.json();db.bigBoard=bigBoardFile.players||[];}render()}catch(e){$("#status").textContent="Error";$("#notice").textContent=e.message+" — open this dashboard through a web server, not file://.";}}
 function list(){
   const all=[...(db?.formats?.[format]||[])];
   if(position==="BIG"){

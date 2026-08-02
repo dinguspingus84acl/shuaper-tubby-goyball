@@ -1,0 +1,63 @@
+name: Apply Mock Draft Upgrade
+on:
+  push:
+    paths:
+      - 'apply-mock-draft-upgrade.trigger'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply mock draft changes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+
+          s = s.replace('<label>Rounds<select id="mockRounds"><option>6</option><option selected>10</option><option>12</option><option>15</option></select></label>', '<label>Rounds<select id="mockRounds"><option selected>14</option></select></label>')
+          s = s.replace('let mock={active:false,teams:10,slot:1,rounds:10,picks:[],filter:"ALL",search:""};', 'let mock={active:false,teams:10,slot:1,rounds:14,picks:[],filter:"ALL",search:""};')
+          s = s.replace('rounds:Number($("#mockRounds").value)', 'rounds:14')
+          s = s.replace('.drafted .team{font-size:.67rem;font-weight:800}', '.drafted .team{font-size:.67rem;font-weight:800}.drafted .arrow{position:absolute;left:7px;bottom:4px;font-weight:950}.drafted{padding-bottom:22px}')
+          s = s.replace('.roster-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}', '.roster-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.roster-card.empty-roster{border-style:dashed;color:var(--muted)}.roster-label{display:block;color:var(--muted);font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}')
+          s = s.replace('function slotLabel(i,teams){const r=Math.floor(i/teams)+1,o=i%teams;return`${r}.${r%2?o+1:teams-o}`}', 'function slotLabel(i,teams){const r=Math.floor(i/teams)+1,o=i%teams;return`${r}.${String(o+1).padStart(2,"0")}`}')
+
+          start = s.index('function renderMock(){')
+          end = s.index('$("#startMock").onclick', start)
+          replacement = r'''function buildRosterSlots(mine){
+  const slots=[{label:"QB",accept:["QB"]},{label:"RB",accept:["RB"]},{label:"RB",accept:["RB"]},{label:"WR",accept:["WR"]},{label:"WR",accept:["WR"]},{label:"TE",accept:["TE"]},{label:"FLEX",accept:["RB","WR","TE"]}];
+  const remaining=[...mine];
+  const filled=slots.map(slot=>{const idx=remaining.findIndex(p=>slot.accept.includes(p.position));return idx>=0?remaining.splice(idx,1)[0]:null});
+  return slots.map((slot,i)=>{const p=filled[i];return `<div class="roster-card ${p?"":"empty-roster"}"><span class="roster-label">${slot.label}</span>${p?`<b>${p.name}</b><span>${p.position} · ${p.team}</span>`:"<span>Empty</span>"}</div>`}).join("")+(remaining.length?remaining.map(p=>`<div class="roster-card"><span class="roster-label">BENCH</span><b>${p.name}</b><span>${p.position} · ${p.team}</span></div>`).join(""):"");
+}
+function renderMock(){
+  const total=mock.teams*14,pickIndex=mock.picks.length,onClock=mock.active&&pickIndex<total?snakeTeamForPick(pickIndex,mock.teams):null;
+  $("#undoPick").disabled=!mock.picks.length;$("#resetMock").disabled=!mock.active;$("#autoToUser").disabled=!mock.active||onClock===mock.slot;
+  if(!mock.active){$("#draftBoard").innerHTML="";$("#myRoster").innerHTML="";$("#mockStatus").textContent="Choose your settings and start the draft.";renderPool();return}
+  $("#mockStatus").innerHTML=pickIndex>=total?"Draft complete.":onClock===mock.slot?`<span class="on-clock">You are on the clock — pick ${slotLabel(pickIndex,mock.teams)}</span>`:`Computer team ${onClock} is on the clock.`;
+  $("#draftBoard").style.gridTemplateColumns=`repeat(${mock.teams},minmax(125px,1fr))`;
+  const visibleSlots=Math.min(total,Math.max(mock.teams*2,Math.ceil((pickIndex+mock.teams)/mock.teams)*mock.teams));
+  const displayIndexes=[];
+  for(let start=0;start<visibleSlots;start+=mock.teams){const round=Math.floor(start/mock.teams)+1,chunk=Array.from({length:Math.min(mock.teams,visibleSlots-start)},(_,j)=>start+j);if(round%2===0)chunk.reverse();displayIndexes.push(...chunk)}
+  $("#draftBoard").innerHTML=displayIndexes.map(i=>{const d=mock.picks[i],team=snakeTeamForPick(i,mock.teams),round=Math.floor(i/mock.teams)+1,arrow=round%2?"→":"←";if(!d)return`<div class="drafted empty-slot"><div class="slot">${slotLabel(i,mock.teams)} · Team ${team}</div><div class="arrow">${arrow}</div></div>`;const p=d.player;return`<div class="drafted ${String(p.position).toLowerCase()} ${d.team===mock.slot?"user-pick":""}"><div class="slot">${slotLabel(i,mock.teams)} · Team ${d.team}</div><div class="name">${shortName(p.name)}</div><div class="team">${p.position} · ${p.team}</div><div class="arrow">${arrow}</div></div>`}).join("");
+  const mine=mock.picks.filter(x=>x.team===mock.slot).map(x=>x.player);$("#myRoster").innerHTML=buildRosterSlots(mine);renderPool();
+}
+function renderPool(){if(!board.length)return;const canPick=mock.active&&snakeTeamForPick(mock.picks.length,mock.teams)===mock.slot;const q=norm(mock.search),list=availablePlayers().filter(p=>(mock.filter==="ALL"||p.position===mock.filter)&&(!q||norm(p.name).includes(q))).slice(0,120);$("#poolList").innerHTML=list.map((p,i)=>`<button class="pool-player" data-pick="${p.id}" ${canPick?"":"disabled"}><span class="pool-rank">${i+1}</span><span><b class="${nameClass(p)}">${p.name}</b><div class="pool-meta">${p.position} #${p.positionRank} · ${p.team}</div></span><span>Draft</span></button>`).join("")||'<div class="empty">No available players.</div>';document.querySelectorAll("[data-pick]").forEach(b=>b.addEventListener("click",()=>userPick(b.dataset.pick)))}
+'''
+          s = s[:start] + replacement + s[end:]
+
+          required = ['option selected>14', 'function buildRosterSlots', 'class="arrow"', 'mock.teams*14', '<span class="pool-rank">${i+1}</span>']
+          missing = [x for x in required if x not in s]
+          if missing:
+              raise SystemExit(f'Missing expected updates: {missing}')
+          p.write_text(s)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Apply mock draft roster arrows and 14 rounds"
+          git push

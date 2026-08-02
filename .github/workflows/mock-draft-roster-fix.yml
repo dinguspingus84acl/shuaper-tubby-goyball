@@ -1,0 +1,139 @@
+name: Improve Mock Draft Board
+on:
+  push:
+    paths:
+      - '.github/workflows/mock-draft-roster-fix.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply mock draft improvements
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          text = path.read_text()
+
+          text, count = re.subn(
+              r'<label>Rounds<select id="mockRounds">.*?</select></label>',
+              '<label>Rounds<select id="mockRounds" disabled><option selected>14</option></select></label>',
+              text,
+              count=1,
+              flags=re.S,
+          )
+          if count != 1:
+              raise SystemExit('Rounds selector not found')
+
+          if '.drafted .arrow{' not in text:
+              text = text.replace(
+                  '.drafted .team{font-size:.67rem;font-weight:800}',
+                  '.drafted .team{font-size:.67rem;font-weight:800}.drafted .arrow{position:absolute;left:7px;bottom:5px;font-weight:950}'
+              )
+
+          text = text.replace(
+              'rounds:Number($("#mockRounds").value)',
+              'rounds:14'
+          )
+
+          new_render_mock = r'''function renderMock(){
+  const total=mock.teams*mock.rounds,pickIndex=mock.picks.length,onClock=mock.active&&pickIndex<total?snakeTeamForPick(pickIndex,mock.teams):null;
+  $("#undoPick").disabled=!mock.picks.length;
+  $("#resetMock").disabled=!mock.active;
+  $("#autoToUser").disabled=!mock.active||onClock===mock.slot;
+  if(!mock.active){
+    $("#draftBoard").innerHTML="";
+    $("#myRoster").innerHTML="";
+    $("#mockStatus").textContent="Choose your settings and start the draft.";
+    renderPool();
+    return;
+  }
+  $("#mockStatus").innerHTML=pickIndex>=total?"Draft complete.":onClock===mock.slot?`<span class="on-clock">You are on the clock — pick ${slotLabel(pickIndex,mock.teams)}</span>`:`Computer team ${onClock} is on the clock.`;
+  $("#draftBoard").style.gridTemplateColumns=`repeat(${mock.teams},minmax(125px,1fr))`;
+  const visibleSlots=Math.min(total,Math.max(mock.teams*2,Math.ceil((pickIndex+mock.teams)/mock.teams)*mock.teams));
+  const displayIndexes=[];
+  for(let start=0;start<visibleSlots;start+=mock.teams){
+    const round=Math.floor(start/mock.teams)+1;
+    const chunk=Array.from({length:Math.min(mock.teams,visibleSlots-start)},(_,j)=>start+j);
+    if(round%2===0)chunk.reverse();
+    displayIndexes.push(...chunk);
+  }
+  $("#draftBoard").innerHTML=displayIndexes.map(i=>{
+    const d=mock.picks[i],team=snakeTeamForPick(i,mock.teams),round=Math.floor(i/mock.teams)+1,arrow=round%2===1?"→":"←";
+    if(!d)return`<div class="drafted empty-slot"><div class="slot">${slotLabel(i,mock.teams)} · Team ${team}</div><div class="arrow">${arrow}</div></div>`;
+    const p=d.player;
+    return`<div class="drafted ${String(p.position).toLowerCase()} ${d.team===mock.slot?"user-pick":""}"><div class="slot">${slotLabel(i,mock.teams)} · Team ${d.team}</div><div class="name">${shortName(p.name)}</div><div class="team">${p.position} · ${p.team}</div><div class="arrow">${arrow}</div></div>`;
+  }).join("");
+
+  const mine=mock.picks.filter(x=>x.team===mock.slot).map(x=>x.player);
+  const slots=[
+    {label:"QB",eligible:["QB"]},
+    {label:"RB",eligible:["RB"]},
+    {label:"RB",eligible:["RB"]},
+    {label:"WR",eligible:["WR"]},
+    {label:"WR",eligible:["WR"]},
+    {label:"TE",eligible:["TE"]},
+    {label:"FLEX",eligible:["RB","WR","TE"]}
+  ];
+  const assigned=Array(slots.length).fill(null),bench=[];
+  mine.forEach(p=>{
+    let idx=-1;
+    if(p.position==="QB")idx=slots.findIndex((s,i)=>!assigned[i]&&s.label==="QB");
+    if(p.position==="RB")idx=slots.findIndex((s,i)=>!assigned[i]&&s.label==="RB");
+    if(p.position==="WR")idx=slots.findIndex((s,i)=>!assigned[i]&&s.label==="WR");
+    if(p.position==="TE")idx=slots.findIndex((s,i)=>!assigned[i]&&s.label==="TE");
+    if(idx<0&&["RB","WR","TE"].includes(p.position))idx=slots.findIndex((s,i)=>!assigned[i]&&s.label==="FLEX");
+    if(idx>=0)assigned[idx]=p;else bench.push(p);
+  });
+  const starterCards=slots.map((slot,i)=>{
+    const p=assigned[i];
+    return`<div class="roster-card"><span>${slot.label}</span>${p?`<b>${p.name}</b><span>${p.position} · ${p.team}</span>`:`<b>Empty</b>`}</div>`;
+  });
+  const benchCards=bench.map((p,i)=>`<div class="roster-card"><span>BENCH ${i+1}</span><b>${p.name}</b><span>${p.position} · ${p.team}</span></div>`);
+  $("#myRoster").innerHTML=[...starterCards,...benchCards].join("");
+  renderPool();
+}
+'''
+
+          text, count = re.subn(
+              r'function renderMock\(\)\{.*?(?=function renderPool\(\)\{)',
+              new_render_mock,
+              text,
+              count=1,
+              flags=re.S,
+          )
+          if count != 1:
+              raise SystemExit('renderMock function not found')
+
+          text, count = re.subn(
+              r'\$\("#poolList"\)\.innerHTML=list\.map\(p=>`<button class="pool-player"',
+              '$("#poolList").innerHTML=list.map((p,index)=>`<button class="pool-player"',
+              text,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit('Player pool map not found')
+
+          text, count = re.subn(
+              r'<span class="pool-rank">#\$\{p\.overallRank\|\|p\.positionRank\}</span>',
+              '<span class="pool-rank">#${index+1}</span>',
+              text,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit('Player pool rank display not found')
+
+          path.write_text(text)
+          PY
+      - name: Commit changes
+        run: |
+          rm .github/workflows/mock-draft-roster-fix.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/mock-draft-roster-fix.yml
+          git commit -m "Improve mock draft arrows roster slots and numbering"
+          git push

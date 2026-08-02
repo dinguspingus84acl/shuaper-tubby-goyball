@@ -1,0 +1,33 @@
+name: Fix Snake Board Layout
+on:
+  push:
+    paths:
+      - '.github/workflows/snake-board-fix.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply true snake layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text()
+          old = '''if(isOverall){$("#board").style.gridTemplateColumns=`repeat(${teamCount},minmax(125px,1fr))`;$("#board").innerHTML=list.map((p,i)=>{const r=Math.floor(i/teamCount)+1,o=i%teamCount,s=r%2?o+1:teamCount-o,a=r%2?"→":"←";return`<div class="pick ${String(p.position).toLowerCase()}" data-id="${p.id}"><div class="top"><div class="name">${shortName(p.name)}</div><div class="slot">${r}.${s}</div></div><div class="meta">${p.position} · ${p.team}</div><div class="arrow">${a}</div></div>`}).join("");requestAnimationFrame(fitBoardNames)}'''
+          new = '''if(isOverall){$("#board").style.gridTemplateColumns=`repeat(${teamCount},minmax(125px,1fr))`;const display=[];for(let start=0;start<list.length;start+=teamCount){const round=Math.floor(start/teamCount)+1,chunk=list.slice(start,start+teamCount);if(round%2===0)chunk.reverse();display.push(...chunk)}$("#board").innerHTML=display.map(p=>{const i=p.overallRank-1,r=Math.floor(i/teamCount)+1,o=i%teamCount,s=o+1,a=r%2?"→":"←";return`<div class="pick ${String(p.position).toLowerCase()}" data-id="${p.id}"><div class="top"><div class="name">${shortName(p.name)}</div><div class="slot">${r}.${String(s).padStart(2,"0")}</div></div><div class="meta">${p.position} · ${p.team}</div><div class="arrow">${a}</div></div>`}).join("");requestAnimationFrame(fitBoardNames)}'''
+          if old not in text:
+              raise SystemExit('Expected Overall board render block was not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
+      - name: Commit fix and remove temporary workflow
+        run: |
+          rm .github/workflows/snake-board-fix.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/snake-board-fix.yml
+          git commit -m "Fix overall board snake draft order"
+          git push

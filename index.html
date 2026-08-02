@@ -38,7 +38,7 @@ $("#close").onclick=()=>$("#modal").classList.remove("open");$("#modal").onclick
 function syncMockSlotOptions(){const n=Number($("#mockTeams").value),old=Number($("#mockSlot").value)||1;$("#mockSlot").innerHTML=Array.from({length:n},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join("");$("#mockSlot").value=Math.min(old,n)}
 $("#mockTeams").addEventListener("change",syncMockSlotOptions);
 function snakeTeamForPick(i,teams){const round=Math.floor(i/teams)+1,offset=i%teams;return round%2?offset+1:teams-offset}
-function slotLabel(i,teams){const r=Math.floor(i/teams)+1,o=i%teams;return`${r}.${r%2?o+1:teams-o}`}
+function slotLabel(i,teams){const r=Math.floor(i/teams)+1,o=i%teams;return`${r}.${String(o+1).padStart(2,"0")}`}
 function mockPlayerPool(){
   const seen=new Set();
   const ranked=[];

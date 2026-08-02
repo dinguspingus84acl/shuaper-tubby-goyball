@@ -1,0 +1,33 @@
+name: Fix Mock Draft Slot Labels
+on:
+  push:
+    paths:
+      - '.github/workflows/mock-slot-label-fix.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix mock draft pick numbering
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text()
+          old = 'function slotLabel(i,teams){const r=Math.floor(i/teams)+1,o=i%teams;return`${r}.${r%2?o+1:teams-o}`}'
+          new = 'function slotLabel(i,teams){const r=Math.floor(i/teams)+1,o=i%teams;return`${r}.${String(o+1).padStart(2,"0")}`}'
+          if old not in text:
+              raise SystemExit('Expected slotLabel function was not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
+      - name: Commit fix and remove temporary workflow
+        run: |
+          rm .github/workflows/mock-slot-label-fix.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/mock-slot-label-fix.yml
+          git commit -m "Fix mock draft pick number labels"
+          git push

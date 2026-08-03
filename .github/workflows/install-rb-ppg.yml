@@ -1,0 +1,34 @@
+name: Install RB PPG profile stat
+
+on:
+  push:
+    paths:
+      - '.github/workflows/install-rb-ppg.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add RB PPG script to site
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('index.html')
+          text=path.read_text()
+          tag='<script src="rb-ppg.js?v=1"></script>'
+          if tag not in text:
+              text=text.replace('</body>',tag+'</body>')
+              path.write_text(text)
+          PY
+      - name: Commit change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Show 2025 RB PPG rank in player profiles"
+          git push

@@ -1,0 +1,36 @@
+name: Remove duplicate position stat
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/remove-position-profile-stat.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove duplicate Position box from player profiles
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          target = '<div class="stat"><span>Position</span><b>${p.position}</b></div>'
+          if target not in text:
+              raise SystemExit('Position stat markup was not found in index.html')
+          text = text.replace(target, '', 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Remove duplicate position box from player profiles"
+          git push

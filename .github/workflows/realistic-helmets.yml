@@ -1,0 +1,53 @@
+name: Apply Realistic Helmet Styling
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/realistic-helmets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update helmet styling
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          start = text.index('.helmet{')
+          end = text.index('.stats{', start)
+
+          realistic = r'''.helmet{position:relative;width:205px;height:145px;flex:0 0 205px;display:flex;align-items:center;justify-content:center;padding:12px 52px 14px 18px;background:radial-gradient(circle at 34% 22%,rgba(255,255,255,.98) 0 11%,rgba(255,255,255,.62) 12% 19%,transparent 20%),linear-gradient(138deg,#ffffff 0%,#f1f5f9 34%,#d7dee8 70%,#9aa8b8 100%);border:2px solid #263344;border-radius:104px 91px 60px 68px;margin-right:38px;box-shadow:inset 10px 12px 18px rgba(255,255,255,.9),inset -22px -18px 30px rgba(15,23,42,.24),0 14px 30px rgba(0,0,0,.38);transform:rotate(-1deg)}.helmet:before{content:'';position:absolute;right:-50px;top:50px;width:88px;height:67px;border:8px solid #0b1728;border-left:0;border-radius:0 40px 38px 0;transform:skewY(-7deg);box-shadow:inset -2px -2px 0 rgba(255,255,255,.14)}.helmet:after{content:'';position:absolute;right:-26px;bottom:3px;width:68px;height:45px;border-right:9px solid #0b1728;border-bottom:9px solid #0b1728;border-radius:0 0 28px 0;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}.helmet img{width:108px;height:108px;object-fit:contain;filter:drop-shadow(0 3px 3px rgba(0,0,0,.24));transform:translateX(-5px)}.helmet .helmet-ear{position:absolute;right:56px;bottom:23px;width:22px;height:22px;border-radius:50%;background:#192638;border:5px solid #d8e0e9;box-shadow:0 0 0 2px #64748b}.helmet .helmet-bumper{position:absolute;left:18px;bottom:12px;width:46px;height:13px;background:#f8fafc;border:2px solid #64748b;border-radius:8px 5px 5px 8px;transform:rotate(-5deg)}'''
+
+          text = text[:start] + realistic + text[end:]
+
+          old_fn = "function helmet(t){let s=teams[t];return `<div class=\"helmet\">${s?`<img src=\"https://a.espncdn.com/i/teamlogos/nfl/500/${s}.png\">`:`<b>${t}</b>`}</div>`}"
+          new_fn = "function helmet(t){let s=teams[t];return `<div class=\"helmet\">${s?`<img src=\"https://a.espncdn.com/i/teamlogos/nfl/500/${s}.png\" alt=\"${t} team logo\">`:`<b>${t}</b>`}<span class=\"helmet-ear\"></span><span class=\"helmet-bumper\"></span></div>`}"
+          if old_fn not in text:
+              raise SystemExit('Helmet function pattern was not found')
+          text = text.replace(old_fn, new_fn, 1)
+
+          mobile_old = '.helmet{width:120px;height:80px;flex-basis:120px;margin-right:18px;padding-right:30px}.helmet img{width:66px;height:66px}.helmet:before{right:-27px;top:29px;width:46px;height:37px}.helmet:after{right:-12px;width:34px;height:24px}'
+          mobile_new = '.helmet{width:132px;height:92px;flex-basis:132px;margin-right:22px;padding:8px 34px 9px 12px;border-radius:68px 59px 40px 44px}.helmet img{width:70px;height:70px}.helmet:before{right:-31px;top:32px;width:52px;height:41px;border-width:6px}.helmet:after{right:-15px;width:39px;height:27px;border-width:6px}.helmet .helmet-ear{right:36px;bottom:15px;width:15px;height:15px;border-width:3px}.helmet .helmet-bumper{left:11px;bottom:8px;width:30px;height:9px}'
+          if mobile_old not in text:
+              raise SystemExit('Mobile helmet pattern was not found')
+          text = text.replace(mobile_old, mobile_new, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Make player profile helmets more realistic"
+          git push

@@ -31,42 +31,66 @@
     .roster-card.has-photo>.player-photo{position:absolute;left:10px;top:11px}
     .profile-photo-wrap{display:flex;align-items:center;gap:16px;margin:8px 0 12px}
 
-    .team-helmet{
-      position:absolute;
-      right:6px;
-      bottom:5px;
-      width:35px;
-      height:29px;
+    /* Team helmet belongs in the player description/profile, not on draft boards. */
+    .profile-team-helmet-wrap{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin:12px 0 16px;
+      padding:12px 14px;
+      border:1px solid rgba(150,180,210,.2);
+      border-radius:12px;
+      background:#081a2d;
+    }
+    .profile-team-helmet{
+      position:relative;
+      width:108px;
+      height:78px;
+      flex:0 0 108px;
       display:flex;
       align-items:center;
       justify-content:center;
-      background:#fff;
-      border:2px solid rgba(6,19,34,.55);
-      border-radius:17px 17px 11px 12px;
-      box-shadow:0 2px 5px rgba(0,0,0,.28);
-      z-index:6;
+      padding:8px 22px 8px 8px;
+      background:linear-gradient(145deg,#f8fafc,#cbd5e1 72%,#94a3b8);
+      border:3px solid #0f172a;
+      border-radius:54px 48px 31px 36px;
+      box-shadow:inset -10px -8px 14px rgba(15,23,42,.24),0 5px 12px rgba(0,0,0,.35);
       overflow:visible;
-      pointer-events:none;
     }
-    .team-helmet::after{
+    .profile-team-helmet::before{
       content:'';
       position:absolute;
-      right:-5px;
-      bottom:2px;
-      width:10px;
-      height:8px;
-      border-right:3px solid rgba(6,19,34,.7);
-      border-bottom:3px solid rgba(6,19,34,.7);
-      border-radius:0 0 5px 0;
+      right:-20px;
+      top:30px;
+      width:37px;
+      height:31px;
+      border:4px solid #111827;
+      border-left:0;
+      border-radius:0 20px 20px 0;
+      transform:skewY(-8deg);
     }
-    .team-helmet img{width:25px;height:25px;object-fit:contain;display:block}
-    .team-helmet-fallback{font-size:.58rem;font-weight:950;color:#061322;line-height:1}
+    .profile-team-helmet::after{
+      content:'';
+      position:absolute;
+      right:-10px;
+      bottom:2px;
+      width:29px;
+      height:22px;
+      border-right:5px solid #111827;
+      border-bottom:5px solid #111827;
+      border-radius:0 0 14px 0;
+    }
+    .profile-team-helmet img{width:62px;height:62px;object-fit:contain;display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+    .profile-team-copy small{display:block;color:#91a4ba;font-size:.68rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .profile-team-copy strong{display:block;margin-top:4px;font-size:1.05rem}
+    .profile-team-copy span{display:block;margin-top:3px;color:#91a4ba;font-size:.82rem}
 
     @media(max-width:650px){
       .player-photo{width:38px;height:38px}
       .pool-player.has-photo{grid-template-columns:34px 34px minmax(0,1fr) auto}
-      .team-helmet{width:31px;height:26px;right:5px;bottom:4px}
-      .team-helmet img{width:22px;height:22px}
+      .profile-team-helmet{width:88px;height:64px;flex-basis:88px}
+      .profile-team-helmet img{width:49px;height:49px}
+      .profile-team-helmet::before{right:-16px;top:24px;width:30px;height:25px}
     }
   `;
   document.head.appendChild(style);
@@ -118,47 +142,11 @@
     el.prepend(makePhoto(name,'small'));
   }
 
-  function removeBoardPhoto(el){
-    el.querySelectorAll(':scope > .player-photo').forEach(photo=>photo.remove());
-    el.classList.remove('has-photo');
-  }
-
-  function teamFromBoardCard(el){
-    const text=(el.querySelector('.meta,.team')?.textContent||'').trim();
-    const parts=text.split('·').map(x=>x.trim()).filter(Boolean);
-    return parts.length ? parts[parts.length-1].toUpperCase() : '';
-  }
-
-  function addTeamHelmet(el){
-    if(el.classList.contains('empty-slot') || el.querySelector(':scope > .team-helmet')) return;
-    const team=teamFromBoardCard(el);
-    if(!team || team==='—') return;
-    const helmet=document.createElement('span');
-    helmet.className='team-helmet';
-    helmet.setAttribute('role','img');
-    helmet.setAttribute('aria-label',`${team} team helmet`);
-    const src=ESPN_LOGO(team);
-    if(src){
-      const img=document.createElement('img');
-      img.alt='';
-      img.loading='lazy';
-      img.decoding='async';
-      img.src=src;
-      img.onerror=()=>{
-        img.remove();
-        const fallback=document.createElement('span');
-        fallback.className='team-helmet-fallback';
-        fallback.textContent=team;
-        helmet.appendChild(fallback);
-      };
-      helmet.appendChild(img);
-    } else {
-      const fallback=document.createElement('span');
-      fallback.className='team-helmet-fallback';
-      fallback.textContent=team;
-      helmet.appendChild(fallback);
-    }
-    el.appendChild(helmet);
+  function clearDraftBoardDecorations(){
+    document.querySelectorAll('.pick,.drafted').forEach(el=>{
+      el.querySelectorAll(':scope > .player-photo,:scope > .team-helmet').forEach(x=>x.remove());
+      el.classList.remove('has-photo');
+    });
   }
 
   function addTablePhoto(row){
@@ -183,34 +171,68 @@
     row.dataset.photoDone='1';
   }
 
-  function addProfilePhoto(){
+  function teamFromProfile(){
+    const pm=document.getElementById('pm');
+    if(!pm) return '';
+    return (pm.textContent.split('·')[0]||'').trim().toUpperCase();
+  }
+
+  function addProfilePhotoAndHelmet(){
     const title=document.getElementById('pn');
     if(!title || !title.textContent.trim()) return;
     const profile=title.closest('.profile'); if(!profile) return;
-    const old=profile.querySelector('.profile-photo-wrap');
-    if(old && old.dataset.name===title.textContent.trim()) return;
+
+    let photoWrap=profile.querySelector('.profile-photo-wrap');
+    if(!photoWrap || photoWrap.dataset.name!==title.textContent.trim()){
+      if(photoWrap) photoWrap.remove();
+      photoWrap=document.createElement('div');
+      photoWrap.className='profile-photo-wrap';
+      photoWrap.dataset.name=title.textContent.trim();
+      photoWrap.appendChild(makePhoto(title.textContent.trim(),'large'));
+      title.insertAdjacentElement('afterend',photoWrap);
+    }
+
+    const team=teamFromProfile();
+    const old=profile.querySelector('.profile-team-helmet-wrap');
+    if(old && old.dataset.team===team) return;
     if(old) old.remove();
+    if(!team || team==='—') return;
+
     const wrap=document.createElement('div');
-    wrap.className='profile-photo-wrap';
-    wrap.dataset.name=title.textContent.trim();
-    wrap.appendChild(makePhoto(title.textContent.trim(),'large'));
-    title.insertAdjacentElement('afterend',wrap);
+    wrap.className='profile-team-helmet-wrap';
+    wrap.dataset.team=team;
+
+    const helmet=document.createElement('div');
+    helmet.className='profile-team-helmet';
+    helmet.setAttribute('role','img');
+    helmet.setAttribute('aria-label',`${team} football helmet`);
+    const src=ESPN_LOGO(team);
+    if(src){
+      const img=document.createElement('img');
+      img.src=src;
+      img.alt='';
+      img.loading='lazy';
+      img.onerror=()=>{img.remove();helmet.textContent=team;};
+      helmet.appendChild(img);
+    } else helmet.textContent=team;
+
+    const copy=document.createElement('div');
+    copy.className='profile-team-copy';
+    copy.innerHTML=`<small>Team helmet</small><strong>${team}</strong><span>Displayed in the player description</span>`;
+    wrap.append(helmet,copy);
+
+    const pm=document.getElementById('pm');
+    if(pm) pm.insertAdjacentElement('afterend',wrap);
   }
 
   function hydrate(){
     scheduled=false;
-
-    // Board helmets render immediately and do not wait for the large player API request.
-    document.querySelectorAll('.pick,.drafted').forEach(el=>{
-      removeBoardPhoto(el);
-      addTeamHelmet(el);
-    });
-
+    clearDraftBoardDecorations();
     if(!photosReady) return;
     document.querySelectorAll('#rows tr').forEach(addTablePhoto);
     document.querySelectorAll('.pool-player').forEach(addPoolPhoto);
     document.querySelectorAll('.roster-card:not(.empty-slot)').forEach(addCardPhoto);
-    if(document.getElementById('modal')?.classList.contains('open')) addProfilePhoto();
+    if(document.getElementById('modal')?.classList.contains('open')) addProfilePhotoAndHelmet();
   }
 
   function schedule(){
@@ -219,9 +241,7 @@
     requestAnimationFrame(hydrate);
   }
 
-  // Render helmets right away, before any network request finishes.
   schedule();
-
   fetch(PLAYER_API)
     .then(r=>r.ok?r.json():Promise.reject(new Error('Player API unavailable')))
     .then(data=>{

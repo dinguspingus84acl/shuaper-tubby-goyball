@@ -9,31 +9,59 @@
 
   const style = document.createElement('style');
   style.textContent = `
+    /* Draft boards stay clean: no faces or helmets. */
     #board .player-photo,#board .profile-helmet,#draftBoard .player-photo,#draftBoard .profile-helmet{display:none!important}
     #board .pick,#draftBoard .drafted{padding-left:8px!important;min-height:78px!important}
+
     .player-photo{width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top center;background:#17314a;border:2px solid rgba(255,255,255,.58);flex:0 0 auto}
-    .player-photo.small{width:34px;height:34px;border-width:1px}.player-photo.large{width:108px;height:108px;border-width:3px}
-    .player-photo-fallback{display:inline-flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:950;color:#fff;background:#244761}
-    .photo-name-cell{display:flex;align-items:center;gap:10px;min-width:190px}.pool-player.has-photo{grid-template-columns:42px 38px minmax(0,1fr) auto}
-    .roster-card.has-photo{position:relative;padding-left:60px;min-height:68px}.roster-card.has-photo>.player-photo{position:absolute;left:10px;top:11px}
+    .player-photo.small{width:34px;height:34px;border-width:1px}
+    .player-photo.large{width:112px;height:112px;border-width:3px}
+    .player-photo-fallback{display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:950;color:#fff;background:#244761}
+    .photo-name-cell{display:flex;align-items:center;gap:10px;min-width:190px}
+    .pool-player.has-photo{grid-template-columns:42px 38px minmax(0,1fr) auto}
+    .roster-card.has-photo{position:relative;padding-left:60px;min-height:68px}
+    .roster-card.has-photo>.player-photo{position:absolute;left:10px;top:11px}
 
     .profile{position:relative}
-    .profile-top-visuals{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin:12px 0 18px;padding-right:4px}
-    .profile-photo-block{display:flex;align-items:center;gap:14px;min-width:0}
-    .profile-photo-copy strong{display:block;font-size:1.05rem}.profile-photo-copy span{display:block;margin-top:4px;color:#91a4ba;font-size:.82rem}
-    .profile-helmet{position:relative;width:118px;height:80px;flex:0 0 118px;display:flex;align-items:center;justify-content:center;padding:8px 28px 8px 8px;background:linear-gradient(145deg,#f8fafc,#d7e1ec 60%,#8fa0b3);border:4px solid #111827;border-radius:60px 52px 34px 39px;box-shadow:inset -12px -9px 15px rgba(15,23,42,.25),0 5px 12px rgba(0,0,0,.35);overflow:visible;margin-right:18px}
+    .profile-top-visuals{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:start;
+      gap:20px;
+      margin:10px 0 18px;
+      min-height:118px;
+    }
+    .profile-photo-block{display:flex;align-items:center;gap:16px;min-width:0}
+    .profile-photo-copy{min-width:0}
+    .profile-photo-copy strong{display:block;font-size:1.08rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .profile-photo-copy span{display:block;margin-top:5px;color:#91a4ba;font-size:.84rem}
+    .profile-helmet{
+      position:relative;
+      width:118px;
+      height:80px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 28px 8px 8px;
+      margin:2px 18px 0 0;
+      background:linear-gradient(145deg,#f8fafc,#d7e1ec 60%,#8fa0b3);
+      border:4px solid #111827;
+      border-radius:60px 52px 34px 39px;
+      box-shadow:inset -12px -9px 15px rgba(15,23,42,.25),0 5px 12px rgba(0,0,0,.35);
+      overflow:visible;
+    }
     .profile-helmet:before{content:'';position:absolute;right:-25px;top:29px;width:43px;height:35px;border:5px solid #111827;border-left:0;border-radius:0 22px 22px 0;transform:skewY(-7deg)}
     .profile-helmet:after{content:'';position:absolute;right:-12px;bottom:0;width:34px;height:23px;border-right:6px solid #111827;border-bottom:6px solid #111827;border-radius:0 0 15px 0}
     .profile-helmet img{width:64px;height:64px;object-fit:contain}
     .profile-helmet-fallback{font-weight:950;color:#071321}
-    .note-box .description-helmet{display:none!important}
+    .note-box .description-helmet,.profile .description-helmet,.profile .profile-visuals,.profile .profile-team-helmet-wrap{display:none!important}
 
     @media(max-width:650px){
       .pool-player.has-photo{grid-template-columns:34px 34px minmax(0,1fr) auto}
-      .profile-top-visuals{gap:10px;align-items:center}
-      .player-photo.large{width:86px;height:86px}
+      .profile-top-visuals{grid-template-columns:1fr auto;gap:10px;min-height:94px}
+      .player-photo.large{width:88px;height:88px}
       .profile-photo-copy{display:none}
-      .profile-helmet{width:88px;height:62px;flex-basis:88px;padding-right:20px;margin-right:12px}
+      .profile-helmet{width:88px;height:62px;padding-right:20px;margin-right:12px}
       .profile-helmet img{width:48px;height:48px}
       .profile-helmet:before{right:-18px;top:22px;width:31px;height:26px}
       .profile-helmet:after{right:-9px;width:25px;height:18px}
@@ -43,7 +71,18 @@
 
   function initials(name){return String(name||'?').trim().split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'?'}
   function fallback(name,size=''){const s=document.createElement('span');s.className=`player-photo player-photo-fallback ${size}`.trim();s.textContent=initials(name);return s}
-  function makePhoto(name,size=''){const p=byName.get(norm(name));if(!p?.player_id)return fallback(name,size);const img=document.createElement('img');img.className=`player-photo ${size}`.trim();img.loading='lazy';img.alt=`${name} headshot`;img.src=PLAYER_CDN(p.player_id);img.onerror=()=>img.isConnected&&img.replaceWith(fallback(name,size));return img}
+  function makePhoto(name,size=''){
+    const p=byName.get(norm(name));
+    if(!p?.player_id)return fallback(name,size);
+    const img=document.createElement('img');
+    img.className=`player-photo ${size}`.trim();
+    img.loading='lazy';
+    img.decoding='async';
+    img.alt=`${name} headshot`;
+    img.src=PLAYER_CDN(p.player_id);
+    img.onerror=()=>img.isConnected&&img.replaceWith(fallback(name,size));
+    return img;
+  }
   function fullName(el){const id=el.dataset?.id;if(id){const key=norm(id.replace(/^(qb|rb|wr|te)-\d+-/i,''));for(const [k,p] of byName){if(key===k||key.endsWith(k))return p.full_name}}return [...el.querySelectorAll('b,.name')].map(x=>x.textContent.trim()).find(Boolean)||''}
 
   function stripBoards(){document.querySelectorAll('#board .pick,#draftBoard .drafted').forEach(card=>{card.querySelectorAll('.player-photo,.team-helmet,.realistic-helmet,.helmet-shell,.description-helmet,.profile-helmet').forEach(x=>x.remove());card.classList.remove('has-photo')})}
@@ -62,8 +101,8 @@
     if(!profile||!name)return;
 
     profile.querySelectorAll('.description-helmet,.profile-visuals,.profile-team-helmet-wrap').forEach(x=>x.remove());
+    const key=`${name}|${team}|${photosReady?'ready':'loading'}`;
     let top=profile.querySelector('.profile-top-visuals');
-    const key=`${name}|${team}`;
     if(top?.dataset.key===key)return;
     top?.remove();
 
@@ -81,18 +120,43 @@
 
     const helmet=document.createElement('div');
     helmet.className='profile-helmet';
+    helmet.setAttribute('aria-label',`${team} helmet`);
     const slug=TEAM_SLUGS[team];
-    if(slug){const img=document.createElement('img');img.src=`https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png`;img.alt=`${team} helmet`;img.onerror=()=>{img.remove();const s=document.createElement('span');s.className='profile-helmet-fallback';s.textContent=team;helmet.appendChild(s)};helmet.appendChild(img)}else{const s=document.createElement('span');s.className='profile-helmet-fallback';s.textContent=team||'NFL';helmet.appendChild(s)}
+    if(slug){
+      const img=document.createElement('img');
+      img.src=`https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png`;
+      img.alt='';
+      img.loading='lazy';
+      img.onerror=()=>{img.remove();const s=document.createElement('span');s.className='profile-helmet-fallback';s.textContent=team;helmet.appendChild(s)};
+      helmet.appendChild(img);
+    }else{
+      const s=document.createElement('span');s.className='profile-helmet-fallback';s.textContent=team||'NFL';helmet.appendChild(s);
+    }
 
     top.append(photoBlock,helmet);
-    pm.insertAdjacentElement('afterend',top);
+    title.insertAdjacentElement('afterend',top);
   }
 
-  function hydrate(){pending=false;stripBoards();document.querySelectorAll('.description-helmet').forEach(x=>x.remove());renderProfileTop();if(!photosReady)return;document.querySelectorAll('#rows tr').forEach(addTablePhoto);document.querySelectorAll('.pool-player').forEach(addPoolPhoto);document.querySelectorAll('.roster-card:not(.empty-slot)').forEach(addRosterPhoto);renderProfileTop()}
+  function hydrate(){
+    pending=false;
+    stripBoards();
+    document.querySelectorAll('.description-helmet').forEach(x=>x.remove());
+    renderProfileTop();
+    if(!photosReady)return;
+    document.querySelectorAll('#rows tr').forEach(addTablePhoto);
+    document.querySelectorAll('.pool-player').forEach(addPoolPhoto);
+    document.querySelectorAll('.roster-card:not(.empty-slot)').forEach(addRosterPhoto);
+    renderProfileTop();
+  }
   function schedule(){if(pending)return;pending=true;requestAnimationFrame(hydrate)}
 
-  fetch(PLAYER_API).then(r=>r.ok?r.json():{}).then(data=>Object.values(data).forEach(p=>{const n=p.full_name||`${p.first_name||''} ${p.last_name||''}`.trim();if(n)byName.set(norm(n),{...p,full_name:n})})).catch(()=>{}).finally(()=>{photosReady=true;schedule()});
-  new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']});
+  fetch(PLAYER_API)
+    .then(r=>r.ok?r.json():{})
+    .then(data=>Object.values(data).forEach(p=>{const n=p.full_name||`${p.first_name||''} ${p.last_name||''}`.trim();if(n)byName.set(norm(n),{...p,full_name:n})}))
+    .catch(()=>{})
+    .finally(()=>{photosReady=true;document.querySelector('.profile-top-visuals')?.remove();schedule()});
+
+  new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true,characterData:true});
   window.addEventListener('load',schedule);
   schedule();
 })();

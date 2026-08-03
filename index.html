@@ -69,5 +69,6 @@ function renderPool(){if(!board.length)return;const canPick=mock.active&&snakeTe
 $('#startMock').onclick=startMock;$('#undoPick').onclick=()=>{if(mock.picks.length){mock.picks.pop();renderMock()}};$('#resetMock').onclick=()=>{mock.active=false;mock.picks=[];renderMock()};$('#poolSearch').oninput=e=>{mock.search=e.target.value;renderPool()};document.querySelectorAll('.pool-filter').forEach(b=>b.onclick=()=>{mock.filter=b.dataset.filter;document.querySelectorAll('.pool-filter').forEach(x=>x.classList.toggle('primary',x===b));renderPool()});
 load();
 </script>
+<script src="headshots.js" defer></script>
 </body>
 </html>

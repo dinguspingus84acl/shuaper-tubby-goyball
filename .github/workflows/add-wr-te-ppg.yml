@@ -1,0 +1,41 @@
+name: Add WR and TE PPG ranks
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-wr-te-ppg.yml'
+      - 'wr-2025-ppg.json'
+      - 'te-2025-ppg.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index.html
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          s=s.replace("let board=[],players=[],rbPpgRanks=new Map(),qbPpgRanks=new Map(),position=", "let board=[],players=[],rbPpgRanks=new Map(),qbPpgRanks=new Map(),wrPpgRanks=new Map(),tePpgRanks=new Map(),position=")
+          s=s.replace("'rb-2025-ppg.json','qb-2025-ppg.json']", "'rb-2025-ppg.json','qb-2025-ppg.json','wr-2025-ppg.json','te-2025-ppg.json']")
+          s=s.replace("[b,p,q,rb,w,t,ppg,qbPpg]=d;", "[b,p,q,rb,w,t,ppg,qbPpg,wrPpg,tePpg]=d;")
+          s=s.replace("qbPpgRanks=new Map((qbPpg.players||[]).map(x=>[N(x.name),x.rank]));", "qbPpgRanks=new Map((qbPpg.players||[]).map(x=>[N(x.name),x.rank]));wrPpgRanks=new Map((wrPpg.players||[]).map(x=>[N(x.name),x.rank]));tePpgRanks=new Map((tePpg.players||[]).map(x=>[N(x.name),x.rank]));")
+          marker="${p.position==='QB'&&qbPpgRanks.get(N(p.name))?`<div class=\"stat\"><span>2025 PPG rank</span><b>#${qbPpgRanks.get(N(p.name))}</b></div>`:''}"
+          addition=marker+"${p.position==='WR'&&wrPpgRanks.get(N(p.name))?`<div class=\"stat\"><span>2025 PPG rank</span><b>#${wrPpgRanks.get(N(p.name))}</b></div>`:''}${p.position==='TE'&&tePpgRanks.get(N(p.name))?`<div class=\"stat\"><span>2025 PPG rank</span><b>#${tePpgRanks.get(N(p.name))}</b></div>`:''}"
+          if "p.position==='WR'&&wrPpgRanks" not in s:
+              s=s.replace(marker,addition)
+          p.write_text(s)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Show 2025 WR and TE PPG ranks in player profiles"
+          git push

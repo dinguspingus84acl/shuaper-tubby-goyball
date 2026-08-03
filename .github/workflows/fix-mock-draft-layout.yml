@@ -1,0 +1,48 @@
+name: Fix Mock Draft Layout
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-mock-draft-layout.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix mock draft player pool layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          replacements = {
+            ".mock-layout{display:grid;grid-template-columns:1.5fr .7fr;gap:14px}": ".mock-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,520px);gap:16px;align-items:start;width:100%}",
+            ".player-pool{position:sticky;top:76px;max-height:calc(100vh - 90px)}": ".player-pool{position:sticky;top:76px;width:100%;min-width:0;max-height:calc(100vh - 92px);overflow:hidden}",
+            ".pool-head{padding:12px}": ".pool-head{padding:12px;position:sticky;top:0;z-index:3;background:#091c30}",
+            ".pool-list{max-height:calc(100vh - 230px);overflow:auto}": ".pool-list{height:calc(100vh - 245px);min-height:420px;overflow-y:auto;overflow-x:hidden}",
+            ".pool-player{display:grid;grid-template-columns:34px 42px 1fr auto;gap:8px;align-items:center;padding:9px 12px;border-top:1px solid var(--l)}": ".pool-player{display:grid;grid-template-columns:34px 42px minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid var(--l)}",
+            "@media(max-width:900px){.tools{display:grid}.mock-layout{grid-template-columns:1fr}.player-pool{position:static}.stats{grid-template-columns:1fr 1fr}}": "@media(max-width:1200px){.mock-layout{grid-template-columns:1fr}.player-pool{position:static;grid-row:1;max-height:none}.pool-list{height:620px;min-height:420px}}@media(max-width:900px){.tools{display:grid}.stats{grid-template-columns:1fr 1fr}}"
+          }
+
+          for old, new in replacements.items():
+            if old not in text:
+              raise SystemExit(f'Pattern not found: {old[:80]}')
+            text = text.replace(old, new, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Fix mock draft player pool layout"
+          git push

@@ -1,0 +1,42 @@
+name: Randomize CPU Mock Draft Picks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/randomize-cpu-drafts.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add weighted CPU draft randomness
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          old = "function sim(){let total=mock.teams*14;while(mock.picks.length<total&&teamAt(mock.picks.length,mock.teams)!==mock.slot){let used=new Set(mock.picks.map(x=>x.player.id)),p=pool('ALL').find(x=>!used.has(x.id));if(!p)break;mock.picks.push({player:p,team:teamAt(mock.picks.length,mock.teams)})}mockView()}"
+
+          new = "function cpuPick(){let used=new Set(mock.picks.map(x=>x.player.id)),available=pool('ALL').filter(x=>!used.has(x.id));if(!available.length)return null;let window=available.slice(0,4),weights=[45,30,17,8].slice(0,window.length),total=weights.reduce((a,b)=>a+b,0),roll=Math.random()*total;for(let i=0;i<window.length;i++){roll-=weights[i];if(roll<0)return window[i]}return window[0]}function sim(){let total=mock.teams*14;while(mock.picks.length<total&&teamAt(mock.picks.length,mock.teams)!==mock.slot){let p=cpuPick();if(!p)break;mock.picks.push({player:p,team:teamAt(mock.picks.length,mock.teams)})}mockView()}"
+
+          if old not in text:
+              raise SystemExit('Existing sim function was not found')
+
+          text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Randomize CPU picks in mock drafts"
+          git push

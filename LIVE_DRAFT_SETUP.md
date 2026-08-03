@@ -1,63 +1,61 @@
 # Live Draft Room Setup
 
-The multiplayer page is available at:
+The multiplayer page is already in GitHub:
 
 `https://shuapertubbygoyball.com/live-draft.html`
 
-It needs a free Firebase Realtime Database project before rooms can sync between browsers.
+The only remaining step is connecting the free Firebase Realtime Database.
 
-## 1. Create the Firebase project
+## What you need to send me
 
-1. Go to Firebase Console.
-2. Create a project.
-3. Open **Build → Realtime Database**.
-4. Create the database in the closest US region.
-5. Start in test mode temporarily.
+After creating the Firebase web app, send me the full `firebaseConfig` block Firebase gives you. It looks like this:
 
-## 2. Register the web app
-
-1. Open **Project settings**.
-2. Under **Your apps**, choose the web icon `</>`.
-3. Register the app.
-4. Copy the displayed `firebaseConfig` values.
-
-## 3. Update the repository
-
-Open `firebase-config.js` and replace every `PASTE_...` value with the matching Firebase value.
-
-The `databaseURL` field must be included.
-
-## 4. Realtime Database rules
-
-For initial testing, use:
-
-```json
-{
-  "rules": {
-    "rooms": {
-      "$room": {
-        ".read": true,
-        ".write": true
-      }
-    }
-  }
-}
+```js
+const firebaseConfig = {
+  apiKey: "...",
+  authDomain: "...",
+  databaseURL: "...",
+  projectId: "...",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "..."
+};
 ```
 
-These rules are intentionally open for testing. Add Firebase Authentication before using the site publicly at scale.
+These browser configuration values are intended to be used in frontend code. Do not send a service-account private key or admin SDK secret.
 
-## Current multiplayer features
+## Create the free Firebase project
 
-- Create a six-character room code
-- Join the same room from another browser or device
-- Claim a draft slot
-- Real-time draft-board updates
-- Real-time available-player removal
-- Host-controlled draft start
-- 10-, 12-, and 14-team snake drafts
-- 14 rounds
-- Invite-link copying
+1. Open the Firebase Console.
+2. Click **Create a project**.
+3. Give it any name, such as `shua-live-draft`.
+4. Google Analytics is optional and can be disabled.
+5. After the project opens, click the web-app icon `</>`.
+6. Name the app `SHUA Live Draft` and register it.
+7. Copy the complete `firebaseConfig` block.
 
-## Next development step
+## Create Realtime Database
 
-Add CPU control for every unclaimed team slot, including weighted randomized picks from the next four available players.
+1. In Firebase, open **Build → Realtime Database**.
+2. Click **Create Database**.
+3. Pick the closest United States location.
+4. Choose **Start in locked mode**.
+5. Open the **Rules** tab.
+6. Replace the rules with the contents of `firebase-database-rules.json` from this repository.
+7. Click **Publish**.
+
+## After you send the configuration
+
+I will place the values into `firebase-config.js` in GitHub. Once GitHub Pages redeploys, you can:
+
+- Create a live room.
+- Copy the invite link.
+- Send it to a friend.
+- Select separate draft slots.
+- See picks update instantly on both devices.
+
+## Files already added
+
+- `live-draft.html` — multiplayer draft room
+- `firebase-config.js` — Firebase browser configuration
+- `firebase-database-rules.json` — database rules to paste into Firebase

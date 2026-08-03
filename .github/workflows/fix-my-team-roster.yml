@@ -1,0 +1,42 @@
+name: Fix My Team Roster Slots
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-my-team-roster.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add positional roster slots
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          old = "let mine=mock.picks.filter(x=>x.team===mock.slot).map(x=>x.player);$('#myRoster').innerHTML=mine.map(p=>`<div class=\"roster-card\" data-id=\"${p.id}\">${pic(p.name,'sm')}<b>${p.name}</b><span>${p.position} · ${p.team}</span></div>`).join('');bind();renderPool()"
+
+          new = "let mine=mock.picks.filter(x=>x.team===mock.slot).map(x=>x.player),usedRoster=new Set(),starterSlots=['QB','RB','RB','WR','WR','TE','FLEX'],roster=[];starterSlots.forEach(slot=>{let idx=mine.findIndex((p,i)=>!usedRoster.has(i)&&(slot==='FLEX'?['RB','WR','TE'].includes(p.position):p.position===slot));if(idx>-1){usedRoster.add(idx);roster.push({slot,player:mine[idx]})}else roster.push({slot,player:null})});let bench=mine.filter((p,i)=>!usedRoster.has(i));$('#myRoster').innerHTML=roster.map(x=>x.player?`<div class=\"roster-card\" data-id=\"${x.player.id}\">${pic(x.player.name,'sm')}<b>${x.slot}: ${x.player.name}</b><span>${x.player.position} · ${x.player.team}</span></div>`:`<div class=\"roster-card empty-slot\"><b>${x.slot}</b><span>Empty</span></div>`).join('')+(bench.length?`<div class=\"bench-heading\">Bench</div>${bench.map(p=>`<div class=\"roster-card\" data-id=\"${p.id}\">${pic(p.name,'sm')}<b>${p.name}</b><span>${p.position} · ${p.team}</span></div>`).join('')}`:'<div class=\"bench-heading\">Bench</div>');bind();renderPool()"
+
+          if old not in text:
+              raise SystemExit('My Team roster rendering pattern not found')
+
+          text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Show positional slots under My Team"
+          git push

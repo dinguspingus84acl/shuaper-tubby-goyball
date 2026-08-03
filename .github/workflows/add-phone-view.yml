@@ -1,0 +1,49 @@
+name: Add Phone View Toggle
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/add-phone-view.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add phone view toggle
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          for filename in ['index.html','live-draft.html']:
+              path=Path(filename)
+              if not path.exists():
+                  continue
+              text=path.read_text(encoding='utf-8')
+
+              if '.view-mode-toggle{' not in text:
+                  css='''.view-mode-toggle{position:fixed;right:14px;bottom:14px;z-index:100;display:flex;gap:6px;padding:6px;background:#061322ee;border:1px solid #ffffff35;border-radius:12px;box-shadow:0 8px 24px #0008}.view-mode-toggle button{border:1px solid #ffffff30;background:transparent;color:#91a4ba;border-radius:8px;padding:9px 12px;font-weight:900}.view-mode-toggle button.active{background:#183d63;color:#fff}.phone-mode header{padding:18px 12px}.phone-mode h1{font-size:2.35rem}.phone-mode main,.phone-mode .tools{padding-left:10px;padding-right:10px}.phone-mode .tools{display:grid}.phone-mode .positions,.phone-mode .team-options,.phone-mode .mock-actions,.phone-mode .mock-filters,.phone-mode .filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}.phone-mode .positions button,.phone-mode .team-options button,.phone-mode .mock-actions button,.phone-mode .mock-filters button,.phone-mode .filters button{min-height:44px}.phone-mode .mock-layout,.phone-mode .layout{display:flex!important;flex-direction:column!important}.phone-mode .player-pool,.phone-mode .side{order:-1;position:static!important;width:100%!important;max-height:none!important}.phone-mode .pool-list,.phone-mode .pool{height:58vh!important;min-height:360px!important}.phone-mode .board,.phone-mode .draft-board{display:grid;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:8px}.phone-mode .pick,.phone-mode .drafted{min-width:138px;scroll-snap-align:start}.phone-mode .pool-player,.phone-mode .player{grid-template-columns:30px 40px minmax(0,1fr) auto}.phone-mode .draft-btn,.phone-mode .draft{min-height:42px;min-width:64px}.phone-mode .roster-card{min-height:68px}.phone-mode .profile{width:100%;max-height:95vh;padding:16px}.phone-mode .profile-top{gap:12px;min-height:110px}.phone-mode .stats{grid-template-columns:1fr 1fr}.phone-mode .setup{grid-template-columns:1fr!important}.phone-mode .room-bar{align-items:stretch}.phone-mode .room-bar>div:last-child{display:flex;gap:6px;width:100%}.phone-mode .room-bar>div:last-child button{flex:1}'''
+                  text=text.replace('</style>',css+'</style>',1)
+
+              if 'id="viewModeToggle"' not in text:
+                  toggle='''<div id="viewModeToggle" class="view-mode-toggle"><button type="button" data-mode="desktop">Desktop</button><button type="button" data-mode="phone">Phone</button></div>'''
+                  text=text.replace('</body>',toggle+'</body>',1)
+
+              if "localStorage.getItem('shuaViewMode')" not in text:
+                  js='''<script>(function(){const key='shuaViewMode',toggle=document.getElementById('viewModeToggle');if(!toggle)return;const auto=window.matchMedia('(max-width:700px)').matches?'phone':'desktop';function apply(mode){document.body.classList.toggle('phone-mode',mode==='phone');toggle.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));localStorage.setItem(key,mode)}toggle.addEventListener('click',e=>{const b=e.target.closest('button[data-mode]');if(b)apply(b.dataset.mode)});apply(localStorage.getItem(key)||auto)})();</script>'''
+                  text=text.replace('</body>',js+'</body>',1)
+
+              path.write_text(text,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html live-draft.html
+          git diff --cached --quiet || git commit -m "Add desktop and phone layout toggle"
+          git push

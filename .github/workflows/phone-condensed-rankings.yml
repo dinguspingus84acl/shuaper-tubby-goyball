@@ -1,0 +1,37 @@
+name: Condense phone ranking rows
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/phone-condensed-rankings.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update phone ranking layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          css = ".phone-mode #tableCard thead{display:none!important}.phone-mode #tableCard tbody{display:block!important;padding:0!important}.phone-mode #tableCard tbody tr{display:grid!important;grid-template-columns:44px minmax(0,1fr) 66px 54px!important;align-items:center!important;gap:0!important;border:0!important;border-top:1px solid var(--l)!important;border-radius:0!important}.phone-mode #tableCard tbody td{display:block!important;padding:10px 6px!important;border:0!important;min-width:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.phone-mode #tableCard tbody td:nth-child(5),.phone-mode #tableCard tbody td:nth-child(6){display:none!important}.phone-mode #tableCard .photo{display:none!important}.phone-mode #tableCard .photo-cell{display:block!important;min-width:0!important}.phone-mode #tableCard .photo-cell b{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.phone-mode #tableCard .badge{padding:4px 6px!important;font-size:.68rem!important}"
+          marker = '</style></head>'
+          if css not in text:
+              text = text.replace(marker, css + marker, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Condense phone ranking rows to one line"
+          git push

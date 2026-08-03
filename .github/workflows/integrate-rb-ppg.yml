@@ -1,0 +1,62 @@
+name: Integrate RB PPG into player profiles
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/integrate-rb-ppg.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build 2025 RB PPG ranking into index.html
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          old_state = "let board=[],players=[],position='ALL',teamCount=10,overallView='BOARD',photos=new Map(),mock="
+          new_state = "let board=[],players=[],rbPpgRanks=new Map(),position='ALL',teamCount=10,overallView='BOARD',photos=new Map(),mock="
+          if old_state in text:
+              text = text.replace(old_state, new_state, 1)
+          elif new_state not in text:
+              raise SystemExit('Could not find main state declaration')
+
+          old_load = "let u=['big-board.json','players.json','qb-rankings.json','rb-rankings.json','wr-rankings.json','te-rankings.json'],r=await Promise.all(u.map(x=>fetch(x,{cache:'no-store'}))),d=await Promise.all(r.map(x=>x.json())),[b,p,q,rb,w,t]=d;players="
+          new_load = "let u=['big-board.json','players.json','qb-rankings.json','rb-rankings.json','wr-rankings.json','te-rankings.json','rb-2025-ppg.json'],r=await Promise.all(u.map(x=>fetch(x,{cache:'no-store'}))),d=await Promise.all(r.map(x=>x.json())),[b,p,q,rb,w,t,ppg]=d;rbPpgRanks=new Map((ppg.players||[]).map(x=>[N(x.name),x.rank]));players="
+          if old_load in text:
+              text = text.replace(old_load, new_load, 1)
+          elif new_load not in text:
+              raise SystemExit('Could not find data loading declaration')
+
+          old_stats = "<div class=\"stat\"><span>ESPN ADP</span><b>${a.espnAdp||'—'}</b></div>`;"
+          new_stats = "<div class=\"stat\"><span>ESPN ADP</span><b>${a.espnAdp||'—'}</b></div>${p.position==='RB'&&rbPpgRanks.get(N(p.name))?`<div class=\"stat\"><span>2025 PPG rank</span><b>#${rbPpgRanks.get(N(p.name))}</b></div>`:''}`;"
+          if old_stats in text:
+              text = text.replace(old_stats, new_stats, 1)
+          elif '2025 PPG rank' not in text:
+              raise SystemExit('Could not find profile stats renderer')
+
+          text = text.replace('<script src="rb-ppg.js?v=1"></script>', '')
+          text = text.replace('<script src="rb-ppg.js?v=2"></script>', '')
+          text = text.replace('<script src="rb-ppg.js?v=3"></script>', '')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit integrated profile renderer
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+          else
+            git commit -m "Integrate 2025 RB PPG ranks into player profiles"
+            git push
+          fi

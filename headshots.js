@@ -13,51 +13,30 @@
     .player-photo.large{width:112px;height:112px;border-width:3px;margin:4px 0 12px}
     .player-photo-fallback{display:inline-flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:950;color:#fff;background:#244761}
 
-    /* Keep the headshot from covering the player name or draft ranking. */
-    .pick.has-photo,.drafted.has-photo{
-      min-height:112px;
-      padding:52px 8px 22px;
-    }
-    .pick.has-photo>.player-photo,.drafted.has-photo>.player-photo{
-      position:absolute;
-      left:8px;
-      top:8px;
-      width:38px;
-      height:38px;
-    }
+    .pick.has-photo,.drafted.has-photo{min-height:112px;padding:52px 8px 22px}
+    .pick.has-photo>.player-photo,.drafted.has-photo>.player-photo{position:absolute;left:8px;top:8px;width:38px;height:38px}
+
+    /* Keep the full player name anchored to the left edge. */
     .pick.has-photo .name,.drafted.has-photo .name{
-      position:relative;
-      z-index:2;
+      position:relative!important;
+      left:0!important;
+      right:auto!important;
+      z-index:4;
       display:block;
-      width:100%;
+      width:calc(100% - 2px);
+      margin:0;
+      padding:0;
+      text-align:left!important;
       color:#061322;
       font-size:.82rem;
       font-weight:950;
-      line-height:1.1;
+      line-height:1.12;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
-    .pick.has-photo .slot,.drafted.has-photo .slot{
-      position:absolute;
-      right:7px;
-      top:8px;
-      z-index:3;
-      display:block;
-      padding:3px 5px;
-      border-radius:5px;
-      background:rgba(255,255,255,.72);
-      color:#061322;
-      font-size:.72rem;
-      font-weight:950;
-      opacity:1;
-    }
-    .pick.has-photo .meta,.drafted.has-photo .team{
-      position:relative;
-      z-index:2;
-      display:block;
-      margin-top:4px;
-    }
+    .pick.has-photo .slot,.drafted.has-photo .slot{position:absolute;right:7px;top:8px;left:auto;z-index:5;display:block;padding:3px 5px;border-radius:5px;background:rgba(255,255,255,.82);color:#061322;font-size:.72rem;font-weight:950;opacity:1}
+    .pick.has-photo .meta,.drafted.has-photo .team{position:relative;left:0!important;z-index:2;display:block;margin-top:4px;text-align:left!important}
     .pick.has-photo .arrow,.drafted.has-photo .arrow{z-index:2}
 
     .photo-name-cell{display:flex;align-items:center;gap:10px;min-width:190px}
@@ -68,9 +47,10 @@
 
     @media(max-width:650px){
       .player-photo{width:38px;height:38px}
-      .pick.has-photo,.drafted.has-photo{min-height:106px;padding-top:49px}
-      .pick.has-photo>.player-photo,.drafted.has-photo>.player-photo{width:34px;height:34px}
-      .pick.has-photo .name,.drafted.has-photo .name{font-size:.78rem}
+      .pick.has-photo,.drafted.has-photo{min-height:106px;padding:49px 7px 21px}
+      .pick.has-photo>.player-photo,.drafted.has-photo>.player-photo{width:34px;height:34px;left:7px;top:7px}
+      .pick.has-photo .name,.drafted.has-photo .name{font-size:.76rem}
+      .pick.has-photo .slot,.drafted.has-photo .slot{right:6px;top:7px;font-size:.68rem}
       .pool-player.has-photo{grid-template-columns:34px 34px minmax(0,1fr) auto}
     }
   `;
@@ -83,8 +63,6 @@
 
   function fullNameFromElement(el){
     if(el.id==='pn') return el.textContent.trim();
-    const direct=el.querySelector('.full-player-name,[data-full-name]');
-    if(direct) return direct.dataset.fullName || direct.textContent.trim();
     const id=el.dataset && el.dataset.id;
     if(id){
       const key=norm(id.replace(/^(qb|rb|wr|te)-\d+-/i,''));
@@ -93,23 +71,6 @@
     }
     const candidates=[...el.querySelectorAll('b,.name')].map(x=>x.textContent.trim()).filter(Boolean);
     return candidates.find(x=>x && !/^(empty|bench)$/i.test(x)) || '';
-  }
-
-  function makePhoto(name,size=''){
-    const key=norm(name);
-    const player=byName.get(key);
-    const img=document.createElement('img');
-    img.className=`player-photo ${size}`.trim();
-    img.loading='lazy';
-    img.decoding='async';
-    img.alt=`${name} headshot`;
-    if(player && player.player_id){
-      img.src=CDN(player.player_id);
-      img.onerror=()=>replaceWithFallback(img,name,size);
-    }else{
-      return fallback(name,size);
-    }
-    return img;
   }
 
   function fallback(name,size=''){
@@ -121,9 +82,17 @@
     return span;
   }
 
-  function replaceWithFallback(img,name,size){
-    if(!img.isConnected)return;
-    img.replaceWith(fallback(name,size));
+  function makePhoto(name,size=''){
+    const player=byName.get(norm(name));
+    if(!player || !player.player_id) return fallback(name,size);
+    const img=document.createElement('img');
+    img.className=`player-photo ${size}`.trim();
+    img.loading='lazy';
+    img.decoding='async';
+    img.alt=`${name} headshot`;
+    img.src=CDN(player.player_id);
+    img.onerror=()=>{if(img.isConnected)img.replaceWith(fallback(name,size));};
+    return img;
   }
 
   function addCardPhoto(el){
@@ -137,10 +106,12 @@
     if(row.dataset.photoDone)return;
     const cells=row.children;if(cells.length<2)return;
     const name=fullNameFromElement(row);if(!name)return;
-    const cell=cells[1];
-    const wrap=document.createElement('div');wrap.className='photo-name-cell';
+    const cell=cells[1],wrap=document.createElement('div');
+    wrap.className='photo-name-cell';
     while(cell.firstChild)wrap.appendChild(cell.firstChild);
-    wrap.prepend(makePhoto(name));cell.appendChild(wrap);row.dataset.photoDone='1';
+    wrap.prepend(makePhoto(name));
+    cell.appendChild(wrap);
+    row.dataset.photoDone='1';
   }
 
   function addPoolPhoto(row){
@@ -148,18 +119,21 @@
     const name=fullNameFromElement(row);if(!name)return;
     const rank=row.querySelector('.pool-rank');
     if(rank)rank.insertAdjacentElement('afterend',makePhoto(name,'small'));else row.prepend(makePhoto(name,'small'));
-    row.classList.add('has-photo');row.dataset.photoDone='1';
+    row.classList.add('has-photo');
+    row.dataset.photoDone='1';
   }
 
   function addProfilePhoto(){
     const title=document.getElementById('pn');if(!title||!title.textContent.trim())return;
     const profile=title.closest('.profile');if(!profile)return;
-    const old=profile.querySelector('.profile-photo-wrap');if(old&&old.dataset.name===title.textContent.trim())return;
+    const old=profile.querySelector('.profile-photo-wrap');
+    if(old&&old.dataset.name===title.textContent.trim())return;
     if(old)old.remove();
-    const wrap=document.createElement('div');wrap.className='profile-photo-wrap';wrap.dataset.name=title.textContent.trim();
+    const wrap=document.createElement('div');
+    wrap.className='profile-photo-wrap';
+    wrap.dataset.name=title.textContent.trim();
     wrap.appendChild(makePhoto(title.textContent.trim(),'large'));
-    const info=document.createElement('div');info.innerHTML=`<strong>${title.textContent.trim()}</strong><div style="color:#91a4ba;margin-top:4px">Player headshot</div>`;
-    wrap.appendChild(info);title.insertAdjacentElement('afterend',wrap);
+    title.insertAdjacentElement('afterend',wrap);
   }
 
   function hydrate(){

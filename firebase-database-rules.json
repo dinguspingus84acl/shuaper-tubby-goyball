@@ -1,0 +1,13 @@
+{
+  "rules": {
+    "rooms": {
+      "$room": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['hostId','teams','rounds','status','currentPick']) || !newData.exists()"
+      }
+    },
+    ".read": false,
+    ".write": false
+  }
+}

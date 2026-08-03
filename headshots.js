@@ -12,14 +12,67 @@
     .player-photo.small{width:34px;height:34px;border-width:1px}
     .player-photo.large{width:112px;height:112px;border-width:3px;margin:4px 0 12px}
     .player-photo-fallback{display:inline-flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:950;color:#fff;background:#244761}
-    .pick.has-photo,.drafted.has-photo{padding-left:55px}
-    .pick.has-photo>.player-photo,.drafted.has-photo>.player-photo{position:absolute;left:8px;top:24px}
+
+    /* Keep the headshot from covering the player name or draft ranking. */
+    .pick.has-photo,.drafted.has-photo{
+      min-height:112px;
+      padding:52px 8px 22px;
+    }
+    .pick.has-photo>.player-photo,.drafted.has-photo>.player-photo{
+      position:absolute;
+      left:8px;
+      top:8px;
+      width:38px;
+      height:38px;
+    }
+    .pick.has-photo .name,.drafted.has-photo .name{
+      position:relative;
+      z-index:2;
+      display:block;
+      width:100%;
+      color:#061322;
+      font-size:.82rem;
+      font-weight:950;
+      line-height:1.1;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .pick.has-photo .slot,.drafted.has-photo .slot{
+      position:absolute;
+      right:7px;
+      top:8px;
+      z-index:3;
+      display:block;
+      padding:3px 5px;
+      border-radius:5px;
+      background:rgba(255,255,255,.72);
+      color:#061322;
+      font-size:.72rem;
+      font-weight:950;
+      opacity:1;
+    }
+    .pick.has-photo .meta,.drafted.has-photo .team{
+      position:relative;
+      z-index:2;
+      display:block;
+      margin-top:4px;
+    }
+    .pick.has-photo .arrow,.drafted.has-photo .arrow{z-index:2}
+
     .photo-name-cell{display:flex;align-items:center;gap:10px;min-width:190px}
     .pool-player.has-photo{grid-template-columns:42px 38px minmax(0,1fr) auto}
     .roster-card.has-photo{position:relative;padding-left:60px;min-height:68px}
     .roster-card.has-photo>.player-photo{position:absolute;left:10px;top:11px}
     .profile-photo-wrap{display:flex;align-items:center;gap:16px;margin:8px 0 12px}
-    @media(max-width:650px){.player-photo{width:38px;height:38px}.pick.has-photo,.drafted.has-photo{padding-left:50px}.pool-player.has-photo{grid-template-columns:34px 34px minmax(0,1fr) auto}}
+
+    @media(max-width:650px){
+      .player-photo{width:38px;height:38px}
+      .pick.has-photo,.drafted.has-photo{min-height:106px;padding-top:49px}
+      .pick.has-photo>.player-photo,.drafted.has-photo>.player-photo{width:34px;height:34px}
+      .pick.has-photo .name,.drafted.has-photo .name{font-size:.78rem}
+      .pool-player.has-photo{grid-template-columns:34px 34px minmax(0,1fr) auto}
+    }
   `;
   document.head.appendChild(style);
 

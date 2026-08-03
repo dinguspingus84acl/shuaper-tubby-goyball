@@ -1,0 +1,51 @@
+name: Fix player card close behavior
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fix-player-card-close.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make player profile close smoothly
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          old = "$('#close').onclick=()=>$('#modal').classList.remove('open');$('#modal').onclick=e=>{if(e.target.id==='modal')$('#modal').classList.remove('open')};"
+          new = "function closeProfile(){const m=$('#modal');m.classList.remove('open');m.removeAttribute('data-id');document.body.style.overflow='';}$('#close').onclick=e=>{e.preventDefault();e.stopPropagation();closeProfile()};$('#modal').onclick=e=>{if(e.target===$('#modal'))closeProfile()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#modal').classList.contains('open'))closeProfile()});"
+
+          if old not in text:
+              raise SystemExit('Existing modal close handler was not found')
+          text = text.replace(old, new, 1)
+
+          open_old = "$('#modal').classList.add('open')}"
+          open_new = "$('#modal').classList.add('open');document.body.style.overflow='hidden'}"
+          if open_old not in text:
+              raise SystemExit('Modal open handler was not found')
+          text = text.replace(open_old, open_new, 1)
+
+          css_old = ".closem{float:right;background:transparent;color:#fff;border:1px solid var(--l);border-radius:7px;padding:7px 11px}"
+          css_new = ".closem{float:right;background:transparent;color:#fff;border:1px solid var(--l);border-radius:7px;padding:7px 11px;position:sticky;top:0;z-index:5;touch-action:manipulation}"
+          if css_old in text:
+              text = text.replace(css_old, css_new, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Fix player profile close behavior"
+          git push

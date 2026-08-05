@@ -1,9 +1,12 @@
 name: Install SOS profile stat
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - '.github/workflows/install-sos-profile.yml'
+      - 'sos.js'
+      - 'strength-of-schedule.json'
 
 permissions:
   contents: write

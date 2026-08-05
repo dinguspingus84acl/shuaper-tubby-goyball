@@ -1,0 +1,87 @@
+name: Add depth chart tab
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/add-depth-chart-tab.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add depth chart tab without changing existing layouts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          replacements = [
+            (
+              '.search{position:relative;flex:1}',
+              '.search{position:relative;flex:0 1 420px;min-width:220px}.positions{flex:1;justify-content:flex-end}'
+            ),
+            (
+              '<button class="pos" data-pos="MOCK">Mock Draft</button>',
+              '<button class="pos" data-pos="MOCK">Mock Draft</button><button class="pos" data-pos="DEPTH">Depth Charts</button>'
+            ),
+            (
+              '</section></main>',
+              '</section><section id="depthSection" hidden><div class="depth-toolbar"><label>Team<select id="depthTeam"></select></label></div><div id="depthGrid" class="depth-grid"></div></section></main>'
+            ),
+            (
+              'let board=[],players=[],',
+              'let board=[],players=[],depthCharts=[],'
+            ),
+            (
+              "'te-2025-ppg.json']",
+              "'te-2025-ppg.json','depth-chart.json']"
+            ),
+            (
+              '[b,p,q,rb,w,t,ppg,qbPpg,wrPpg,tePpg]=d;',
+              '[b,p,q,rb,w,t,ppg,qbPpg,wrPpg,tePpg,depthData]=d;depthCharts=depthData.teams||[];'
+            ),
+          ]
+
+          for old, new in replacements:
+              if old not in text:
+                  raise SystemExit(f'Missing expected markup: {old[:80]}')
+              text = text.replace(old, new, 1)
+
+          old_render = "function render(){let o=position==='ALL',md=position==='MOCK',l=list();$('#title').textContent=md?'Mock Draft':o?'My SHUA Big Board':position+' Rankings';$('#sub').textContent=o?teamCount+'-team snake draft':'';$('#teamControls').hidden=!o;$('#overallToggle').hidden=!o;$('#mockSection').hidden=!md;if(o){$('#board').hidden=overallView!=='BOARD';$('#tableCard').hidden=overallView!=='LIST';boardView(l);table(l,true)}else if(md){$('#board').hidden=true;$('#tableCard').hidden=true;mockView()}else{$('#board').hidden=true;$('#tableCard').hidden=false;table(l,false)}}"
+          new_render = "function render(){let o=position==='ALL',md=position==='MOCK',dc=position==='DEPTH',l=dc?[]:list();$('#title').textContent=dc?'NFL Depth Charts':md?'Mock Draft':o?'My SHUA Big Board':position+' Rankings';$('#sub').textContent=o?teamCount+'-team snake draft':dc?'Select a team to view its offensive depth chart':'';$('#teamControls').hidden=!o;$('#overallToggle').hidden=!o;$('#mockSection').hidden=!md;$('#depthSection').hidden=!dc;if(dc){$('#board').hidden=true;$('#tableCard').hidden=true;depthView()}else if(o){$('#board').hidden=overallView!=='BOARD';$('#tableCard').hidden=overallView!=='LIST';boardView(l);table(l,true)}else if(md){$('#board').hidden=true;$('#tableCard').hidden=true;mockView()}else{$('#board').hidden=true;$('#tableCard').hidden=false;table(l,false)}}"
+          if old_render not in text:
+              raise SystemExit('Render function signature did not match expected code')
+          text = text.replace(old_render, new_render, 1)
+
+          marker = 'function boardView(l){'
+          depth_function = "function depthView(){let s=$('#depthTeam');if(!depthCharts.length)return;if(!s.options.length)s.innerHTML=depthCharts.map(x=>`<option value=\"${x.team}\">${x.team}</option>`).join('');let code=s.value||depthCharts[0].team,d=depthCharts.find(x=>x.team===code)||depthCharts[0];s.value=d.team;$('#depthGrid').innerHTML=['QB','RB','WR','TE'].map(pos=>`<div class=\"depth-card ${pos.toLowerCase()}\"><h3>${pos}</h3>${(d[pos]||[]).map((n,i)=>{let p=players.find(x=>N(x.name)===N(n));return `<div class=\"depth-player\" ${p?`data-id=\"${p.id}\"`:''}><b>${i+1}</b><span>${n}</span></div>`}).join('')||'<div class=\"depth-empty\">No players listed</div>'}</div>`).join('');bind()}"
+          if marker not in text:
+              raise SystemExit('boardView marker not found')
+          text = text.replace(marker, depth_function + marker, 1)
+
+          listener_marker = "$('#mockTeams').onchange=slots;"
+          if listener_marker not in text:
+              raise SystemExit('Mock teams listener marker not found')
+          text = text.replace(listener_marker, "$('#depthTeam').onchange=depthView;" + listener_marker, 1)
+
+          css = ".depth-toolbar{display:flex;justify-content:flex-end;margin:12px 0}.depth-toolbar label{display:grid;gap:5px;color:var(--m);font-weight:800}.depth-toolbar select{min-width:150px;height:42px;border:1px solid var(--l);border-radius:8px;background:#0b2139;color:#fff;padding:0 10px}.depth-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.depth-card{border-radius:12px;padding:14px;color:#061322;min-width:0}.depth-card h3{margin:0 0 10px;font-size:1.15rem}.depth-player{display:grid;grid-template-columns:24px minmax(0,1fr);gap:7px;padding:9px 0;border-top:1px solid #06132225;cursor:pointer}.depth-player span{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.depth-empty{padding:10px 0;opacity:.7}@media(max-width:850px){.depth-grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.depth-grid{grid-template-columns:1fr}.depth-toolbar{justify-content:stretch}.depth-toolbar label,.depth-toolbar select{width:100%}.phone-mode .search{flex:auto;min-width:0}}"
+          if '</style>' not in text:
+              raise SystemExit('Style closing tag not found')
+          text = text.replace('</style>', css + '</style>', 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add team depth chart tab"
+          git push

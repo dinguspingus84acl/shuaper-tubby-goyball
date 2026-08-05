@@ -1,0 +1,32 @@
+name: Remove mock draft decision engine
+
+on:
+  push:
+    paths:
+      - '.github/workflows/remove-decision-engine.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  remove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore original mock draft simulator
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          text = text.replace('<script src="decision-engine.js"></script>', '')
+          p.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git rm .github/workflows/remove-decision-engine.yml
+          git commit -m "Restore original mock draft simulator"
+          git push

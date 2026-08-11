@@ -1,0 +1,63 @@
+name: Fix player headshot matching
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-player-headshots.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make headshot matching deterministic and team-aware
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          old_decl = "position='ALL',teamCount=10,overallView='BOARD',photos=new Map(),mock="
+          new_decl = "position='ALL',teamCount=10,overallView='BOARD',photos=new Map(),photoCandidates=new Map(),mock="
+          if old_decl not in text:
+              raise SystemExit('photo declaration not found')
+          text = text.replace(old_decl, new_decl, 1)
+
+          old_pic = "function pic(n,c=''){let p=photos.get(N(n)),cl='photo '+c;return p?`<img class=\"${cl}\" src=\"https://sleepercdn.com/content/nfl/players/thumb/${p}.jpg\" onerror=\"this.outerHTML='<span class=&quot;${cl} fallback&quot;>${init(n)}</span>'\">`:`<span class=\"${cl} fallback\">${init(n)}</span>`}"
+          new_pic = "function playerPhotoId(n,t='',pos=''){let key=N(n),direct=photos.get(key);if(direct)return direct;let list=photoCandidates.get(key)||[];if(!list.length)return'';let team=N(t),position=String(pos||'').toUpperCase();let exact=list.find(x=>(!position||x.position===position)&&(!team||N(x.team)===team));if(exact)return exact.id;let byPos=list.find(x=>!position||x.position===position);return byPos?.id||''}function pic(n,c='',t='',pos=''){let p=playerPhotoId(n,t,pos),cl='photo '+c;return p?`<img class=\"${cl}\" src=\"https://sleepercdn.com/content/nfl/players/thumb/${p}.jpg\" alt=\"${n}\" onerror=\"this.outerHTML='<span class=&quot;${cl} fallback&quot;>${init(n)}</span>'\">`:`<span class=\"${cl} fallback\">${init(n)}</span>`}"
+          if old_pic not in text:
+              raise SystemExit('pic function not found')
+          text = text.replace(old_pic, new_pic, 1)
+
+          old_load = "fetch('https://api.sleeper.app/v1/players/nfl').then(x=>x.json()).then(x=>{Object.values(x).forEach(p=>{let n=p.full_name||`${p.first_name||''} ${p.last_name||''}`.trim();if(n&&p.player_id)photos.set(N(n),p.player_id)});render();if($('#modal').classList.contains('open'))profile($('#modal').dataset.id)})"
+          new_load = "fetch('https://api.sleeper.app/v1/players/nfl').then(x=>x.json()).then(x=>{photoCandidates.clear();Object.values(x).forEach(p=>{let n=p.full_name||`${p.first_name||''} ${p.last_name||''}`.trim();if(!n||!p.player_id)return;let key=N(n),row={id:p.player_id,team:p.team||'',position:String(p.position||'').toUpperCase(),active:p.active!==false};if(!photoCandidates.has(key))photoCandidates.set(key,[]);photoCandidates.get(key).push(row)});photos.clear();players.forEach(pl=>{let key=N(pl.name),list=photoCandidates.get(key)||[];if(!list.length)return;let match=list.find(x=>x.position===pl.position&&N(x.team)===N(pl.team))||list.find(x=>x.position===pl.position&&x.active)||list.find(x=>x.position===pl.position)||list.find(x=>N(x.team)===N(pl.team))||(list.length===1?list[0]:null);if(match)photos.set(key,match.id)});render();if($('#modal').classList.contains('open'))profile($('#modal').dataset.id)})"
+          if old_load not in text:
+              raise SystemExit('Sleeper photo loader not found')
+          text = text.replace(old_load, new_load, 1)
+
+          # Pass team/position anywhere we render a player headshot so duplicate names cannot resolve to the wrong player.
+          replacements = {
+              "${pic(p.name)}<b": "${pic(p.name,'',p.team,p.position)}<b",
+              "${pic(p.name,'lg')}</div>": "${pic(p.name,'lg',p.team,p.position)}</div>",
+              "${pic(x.player.name,'sm')}<b": "${pic(x.player.name,'sm',x.player.team,x.player.position)}<b",
+              "${pic(p.name,'sm')}<b>${p.name}": "${pic(p.name,'sm',p.team,p.position)}<b>${p.name}",
+              "${pic(p.name,'sm')}<span data-id": "${pic(p.name,'sm',p.team,p.position)}<span data-id"
+          }
+          for old,new in replacements.items():
+              text = text.replace(old,new)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit headshot fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Fix player headshot matching"
+            git push
+          fi

@@ -1,0 +1,35 @@
+name: Fix Jeremiyah Love spelling
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-jeremiyah-love-name.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Match RB and overall spelling to depth chart
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          files = [Path('rb-rankings.json'), Path('big-board.json')]
+          old = 'Jeramayah Love'
+          new = 'Jeremiyah Love'
+          for path in files:
+              text = path.read_text(encoding='utf-8')
+              if old not in text:
+                  raise SystemExit(f'{old} not found in {path}')
+              path.write_text(text.replace(old, new), encoding='utf-8')
+          PY
+      - name: Commit spelling fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add rb-rankings.json big-board.json
+          git commit -m "Match Jeremiyah Love spelling to depth chart"
+          git push

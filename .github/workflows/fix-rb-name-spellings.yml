@@ -1,0 +1,50 @@
+name: Fix RB name spellings
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-rb-name-spellings.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix RB names
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          rb_path = Path('rb-rankings.json')
+          data = json.loads(rb_path.read_text(encoding='utf-8'))
+          for p in data.get('players', []):
+              if p.get('rank') == 104:
+                  p['name'] = 'Dameon Pierce'
+                  p['team'] = 'PHI'
+              if p.get('rank') == 41 or p.get('name') in {'Jacory Corskey-Merritt','Jcory Corskey- Merritt','Jcory Croskey-Merritt'}:
+                  p['name'] = 'Jacory Croskey-Merritt'
+          rb_path.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+
+          for fname in ['big-board.json','depth-chart.json']:
+              p = Path(fname)
+              if not p.exists():
+                  continue
+              text = p.read_text(encoding='utf-8')
+              text = text.replace('Jcory Corskey- Merritt', 'Jacory Croskey-Merritt')
+              text = text.replace('Jacory Corskey-Merritt', 'Jacory Croskey-Merritt')
+              text = text.replace('Jcory Croskey-Merritt', 'Jacory Croskey-Merritt')
+              p.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add rb-rankings.json big-board.json depth-chart.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Correct Dameon Pierce and Jacory Croskey-Merritt"
+            git push
+          fi

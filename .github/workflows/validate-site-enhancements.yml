@@ -3,6 +3,7 @@ name: Validate site enhancements
 on:
   push:
     paths:
+      - 'site-enhancements.js'
       - '.github/workflows/validate-site-enhancements.yml'
   workflow_dispatch:
 

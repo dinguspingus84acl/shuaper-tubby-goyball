@@ -59,8 +59,6 @@ function addNav(){
   let dnd=nav.querySelector('[data-pos="DND"]');
   if(!dnd){dnd=document.createElement('button');dnd.className='pos dnd-btn';dnd.dataset.pos='DND';dnd.textContent='Do Not Draft';nav.insertBefore(dnd,nav.querySelector('[data-pos="MOCK"]')||null)}
   my.onclick=()=>openTagged('MYGUYS',my);dnd.onclick=()=>openTagged('DND',dnd);
-  const filters=document.querySelector('.mock-filters');
-  if(filters&&!filters.querySelector('[data-filter="MYGUYS"]')){const b=document.createElement('button');b.className='mock-btn pool-filter';b.dataset.filter='MYGUYS';b.textContent='My Guys';filters.appendChild(b);b.onclick=()=>{mock.filter='MYGUYS';filters.querySelectorAll('.pool-filter').forEach(x=>x.classList.toggle('primary',x===b));renderPool()}}
 }
 function openTagged(kind,button){
   currentKind=kind;currentPos='ALL';
@@ -104,7 +102,6 @@ async function loadData(){
 function install(){
   addStyles();ensureControls();addNav();
   document.addEventListener('click',e=>{const b=e.target.closest('.positions .pos');if(b&&!['MYGUYS','DND'].includes(b.dataset.pos))hideTagged()},true);
-  try{const basePool=pool;pool=function(f){if(f==='MYGUYS')return basePool('ALL').filter(p=>isTagged(p,'draft'));return basePool(f)}}catch(e){}
   const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();applyColors()}));obs.observe(document.body,{subtree:true,childList:true});
   loadData().catch(console.error);requestAnimationFrame(decorateTeamLogos);
 }

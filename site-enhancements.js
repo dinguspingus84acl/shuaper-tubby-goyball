@@ -20,6 +20,13 @@ function addStyles(){
     .tag-group td{background:#0d2945!important;color:#fff!important;font-weight:950!important;letter-spacing:.08em;padding:9px 14px!important}.tag-group.qb td{border-left:5px solid var(--qb)}.tag-group.rb td{border-left:5px solid var(--rb)}.tag-group.wr td{border-left:5px solid var(--wr)}.tag-group.te td{border-left:5px solid var(--te)}
     .team-abbr{display:inline-flex;align-items:center;gap:7px;font-weight:800;white-space:nowrap}.team-mini-logo{width:22px;height:22px;object-fit:contain;vertical-align:middle;flex:0 0 22px}.team-mini-logo.sm{width:18px;height:18px;flex-basis:18px}
     @media(max-width:650px){.tagged-controls.open{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.tagged-controls button{padding:8px 4px}.tagged-count{grid-column:1/-1;margin-left:0}.tag-group{display:block!important}.tag-group td{display:block!important}}
+    @media(max-width:650px){
+      .phone-mode #tableCard tbody tr{grid-template-columns:42px minmax(0,1fr) 58px 62px!important}
+      .phone-mode #tableCard tbody td:nth-child(4){padding-left:0!important;padding-right:2px!important;transform:translateX(-5px);overflow:visible!important}
+      .phone-mode #tableCard .team-abbr{gap:3px!important;font-size:.68rem!important}
+      .phone-mode #tableCard .team-mini-logo{width:17px!important;height:17px!important;flex-basis:17px!important}
+    }
+
   `;document.head.appendChild(st);
 }
 function logoHtml(team,small=false){const slug=TEAM_SLUGS[team];return slug?`<span class="team-abbr"><img class="team-mini-logo${small?' sm':''}" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt=""><span>${team}</span></span>`:`<span class="team-abbr">${team||'—'}</span>`}

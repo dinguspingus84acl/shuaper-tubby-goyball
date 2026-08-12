@@ -1,0 +1,40 @@
+name: Update AJ Brown team
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update-aj-brown-team.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set AJ Brown to Patriots
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('wr-rankings.json')
+          data = json.loads(p.read_text())
+          found = False
+          for player in data.get('players', []):
+              if player.get('name') == 'A.J. Brown':
+                  player['team'] = 'NWE'
+                  found = True
+                  break
+          if not found:
+              raise SystemExit('A.J. Brown not found')
+          p.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')))
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add wr-rankings.json
+          git commit -m "Show A.J. Brown on Patriots"
+          git push

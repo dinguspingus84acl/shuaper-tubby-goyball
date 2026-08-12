@@ -21,25 +21,21 @@ jobs:
           p = Path('site-enhancements.js')
           s = p.read_text()
           marker = "\n  `;document.head.appendChild(st);"
-          css = """
-    @media(max-width:650px){
-      .phone-mode #tableCard tbody tr{grid-template-columns:42px minmax(0,1fr) 58px 62px!important}
-      .phone-mode #tableCard tbody td:nth-child(4){padding-left:0!important;padding-right:2px!important;transform:translateX(-5px);overflow:visible!important}
-      .phone-mode #tableCard .team-abbr{gap:3px!important;font-size:.68rem!important}
-      .phone-mode #tableCard .team-mini-logo{width:17px!important;height:17px!important;flex-basis:17px!important}
-    }
-          """
-          if css.strip() in s:
-              raise SystemExit('Phone team CSS already present')
-          if marker not in s:
-              raise SystemExit('Style marker not found')
-          s = s.replace(marker, css + marker, 1)
-          p.write_text(s)
+          css = "\n    @media(max-width:650px){\n      .phone-mode #tableCard tbody tr{grid-template-columns:42px minmax(0,1fr) 58px 62px!important}\n      .phone-mode #tableCard tbody td:nth-child(4){padding-left:0!important;padding-right:2px!important;transform:translateX(-5px);overflow:visible!important}\n      .phone-mode #tableCard .team-abbr{gap:3px!important;font-size:.68rem!important}\n      .phone-mode #tableCard .team-mini-logo{width:17px!important;height:17px!important;flex-basis:17px!important}\n    }\n"
+          if css.strip() not in s:
+              if marker not in s:
+                  raise SystemExit('Style marker not found')
+              s = s.replace(marker, css + marker, 1)
+              p.write_text(s)
           PY
       - name: Validate JavaScript
         run: node --check site-enhancements.js
       - name: Commit change
         run: |
+          if git diff --quiet -- site-enhancements.js; then
+            echo "No change needed"
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add site-enhancements.js

@@ -1,0 +1,39 @@
+name: Remove mock My Guys button
+
+on:
+  push:
+    paths:
+      - '.github/workflows/remove-mock-myguys.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove My Guys mock filter button
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('site-enhancements.js')
+          s = p.read_text()
+          old = '''  const filters=document.querySelector('.mock-filters');
+  if(filters&&!filters.querySelector('[data-filter="MYGUYS"]')){const b=document.createElement('button');b.className='mock-btn pool-filter';b.dataset.filter='MYGUYS';b.textContent='My Guys';filters.appendChild(b);b.onclick=()=>{mock.filter='MYGUYS';filters.querySelectorAll('.pool-filter').forEach(x=>x.classList.toggle('primary',x===b));renderPool()}}
+'''
+          if old not in s:
+              raise SystemExit('My Guys mock filter insertion block not found')
+          s = s.replace(old, '', 1)
+          p.write_text(s)
+          PY
+      - name: Validate JavaScript
+        run: node --check site-enhancements.js
+      - name: Commit change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site-enhancements.js
+          git commit -m "Remove My Guys button from mock draft"
+          git push

@@ -1,0 +1,78 @@
+name: Update WR ranks
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update-wr-ranks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import updated WR rankings
+        env:
+          WR_GZ_B64: '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' 
+        run: |
+          python - <<'PY'
+          import base64, gzip, csv, io, json, os, re
+          from pathlib import Path
+
+          raw = gzip.decompress(base64.b64decode(os.environ['WR_GZ_B64']))
+          text = raw.decode('cp1252')
+          rows = list(csv.DictReader(io.StringIO(text)))
+
+          colors = json.loads(Path('player-color-tags.json').read_text())
+          draft = set(colors.get('WR',{}).get('draft',[]))
+          dnd = set(colors.get('WR',{}).get('do-not-draft',[]))
+
+          def norm(s):
+              return re.sub(r'[^a-z0-9]','',str(s).lower())
+          alias = {norm('Pat Byrnat'):norm('Pat Bryant')}
+          draft_n = {alias.get(norm(x),norm(x)) for x in draft}
+          dnd_n = {alias.get(norm(x),norm(x)) for x in dnd}
+
+          players=[]
+          for row in rows:
+              name=row['Player'].strip()
+              team=row['Team'].strip()
+              # Preserve the explicit site correction requested previously.
+              if name == 'A.J. Brown':
+                  team='NWE'
+              adp=row['ESPN ADP'].strip()
+              if adp:
+                  try:
+                      v=float(adp)
+                      if v.is_integer():
+                          v=int(v)
+                          adp=('+'+str(v)) if v>0 else str(v)
+                  except ValueError:
+                      pass
+              notes=row['Notes'].strip()
+              key=alias.get(norm(name),norm(name))
+              tag='draft' if key in draft_n else ('do-not-draft' if key in dnd_n else '')
+              players.append({'rank':int(row['Rank']),'name':name,'team':team,'espnAdp':adp,'notes':notes,'tag':tag})
+
+          Path('wr-rankings.json').write_text(json.dumps({'position':'WR','players':players},ensure_ascii=False,separators=(',',':')))
+          PY
+      - name: Validate imported WR file
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('wr-rankings.json'))
+          assert len(d['players']) == 131
+          assert [p['rank'] for p in d['players']] == list(range(1,132))
+          aj=next(p for p in d['players'] if p['name']=='A.J. Brown')
+          assert aj['team']=='NWE'
+          PY
+      - name: Commit WR update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add wr-rankings.json
+          git commit -m "Import updated WR rankings"
+          git push

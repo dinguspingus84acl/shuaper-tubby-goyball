@@ -1,0 +1,122 @@
+name: Fix search menu and mock formatting
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-search-menu-and-mock-format.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply reliable menu and mock fixes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          # ---------- index.html ----------
+          p=Path('index.html')
+          s=p.read_text()
+
+          # Big Board title must stay simple.
+          s=s.replace('<h2 id="title">My SHUA Big Board</h2>','<h2 id="title">Big Board</h2>')
+          s=s.replace("o?'My SHUA Big Board':position+' Rankings'","o?'Big Board':position+' Rankings'")
+
+          # The original search is being physically moved into the Fantasy Menu,
+          # so never hide it based on the current tab.
+          s=s.replace("let globalSearch=$('.search');if(globalSearch)globalSearch.hidden=md;","")
+
+          # Use the same round.pick formatter as the board itself.
+          s=re.sub(r"pickLabel=p=>\{let z=mock\.picks\.findIndex\(y=>y\.player\.id===p\.id\);return z<0\?'—':`\$\{Math\.floor\(z/mock\.teams\)\+1\}\.\$\{z%mock\.teams\+1\}`\}",
+                   "pickLabel=p=>{let z=mock.picks.findIndex(y=>y.player.id===p.id);return z<0?'—':lab(z,mock.teams)}",s,count=1)
+
+          # Clean lineup markup: position/slot once, full name, team logo immediately after name, round.pick at right.
+          old_re=r"\$\('#myRoster'\)\.innerHTML=roster\.map\(x=>x\.player\?`<div class=\"roster-card\" data-id=\"\$\{x\.player\.id\}\">\$\{pic\(x\.player\.name,'sm',x\.player\.team,x\.player\.position\)\}<div class=\"roster-name-line\"><b>\$\{x\.slot\}: \$\{x\.player\.name\}</b>\$\{teamMini\(x\.player\.team\)\}</div><em class=\"my-pick-number\">\$\{pickLabel\(x\.player\)\}</em></div>`:`<div class=\"roster-card empty-slot\"><b>\$\{x\.slot\}</b><span>Empty</span></div>`\)\.join\(''\)\+\(bench\.length\?`<div class=\"bench-heading\">Bench</div>\$\{bench\.map\(p=>`<div class=\"roster-card\" data-id=\"\$\{p\.id\}\">\$\{pic\(p\.name,'sm',p\.team,p\.position\)\}<div class=\"roster-name-line\"><b>\$\{p\.position\}: \$\{p\.name\}</b>\$\{teamMini\(p\.team\)\}</div><em class=\"my-pick-number\">\$\{pickLabel\(p\)\}</em></div>`\)\.join\(''\)\}`:'<div class=\"bench-heading\">Bench</div>'\);"
+          new="""$('#myRoster').innerHTML=roster.map(x=>x.player?`<div class="roster-card" data-id="${x.player.id}">${pic(x.player.name,'sm',x.player.team,x.player.position)}<span class="lineup-slot">${x.slot}</span><div class="roster-name-line"><b>${x.player.name}</b>${teamMini(x.player.team)}</div><em class="my-pick-number">${pickLabel(x.player)}</em></div>`:`<div class="roster-card empty-slot"><span class="lineup-slot">${x.slot}</span><b>Empty</b></div>`).join('')+(bench.length?`<div class="bench-heading">Bench</div>${bench.map(p=>`<div class="roster-card" data-id="${p.id}">${pic(p.name,'sm',p.team,p.position)}<span class="lineup-slot">${p.position}</span><div class="roster-name-line"><b>${p.name}</b>${teamMini(p.team)}</div><em class="my-pick-number">${pickLabel(p)}</em></div>`).join('')}`:'<div class="bench-heading">Bench</div>');"""
+          s,n=re.subn(old_re,new,s,count=1)
+          if n!=1:
+              raise SystemExit(f'lineup markup replacement failed: {n}')
+
+          # Make sure the mock board prints actual full names, not abbreviated names.
+          board_pos=s.find('let teamHeaders=Array.from({length:mock.teams}')
+          if board_pos<0: raise SystemExit('mock board anchor missing')
+          head,tail=s[:board_pos],s[board_pos:]
+          tail=tail.replace('${short(p.name)}','${p.name}',1)
+          s=head+tail
+
+          # Cache-bust external UI scripts so the browser cannot keep serving the stale versions.
+          s=re.sub(r'<script src="site-enhancements\.js(?:\?v=[^"]*)?"></script>', '<script src="site-enhancements.js?v=20260822-1303"></script>', s)
+          s=re.sub(r'<script src="mock-draft-ui\.js(?:\?v=[^"]*)?"></script>', '<script src="mock-draft-ui.js?v=20260822-1303"></script>', s)
+          s=re.sub(r'<script src="player-colors\.js(?:\?v=[^"]*)?"></script>', '<script src="player-colors.js?v=20260822-1303"></script>', s)
+          p.write_text(s)
+
+          # ---------- site-enhancements.js ----------
+          p=Path('site-enhancements.js')
+          s=p.read_text()
+
+          # Keep the original top search hidden only while it is still inside .tools.
+          if '.tools>.search{display:none!important}' not in s:
+              s=s.replace('  st.textContent=`\n','  st.textContent=`\n    .tools>.search{display:none!important}\n',1)
+
+          # Remove the duplicate menu-search implementation. We move the existing search node instead.
+          s=re.sub(r"\n    #phoneMenuSearchWrap label\{.*?\.phone-menu-search-result small\{[^\n]*\}\n",'\n',s,flags=re.S)
+          # Replace/ensure styles for the moved original search and its original suggestions box.
+          marker='    #phoneMenuDrawer button.active{background:#183d63;border-color:#ffffff55}\n'
+          styles="""    #phoneMenuDrawer button.active{background:#183d63;border-color:#ffffff55}\n    #phoneMenuSearchWrap{display:block!important;position:relative!important;margin-top:10px;padding-top:12px;border-top:1px solid #ffffff20;min-width:0!important}\n    #phoneMenuSearchWrap input{display:block!important;width:100%!important;height:44px!important;border:1px solid #ffffff25!important;border-radius:10px!important;background:#0b2139!important;color:#fff!important;padding:0 11px!important;outline:none!important}\n    #phoneMenuSearchWrap .suggestions{position:static!important;left:auto!important;right:auto!important;top:auto!important;margin-top:6px!important;width:100%!important;max-height:320px!important;border-radius:10px!important;background:#081a2d!important;color:#fff!important;overflow:auto!important}\n    #phoneMenuSearchWrap .sug{padding:9px 10px!important;border-bottom:1px solid #ffffff12!important;background:#081a2d!important;color:#fff!important}\n    #phoneMenuSearchWrap .sug small{color:#7f93aa!important}\n    body.fantasy-home-mode #phoneMenuDrawer #phoneMenuSearchWrap{display:block!important}\n"""
+          # Normalize to one copy.
+          s=s.replace(marker,styles,1) if '#phoneMenuSearchWrap{display:block!important' not in s else s
+
+          # Drawer should only contain title/items initially; then move existing .tools search below items.
+          s=re.sub(r"drawer\.id='phoneMenuDrawer';drawer\.innerHTML='<h3>Fantasy Menu</h3><div id=\\?\"phoneMenuItems\\?\"></div>.*?';",
+                   "drawer.id='phoneMenuDrawer';drawer.innerHTML='<h3>Fantasy Menu</h3><div id=\"phoneMenuItems\"></div>';",s,count=1)
+
+          # Remove old duplicate-search JS block if present.
+          s=re.sub(r"\n  const menuSearch=document\.getElementById\('phoneMenuSearch'\);.*?\n  \}\n(?=\})",'\n',s,flags=re.S,count=1)
+
+          # Move the EXISTING functional global search into the menu after the menu items.
+          anchor='  document.body.append(button,backdrop,drawer);\n'
+          add="""  document.body.append(button,backdrop,drawer);\n  const movedSearch=document.querySelector('.tools>.search');\n  if(movedSearch){\n    movedSearch.id='phoneMenuSearchWrap';\n    drawer.appendChild(movedSearch);\n    movedSearch.hidden=false;\n  }\n"""
+          if anchor in s and 'const movedSearch=' not in s:
+              s=s.replace(anchor,add,1)
+          elif 'const movedSearch=' not in s:
+              raise SystemExit('menu append anchor missing')
+          p.write_text(s)
+
+          # ---------- mock-draft-ui.js ----------
+          p=Path('mock-draft-ui.js')
+          s=p.read_text()
+          old="""    .mock-sleeper-ui .mock-team-grid .roster-card{border:1px solid #ffffff18!important;background:#0b2139!important;border-radius:7px!important;min-height:40px!important;height:40px!important;padding:4px 46px 4px 34px!important;box-shadow:none!important;position:relative!important}\n    .mock-sleeper-ui .mock-team-grid .roster-card>.photo{left:6px!important;top:8px!important;width:22px!important;height:22px!important;flex-basis:22px!important}\n    .mock-sleeper-ui .mock-team-grid .roster-name-line{display:flex;align-items:center;gap:5px;min-width:0;height:100%}\n    .mock-sleeper-ui .mock-team-grid .roster-name-line b{display:block;min-width:0;flex:0 1 auto;font-size:.64rem!important;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n    .mock-sleeper-ui .mock-team-grid .lineup-team-logo{width:17px;height:17px;object-fit:contain;flex:0 0 17px}\n"""
+          new="""    .mock-sleeper-ui .mock-team-grid .roster-card{border:1px solid #ffffff18!important;background:#0b2139!important;border-radius:6px!important;min-height:34px!important;height:34px!important;padding:3px 44px 3px 62px!important;box-shadow:none!important;position:relative!important}\n    .mock-sleeper-ui .mock-team-grid .roster-card>.photo{left:5px!important;top:7px!important;width:20px!important;height:20px!important;flex-basis:20px!important}\n    .mock-sleeper-ui .mock-team-grid .lineup-slot{position:absolute;left:29px;top:50%;transform:translateY(-50%);width:28px;text-align:center;font-size:.52rem;font-weight:950;color:#8ca0b5;background:#07182a;border-radius:5px;padding:3px 2px}\n    .mock-sleeper-ui .mock-team-grid .roster-name-line{display:flex;align-items:center;gap:4px;min-width:0;height:100%}\n    .mock-sleeper-ui .mock-team-grid .roster-name-line b{display:block;min-width:0;flex:0 1 auto;font-size:.61rem!important;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n    .mock-sleeper-ui .mock-team-grid .lineup-team-logo{width:15px;height:15px;object-fit:contain;flex:0 0 15px}\n"""
+          if old not in s:
+              raise SystemExit('compact lineup css anchor missing')
+          s=s.replace(old,new,1)
+          # Full-name rendering gets an extra line without making boxes larger.
+          s=s.replace('-webkit-line-clamp:3','-webkit-line-clamp:4',1)
+          p.write_text(s)
+          PY
+      - name: Validate requested behavior
+        run: |
+          node --check site-enhancements.js
+          node --check mock-draft-ui.js
+          grep -q '>Big Board</h2>' index.html
+          grep -q 'pickLabel=p.*lab(z,mock.teams)' index.html
+          grep -q 'lineup-slot' index.html
+          grep -q 'lineup-team-logo' index.html
+          grep -q '${p.name}</div><div class="team">' index.html
+          grep -q 'site-enhancements.js?v=20260822-1303' index.html
+          grep -q 'mock-draft-ui.js?v=20260822-1303' index.html
+          grep -q "const movedSearch=document.querySelector('.tools>.search')" site-enhancements.js
+          ! grep -q 'phoneMenuSearchResults' site-enhancements.js
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html site-enhancements.js mock-draft-ui.js
+          git diff --cached --quiet || git commit -m "Fix Fantasy Menu search and mock lineup formatting"
+          git push

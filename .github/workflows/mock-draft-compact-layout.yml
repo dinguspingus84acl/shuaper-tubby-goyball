@@ -1,0 +1,77 @@
+name: Compact mock draft layout
+
+on:
+  push:
+    paths:
+      - '.github/workflows/mock-draft-compact-layout.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch mock draft layout and lineup details
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('index.html')
+          s=p.read_text()
+
+          old="""function render(){let o=position==='ALL',md=position==='MOCK',dc=position==='DEPTH',l=dc?[]:list();$('#title').textContent=dc?'NFL Depth Charts':md?'Mock Draft':o?'My SHUA Big Board':position+' Rankings';$('#sub').textContent=o?teamCount+'-team snake draft':dc?'Select a team to view its offensive depth chart':'';$('#teamControls').hidden=!o;$('#overallToggle').hidden=!o;$('#mockSection').hidden=!md;$('#depthSection').hidden=!dc;"""
+          new="""function render(){let o=position==='ALL',md=position==='MOCK',dc=position==='DEPTH',l=dc?[]:list();$('#title').textContent=dc?'NFL Depth Charts':md?'Mock Draft':o?'My SHUA Big Board':position+' Rankings';$('#sub').textContent=o?teamCount+'-team snake draft':dc?'Select a team to view its offensive depth chart':'';let globalSearch=$('.search');if(globalSearch)globalSearch.hidden=md;$('#teamControls').hidden=!o;$('#overallToggle').hidden=!o;$('#mockSection').hidden=!md;$('#depthSection').hidden=!dc;"""
+          if old not in s:
+              raise SystemExit('render anchor not found')
+          s=s.replace(old,new,1)
+
+          old="""$('#draftBoard').innerHTML=a.map(n=>{let d=mock.picks[n],r=Math.floor(n/mock.teams)+1;if(!d)return `<div class=\"drafted empty-slot\"><div class=\"slot\">${lab(n,mock.teams)}</div><div class=\"arrow\">${r%2?'→':'←'}</div></div>`;let p=d.player;return `<div class=\"drafted ${p.position.toLowerCase()}\" data-id=\"${p.id}\"><div class=\"slot\">${lab(n,mock.teams)}</div><div class=\"name\">${short(p.name)}</div><div class=\"team\">${p.position} · ${p.team}</div></div>`}).join('');let mine=mock.picks.filter(x=>x.team===mock.slot).map(x=>x.player),usedRoster=new Set(),starterSlots=['QB','RB','RB','WR','WR','TE','FLEX'],roster=[];"""
+          new="""let teamHeaders=Array.from({length:mock.teams},(_,j)=>`<div class=\"mock-team-head${j+1===mock.slot?' mine':''}\">Team ${j+1}</div>`).join('');$('#draftBoard').innerHTML=teamHeaders+a.map(n=>{let d=mock.picks[n],r=Math.floor(n/mock.teams)+1;if(!d)return `<div class=\"drafted empty-slot\"><div class=\"slot\">${lab(n,mock.teams)}</div><div class=\"arrow\">${r%2?'→':'←'}</div></div>`;let p=d.player;return `<div class=\"drafted ${p.position.toLowerCase()}\" data-id=\"${p.id}\"><div class=\"slot\">${lab(n,mock.teams)}</div><div class=\"name\">${short(p.name)}</div><div class=\"team\">${p.position} · ${p.team}</div></div>`}).join('');let mine=mock.picks.filter(x=>x.team===mock.slot).map(x=>x.player),pickNo=p=>mock.picks.findIndex(y=>y.player.id===p.id)+1,usedRoster=new Set(),starterSlots=['QB','RB','RB','WR','WR','TE','FLEX'],roster=[];"""
+          if old not in s:
+              raise SystemExit('draft board anchor not found')
+          s=s.replace(old,new,1)
+
+          old="""$('#myRoster').innerHTML=roster.map(x=>x.player?`<div class=\"roster-card\" data-id=\"${x.player.id}\">${pic(x.player.name,'sm',x.player.team,x.player.position)}<b>${x.slot}: ${x.player.name}</b><span>${x.player.position} · ${x.player.team}</span></div>`:`<div class=\"roster-card empty-slot\"><b>${x.slot}</b><span>Empty</span></div>`).join('')+(bench.length?`<div class=\"bench-heading\">Bench</div>${bench.map(p=>`<div class=\"roster-card\" data-id=\"${p.id}\">${pic(p.name,'sm',p.team,p.position)}<b>${p.name}</b><span>${p.position} · ${p.team}</span></div>`).join('')}`:'<div class=\"bench-heading\">Bench</div>');"""
+          new="""$('#myRoster').innerHTML=roster.map(x=>x.player?`<div class=\"roster-card\" data-id=\"${x.player.id}\">${pic(x.player.name,'sm',x.player.team,x.player.position)}<b>${x.slot}: ${x.player.name}</b><span>${x.player.position} · ${x.player.team}</span><em class=\"my-pick-number\">#${pickNo(x.player)}</em></div>`:`<div class=\"roster-card empty-slot\"><b>${x.slot}</b><span>Empty</span></div>`).join('')+(bench.length?`<div class=\"bench-heading\">Bench</div>${bench.map(p=>`<div class=\"roster-card\" data-id=\"${p.id}\">${pic(p.name,'sm',p.team,p.position)}<b>${p.name}</b><span>${p.position} · ${p.team}</span><em class=\"my-pick-number\">#${pickNo(p)}</em></div>`).join('')}`:'<div class=\"bench-heading\">Bench</div>');"""
+          if old not in s:
+              raise SystemExit('roster anchor not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+
+          p=Path('mock-draft-ui.js')
+          s=p.read_text()
+          old="""    .mock-sleeper-ui #draftBoard .arrow{font-size:.6rem!important;bottom:3px!important}\n\n    .mock-sleeper-ui .player-pool"""
+          new="""    .mock-sleeper-ui #draftBoard .arrow{font-size:.6rem!important;bottom:3px!important}\n    .mock-sleeper-ui #draftBoard .mock-team-head{height:24px;min-width:0;display:flex;align-items:center;justify-content:center;background:#0b2239;color:#8196ad;border-radius:3px;font-size:.56rem;font-weight:950;letter-spacing:.02em;position:sticky;top:0;z-index:4}\n    .mock-sleeper-ui #draftBoard .mock-team-head.mine{background:#164a78;color:#fff;box-shadow:inset 0 -2px 0 #4da3ff}\n\n    .mock-sleeper-ui .player-pool"""
+          if old not in s:
+              raise SystemExit('team header css anchor not found')
+          s=s.replace(old,new,1)
+
+          old="""    .mock-sleeper-ui .mock-team-grid .roster-card{border:1px solid #ffffff18!important;background:#0b2139!important;border-radius:8px!important;min-height:54px!important;padding:7px 8px 7px 46px!important;box-shadow:none!important}\n    .mock-sleeper-ui .mock-team-grid .roster-card>.photo{left:8px!important;top:10px!important;width:28px!important;height:28px!important}\n    .mock-sleeper-ui .mock-team-grid .roster-card b{display:block;font-size:.7rem!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n    .mock-sleeper-ui .mock-team-grid .roster-card span{display:block;margin-top:2px;font-size:.58rem!important;color:#8094aa}\n"""
+          new="""    .mock-sleeper-ui .mock-team-grid .roster-card{border:1px solid #ffffff18!important;background:#0b2139!important;border-radius:7px!important;min-height:40px!important;height:40px!important;padding:4px 46px 4px 34px!important;box-shadow:none!important;position:relative!important}\n    .mock-sleeper-ui .mock-team-grid .roster-card>.photo{left:6px!important;top:8px!important;width:22px!important;height:22px!important;flex-basis:22px!important}\n    .mock-sleeper-ui .mock-team-grid .roster-card b{display:block;font-size:.64rem!important;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n    .mock-sleeper-ui .mock-team-grid .roster-card span{display:block;margin-top:1px;font-size:.52rem!important;line-height:1;color:#8094aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n    .mock-sleeper-ui .mock-team-grid .my-pick-number{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-style:normal;font-size:.62rem;font-weight:950;color:#9fb5ca;background:#061522;border:1px solid #ffffff16;border-radius:999px;padding:3px 5px;min-width:30px;text-align:center}\n"""
+          if old not in s:
+              raise SystemExit('lineup css anchor not found')
+          s=s.replace(old,new,1)
+
+          old="""      .phone-mode .mock-sleeper-ui #draftBoard{grid-template-columns:repeat(var(--mock-team-count),68px)!important;max-height:235px!important;overflow:auto!important}\n      .phone-mode .mock-sleeper-ui #draftBoard .drafted{min-height:48px!important;height:48px!important;padding:4px!important}\n"""
+          new="""      .phone-mode .mock-sleeper-ui #draftBoard{grid-template-columns:repeat(var(--mock-team-count),64px)!important;max-height:235px!important;overflow:auto!important}\n      .phone-mode .mock-sleeper-ui #draftBoard .mock-team-head{height:22px;font-size:.5rem!important}\n      .phone-mode .mock-sleeper-ui #draftBoard .drafted{min-height:44px!important;height:44px!important;padding:4px!important}\n"""
+          if old not in s:
+              raise SystemExit('phone board css anchor not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+      - name: Validate files
+        run: |
+          node --check mock-draft-ui.js
+          grep -q 'mock-team-head' index.html
+          grep -q 'my-pick-number' index.html
+          grep -q 'globalSearch.hidden=md' index.html
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html mock-draft-ui.js
+          git diff --cached --quiet || git commit -m "Compact mock lineup and add team draft details"
+          git push

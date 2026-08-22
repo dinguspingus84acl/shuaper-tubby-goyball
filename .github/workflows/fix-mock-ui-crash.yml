@@ -1,0 +1,44 @@
+name: Fix mock UI crash
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-mock-ui-crash.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stop mock UI observer loop
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('mock-draft-ui.js')
+          s=p.read_text()
+          old="""      adp.textContent=p?.additionalStats?.espnAdp||'—';
+      ppg.textContent=getPpg(p);
+"""
+          new="""      const nextAdp=String(p?.additionalStats?.espnAdp||'—');
+      const nextPpg=String(getPpg(p));
+      if(adp.textContent!==nextAdp)adp.textContent=nextAdp;
+      if(ppg.textContent!==nextPpg)ppg.textContent=nextPpg;
+"""
+          if old not in s:
+              raise SystemExit('Expected decoratePool block not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+      - name: Validate JavaScript
+        run: node --check mock-draft-ui.js
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mock-draft-ui.js
+          git diff --cached --quiet || git commit -m "Fix mock draft UI crash loop"
+          git push

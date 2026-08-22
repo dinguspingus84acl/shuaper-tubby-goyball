@@ -1,0 +1,110 @@
+name: Polish mock draft and menu v2
+
+on:
+  push:
+    paths:
+      - '.github/workflows/mock-menu-polish-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply requested UI changes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # INDEX
+          p=Path('index.html')
+          s=p.read_text()
+          s=s.replace('<h2 id="title">My SHUA Big Board</h2>','<h2 id="title">Big Board</h2>',1)
+          s=s.replace("o?'My SHUA Big Board':position+' Rankings'","o?'Big Board':position+' Rankings'",1)
+
+          if 'function teamMini(t)' not in s:
+              anchor='function short(n)'
+              helper='function teamMini(t){let z=teams[t];return z?`<img class="lineup-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${z}.png" alt="${t}">`:``}'
+              if anchor not in s: raise SystemExit('short helper anchor missing')
+              s=s.replace(anchor,helper+anchor,1)
+
+          board_anchor='let teamHeaders=Array.from({length:mock.teams}'
+          pos=s.find(board_anchor)
+          if pos<0: raise SystemExit('teamHeaders anchor missing')
+          head=s[:pos]; tail=s[pos:]
+          if '${short(p.name)}' in tail:
+              tail=tail.replace('${short(p.name)}','${p.name}',1)
+          s=head+tail
+
+          s=s.replace('pickNo=p=>mock.picks.findIndex(y=>y.player.id===p.id)+1',"pickLabel=p=>{let z=mock.picks.findIndex(y=>y.player.id===p.id);return z<0?'—':`${Math.floor(z/mock.teams)+1}.${z%mock.teams+1}`}",1)
+
+          starter_old='<b>${x.slot}: ${x.player.name}</b><span>${x.player.position} · ${x.player.team}</span><em class="my-pick-number">#${pickNo(x.player)}</em>'
+          starter_new='<div class="roster-name-line"><b>${x.slot}: ${x.player.name}</b>${teamMini(x.player.team)}</div><em class="my-pick-number">${pickLabel(x.player)}</em>'
+          bench_old='<b>${p.name}</b><span>${p.position} · ${p.team}</span><em class="my-pick-number">#${pickNo(p)}</em>'
+          bench_new='<div class="roster-name-line"><b>${p.position}: ${p.name}</b>${teamMini(p.team)}</div><em class="my-pick-number">${pickLabel(p)}</em>'
+          if starter_old not in s: raise SystemExit('starter roster anchor missing')
+          if bench_old not in s: raise SystemExit('bench roster anchor missing')
+          s=s.replace(starter_old,starter_new,1).replace(bench_old,bench_new,1)
+          p.write_text(s)
+
+          # SITE ENHANCEMENTS
+          p=Path('site-enhancements.js')
+          s=p.read_text()
+          if '.tools>.search{display:none!important}' not in s:
+              marker='  st.textContent=`\n'
+              if marker not in s: raise SystemExit('style marker missing')
+              s=s.replace(marker,marker+'    .tools>.search{display:none!important}\n',1)
+
+          if '#phoneMenuSearchWrap{' not in s:
+              marker='    body.mobile-menu-open #phoneMenuBackdrop{display:block}\n'
+              css='''    #phoneMenuSearchWrap{margin-top:10px;padding-top:12px;border-top:1px solid #ffffff20}\n    #phoneMenuSearchWrap label{display:block;margin:0 0 7px;color:#91a4ba;font-size:.68rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}\n    #phoneMenuSearch{width:100%;height:44px;border:1px solid #ffffff25;border-radius:10px;background:#0b2139;color:#fff;padding:0 11px;outline:none}\n    #phoneMenuSearchResults{margin-top:6px;border-radius:10px;overflow:hidden;background:#081a2d}\n    .phone-menu-search-result{display:block!important;width:100%!important;min-height:42px!important;margin:0!important;border:0!important;border-top:1px solid #ffffff12!important;border-radius:0!important;background:#081a2d!important;color:#fff!important;padding:8px 10px!important;text-align:left!important;font-weight:800!important}\n    .phone-menu-search-result small{display:block;margin-top:2px;color:#7f93aa;font-size:.64rem;font-weight:700}\n'''
+              if marker not in s: raise SystemExit('mobile css marker missing')
+              s=s.replace(marker,css+marker,1)
+
+          old="drawer.id='phoneMenuDrawer';drawer.innerHTML='<h3>Fantasy Menu</h3><div id=\"phoneMenuItems\"></div>';"
+          new="drawer.id='phoneMenuDrawer';drawer.innerHTML='<h3>Fantasy Menu</h3><div id=\"phoneMenuItems\"></div><div id=\"phoneMenuSearchWrap\"><label for=\"phoneMenuSearch\">Search players</label><input id=\"phoneMenuSearch\" type=\"search\" placeholder=\"Search for a player…\" autocomplete=\"off\"><div id=\"phoneMenuSearchResults\"></div></div>';"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif 'phoneMenuSearchWrap' not in s:
+              raise SystemExit('drawer markup marker missing')
+
+          if "const menuSearch=document.getElementById('phoneMenuSearch');" not in s:
+              marker='  backdrop.onclick=closeMobileMenu;\n'
+              add='''  const menuSearch=document.getElementById('phoneMenuSearch');\n  const menuResults=document.getElementById('phoneMenuSearchResults');\n  if(menuSearch&&menuResults){\n    menuSearch.addEventListener('input',()=>{\n      const q=norm(menuSearch.value);\n      if(!q){menuResults.innerHTML='';return;}\n      const seen=new Set();\n      const matches=[...board,...players].filter(p=>{const k=p.id||norm(p.name);if(seen.has(k))return false;seen.add(k);return norm(p.name).includes(q)}).slice(0,10);\n      menuResults.innerHTML=matches.map(p=>`<button type="button" class="phone-menu-search-result" data-menu-player="${p.id}"><span>${p.name}</span><small>${p.position} #${p.positionRank} · ${p.team}</small></button>`).join('')||'<div style="padding:10px;color:#7f93aa">No players found</div>';\n    });\n    menuResults.addEventListener('click',e=>{const b=e.target.closest('[data-menu-player]');if(!b)return;closeMobileMenu();if(typeof profile==='function')profile(b.dataset.menuPlayer);});\n  }\n'''
+              if marker not in s: raise SystemExit('backdrop marker missing')
+              s=s.replace(marker,marker+add,1)
+          p.write_text(s)
+
+          # MOCK UI CSS
+          p=Path('mock-draft-ui.js')
+          s=p.read_text()
+          old='''    .mock-sleeper-ui .mock-team-grid .roster-card b{display:block;font-size:.64rem!important;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n    .mock-sleeper-ui .mock-team-grid .roster-card span{display:block;margin-top:1px;font-size:.52rem!important;line-height:1;color:#8094aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n'''
+          new='''    .mock-sleeper-ui .mock-team-grid .roster-name-line{display:flex;align-items:center;gap:5px;min-width:0;height:100%}\n    .mock-sleeper-ui .mock-team-grid .roster-name-line b{display:block;min-width:0;flex:0 1 auto;font-size:.64rem!important;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n    .mock-sleeper-ui .mock-team-grid .lineup-team-logo{width:17px;height:17px;object-fit:contain;flex:0 0 17px}\n'''
+          if old in s:
+              s=s.replace(old,new,1)
+          elif '.roster-name-line{' not in s:
+              raise SystemExit('lineup css marker missing')
+
+          s=s.replace('display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden','display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden',1)
+          p.write_text(s)
+          PY
+      - name: Validate JavaScript and requested markers
+        run: |
+          node --check site-enhancements.js
+          node --check mock-draft-ui.js
+          grep -q '>Big Board</h2>' index.html
+          grep -q 'pickLabel=p' index.html
+          grep -q '${p.name}</div><div class="team">' index.html
+          grep -q 'lineup-team-logo' index.html
+          grep -q 'phoneMenuSearch' site-enhancements.js
+          grep -q '.tools>.search{display:none!important}' site-enhancements.js
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html site-enhancements.js mock-draft-ui.js
+          git diff --cached --quiet || git commit -m "Polish menu search and mock draft display"
+          git push

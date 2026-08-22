@@ -26,7 +26,7 @@
     .mock-sleeper-ui #draftBoard{display:grid!important;grid-template-columns:repeat(var(--mock-team-count),92px)!important;gap:2px!important;overflow:auto!important;background:#04101e;border:1px solid var(--mock-line);border-radius:8px 8px 0 0;padding:2px;max-height:300px!important}
     .mock-sleeper-ui #draftBoard .drafted{min-width:0!important;min-height:52px!important;height:52px!important;border-radius:3px!important;padding:5px!important;box-shadow:none!important}
     .mock-sleeper-ui #draftBoard .drafted .slot{font-size:.52rem!important;opacity:.72;margin-bottom:2px}
-    .mock-sleeper-ui #draftBoard .drafted .name{font-size:.64rem!important;line-height:1.02;white-space:normal!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .mock-sleeper-ui #draftBoard .drafted .name{font-size:.64rem!important;line-height:1.02;white-space:normal!important;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
     .mock-sleeper-ui #draftBoard .drafted .team{font-size:.52rem!important;margin-top:2px;opacity:.78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .mock-sleeper-ui #draftBoard .drafted.empty-slot{background:#0a1d31!important;border:1px dashed #ffffff18;color:#5d7188!important}
     .mock-sleeper-ui #draftBoard .arrow{font-size:.6rem!important;bottom:3px!important}
@@ -58,11 +58,12 @@
     .mock-sleeper-ui .mock-team-title{font-size:.9rem!important;font-weight:950;color:#fff;margin-bottom:1px}
     .mock-sleeper-ui .mock-team-subtitle{font-size:.6rem!important;color:#7f93aa;margin-bottom:7px}
     .mock-sleeper-ui .mock-team-grid{display:grid!important;grid-template-columns:1fr!important;gap:5px!important;max-width:560px}
-    .mock-sleeper-ui .mock-team-grid .roster-card{border:1px solid #ffffff18!important;background:#0b2139!important;border-radius:7px!important;min-height:40px!important;height:40px!important;padding:4px 46px 4px 34px!important;box-shadow:none!important;position:relative!important}
-    .mock-sleeper-ui .mock-team-grid .roster-card>.photo{left:6px!important;top:8px!important;width:22px!important;height:22px!important;flex-basis:22px!important}
-    .mock-sleeper-ui .mock-team-grid .roster-name-line{display:flex;align-items:center;gap:5px;min-width:0;height:100%}
-    .mock-sleeper-ui .mock-team-grid .roster-name-line b{display:block;min-width:0;flex:0 1 auto;font-size:.64rem!important;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .mock-sleeper-ui .mock-team-grid .lineup-team-logo{width:17px;height:17px;object-fit:contain;flex:0 0 17px}
+    .mock-sleeper-ui .mock-team-grid .roster-card{border:1px solid #ffffff18!important;background:#0b2139!important;border-radius:6px!important;min-height:34px!important;height:34px!important;padding:3px 44px 3px 62px!important;box-shadow:none!important;position:relative!important}
+    .mock-sleeper-ui .mock-team-grid .roster-card>.photo{left:5px!important;top:7px!important;width:20px!important;height:20px!important;flex-basis:20px!important}
+    .mock-sleeper-ui .mock-team-grid .lineup-slot{position:absolute;left:29px;top:50%;transform:translateY(-50%);width:28px;text-align:center;font-size:.52rem;font-weight:950;color:#8ca0b5;background:#07182a;border-radius:5px;padding:3px 2px}
+    .mock-sleeper-ui .mock-team-grid .roster-name-line{display:flex;align-items:center;gap:4px;min-width:0;height:100%}
+    .mock-sleeper-ui .mock-team-grid .roster-name-line b{display:block;min-width:0;flex:0 1 auto;font-size:.61rem!important;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mock-sleeper-ui .mock-team-grid .lineup-team-logo{width:15px;height:15px;object-fit:contain;flex:0 0 15px}
     .mock-sleeper-ui .mock-team-grid .my-pick-number{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-style:normal;font-size:.62rem;font-weight:950;color:#9fb5ca;background:#061522;border:1px solid #ffffff16;border-radius:999px;padding:3px 5px;min-width:30px;text-align:center}
     .mock-sleeper-ui .mock-team-grid .empty-slot{padding-left:9px!important;background:#091a2b!important;border-style:dashed!important;color:#71869d!important}
     .mock-sleeper-ui .mock-team-grid .bench-heading{grid-column:1!important;margin:5px 0 0!important;color:#7f93aa;font-size:.6rem!important;text-transform:uppercase;letter-spacing:.08em}

@@ -1,0 +1,116 @@
+name: Polish mock draft and menu
+
+on:
+  push:
+    paths:
+      - '.github/workflows/mock-menu-polish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index, menu search, and mock presentation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # ---- index.html ----
+          p=Path('index.html')
+          s=p.read_text()
+          s=s.replace('<h2 id="title">My SHUA Big Board</h2>','<h2 id="title">Big Board</h2>',1)
+          s=s.replace("dc?'NFL Depth Charts':md?'Mock Draft':o?'My SHUA Big Board':position+' Rankings'","dc?'NFL Depth Charts':md?'Mock Draft':o?'Big Board':position+' Rankings'",1)
+
+          old="function helmet(t){let s=teams[t];return `<div class=\"team-logo\">${s?`<img src=\"https://a.espncdn.com/i/teamlogos/nfl/500/${s}.png\" alt=\"${t} team logo\">`:`<b>${t}</b>`}</div>`}"
+          new=old+"function teamMini(t){let s=teams[t];return s?`<img class=\"lineup-team-logo\" src=\"https://a.espncdn.com/i/teamlogos/nfl/500/${s}.png\" alt=\"${t}\">`:''}"
+          if 'function teamMini(' not in s:
+              if old not in s: raise SystemExit('helmet helper anchor not found')
+              s=s.replace(old,new,1)
+
+          old="return `<div class=\"drafted ${p.position.toLowerCase()}\" data-id=\"${p.id}\"><div class=\"slot\">${lab(n,mock.teams)}</div><div class=\"name\">${short(p.name)}</div><div class=\"team\">${p.position} · ${p.team}</div></div>`"
+          new="return `<div class=\"drafted ${p.position.toLowerCase()}\" data-id=\"${p.id}\"><div class=\"slot\">${lab(n,mock.teams)}</div><div class=\"name\">${p.name}</div><div class=\"team\">${p.position} · ${p.team}</div></div>`"
+          if old not in s: raise SystemExit('mock full-name anchor not found')
+          s=s.replace(old,new,1)
+
+          old="pickNo=p=>mock.picks.findIndex(y=>y.player.id===p.id)+1"
+          new="pickLabel=p=>{let z=mock.picks.findIndex(y=>y.player.id===p.id);return z<0?'—':`${Math.floor(z/mock.teams)+1}.${z%mock.teams+1}`}"
+          if old not in s: raise SystemExit('pick number helper anchor not found')
+          s=s.replace(old,new,1)
+
+          old="""$('#myRoster').innerHTML=roster.map(x=>x.player?`<div class=\"roster-card\" data-id=\"${x.player.id}\">${pic(x.player.name,'sm',x.player.team,x.player.position)}<b>${x.slot}: ${x.player.name}</b><span>${x.player.position} · ${x.player.team}</span><em class=\"my-pick-number\">#${pickNo(x.player)}</em></div>`:`<div class=\"roster-card empty-slot\"><b>${x.slot}</b><span>Empty</span></div>`).join('')+(bench.length?`<div class=\"bench-heading\">Bench</div>${bench.map(p=>`<div class=\"roster-card\" data-id=\"${p.id}\">${pic(p.name,'sm',p.team,p.position)}<b>${p.name}</b><span>${p.position} · ${p.team}</span><em class=\"my-pick-number\">#${pickNo(p)}</em></div>`).join('')}`:'<div class=\"bench-heading\">Bench</div>');"""
+          new="""$('#myRoster').innerHTML=roster.map(x=>x.player?`<div class=\"roster-card\" data-id=\"${x.player.id}\">${pic(x.player.name,'sm',x.player.team,x.player.position)}<div class=\"roster-name-line\"><b>${x.slot}: ${x.player.name}</b>${teamMini(x.player.team)}</div><em class=\"my-pick-number\">${pickLabel(x.player)}</em></div>`:`<div class=\"roster-card empty-slot\"><b>${x.slot}</b><span>Empty</span></div>`).join('')+(bench.length?`<div class=\"bench-heading\">Bench</div>${bench.map(p=>`<div class=\"roster-card\" data-id=\"${p.id}\">${pic(p.name,'sm',p.team,p.position)}<div class=\"roster-name-line\"><b>${p.position}: ${p.name}</b>${teamMini(p.team)}</div><em class=\"my-pick-number\">${pickLabel(p)}</em></div>`).join('')}`:'<div class=\"bench-heading\">Bench</div>');"""
+          if old not in s: raise SystemExit('roster markup anchor not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+
+          # ---- site-enhancements.js ----
+          p=Path('site-enhancements.js')
+          s=p.read_text()
+          old="    @media(min-width:901px){.search{flex:0 1 285px!important;min-width:180px!important}}\n"
+          new="    .tools>.search{display:none!important}\n"
+          if old in s: s=s.replace(old,new,1)
+          elif '.tools>.search{display:none!important}' not in s: raise SystemExit('search css anchor not found')
+
+          css_anchor="    #phoneMenuDrawer button.active{background:#183d63;border-color:#ffffff55}\n"
+          css_add="""    #phoneMenuDrawer button.active{background:#183d63;border-color:#ffffff55}\n    #phoneMenuSearchWrap{margin-top:10px;padding-top:12px;border-top:1px solid #ffffff20}\n    #phoneMenuSearchWrap label{display:block;margin:0 0 7px;color:#91a4ba;font-size:.68rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}\n    #phoneMenuSearch{width:100%;height:44px;border:1px solid #ffffff25;border-radius:10px;background:#0b2139;color:#fff;padding:0 11px;outline:none}\n    #phoneMenuSearchResults{margin-top:6px;border-radius:10px;overflow:hidden;background:#081a2d}\n    .phone-menu-search-result{display:block!important;width:100%!important;min-height:42px!important;margin:0!important;border:0!important;border-top:1px solid #ffffff12!important;border-radius:0!important;background:#081a2d!important;color:#fff!important;padding:8px 10px!important;text-align:left!important;font-weight:800!important}\n    .phone-menu-search-result small{display:block;margin-top:2px;color:#7f93aa;font-size:.64rem;font-weight:700}\n"""
+          if '#phoneMenuSearchWrap{' not in s:
+              if css_anchor not in s: raise SystemExit('drawer css anchor not found')
+              s=s.replace(css_anchor,css_add,1)
+
+          old="drawer.id='phoneMenuDrawer';drawer.innerHTML='<h3>Fantasy Menu</h3><div id=\"phoneMenuItems\"></div>';"
+          new="drawer.id='phoneMenuDrawer';drawer.innerHTML='<h3>Fantasy Menu</h3><div id=\"phoneMenuItems\"></div><div id=\"phoneMenuSearchWrap\"><label for=\"phoneMenuSearch\">Search players</label><input id=\"phoneMenuSearch\" type=\"search\" placeholder=\"Search for a player…\" autocomplete=\"off\"><div id=\"phoneMenuSearchResults\"></div></div>';"
+          if old not in s: raise SystemExit('drawer markup anchor not found')
+          s=s.replace(old,new,1)
+
+          old="  backdrop.onclick=closeMobileMenu;\n}"
+          new="""  backdrop.onclick=closeMobileMenu;
+  const menuSearch=document.getElementById('phoneMenuSearch');
+  const menuResults=document.getElementById('phoneMenuSearchResults');
+  if(menuSearch&&menuResults){
+    menuSearch.addEventListener('input',()=>{
+      const q=norm(menuSearch.value);
+      if(!q){menuResults.innerHTML='';return;}
+      let seen=new Set();
+      const matches=[...board,...players].filter(p=>{const k=p.id||norm(p.name);if(seen.has(k))return false;seen.add(k);return norm(p.name).includes(q)}).slice(0,10);
+      menuResults.innerHTML=matches.map(p=>`<button type=\"button\" class=\"phone-menu-search-result\" data-menu-player=\"${p.id}\"><span>${p.name}</span><small>${p.position} #${p.positionRank} · ${p.team}</small></button>`).join('')||'<div style=\"padding:10px;color:#7f93aa\">No players found</div>';
+    });
+    menuResults.addEventListener('click',e=>{
+      const b=e.target.closest('[data-menu-player]');if(!b)return;
+      closeMobileMenu();
+      if(typeof profile==='function')profile(b.dataset.menuPlayer);
+    });
+  }
+}"
+          if old not in s: raise SystemExit('menu listener anchor not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+
+          # ---- mock-draft-ui.js ----
+          p=Path('mock-draft-ui.js')
+          s=p.read_text()
+          old="    .mock-sleeper-ui .mock-team-grid .roster-card b{display:block;font-size:.64rem!important;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n    .mock-sleeper-ui .mock-team-grid .roster-card span{display:block;margin-top:1px;font-size:.52rem!important;line-height:1;color:#8094aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n"
+          new="""    .mock-sleeper-ui .mock-team-grid .roster-name-line{display:flex;align-items:center;gap:5px;min-width:0;height:100%}\n    .mock-sleeper-ui .mock-team-grid .roster-name-line b{display:block;min-width:0;flex:0 1 auto;font-size:.64rem!important;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n    .mock-sleeper-ui .mock-team-grid .lineup-team-logo{width:17px;height:17px;object-fit:contain;flex:0 0 17px}\n"""
+          if old not in s: raise SystemExit('lineup text css anchor not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+      - name: Validate
+        run: |
+          node --check site-enhancements.js
+          node --check mock-draft-ui.js
+          grep -q "o?'Big Board'" index.html
+          grep -q 'pickLabel=p' index.html
+          grep -q 'mock-team-head' index.html
+          grep -q 'phoneMenuSearch' site-enhancements.js
+          grep -q 'lineup-team-logo' index.html
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html site-enhancements.js mock-draft-ui.js
+          git diff --cached --quiet || git commit -m "Polish search, big board, and mock lineup"
+          git push

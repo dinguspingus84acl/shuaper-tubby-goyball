@@ -1,0 +1,63 @@
+name: Fix mock tab crash
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-mock-tab-crash.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Debounce DOM observers
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('site-enhancements.js')
+          s=p.read_text()
+          old="""  const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();applyColors()}));
+  obs.observe(document.body,{subtree:true,childList:true});
+"""
+          new="""  let enhancementSyncQueued=false;
+  const syncEnhancements=()=>{
+    if(enhancementSyncQueued)return;
+    enhancementSyncQueued=true;
+    requestAnimationFrame(()=>{
+      enhancementSyncQueued=false;
+      decorateTeamLogos();
+      applyColors();
+    });
+  };
+  const obs=new MutationObserver(syncEnhancements);
+  obs.observe(document.body,{subtree:true,childList:true});
+"""
+          if old not in s:
+              raise SystemExit('site-enhancements observer block not found')
+          p.write_text(s.replace(old,new,1))
+
+          p=Path('player-colors.js')
+          s=p.read_text()
+          old="new MutationObserver(apply).observe(document.body,{subtree:true,childList:true});document.addEventListener('click',()=>requestAnimationFrame(apply),true)"
+          new="let colorSyncQueued=false;const syncColors=()=>{if(colorSyncQueued)return;colorSyncQueued=true;requestAnimationFrame(()=>{colorSyncQueued=false;apply()})};new MutationObserver(syncColors).observe(document.body,{subtree:true,childList:true});document.addEventListener('click',syncColors,true)"
+          if old not in s:
+              raise SystemExit('player-colors observer block not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+      - name: Validate JavaScript
+        run: |
+          node --check site-enhancements.js
+          node --check player-colors.js
+          node --check mock-draft-ui.js
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site-enhancements.js player-colors.js
+          git diff --cached --quiet || git commit -m "Fix mock tab DOM observer crash"
+          git push

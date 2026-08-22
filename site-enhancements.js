@@ -16,6 +16,7 @@ function addStyles(){
   const st=document.createElement('style');
   st.id='shuaEnhancementStyles';
   st.textContent=`
+    .tools>.search{display:none!important}
     @media(min-width:901px){.search{flex:0 1 285px!important;min-width:180px!important}}
     .home-btn.active{background:linear-gradient(90deg,#b51635,#203fa7)!important;color:#fff!important}
     .myguys-btn{border-color:#35d07f66!important}.myguys-btn.active{background:#145c3d!important;color:#fff!important;border-color:#35d07f!important}
@@ -40,6 +41,12 @@ function addStyles(){
     #phoneMenuDrawer h3{margin:0 0 14px;color:#91a4ba;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase}
     #phoneMenuDrawer button{display:block;width:100%;min-height:48px;margin:0 0 8px;padding:10px 13px;border:1px solid #ffffff25;border-radius:10px;background:#0b2139;color:#fff;text-align:left;font-weight:900}
     #phoneMenuDrawer button.active{background:#183d63;border-color:#ffffff55}
+    #phoneMenuSearchWrap{margin-top:10px;padding-top:12px;border-top:1px solid #ffffff20}
+    #phoneMenuSearchWrap label{display:block;margin:0 0 7px;color:#91a4ba;font-size:.68rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    #phoneMenuSearch{width:100%;height:44px;border:1px solid #ffffff25;border-radius:10px;background:#0b2139;color:#fff;padding:0 11px;outline:none}
+    #phoneMenuSearchResults{margin-top:6px;border-radius:10px;overflow:hidden;background:#081a2d}
+    .phone-menu-search-result{display:block!important;width:100%!important;min-height:42px!important;margin:0!important;border:0!important;border-top:1px solid #ffffff12!important;border-radius:0!important;background:#081a2d!important;color:#fff!important;padding:8px 10px!important;text-align:left!important;font-weight:800!important}
+    .phone-menu-search-result small{display:block;margin-top:2px;color:#7f93aa;font-size:.64rem;font-weight:700}
     body.mobile-menu-open #phoneMenuBackdrop{display:block}
     body.mobile-menu-open #phoneMenuDrawer{transform:translateX(0)}
 
@@ -172,10 +179,22 @@ function ensureMobileMenu(){
   button.id='phoneMenuButton';button.type='button';button.setAttribute('aria-label','Open menu');
   button.innerHTML='<span></span><span></span><span></span>';
   const backdrop=document.createElement('div');backdrop.id='phoneMenuBackdrop';
-  const drawer=document.createElement('aside');drawer.id='phoneMenuDrawer';drawer.innerHTML='<h3>Fantasy Menu</h3><div id="phoneMenuItems"></div>';
+  const drawer=document.createElement('aside');drawer.id='phoneMenuDrawer';drawer.innerHTML='<h3>Fantasy Menu</h3><div id="phoneMenuItems"></div><div id="phoneMenuSearchWrap"><label for="phoneMenuSearch">Search players</label><input id="phoneMenuSearch" type="search" placeholder="Search for a player…" autocomplete="off"><div id="phoneMenuSearchResults"></div></div>';
   document.body.append(button,backdrop,drawer);
   button.onclick=()=>document.body.classList.contains('mobile-menu-open')?closeMobileMenu():openMobileMenu();
   backdrop.onclick=closeMobileMenu;
+  const menuSearch=document.getElementById('phoneMenuSearch');
+  const menuResults=document.getElementById('phoneMenuSearchResults');
+  if(menuSearch&&menuResults){
+    menuSearch.addEventListener('input',()=>{
+      const q=norm(menuSearch.value);
+      if(!q){menuResults.innerHTML='';return;}
+      const seen=new Set();
+      const matches=[...board,...players].filter(p=>{const k=p.id||norm(p.name);if(seen.has(k))return false;seen.add(k);return norm(p.name).includes(q)}).slice(0,10);
+      menuResults.innerHTML=matches.map(p=>`<button type="button" class="phone-menu-search-result" data-menu-player="${p.id}"><span>${p.name}</span><small>${p.position} #${p.positionRank} · ${p.team}</small></button>`).join('')||'<div style="padding:10px;color:#7f93aa">No players found</div>';
+    });
+    menuResults.addEventListener('click',e=>{const b=e.target.closest('[data-menu-player]');if(!b)return;closeMobileMenu();if(typeof profile==='function')profile(b.dataset.menuPlayer);});
+  }
 }
 function openMobileMenu(){refreshMobileMenu();document.body.classList.add('mobile-menu-open')}
 function closeMobileMenu(){document.body.classList.remove('mobile-menu-open')}

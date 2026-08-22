@@ -1,0 +1,50 @@
+name: Native mock team tab
+
+on:
+  push:
+    paths:
+      - '.github/workflows/native-team-tab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add native TEAM filter and lineup view
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p=Path('index.html')
+          s=p.read_text()
+
+          old='<div class="mock-filters"><button class="mock-btn pool-filter primary" data-filter="ALL">All</button>'
+          new='<div class="mock-filters"><button class="mock-btn pool-filter" data-filter="TEAM">TEAM</button><button class="mock-btn pool-filter primary" data-filter="ALL">All</button>'
+          if old not in s and 'data-filter="TEAM"' not in s:
+              raise SystemExit('mock filter anchor not found')
+          if old in s:
+              s=s.replace(old,new,1)
+
+          pattern=r"function renderPool\(\)\{.*?\}\$\('#startMock'\)\.onclick=start;"
+          replacement="""function renderPool(){document.querySelectorAll('.pool-filter').forEach(x=>x.classList.toggle('primary',x.dataset.filter===mock.filter));let poolCard=document.querySelector('.player-pool');if(poolCard)poolCard.classList.toggle('team-pool-mode',mock.filter==='TEAM');if(mock.filter==='TEAM'){let source=$('#myRoster'),lineup=source&&source.innerHTML?source.innerHTML:'<div class=\"mock-team-empty\">Start the draft to build your lineup.</div>';$('#poolList').innerHTML=`<div class=\"mock-team-view\"><div class=\"mock-team-title\">My Team Lineup</div><div class=\"mock-team-subtitle\">Starters · FLEX · Bench</div><div class=\"mock-team-grid\">${lineup}</div></div>`;bind();return}let used=new Set(mock.picks.map(x=>x.player.id)),q=N(mock.search),a=pool(mock.filter).filter(p=>!used.has(p.id)&&(!q||N(p.name).includes(q))),can=mock.active&&teamAt(mock.picks.length,mock.teams)===mock.slot;$('#poolList').innerHTML=a.map((p,i)=>`<div class=\"pool-player\"><b class=\"pool-rank\">${i+1}</b>${pic(p.name,'sm',p.team,p.position)}<span data-id=\"${p.id}\"><b>${p.name}</b><div class=\"pool-meta\">${p.position} #${p.positionRank} · ${p.team}</div></span><button class=\"draft-btn\" data-pick=\"${p.id}\" ${can?'':'disabled'}>Draft</button></div>`).join('');document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>pick(b.dataset.pick));bind()}$('#startMock').onclick=start;"""
+          ns,n=re.subn(pattern,replacement,s,count=1)
+          if n!=1:
+              raise SystemExit(f'renderPool replacement count {n}')
+          p.write_text(ns)
+          PY
+      - name: Validate embedded JavaScript marker
+        run: |
+          grep -q 'data-filter="TEAM"' index.html
+          grep -q 'My Team Lineup' index.html
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add native mock draft team tab"
+          git push

@@ -17,6 +17,8 @@ function addStyles(){
   st.id='shuaEnhancementStyles';
   st.textContent=`
     .tools>.search{display:none!important}
+    .phone-mode .positions{display:none!important}
+    .phone-mode #phoneMenuButton{display:flex!important}
     @media(min-width:901px){.search{flex:0 1 285px!important;min-width:180px!important}}
     .home-btn.active{background:linear-gradient(90deg,#b51635,#203fa7)!important;color:#fff!important}
     .myguys-btn{border-color:#35d07f66!important}.myguys-btn.active{background:#145c3d!important;color:#fff!important;border-color:#35d07f!important}

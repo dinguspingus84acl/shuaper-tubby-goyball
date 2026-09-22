@@ -181,6 +181,7 @@ function showTrade(){
   const tagged=document.getElementById('taggedControls');if(tagged)tagged.classList.remove('open');
   document.getElementById('teamControls').hidden=true;
   document.getElementById('overallToggle').hidden=true;
+  const positionToggle=document.getElementById('positionToggle');if(positionToggle)positionToggle.hidden=true;
   document.getElementById('board').hidden=true;
   document.getElementById('tableCard').hidden=true;
   document.getElementById('mockSection').hidden=true;

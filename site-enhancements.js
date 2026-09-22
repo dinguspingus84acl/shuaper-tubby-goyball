@@ -160,6 +160,7 @@ function renderTagged(){
   document.getElementById('sub').textContent=currentPos==='ALL'?'Grouped by position — QB, RB, WR, TE':`Showing ${currentPos} only`;
   document.getElementById('teamControls').hidden=true;
   document.getElementById('overallToggle').hidden=true;
+  const positionToggle=document.getElementById('positionToggle');if(positionToggle)positionToggle.hidden=true;
   document.getElementById('mockSection').hidden=true;
   document.getElementById('depthSection').hidden=true;
   document.getElementById('board').hidden=true;

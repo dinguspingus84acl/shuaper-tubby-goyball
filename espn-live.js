@@ -63,6 +63,9 @@ let activeStat='points';
 let loading=false;
 let timer=null;
 let lastUpdated=null;
+let openGameLogId=null;
+let proSchedule=null;
+const gameLogCache=new Map();
 
 const style=document.createElement('style');
 style.id='espnLiveStyles';
@@ -86,6 +89,20 @@ style.textContent=`
 .espn-player-copy{min-width:0}
 .espn-player-name{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .espn-player-stats{margin-top:3px;color:#71869d;font-size:.57rem;line-height:1.25;white-space:normal}
+.espn-gamelog-btn{margin-top:5px;border:1px solid #ffffff22;background:#0b2139;color:#b7c9db;border-radius:7px;padding:4px 8px;font-size:.58rem;font-weight:900}
+.espn-player-block{border-top:1px solid #ffffff12}
+.espn-player-block:first-child{border-top:0}
+.espn-player-block .espn-live-row{border-top:0}
+.espn-game-log{background:#061522;border-top:1px solid #ffffff18;padding:0 10px 10px}
+.espn-game-log[hidden]{display:none!important}
+.espn-game-log-title{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0 7px;font-size:.68rem;font-weight:950}
+.espn-game-log-title span{color:#7f93aa;font-size:.58rem;font-weight:800}
+.espn-game-log-table{width:100%;border-collapse:collapse;font-size:.62rem}
+.espn-game-log-table th,.espn-game-log-table td{padding:7px 8px;border-top:1px solid #ffffff10;text-align:left}
+.espn-game-log-table th{color:#7f93aa;font-size:.56rem;text-transform:uppercase;letter-spacing:.05em}
+.espn-game-log-table .gl-pts{text-align:right;font-weight:950}
+.espn-game-log-table .gl-stat{color:#b8c7d6}
+.espn-game-log-empty{padding:12px 4px;color:#7f93aa;font-size:.62rem}
 .espn-team-logo{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
 .espn-pos{font-weight:900}
 .espn-points,.espn-selected-stat{text-align:right;font-weight:900}
@@ -181,6 +198,7 @@ function parsePlayer(entry){
     name,
     position,
     team:TEAM_BY_ID[Number(p.proTeamId)]||'—',
+    proTeamId:Number(p.proTeamId)||0,
     points:total,
     average:Number.isFinite(avg)?avg:null,
     passAtt:rawStat(season,0),
@@ -268,6 +286,123 @@ function statsSummary(p){
   }
   return `${formatStat(p,'targets')} Tgt · ${formatStat(p,'receptions')} Rec · ${formatStat(p,'recYds')} Rec Yds · ${formatStat(p,'recTD')} Rec TD`;
 }
+
+function gameLogStatLine(position,s){
+  const passAtt=rawStat(s,0),comp=rawStat(s,1),passYds=rawStat(s,3),passTD=rawStat(s,4),ints=rawStat(s,20);
+  const rushAtt=rawStat(s,23),rushYds=rawStat(s,24),rushTD=rawStat(s,25);
+  const recYds=rawStat(s,42),recTD=rawStat(s,43),rec=rawStat(s,53),targets=rawStat(s,58);
+  if(position==='QB')return comp+'/'+passAtt+' CMP, '+passYds+' YDS, '+passTD+' TD, '+ints+' INT · '+rushAtt+' CAR, '+rushYds+' YDS, '+rushTD+' TD';
+  if(position==='RB')return rushAtt+' CAR, '+rushYds+' YDS, '+rushTD+' TD · '+rec+'/'+targets+' REC, '+recYds+' YDS, '+recTD+' TD';
+  return rec+'/'+targets+' REC, '+recYds+' YDS, '+recTD+' TD'+(rushAtt?' · '+rushAtt+' CAR, '+rushYds+' YDS':'');
+}
+async function fetchProSchedule(){
+  if(proSchedule)return proSchedule;
+  const path='/apis/v3/games/ffl/seasons/'+SEASON+'?view=proTeamSchedules_wl';
+  const urls=['https://lm-api-reads.fantasy.espn.com'+path,'https://fantasy.espn.com'+path];
+  for(const url of urls){
+    try{
+      const r=await fetch(url,{cache:'no-store',mode:'cors',headers:{'Accept':'application/json'}});
+      if(!r.ok)continue;
+      const d=await r.json();
+      const teams=d?.settings?.proTeams||d?.proTeams||[];
+      if(teams.length){proSchedule=teams;return teams}
+    }catch(e){}
+  }
+  return [];
+}
+function opponentLabel(proTeamId,week){
+  if(!proSchedule||!proTeamId)return '—';
+  const team=proSchedule.find(t=>Number(t.id)===Number(proTeamId));
+  const games=team?.proGamesByScoringPeriod?.[String(week)]||team?.proGamesByScoringPeriod?.[week]||[];
+  const g=Array.isArray(games)?games[0]:games;
+  if(!g)return 'BYE';
+  const home=Number(g.homeProTeamId??g.homeTeamId??g.home?.proTeamId??g.home?.teamId??0);
+  const away=Number(g.awayProTeamId??g.awayTeamId??g.away?.proTeamId??g.away?.teamId??0);
+  let opp=0,prefix='';
+  if(home&&Number(proTeamId)===home){opp=away;prefix='vs '}
+  else if(away&&Number(proTeamId)===away){opp=home;prefix='@ '}
+  else{
+    opp=Number(g.opponentProTeamId??g.opponentId??0);
+    prefix='';
+  }
+  return opp?(prefix+(TEAM_BY_ID[opp]||'OPP')):'—';
+}
+function deepStats(entry){
+  const pool=entry?.playerPoolEntry||entry;
+  const p=pool?.player||entry?.player||pool;
+  return p?.stats||pool?.stats||entry?.stats||[];
+}
+async function fetchGameLog(player){
+  const cached=gameLogCache.get(String(player.id));
+  if(cached&&Date.now()-cached.ts<REFRESH_MS)return cached.rows;
+  const filter=JSON.stringify({players:{
+    filterIds:{value:[Number(player.id)]},
+    filterStatsForSourceIds:{value:[0]},
+    filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+SEASON,'10'+SEASON]}
+  }});
+  const base='/apis/v3/games/ffl/seasons/'+SEASON+'/segments/0/leaguedefaults/'+PPR_PRESET_ID;
+  const candidates=[
+    ['https://lm-api-reads.fantasy.espn.com'+base+'?view=kona_playercard','kona_playercard'],
+    ['https://lm-api-reads.fantasy.espn.com'+base+'?view=kona_player_info','kona_player_info'],
+    ['https://fantasy.espn.com'+base+'?view=kona_player_info','kona_player_info']
+  ];
+  let list=null,lastError=null;
+  for(const [url] of candidates){
+    try{
+      const r=await fetch(url,{cache:'no-store',mode:'cors',headers:{'Accept':'application/json','X-Fantasy-Filter':filter,'X-Fantasy-Source':'kona'}});
+      if(!r.ok)throw new Error('ESPN returned '+r.status);
+      const d=await r.json();
+      const arr=Array.isArray(d)?d:(d.players||[]);
+      if(arr.length){list=arr;break}
+    }catch(e){lastError=e}
+  }
+  if(!list)throw lastError||new Error('No game log data');
+  await fetchProSchedule();
+  const stats=deepStats(list[0]);
+  const byWeek=new Map();
+  (Array.isArray(stats)?stats:[]).forEach(s=>{
+    const week=Number(s?.scoringPeriodId||0);
+    if(Number(s?.seasonId)!==SEASON||statSource(s)!==0||week<=0||week>20)return;
+    const pts=Number(s?.appliedTotal);
+    if(!Number.isFinite(pts)&&!s?.stats)return;
+    const prev=byWeek.get(week);
+    const size=Object.keys(s?.stats||{}).length;
+    const prevSize=Object.keys(prev?.stats||{}).length;
+    if(!prev||size>prevSize)byWeek.set(week,s);
+  });
+  const log=[...byWeek.entries()].sort((a,b)=>a[0]-b[0]).map(([week,s])=>({
+    week,
+    opponent:opponentLabel(player.proTeamId,week),
+    points:Number.isFinite(Number(s.appliedTotal))?Number(s.appliedTotal):0,
+    line:gameLogStatLine(player.position,s)
+  }));
+  gameLogCache.set(String(player.id),{ts:Date.now(),rows:log});
+  return log;
+}
+function gameLogHtml(player){
+  const cached=gameLogCache.get(String(player.id));
+  if(!cached)return '<div class="espn-game-log-empty">Loading game log…</div>';
+  if(cached.error)return '<div class="espn-game-log-empty espn-error">Could not load this game log. Tap Game Log to try again.</div>';
+  if(!cached.rows.length)return '<div class="espn-game-log-empty">No completed game stats yet.</div>';
+  return '<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>2026 · PPR</span></div>'+
+    '<table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th><th>Stat Line</th><th class="gl-pts">PPR</th></tr></thead><tbody>'+
+    cached.rows.map(g=>'<tr><td>'+g.week+'</td><td>'+g.opponent+'</td><td class="gl-stat">'+g.line+'</td><td class="gl-pts">'+g.points.toFixed(1)+'</td></tr>').join('')+
+    '</tbody></table>';
+}
+async function toggleGameLog(id){
+  const player=rows.find(p=>String(p.id)===String(id));
+  if(!player)return;
+  if(openGameLogId===String(id)){openGameLogId=null;render();return}
+  openGameLogId=String(id);
+  render();
+  try{
+    await fetchGameLog(player);
+  }catch(e){
+    gameLogCache.set(String(id),{ts:Date.now(),rows:[],error:true});
+  }
+  if(openGameLogId===String(id))render();
+}
+
 function renderStatFilters(){
   const box=document.getElementById('espnStatFilters');
   const cfg=configForFilter();
@@ -299,19 +434,25 @@ function render(){
   }
   const ranked=rankRows(rows,activeFilter);
   box.innerHTML=ranked.map((p,i)=>{
-    const id=localPlayerId(p.name);
-    return `<div class="espn-live-row"${id?` data-espn-player-id="${id}"`:''}>
-      <div class="espn-rank">#${i+1}</div>
-      <div class="espn-player">${teamLogo(p.team)}<div class="espn-player-copy"><div class="espn-player-name">${p.name}</div><div class="espn-player-stats">${statsSummary(p)}</div></div></div>
-      <div class="espn-pos">${p.position}</div>
-      <div class="espn-team">${p.team}</div>
-      <div class="espn-points">${p.points.toFixed(1)}</div>
-      <div class="espn-selected-stat">${formatStat(p,activeStat)}</div>
+    const id=localPlayerId(p.name),open=openGameLogId===String(p.id);
+    return `<div class="espn-player-block">
+      <div class="espn-live-row"${id?` data-espn-player-id="${id}"`:''}>
+        <div class="espn-rank">#${i+1}</div>
+        <div class="espn-player">${teamLogo(p.team)}<div class="espn-player-copy"><div class="espn-player-name">${p.name}</div><div class="espn-player-stats">${statsSummary(p)}</div><button type="button" class="espn-gamelog-btn" data-game-log="${p.id}">${open?'Hide Game Log':'Game Log'}</button></div></div>
+        <div class="espn-pos">${p.position}</div>
+        <div class="espn-team">${p.team}</div>
+        <div class="espn-points">${p.points.toFixed(1)}</div>
+        <div class="espn-selected-stat">${formatStat(p,activeStat)}</div>
+      </div>
+      <div class="espn-game-log" ${open?'':'hidden'}>${open?gameLogHtml(p):''}</div>
     </div>`;
   }).join('');
   box.querySelectorAll('[data-espn-player-id]').forEach(el=>{
     el.style.cursor='pointer';
-    el.onclick=()=>{try{profile(el.dataset.espnPlayerId)}catch(e){}};
+    el.onclick=e=>{if(e.target.closest('[data-game-log]'))return;try{profile(el.dataset.espnPlayerId)}catch(err){}};
+  });
+  box.querySelectorAll('[data-game-log]').forEach(btn=>{
+    btn.onclick=e=>{e.preventDefault();e.stopPropagation();toggleGameLog(btn.dataset.gameLog)};
   });
 }
 function setUpdatedLabel(message,error=false){

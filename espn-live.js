@@ -81,14 +81,19 @@ style.textContent=`
 .espn-stat-btn{padding:6px 9px;font-size:.65rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
-.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(210px,1.8fr) 58px 68px 82px 92px 86px;gap:8px;align-items:center}
+.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 92px;gap:8px;align-items:center}
 .espn-live-head{padding:8px 10px;color:var(--m);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#07182a}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:7px;min-width:0}
 .espn-player-copy{min-width:0}
 .espn-player-name{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.espn-gamelog-btn{border:1px solid #ffffff28;background:#0b2139;color:#c7d7e8;border-radius:8px;padding:6px 8px;font-size:.6rem;font-weight:950;width:100%;min-height:32px}
+.espn-name-btn{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:950;text-align:left;cursor:pointer;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.espn-name-btn:hover{text-decoration:underline}
+.espn-profile-gamelog{margin-top:12px;border:1px solid var(--l);border-radius:10px;background:#07182a;overflow:hidden}
+.espn-profile-gamelog-btn{width:100%;min-height:42px;border:0;background:#0b2139;color:#d7e6f5;padding:9px 12px;font-weight:950;text-align:left;display:flex;align-items:center;justify-content:space-between}
+.espn-profile-gamelog-btn span{color:#8ca0b5;font-size:.66rem;font-weight:800}
+.espn-profile-gamelog-panel{padding:0 10px 10px;background:#061522}
 .espn-player-block{border-top:1px solid #ffffff12}
 .espn-player-block:first-child{border-top:0}
 .espn-player-block .espn-live-row{border-top:0}
@@ -112,12 +117,10 @@ style.textContent=`
 .espn-error{color:#ff8b9d}
 .espn-live-source{font-size:.62rem;color:#73879e}
 @media(max-width:700px){
-  .espn-live-head,.espn-live-row{grid-template-columns:38px minmax(0,1fr) 62px 72px}
+  .espn-live-head,.espn-live-row{grid-template-columns:38px minmax(0,1fr) 54px 66px}
   .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
-  .espn-live-head>*:nth-child(6),.espn-live-row>*:nth-child(6){display:block}
-  .espn-live-head>*:nth-child(7),.espn-live-row>*:nth-child(7){display:block}
   .espn-live-row{padding:7px 8px;min-height:56px}
   .espn-player-name{font-size:.72rem}
   .espn-selected-stat{font-size:.72rem}
@@ -154,7 +157,7 @@ section.innerHTML=`
     <div class="espn-live-source">ESPN 2026 full-PPR actual stats · choose a position, then rank players by any relevant stat · auto-refreshes every 60 seconds while open</div>
     <div class="espn-live-card">
       <div class="espn-live-head">
-        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div style="text-align:right">PPR Pts</div><div id="espnSelectedStatHead" style="text-align:right">PPR Pts</div><div>Game Log</div>
+        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div style="text-align:right">PPR Pts</div><div id="espnSelectedStatHead" style="text-align:right">PPR Pts</div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open ESPN Live to load current rankings.</div></div>
     </div>
@@ -406,6 +409,77 @@ async function toggleGameLog(id){
   if(openGameLogId===String(id))render();
 }
 
+
+function ensureProfileGameLogUi(){
+  let wrap=document.getElementById('espnProfileGameLogWrap');
+  if(wrap)return wrap;
+  const profileBox=document.querySelector('#modal .profile');
+  const notes=profileBox?.querySelector('.note-box');
+  if(!profileBox)return null;
+  wrap=document.createElement('div');
+  wrap.id='espnProfileGameLogWrap';
+  wrap.className='espn-profile-gamelog';
+  wrap.hidden=true;
+  wrap.innerHTML='<button type="button" id="espnProfileGameLogBtn" class="espn-profile-gamelog-btn">Game Log <span>2026 PPR</span></button><div id="espnProfileGameLogPanel" class="espn-profile-gamelog-panel" hidden></div>';
+  if(notes)profileBox.insertBefore(wrap,notes);else profileBox.appendChild(wrap);
+  document.getElementById('espnProfileGameLogBtn').onclick=async()=>{
+    const id=wrap.dataset.espnId;
+    const player=rows.find(p=>String(p.id)===String(id));
+    const panel=document.getElementById('espnProfileGameLogPanel');
+    if(!player||!panel)return;
+    if(!panel.hidden){
+      panel.hidden=true;
+      document.getElementById('espnProfileGameLogBtn').firstChild.textContent='Game Log ';
+      return;
+    }
+    panel.hidden=false;
+    document.getElementById('espnProfileGameLogBtn').firstChild.textContent='Hide Game Log ';
+    panel.innerHTML='<div class="espn-game-log-empty">Loading game log…</div>';
+    try{
+      await fetchGameLog(player);
+      panel.innerHTML=gameLogHtml(player);
+    }catch(e){
+      gameLogCache.set(String(id),{ts:Date.now(),rows:[],error:true});
+      panel.innerHTML=gameLogHtml(player);
+    }
+  };
+  return wrap;
+}
+function resetProfileGameLog(player){
+  const wrap=ensureProfileGameLogUi();
+  if(!wrap)return;
+  wrap.hidden=false;
+  wrap.dataset.espnId=String(player.id);
+  const panel=document.getElementById('espnProfileGameLogPanel');
+  if(panel){panel.hidden=true;panel.innerHTML=''}
+  const btn=document.getElementById('espnProfileGameLogBtn');
+  if(btn)btn.firstChild.textContent='Game Log ';
+}
+function hideProfileGameLog(){
+  const wrap=document.getElementById('espnProfileGameLogWrap');
+  if(wrap)wrap.hidden=true;
+}
+function openEspnPlayerProfile(player){
+  const localId=localPlayerId(player.name);
+  if(localId){
+    try{profile(localId)}catch(e){}
+  }else{
+    const modal=document.getElementById('modal');
+    if(!modal)return;
+    document.getElementById('pn').textContent=player.name;
+    document.getElementById('pn').className='';
+    document.getElementById('pm').textContent=player.team+' · '+player.position;
+    document.getElementById('profileTop').innerHTML='<div class="person"></div>'+teamLogo(player.team);
+    document.getElementById('injuryStatus').innerHTML='';
+    const cfg=STAT_CONFIG[player.position]||STAT_CONFIG.ALL;
+    document.getElementById('stats').innerHTML=cfg.slice(0,4).map(x=>'<div class="stat"><span>'+x.label+'</span><b>'+formatStat(player,x.key)+'</b></div>').join('');
+    document.getElementById('playerNotes').textContent='No notes provided.';
+    modal.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  resetProfileGameLog(player);
+}
+
 function renderStatFilters(){
   const box=document.getElementById('espnStatFilters');
   const cfg=configForFilter();
@@ -437,26 +511,22 @@ function render(){
   }
   const ranked=rankRows(rows,activeFilter);
   box.innerHTML=ranked.map((p,i)=>{
-    const id=localPlayerId(p.name),open=openGameLogId===String(p.id);
-    return `<div class="espn-player-block">
-      <div class="espn-live-row"${id?` data-espn-player-id="${id}"`:''}>
-        <div class="espn-rank">#${i+1}</div>
-        <div class="espn-player">${teamLogo(p.team)}<div class="espn-player-copy"><div class="espn-player-name">${p.name}</div></div></div>
-        <div class="espn-pos">${p.position}</div>
-        <div class="espn-team">${p.team}</div>
-        <div class="espn-points">${p.points.toFixed(1)}</div>
-        <div class="espn-selected-stat">${formatStat(p,activeStat)}</div>
-        <div><button type="button" class="espn-gamelog-btn" data-game-log="${p.id}">${open?'Hide':'Game Log'}</button></div>
-      </div>
-      <div class="espn-game-log" ${open?'':'hidden'}>${open?gameLogHtml(p):''}</div>
+    return `<div class="espn-live-row">
+      <div class="espn-rank">#${i+1}</div>
+      <div class="espn-player">${teamLogo(p.team)}<div class="espn-player-copy"><button type="button" class="espn-name-btn" data-espn-open-player="${p.id}">${p.name}</button></div></div>
+      <div class="espn-pos">${p.position}</div>
+      <div class="espn-team">${p.team}</div>
+      <div class="espn-points">${p.points.toFixed(1)}</div>
+      <div class="espn-selected-stat">${formatStat(p,activeStat)}</div>
     </div>`;
   }).join('');
-  box.querySelectorAll('[data-espn-player-id]').forEach(el=>{
-    el.style.cursor='pointer';
-    el.onclick=e=>{if(e.target.closest('[data-game-log]'))return;try{profile(el.dataset.espnPlayerId)}catch(err){}};
-  });
-  box.querySelectorAll('[data-game-log]').forEach(btn=>{
-    btn.onclick=e=>{e.preventDefault();e.stopPropagation();toggleGameLog(btn.dataset.gameLog)};
+  box.querySelectorAll('[data-espn-open-player]').forEach(btn=>{
+    btn.onclick=e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      const player=rows.find(p=>String(p.id)===String(btn.dataset.espnOpenPlayer));
+      if(player)openEspnPlayerProfile(player);
+    };
   });
 }
 function setUpdatedLabel(message,error=false){
@@ -545,6 +615,8 @@ document.querySelectorAll('[data-espn-filter]').forEach(b=>{
   };
 });
 document.getElementById('espnRefresh').onclick=refresh;
+document.getElementById('close')?.addEventListener('click',hideProfileGameLog);
+document.getElementById('modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('modal'))hideProfileGameLog()});
 
 document.addEventListener('click',e=>{
   const navBtn=e.target.closest('.positions .pos');

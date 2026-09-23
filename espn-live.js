@@ -66,6 +66,7 @@ let lastUpdated=null;
 let openGameLogId=null;
 let proSchedule=null;
 const gameLogCache=new Map();
+const gameLogModes=new Map();
 
 const style=document.createElement('style');
 style.id='espnLiveStyles';
@@ -101,7 +102,10 @@ style.textContent=`
 .espn-game-log[hidden]{display:none!important}
 .espn-game-log-title{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0 7px;font-size:.68rem;font-weight:950}
 .espn-game-log-title span{color:#7f93aa;font-size:.58rem;font-weight:800}
-.espn-game-log-season{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 8px}.espn-game-log-chip{border:1px solid #ffffff16;background:#081a2d;border-radius:7px;padding:5px 7px;font-size:.57rem;color:#aebfd0}.espn-game-log-chip b{color:#fff;margin-left:3px}
+.espn-game-log-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 8px}
+.espn-game-log-tab{border:1px solid #ffffff20;background:#081a2d;color:#91a4ba;border-radius:8px;padding:6px 10px;font-size:.62rem;font-weight:950}
+.espn-game-log-tab.active{background:#183d63;color:#fff;border-color:#ffffff35}
+.espn-game-log-table-wrap{overflow-x:auto}
 .espn-game-log-table{width:100%;border-collapse:collapse;font-size:.62rem}
 .espn-game-log-table th,.espn-game-log-table td{padding:7px 8px;border-top:1px solid #ffffff10;text-align:left}
 .espn-game-log-table th{color:#7f93aa;font-size:.56rem;text-transform:uppercase;letter-spacing:.05em}
@@ -377,23 +381,94 @@ async function fetchGameLog(player){
   const log=[...byWeek.entries()].sort((a,b)=>a[0]-b[0]).map(([week,s])=>({
     week,
     opponent:opponentLabel(player.proTeamId,week),
-    points:Number.isFinite(Number(s.appliedTotal))?Number(s.appliedTotal):0,
-    line:gameLogStatLine(player.position,s)
+    totalPoints:Number.isFinite(Number(s.appliedTotal))?Number(s.appliedTotal):0,
+    passAtt:rawStat(s,0),
+    completions:rawStat(s,1),
+    passYds:rawStat(s,3),
+    passTD:rawStat(s,4),
+    interceptions:rawStat(s,20),
+    rushAtt:rawStat(s,23),
+    rushYds:rawStat(s,24),
+    rushTD:rawStat(s,25),
+    recYds:rawStat(s,42),
+    recTD:rawStat(s,43),
+    receptions:rawStat(s,53),
+    targets:rawStat(s,58),
+    fumblesLost:rawStat(s,72)
   }));
   gameLogCache.set(String(player.id),{ts:Date.now(),rows:log});
   return log;
+}
+function gameLogModesFor(position){
+  if(position==='RB')return [{key:'rush',label:'Rushing'},{key:'rec',label:'Receiving'}];
+  if(position==='QB')return [{key:'pass',label:'Passing'},{key:'rush',label:'Rushing'}];
+  return [{key:'rec',label:'Receiving'}];
+}
+function defaultGameLogMode(position){
+  return position==='QB'?'pass':position==='RB'?'rush':'rec';
+}
+function categoryPoints(g,mode,position){
+  if(mode==='pass')return g.passYds*.04+g.passTD*4-g.interceptions*2-g.fumblesLost*2;
+  if(mode==='rush')return g.rushYds*.1+g.rushTD*6;
+  if(mode==='rec')return g.receptions+g.recYds*.1+g.recTD*6;
+  return g.totalPoints||0;
+}
+function gameLogColumns(mode,position){
+  if(mode==='pass')return [
+    {label:'PTS',key:'pts'},
+    {label:'YDS',key:'passYds'},
+    {label:'TD',key:'passTD'},
+    {label:'INT/FUM',key:'turnovers'}
+  ];
+  if(mode==='rush')return [
+    {label:'PTS',key:'pts'},
+    {label:'ATT',key:'rushAtt'},
+    {label:'YDS',key:'rushYds'},
+    {label:'TD',key:'rushTD'}
+  ];
+  return [
+    {label:'PTS',key:'pts'},
+    {label:'REC',key:'receptions'},
+    {label:'TGT',key:'targets'},
+    {label:'YDS',key:'recYds'},
+    {label:'TD',key:'recTD'}
+  ];
+}
+function gameLogCell(g,key,mode,position){
+  if(key==='pts')return categoryPoints(g,mode,position).toFixed(1);
+  if(key==='turnovers')return g.interceptions+'/'+g.fumblesLost;
+  const v=Number(g[key]||0);
+  return Number.isInteger(v)?String(v):v.toFixed(1);
 }
 function gameLogHtml(player){
   const cached=gameLogCache.get(String(player.id));
   if(!cached)return '<div class="espn-game-log-empty">Loading game log…</div>';
   if(cached.error)return '<div class="espn-game-log-empty espn-error">Could not load this game log. Tap Game Log to try again.</div>';
-  const cfg=STAT_CONFIG[player.position]||STAT_CONFIG.ALL;
-  const season='<div class="espn-game-log-season">'+cfg.map(x=>'<span class="espn-game-log-chip">'+x.label+' <b>'+formatStat(player,x.key)+'</b></span>').join('')+'</div>';
-  if(!cached.rows.length)return '<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>2026 · PPR</span></div>'+season+'<div class="espn-game-log-empty">No completed game stats yet.</div>';
-  return '<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>2026 · PPR</span></div>'+season+
-    '<table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th><th>Stat Line</th><th class="gl-pts">PPR</th></tr></thead><tbody>'+
-    cached.rows.map(g=>'<tr><td>'+g.week+'</td><td>'+g.opponent+'</td><td class="gl-stat">'+g.line+'</td><td class="gl-pts">'+g.points.toFixed(1)+'</td></tr>').join('')+
-    '</tbody></table>';
+  const modes=gameLogModesFor(player.position);
+  let mode=gameLogModes.get(String(player.id))||defaultGameLogMode(player.position);
+  if(!modes.some(x=>x.key===mode))mode=modes[0].key;
+  const tabs='<div class="espn-game-log-tabs">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" data-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
+  if(!cached.rows.length)return '<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>2026 · PPR</span></div>'+tabs+'<div class="espn-game-log-empty">No completed game stats yet.</div>';
+  const cols=gameLogColumns(mode,player.position);
+  return '<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>2026 · PPR</span></div>'+tabs+
+    '<div class="espn-game-log-table-wrap"><table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th>'+
+    cols.map(c=>'<th class="'+(c.key==='pts'?'gl-pts':'')+'">'+c.label+'</th>').join('')+
+    '</tr></thead><tbody>'+
+    cached.rows.map(g=>'<tr><td>'+g.week+'</td><td>'+g.opponent+'</td>'+
+      cols.map(c=>'<td class="'+(c.key==='pts'?'gl-pts':'gl-stat')+'">'+gameLogCell(g,c.key,mode,player.position)+'</td>').join('')+
+    '</tr>').join('')+
+    '</tbody></table></div>';
+}
+function bindGameLogModeButtons(panel,player){
+  panel.querySelectorAll('[data-gl-mode]').forEach(btn=>{
+    btn.onclick=e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      gameLogModes.set(String(player.id),btn.dataset.glMode);
+      panel.innerHTML=gameLogHtml(player);
+      bindGameLogModeButtons(panel,player);
+    };
+  });
 }
 async function toggleGameLog(id){
   const player=rows.find(p=>String(p.id)===String(id));
@@ -438,9 +513,11 @@ function ensureProfileGameLogUi(){
     try{
       await fetchGameLog(player);
       panel.innerHTML=gameLogHtml(player);
+      bindGameLogModeButtons(panel,player);
     }catch(e){
       gameLogCache.set(String(id),{ts:Date.now(),rows:[],error:true});
       panel.innerHTML=gameLogHtml(player);
+      bindGameLogModeButtons(panel,player);
     }
   };
   return wrap;
@@ -450,6 +527,7 @@ function resetProfileGameLog(player){
   if(!wrap)return;
   wrap.hidden=false;
   wrap.dataset.espnId=String(player.id);
+  if(!gameLogModes.has(String(player.id)))gameLogModes.set(String(player.id),defaultGameLogMode(player.position));
   const panel=document.getElementById('espnProfileGameLogPanel');
   if(panel){panel.hidden=true;panel.innerHTML=''}
   const btn=document.getElementById('espnProfileGameLogBtn');

@@ -33,7 +33,8 @@ style.textContent=`
 .trade-player{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;min-height:42px;padding:5px 6px;border:1px solid #ffffff14;border-radius:8px;background:#081a2d}
 .trade-player-main{min-width:0}
 .trade-player-name{display:flex;align-items:center;gap:5px;font-weight:900;font-size:.74rem;min-width:0}
-.trade-player-name span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trade-player-link{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:900;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;cursor:pointer}
+.trade-player-link:hover{text-decoration:underline}
 .trade-team-logo{width:18px;height:18px;object-fit:contain;flex:0 0 18px}
 .trade-player-meta{margin-top:2px;color:#7e92a8;font-size:.58rem}
 .trade-value{font-weight:950;font-size:.76rem;white-space:nowrap}
@@ -46,11 +47,23 @@ style.textContent=`
 .trade-meter-left,.trade-meter-right{height:100%;transition:width .15s ease}
 .trade-meter-left{background:var(--g)}
 .trade-meter-right{background:#53a6cf}
+.trade-why{margin-top:11px;padding-top:10px;border-top:1px solid #ffffff14;text-align:left}
+.trade-why-title{font-size:.7rem;font-weight:950;margin-bottom:7px;color:#c7d6e5}
+.trade-why-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.trade-why-side{border:1px solid #ffffff12;border-radius:9px;background:#081a2d;padding:8px}
+.trade-why-side h4{margin:0 0 6px;font-size:.66rem}
+.trade-why-line{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-top:1px solid #ffffff0d;font-size:.62rem}
+.trade-why-line:first-of-type{border-top:0}
+.trade-why-line span:first-child{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trade-why-line b{white-space:nowrap}
+.trade-why-total{display:flex;justify-content:space-between;gap:8px;padding-top:6px;margin-top:4px;border-top:1px solid #ffffff1b;font-size:.65rem;font-weight:950}
+.trade-why-delta{text-align:center;margin-top:7px;color:var(--m);font-size:.62rem}
 .trade-actions{display:flex;justify-content:center;gap:7px}
 .trade-clear{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:7px 10px;font-weight:900}
 @media(max-width:700px){
   .trade-sides{grid-template-columns:1fr}
   .trade-player{grid-template-columns:minmax(0,1fr) auto auto}
+  .trade-why-grid{grid-template-columns:1fr}
 }
 `;
 document.head.appendChild(style);
@@ -70,6 +83,7 @@ section.innerHTML=
       '<div id="tradeVerdict" class="trade-verdict">Add players to both sides</div>'+
       '<div id="tradeEdge" class="trade-edge">Trade values are calculated directly from your overall ranks.</div>'+
       '<div class="trade-meter"><div id="tradeMeterLeft" class="trade-meter-left" style="width:50%"></div><div id="tradeMeterRight" class="trade-meter-right" style="width:50%"></div></div>'+
+      '<div id="tradeWhy" class="trade-why"></div>'+
     '</div>'+
     '<div class="trade-actions"><button type="button" id="tradeClear" class="trade-clear">Clear Trade</button></div>'+
   '</div>';
@@ -129,7 +143,7 @@ function renderSide(side){
     list.innerHTML=state[side].map(p=>
       '<div class="trade-player">'+
         '<div class="trade-player-main">'+
-          '<div class="trade-player-name"><span>'+p.name+'</span>'+teamLogo(p.team)+'</div>'+
+          '<div class="trade-player-name"><button type="button" class="trade-player-link" data-trade-profile="'+encodeURIComponent(p.name)+'">'+p.name+'</button>'+teamLogo(p.team)+'</div>'+
           '<div class="trade-player-meta">'+(tradeMode==='ROS'?'ROS '+p.position+' #'+p.positionRank:'Pre Season #'+p.rank+' overall')+(p.team&&p.team!=='—'?' · '+p.team:'')+'</div>'+
         '</div>'+
         '<div class="trade-value">'+p.value.toFixed(1)+'</div>'+
@@ -139,6 +153,22 @@ function renderSide(side){
   }
   updateVerdict();
 }
+function tradeRankLabel(p){
+  return tradeMode==='ROS'?(p.position+' #'+p.positionRank+' ROS'):('#'+p.rank+' overall');
+}
+function whySideHtml(side,label){
+  const total=sum(side);
+  const items=[...state[side]].sort((a,b)=>b.value-a.value);
+  return '<div class="trade-why-side"><h4>'+label+'</h4>'+
+    (items.length?items.map(p=>'<div class="trade-why-line"><span>'+p.name+' · '+tradeRankLabel(p)+'</span><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
+    '<div class="trade-why-total"><span>Total</span><b>'+total.toFixed(1)+'</b></div></div>';
+}
+function updateWhy(){
+  const box=document.getElementById('tradeWhy');if(!box)return;
+  const a=sum('left'),b=sum('right'),delta=Math.abs(a-b);
+  box.innerHTML='<div class="trade-why-title">Why this result</div><div class="trade-why-grid">'+whySideHtml('left','Your Side')+whySideHtml('right','Their Side')+'</div>'+
+    '<div class="trade-why-delta">'+(state.left.length&&state.right.length?activeModeLabel()+' value difference: '+delta.toFixed(1):'Add players to both sides to compare value.')+'</div>';
+}
 function updateVerdict(){
   const a=sum('left'),b=sum('right');
   const verdict=document.getElementById('tradeVerdict');
@@ -146,6 +176,7 @@ function updateVerdict(){
   const ml=document.getElementById('tradeMeterLeft');
   const mr=document.getElementById('tradeMeterRight');
   const total=a+b;
+  updateWhy();
   const lp=total?a/total*100:50;
   ml.style.width=lp+'%';mr.style.width=(100-lp)+'%';
   if(!state.left.length||!state.right.length){
@@ -227,6 +258,19 @@ document.addEventListener('click',e=>{
   const modeBtn=e.target.closest('[data-trade-mode]');if(modeBtn){setTradeMode(modeBtn.dataset.tradeMode);return;}
   const navBtn=e.target.closest('.positions .pos');
   if(navBtn&&navBtn.dataset.pos!=='TRADE')hideTrade();
+  const prof=e.target.closest('[data-trade-profile]');
+  if(prof){
+    e.preventDefault();e.stopPropagation();
+    const name=decodeURIComponent(prof.dataset.tradeProfile);
+    if(window.openUnifiedPlayerProfileByName)window.openUnifiedPlayerProfileByName(name);
+    else{
+      try{
+        const p=players.find(x=>norm(x.name)===norm(name))||board.find(x=>norm(x.name)===norm(name));
+        if(p)profile(p.id);
+      }catch(err){}
+    }
+    return;
+  }
   const add=e.target.closest('[data-add]');
   if(add)addPlayer(add.dataset.add,decodeURIComponent(add.dataset.name));
   const rem=e.target.closest('[data-remove]');

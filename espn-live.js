@@ -548,6 +548,10 @@ function hideProfileGameLog(){
   if(wrap)wrap.hidden=true;
 }
 function openEspnPlayerProfile(player){
+  if(window.openUnifiedPlayerProfileByName){
+    window.openUnifiedPlayerProfileByName(player.name);
+    return;
+  }
   const localId=localPlayerId(player.name);
   if(localId){
     try{profile(localId)}catch(e){}
@@ -711,5 +715,49 @@ document.addEventListener('click',e=>{
   if(navBtn&&navBtn.dataset.pos!=='ESPN')hideEspn();
 });
 
+window.ShuaEspnLive={
+  async ensureData(){
+    if(!rows.length)await refresh();
+    return rows;
+  },
+  getPlayerByName(name){
+    return rows.find(p=>norm(p.name)===norm(name))||null;
+  },
+  async renderPlayerStats(name,target){
+    if(!target)return;
+    target.innerHTML='<div class="espn-game-log-empty">Loading ESPN data…</div>';
+    try{
+      if(!rows.length)await refresh();
+      const p=rows.find(x=>norm(x.name)===norm(name));
+      if(!p){target.innerHTML='<div class="espn-game-log-empty">No ESPN data found for this player.</div>';return}
+      const posRows=rows.filter(x=>x.position===p.position).sort((a,b)=>b.points-a.points||((b.average??-Infinity)-(a.average??-Infinity)));
+      const rank=posRows.findIndex(x=>String(x.id)===String(p.id))+1;
+      const cfg=STAT_CONFIG[p.position]||STAT_CONFIG.ALL;
+      target.innerHTML='<div class="unified-rank-grid">'+
+        '<div class="unified-rank-card"><span>ESPN '+p.position+' Rank</span><b>#'+(rank||'—')+'</b></div>'+
+        '<div class="unified-rank-card"><span>PPR Points</span><b>'+p.points.toFixed(1)+'</b></div>'+
+        '<div class="unified-rank-card"><span>PPG</span><b>'+(p.average===null?'—':p.average.toFixed(1))+'</b></div>'+
+      '</div><div class="unified-stat-grid">'+
+        cfg.filter(x=>!['points','average'].includes(x.key)).map(x=>'<div class="unified-stat-item"><span>'+x.label+'</span><b>'+formatStat(p,x.key)+'</b></div>').join('')+
+      '</div>';
+    }catch(e){
+      target.innerHTML='<div class="espn-game-log-empty espn-error">Could not load ESPN data right now.</div>';
+    }
+  },
+  async renderGameLog(name,target){
+    if(!target)return;
+    target.innerHTML='<div class="espn-game-log-empty">Loading game log…</div>';
+    try{
+      if(!rows.length)await refresh();
+      const p=rows.find(x=>norm(x.name)===norm(name));
+      if(!p){target.innerHTML='<div class="espn-game-log-empty">No ESPN game log found for this player.</div>';return}
+      await fetchGameLog(p);
+      target.innerHTML=gameLogHtml(p);
+      bindGameLogModeButtons(target,p);
+    }catch(e){
+      target.innerHTML='<div class="espn-game-log-empty espn-error">Could not load this game log right now.</div>';
+    }
+  }
+};
 renderStatFilters();
 })();

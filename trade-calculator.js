@@ -8,7 +8,7 @@ if(!nav||!main||document.getElementById('tradeSection'))return;
 const TEAM_SLUGS={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',DAL:'dal',DEN:'den',DET:'det',GNB:'gb',GB:'gb',HOU:'hou',IND:'ind',JAX:'jax',KAN:'kc',KC:'kc',LAC:'lac',LAR:'lar',LVR:'lv',LV:'lv',MIA:'mia',MIN:'min',NWE:'ne',NE:'ne',NOR:'no',NO:'no',NYG:'nyg',NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SFO:'sf',SF:'sf',TAM:'tb',TB:'tb',TEN:'ten',WAS:'wsh',WSH:'wsh'};
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
 const state={left:[],right:[]};
-let tradePlayers=[];
+let tradeMode='PRESEASON',tradePlayers=[],preseasonPlayers=[],rosPlayers=[];
 
 const style=document.createElement('style');
 style.id='tradeCalculatorStyles';
@@ -16,6 +16,7 @@ style.textContent=`
 #tradeSection{margin-top:8px}
 .trade-shell{display:grid;gap:10px}
 .trade-note{color:var(--m);font-size:.72rem;margin:0 0 2px}
+.trade-mode-toggle{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 2px}.trade-mode-btn{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 12px;font-weight:900}.trade-mode-btn.active{background:#183d63!important;color:#fff!important}
 .trade-sides{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
 .trade-side{border:1px solid var(--l);border-radius:12px;background:#091c30e8;overflow:visible;min-width:0}
 .trade-side-head{display:flex;justify-content:space-between;align-items:center;padding:10px 11px;border-bottom:1px solid var(--l)}
@@ -59,7 +60,8 @@ section.id='tradeSection';
 section.hidden=true;
 section.innerHTML=
   '<div class="trade-shell">'+
-    '<p class="trade-note">Uses your current Big Board rankings only. Higher-ranked players receive more value with a top-heavy curve so a pile of lower-ranked players does not automatically beat a stud.</p>'+
+    '<div class="trade-mode-toggle"><button type="button" class="trade-mode-btn active" data-trade-mode="PRESEASON">Pre Season</button><button type="button" class="trade-mode-btn" data-trade-mode="ROS">ROS</button></div>'+
+    '<p id="tradeNote" class="trade-note">Pre Season values use your Big Board overall rankings.</p>'+
     '<div class="trade-sides">'+
       sideHtml('left','Your Side')+
       sideHtml('right','Their Side')+
@@ -88,6 +90,25 @@ function sideHtml(side,label){
 function playerValue(rank){
   return Math.max(.1,100*Math.exp(-0.02*(rank-1)));
 }
+function activeModeLabel(){return tradeMode==='ROS'?'ROS':'Pre Season'}
+function syncSelectedToMode(){
+  const byName=new Map(tradePlayers.map(p=>[norm(p.name),p]));
+  ['left','right'].forEach(side=>{
+    state[side]=state[side].map(p=>byName.get(norm(p.name))).filter(Boolean);
+  });
+}
+function setTradeMode(mode){
+  tradeMode=mode==='ROS'?'ROS':'PRESEASON';
+  tradePlayers=tradeMode==='ROS'?rosPlayers:preseasonPlayers;
+  document.querySelectorAll('[data-trade-mode]').forEach(b=>b.classList.toggle('active',b.dataset.tradeMode===tradeMode));
+  const note=document.getElementById('tradeNote');
+  if(note)note.textContent=tradeMode==='ROS'
+    ?'ROS values use your ROS position rankings while keeping the cross-position value scale from your Pre Season Big Board.'
+    :'Pre Season values use your Big Board overall rankings.';
+  syncSelectedToMode();
+  renderSide('left');renderSide('right');
+  ['left','right'].forEach(side=>showMatches(side));
+}
 function teamLogo(team){
   const slug=TEAM_SLUGS[team];
   return slug?'<img class="trade-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/'+slug+'.png" alt="">':'';
@@ -109,7 +130,7 @@ function renderSide(side){
       '<div class="trade-player">'+
         '<div class="trade-player-main">'+
           '<div class="trade-player-name"><span>'+p.name+'</span>'+teamLogo(p.team)+'</div>'+
-          '<div class="trade-player-meta">#'+p.rank+' overall · '+p.position+(p.team&&p.team!=='—'?' · '+p.team:'')+'</div>'+
+          '<div class="trade-player-meta">'+(tradeMode==='ROS'?'ROS '+p.position+' #'+p.positionRank:'Pre Season #'+p.rank+' overall')+(p.team&&p.team!=='—'?' · '+p.team:'')+'</div>'+
         '</div>'+
         '<div class="trade-value">'+p.value.toFixed(1)+'</div>'+
         '<button type="button" class="trade-remove" data-remove="'+side+'" data-name="'+encodeURIComponent(p.name)+'" aria-label="Remove '+p.name+'">×</button>'+
@@ -129,7 +150,7 @@ function updateVerdict(){
   ml.style.width=lp+'%';mr.style.width=(100-lp)+'%';
   if(!state.left.length||!state.right.length){
     verdict.textContent='Add players to both sides';
-    edge.textContent='Trade values are calculated directly from your overall ranks.';
+    edge.textContent=tradeMode==='ROS'?'Trade values are calculated from your ROS ranks.':'Trade values are calculated from your Pre Season Big Board ranks.';
     return;
   }
   const diff=Math.abs(a-b);
@@ -169,7 +190,7 @@ function showMatches(side){
   results.innerHTML=matches.map(p=>
     '<button type="button" class="trade-result" data-add="'+side+'" data-name="'+encodeURIComponent(p.name)+'">'+
       '<span class="trade-result-name">'+p.name+'</span>'+
-      '<span class="trade-result-meta">#'+p.rank+' · '+p.position+' · '+p.value.toFixed(1)+'</span>'+
+      '<span class="trade-result-meta">'+(tradeMode==='ROS'?p.position+' #'+p.positionRank:'Overall #'+p.rank)+' · '+p.value.toFixed(1)+'</span>'+
     '</button>'
   ).join('');
   results.style.display='block';
@@ -203,6 +224,7 @@ if(depthBtn)depthBtn.insertAdjacentElement('afterend',button);else nav.appendChi
 button.onclick=e=>{e.preventDefault();showTrade()};
 
 document.addEventListener('click',e=>{
+  const modeBtn=e.target.closest('[data-trade-mode]');if(modeBtn){setTradeMode(modeBtn.dataset.tradeMode);return;}
   const navBtn=e.target.closest('.positions .pos');
   if(navBtn&&navBtn.dataset.pos!=='TRADE')hideTrade();
   const add=e.target.closest('[data-add]');
@@ -238,26 +260,61 @@ Promise.all([
   fetch('qb-rankings.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('rb-rankings.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('wr-rankings.json',{cache:'no-store'}).then(r=>r.json()),
-  fetch('te-rankings.json',{cache:'no-store'}).then(r=>r.json())
+  fetch('te-rankings.json',{cache:'no-store'}).then(r=>r.json()),
+  fetch('ros-rankings.json',{cache:'no-store'}).then(r=>r.json())
 ]).then(data=>{
-  const big=data[0],meta=new Map();
+  const big=data[0],ros=data[5],meta=new Map(),positionLists={QB:[],RB:[],WR:[],TE:[]};
   ['QB','RB','WR','TE'].forEach((pos,i)=>{
     (data[i+1].players||[]).forEach(p=>{
       const k=norm(p.name);
       if(!meta.has(k))meta.set(k,{team:p.team||'—',position:pos});
+      positionLists[pos].push(p);
     });
   });
+
+  const overallRank=new Map();
+  (big.players||[]).forEach((name,i)=>{if(!overallRank.has(norm(name)))overallRank.set(norm(name),i+1)});
+
+  // Pre Season: exact current Big Board order/value scale.
   const seen=new Set();
-  tradePlayers=(big.players||[]).map((name,i)=>{
+  preseasonPlayers=(big.players||[]).map((name,i)=>{
     const k=norm(name);
     if(seen.has(k))return null;
     seen.add(k);
     const x=meta.get(k)||{team:'—',position:'—'};
-    return {name,rank:i+1,team:x.team,position:x.position,value:playerValue(i+1)};
+    const posList=positionLists[x.position]||[];
+    const posIndex=posList.findIndex(p=>norm(p.name)===k);
+    return {name,rank:i+1,positionRank:posIndex>=0?posIndex+1:null,team:x.team,position:x.position,value:playerValue(i+1)};
   }).filter(Boolean);
-  renderSide('left');renderSide('right');
+
+  // ROS: move each player into the value slot belonging to that ROS positional rank.
+  // This preserves your Big Board's cross-position weighting while applying your new ROS order.
+  const aliases={chigokonkwo:'chigoziemokonkwo'};
+  const metaByName=new Map(meta);
+  rosPlayers=[];
+  ['QB','RB','WR','TE'].forEach(pos=>{
+    const preSlots=(positionLists[pos]||[]).map((p,idx)=>{
+      const rank=overallRank.get(norm(p.name));
+      return {positionRank:idx+1,overallRank:rank||999,value:playerValue(rank||999)};
+    });
+    (ros[pos]||[]).forEach(r=>{
+      const key=aliases[norm(r.name)]||norm(r.name);
+      const info=metaByName.get(key)||{team:'—',position:pos};
+      const slot=preSlots[Math.max(0,+r.rank-1)]||preSlots[preSlots.length-1]||{overallRank:999,value:playerValue(999)};
+      rosPlayers.push({
+        name:r.name,
+        rank:slot.overallRank,
+        positionRank:+r.rank,
+        team:info.team,
+        position:pos,
+        value:slot.value
+      });
+    });
+  });
+
+  setTradeMode('PRESEASON');
 }).catch(()=>{
-  document.getElementById('tradeVerdict').textContent='Could not load Big Board';
+  document.getElementById('tradeVerdict').textContent='Could not load rankings';
   document.getElementById('tradeEdge').textContent='Refresh the page and try again.';
 });
 

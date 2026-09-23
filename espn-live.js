@@ -132,6 +132,16 @@ style.textContent=`
   .espn-stat-label{width:100%}
   .espn-stat-filters{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:2px}
   .espn-stat-btn{flex:0 0 auto}
+  .espn-game-log-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .espn-game-log-table{display:table!important;width:max-content!important;min-width:100%!important;border-collapse:collapse!important}
+  .espn-game-log-table thead{display:table-header-group!important}
+  .espn-game-log-table tbody{display:table-row-group!important}
+  .espn-game-log-table tr{display:table-row!important;border:0!important}
+  .espn-game-log-table th,.espn-game-log-table td{display:table-cell!important;white-space:nowrap!important;padding:7px 8px!important;border-top:1px solid #ffffff10!important}
+  .espn-game-log-table th:first-child,.espn-game-log-table td:first-child{position:sticky;left:0;z-index:2;background:#061522}
+  .espn-game-log-table th:nth-child(2),.espn-game-log-table td:nth-child(2){min-width:58px}
+  .espn-game-log-tabs{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:6px}
+  .espn-game-log-tab{flex:0 0 auto}
 }
 `;
 document.head.appendChild(style);

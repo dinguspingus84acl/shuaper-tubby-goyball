@@ -13,8 +13,53 @@ const TEAM_BY_ID={0:'FA',1:'ATL',2:'BUF',3:'CHI',4:'CIN',5:'CLE',6:'DAL',7:'DEN'
 const TEAM_SLUGS={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',DAL:'dal',DEN:'den',DET:'det',GNB:'gb',GB:'gb',HOU:'hou',IND:'ind',JAX:'jax',KAN:'kc',KC:'kc',LAC:'lac',LAR:'lar',LVR:'lv',LV:'lv',MIA:'mia',MIN:'min',NWE:'ne',NE:'ne',NOR:'no',NO:'no',NYG:'nyg',NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SFO:'sf',SF:'sf',TAM:'tb',TB:'tb',TEN:'ten',WAS:'wsh',WSH:'wsh'};
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
 
+const STAT_CONFIG={
+  ALL:[
+    {key:'points',label:'PPR Pts'},
+    {key:'average',label:'PPG'}
+  ],
+  QB:[
+    {key:'points',label:'PPR Pts'},
+    {key:'average',label:'PPG'},
+    {key:'passYds',label:'Pass Yds'},
+    {key:'passTD',label:'Pass TD'},
+    {key:'completions',label:'Comp'},
+    {key:'passAtt',label:'Pass Att'},
+    {key:'rushYds',label:'Rush Yds'},
+    {key:'rushTD',label:'Rush TD'}
+  ],
+  RB:[
+    {key:'points',label:'PPR Pts'},
+    {key:'average',label:'PPG'},
+    {key:'rushAtt',label:'Rush Att'},
+    {key:'rushYds',label:'Rush Yds'},
+    {key:'rushTD',label:'Rush TD'},
+    {key:'targets',label:'Targets'},
+    {key:'receptions',label:'Rec'},
+    {key:'recYds',label:'Rec Yds'},
+    {key:'recTD',label:'Rec TD'}
+  ],
+  WR:[
+    {key:'points',label:'PPR Pts'},
+    {key:'average',label:'PPG'},
+    {key:'targets',label:'Targets'},
+    {key:'receptions',label:'Rec'},
+    {key:'recYds',label:'Rec Yds'},
+    {key:'recTD',label:'Rec TD'}
+  ],
+  TE:[
+    {key:'points',label:'PPR Pts'},
+    {key:'average',label:'PPG'},
+    {key:'targets',label:'Targets'},
+    {key:'receptions',label:'Rec'},
+    {key:'recYds',label:'Rec Yds'},
+    {key:'recTD',label:'Rec TD'}
+  ]
+};
+
 let rows=[];
 let activeFilter='ALL';
+let activeStat='points';
 let loading=false;
 let timer=null;
 let lastUpdated=null;
@@ -25,31 +70,43 @@ style.textContent=`
 #espnLiveSection{margin-top:8px}
 .espn-live-shell{display:grid;gap:8px}
 .espn-live-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.espn-live-filters{display:flex;gap:6px;flex-wrap:wrap}
-.espn-filter,.espn-refresh{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 11px;font-weight:900}
-.espn-filter.active,.espn-refresh:active{background:#183d63!important;color:#fff!important}
+.espn-live-filters,.espn-stat-filters{display:flex;gap:6px;flex-wrap:wrap}
+.espn-filter,.espn-stat-btn,.espn-refresh{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 11px;font-weight:900}
+.espn-filter.active,.espn-stat-btn.active,.espn-refresh:active{background:#183d63!important;color:#fff!important}
+.espn-stat-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 9px;border:1px solid #ffffff16;border-radius:10px;background:#07182a}
+.espn-stat-label{color:#7f93aa;font-size:.62rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+.espn-stat-btn{padding:6px 9px;font-size:.65rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
-.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(190px,1.7fr) 68px 72px 82px 78px;gap:8px;align-items:center}
+.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 92px;gap:8px;align-items:center}
 .espn-live-head{padding:8px 10px;color:var(--m);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#07182a}
-.espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:48px}
+.espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:7px;min-width:0}
+.espn-player-copy{min-width:0}
 .espn-player-name{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.espn-player-stats{margin-top:3px;color:#71869d;font-size:.57rem;line-height:1.25;white-space:normal}
 .espn-team-logo{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
 .espn-pos{font-weight:900}
-.espn-points,.espn-avg{text-align:right;font-weight:900}
+.espn-points,.espn-selected-stat{text-align:right;font-weight:900}
+.espn-selected-stat{color:#dbeafe}
 .espn-team{color:var(--m);font-size:.68rem}
 .espn-status{padding:18px;text-align:center;color:var(--m)}
 .espn-error{color:#ff8b9d}
 .espn-live-source{font-size:.62rem;color:#73879e}
 @media(max-width:700px){
-  .espn-live-head,.espn-live-row{grid-template-columns:38px minmax(0,1fr) 48px 64px}
+  .espn-live-head,.espn-live-row{grid-template-columns:38px minmax(0,1fr) 54px 66px}
+  .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
-  .espn-live-head>*:nth-child(6),.espn-live-row>*:nth-child(6){display:none}
-  .espn-live-row{padding:7px 8px}
+  .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
+  .espn-live-row{padding:7px 8px;min-height:56px}
   .espn-player-name{font-size:.72rem}
-  .espn-points{font-size:.72rem}
+  .espn-player-stats{font-size:.52rem}
+  .espn-selected-stat{font-size:.72rem}
+  .espn-stat-bar{align-items:flex-start}
+  .espn-stat-label{width:100%}
+  .espn-stat-filters{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:2px}
+  .espn-stat-btn{flex:0 0 auto}
 }
 `;
 document.head.appendChild(style);
@@ -72,15 +129,20 @@ section.innerHTML=`
         <button type="button" id="espnRefresh" class="espn-refresh">Refresh</button>
       </div>
     </div>
-    <div class="espn-live-source">ESPN 2026 full-PPR actual fantasy points · auto-refreshes every 60 seconds while this tab is open</div>
+    <div class="espn-stat-bar">
+      <span class="espn-stat-label">Rank by</span>
+      <div id="espnStatFilters" class="espn-stat-filters"></div>
+    </div>
+    <div class="espn-live-source">ESPN 2026 full-PPR actual stats · choose a position, then rank players by any relevant stat · auto-refreshes every 60 seconds while open</div>
     <div class="espn-live-card">
       <div class="espn-live-head">
-        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div style="text-align:right">PPR Pts</div><div style="text-align:right">PPG</div>
+        <div>Rank</div><div>Player / Season Stats</div><div>Pos</div><div>Team</div><div style="text-align:right">PPR Pts</div><div id="espnSelectedStatHead" style="text-align:right">PPR Pts</div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open ESPN Live to load current rankings.</div></div>
     </div>
   </div>
 `;
+
 const trade=document.getElementById('tradeSection');
 const depth=document.getElementById('depthSection');
 if(trade&&trade.parentNode===main)main.insertBefore(section,trade.nextSibling);
@@ -97,6 +159,11 @@ function seasonStat(stats){
   const exact=stats.find(s=>Number(s?.seasonId)===SEASON&&statSource(s)===0&&splitType(s)===0);
   if(exact)return exact;
   return stats.find(s=>Number(s?.seasonId)===SEASON&&statSource(s)===0&&Number(s?.scoringPeriodId||0)===0)||null;
+}
+function rawStat(season,id){
+  const value=season?.stats?.[id] ?? season?.stats?.[String(id)] ?? 0;
+  const num=Number(value);
+  return Number.isFinite(num)?num:0;
 }
 function parsePlayer(entry){
   const p=entry?.player || entry?.playerPoolEntry?.player || entry;
@@ -115,7 +182,20 @@ function parsePlayer(entry){
     position,
     team:TEAM_BY_ID[Number(p.proTeamId)]||'—',
     points:total,
-    average:Number.isFinite(avg)?avg:null
+    average:Number.isFinite(avg)?avg:null,
+    passAtt:rawStat(season,0),
+    completions:rawStat(season,1),
+    passYds:rawStat(season,3),
+    passTD:rawStat(season,4),
+    interceptions:rawStat(season,20),
+    rushAtt:rawStat(season,23),
+    rushYds:rawStat(season,24),
+    rushTD:rawStat(season,25),
+    recYds:rawStat(season,42),
+    recTD:rawStat(season,43),
+    receptions:rawStat(season,53),
+    targets:rawStat(season,58),
+    fumblesLost:rawStat(season,72)
   };
 }
 function endpointFilter(){
@@ -160,9 +240,48 @@ async function fetchEspn(){
   }
   throw lastError||new Error('ESPN data request failed');
 }
+function configForFilter(){
+  return STAT_CONFIG[activeFilter]||STAT_CONFIG.ALL;
+}
+function statLabel(key){
+  return (configForFilter().find(x=>x.key===key)||STAT_CONFIG.ALL.find(x=>x.key===key)||{label:key}).label;
+}
+function statValue(p,key){
+  const v=p?.[key];
+  if(v===null||v===undefined||!Number.isFinite(Number(v)))return 0;
+  return Number(v);
+}
+function formatStat(p,key){
+  if(key==='points'||key==='average')return statValue(p,key).toFixed(1);
+  return Number.isInteger(statValue(p,key))?String(statValue(p,key)):statValue(p,key).toFixed(1);
+}
 function rankRows(list,filter){
   const filtered=filter==='ALL'?list:list.filter(p=>p.position===filter);
-  return [...filtered].sort((a,b)=>b.points-a.points||((b.average??-Infinity)-(a.average??-Infinity))||a.name.localeCompare(b.name));
+  return [...filtered].sort((a,b)=>statValue(b,activeStat)-statValue(a,activeStat)||b.points-a.points||a.name.localeCompare(b.name));
+}
+function statsSummary(p){
+  if(p.position==='QB'){
+    return `${formatStat(p,'passYds')} Pass Yds · ${formatStat(p,'passTD')} Pass TD · ${formatStat(p,'rushYds')} Rush Yds · ${formatStat(p,'rushTD')} Rush TD`;
+  }
+  if(p.position==='RB'){
+    return `${formatStat(p,'rushAtt')} Rush · ${formatStat(p,'rushYds')} Rush Yds · ${formatStat(p,'rushTD')} Rush TD · ${formatStat(p,'targets')} Tgt · ${formatStat(p,'receptions')} Rec · ${formatStat(p,'recYds')} Rec Yds`;
+  }
+  return `${formatStat(p,'targets')} Tgt · ${formatStat(p,'receptions')} Rec · ${formatStat(p,'recYds')} Rec Yds · ${formatStat(p,'recTD')} Rec TD`;
+}
+function renderStatFilters(){
+  const box=document.getElementById('espnStatFilters');
+  const cfg=configForFilter();
+  if(!cfg.some(x=>x.key===activeStat))activeStat='points';
+  box.innerHTML=cfg.map(x=>`<button type="button" class="espn-stat-btn${x.key===activeStat?' active':''}" data-espn-stat="${x.key}">${x.label}</button>`).join('');
+  box.querySelectorAll('[data-espn-stat]').forEach(b=>{
+    b.onclick=()=>{
+      activeStat=b.dataset.espnStat;
+      renderStatFilters();
+      render();
+    };
+  });
+  const head=document.getElementById('espnSelectedStatHead');
+  if(head)head.textContent=statLabel(activeStat);
 }
 function localPlayerId(name){
   try{
@@ -183,11 +302,11 @@ function render(){
     const id=localPlayerId(p.name);
     return `<div class="espn-live-row"${id?` data-espn-player-id="${id}"`:''}>
       <div class="espn-rank">#${i+1}</div>
-      <div class="espn-player">${teamLogo(p.team)}<div class="espn-player-name">${p.name}</div></div>
+      <div class="espn-player">${teamLogo(p.team)}<div class="espn-player-copy"><div class="espn-player-name">${p.name}</div><div class="espn-player-stats">${statsSummary(p)}</div></div></div>
       <div class="espn-pos">${p.position}</div>
       <div class="espn-team">${p.team}</div>
       <div class="espn-points">${p.points.toFixed(1)}</div>
-      <div class="espn-avg">${p.average===null?'—':p.average.toFixed(1)}</div>
+      <div class="espn-selected-stat">${formatStat(p,activeStat)}</div>
     </div>`;
   }).join('');
   box.querySelectorAll('[data-espn-player-id]').forEach(el=>{
@@ -206,18 +325,18 @@ async function refresh(){
   const button=document.getElementById('espnRefresh');
   button.disabled=true;
   button.textContent='Refreshing…';
-  if(!rows.length)document.getElementById('espnLiveRows').innerHTML='<div class="espn-status">Loading ESPN PPR rankings…</div>';
+  if(!rows.length)document.getElementById('espnLiveRows').innerHTML='<div class="espn-status">Loading ESPN PPR stats…</div>';
   try{
     const fresh=await fetchEspn();
     rows=fresh;
     lastUpdated=new Date();
-    try{localStorage.setItem('shuaEspnLivePpr',JSON.stringify({ts:lastUpdated.getTime(),rows}))}catch(e){}
+    try{localStorage.setItem('shuaEspnLivePprStats',JSON.stringify({ts:lastUpdated.getTime(),rows}))}catch(e){}
     render();
     setUpdatedLabel('Updated '+lastUpdated.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}));
   }catch(err){
     if(!rows.length){
       try{
-        const cached=JSON.parse(localStorage.getItem('shuaEspnLivePpr')||'null');
+        const cached=JSON.parse(localStorage.getItem('shuaEspnLivePprStats')||localStorage.getItem('shuaEspnLivePpr')||'null');
         if(cached?.rows?.length){
           rows=cached.rows;
           lastUpdated=new Date(cached.ts||Date.now());
@@ -249,7 +368,8 @@ function showEspn(){
   ids.forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true});
   section.hidden=false;
   document.getElementById('title').textContent='ESPN Live PPR';
-  document.getElementById('sub').textContent='2026 scoring leaders — actual full-PPR points';
+  document.getElementById('sub').textContent='2026 scoring leaders — filter by position and rank by stat';
+  renderStatFilters();
   if(!rows.length)refresh();
   if(timer)clearInterval(timer);
   timer=setInterval(()=>{if(!section.hidden)refresh()},REFRESH_MS);
@@ -273,7 +393,9 @@ button.onclick=e=>{e.preventDefault();showEspn()};
 document.querySelectorAll('[data-espn-filter]').forEach(b=>{
   b.onclick=()=>{
     activeFilter=b.dataset.espnFilter;
+    activeStat='points';
     document.querySelectorAll('[data-espn-filter]').forEach(x=>x.classList.toggle('active',x===b));
+    renderStatFilters();
     render();
   };
 });
@@ -284,4 +406,5 @@ document.addEventListener('click',e=>{
   if(navBtn&&navBtn.dataset.pos!=='ESPN')hideEspn();
 });
 
+renderStatFilters();
 })();

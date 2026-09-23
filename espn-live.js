@@ -81,15 +81,14 @@ style.textContent=`
 .espn-stat-btn{padding:6px 9px;font-size:.65rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
-.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 92px;gap:8px;align-items:center}
+.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(210px,1.8fr) 58px 68px 82px 92px 86px;gap:8px;align-items:center}
 .espn-live-head{padding:8px 10px;color:var(--m);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#07182a}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:7px;min-width:0}
 .espn-player-copy{min-width:0}
 .espn-player-name{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.espn-player-stats{margin-top:3px;color:#71869d;font-size:.57rem;line-height:1.25;white-space:normal}
-.espn-gamelog-btn{margin-top:5px;border:1px solid #ffffff22;background:#0b2139;color:#b7c9db;border-radius:7px;padding:4px 8px;font-size:.58rem;font-weight:900}
+.espn-gamelog-btn{border:1px solid #ffffff28;background:#0b2139;color:#c7d7e8;border-radius:8px;padding:6px 8px;font-size:.6rem;font-weight:950;width:100%;min-height:32px}
 .espn-player-block{border-top:1px solid #ffffff12}
 .espn-player-block:first-child{border-top:0}
 .espn-player-block .espn-live-row{border-top:0}
@@ -97,6 +96,7 @@ style.textContent=`
 .espn-game-log[hidden]{display:none!important}
 .espn-game-log-title{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0 7px;font-size:.68rem;font-weight:950}
 .espn-game-log-title span{color:#7f93aa;font-size:.58rem;font-weight:800}
+.espn-game-log-season{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 8px}.espn-game-log-chip{border:1px solid #ffffff16;background:#081a2d;border-radius:7px;padding:5px 7px;font-size:.57rem;color:#aebfd0}.espn-game-log-chip b{color:#fff;margin-left:3px}
 .espn-game-log-table{width:100%;border-collapse:collapse;font-size:.62rem}
 .espn-game-log-table th,.espn-game-log-table td{padding:7px 8px;border-top:1px solid #ffffff10;text-align:left}
 .espn-game-log-table th{color:#7f93aa;font-size:.56rem;text-transform:uppercase;letter-spacing:.05em}
@@ -112,13 +112,14 @@ style.textContent=`
 .espn-error{color:#ff8b9d}
 .espn-live-source{font-size:.62rem;color:#73879e}
 @media(max-width:700px){
-  .espn-live-head,.espn-live-row{grid-template-columns:38px minmax(0,1fr) 54px 66px}
+  .espn-live-head,.espn-live-row{grid-template-columns:38px minmax(0,1fr) 62px 72px}
   .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
+  .espn-live-head>*:nth-child(6),.espn-live-row>*:nth-child(6){display:block}
+  .espn-live-head>*:nth-child(7),.espn-live-row>*:nth-child(7){display:block}
   .espn-live-row{padding:7px 8px;min-height:56px}
   .espn-player-name{font-size:.72rem}
-  .espn-player-stats{font-size:.52rem}
   .espn-selected-stat{font-size:.72rem}
   .espn-stat-bar{align-items:flex-start}
   .espn-stat-label{width:100%}
@@ -153,7 +154,7 @@ section.innerHTML=`
     <div class="espn-live-source">ESPN 2026 full-PPR actual stats · choose a position, then rank players by any relevant stat · auto-refreshes every 60 seconds while open</div>
     <div class="espn-live-card">
       <div class="espn-live-head">
-        <div>Rank</div><div>Player / Season Stats</div><div>Pos</div><div>Team</div><div style="text-align:right">PPR Pts</div><div id="espnSelectedStatHead" style="text-align:right">PPR Pts</div>
+        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div style="text-align:right">PPR Pts</div><div id="espnSelectedStatHead" style="text-align:right">PPR Pts</div><div>Game Log</div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open ESPN Live to load current rankings.</div></div>
     </div>
@@ -383,8 +384,10 @@ function gameLogHtml(player){
   const cached=gameLogCache.get(String(player.id));
   if(!cached)return '<div class="espn-game-log-empty">Loading game log…</div>';
   if(cached.error)return '<div class="espn-game-log-empty espn-error">Could not load this game log. Tap Game Log to try again.</div>';
-  if(!cached.rows.length)return '<div class="espn-game-log-empty">No completed game stats yet.</div>';
-  return '<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>2026 · PPR</span></div>'+
+  const cfg=STAT_CONFIG[player.position]||STAT_CONFIG.ALL;
+  const season='<div class="espn-game-log-season">'+cfg.map(x=>'<span class="espn-game-log-chip">'+x.label+' <b>'+formatStat(player,x.key)+'</b></span>').join('')+'</div>';
+  if(!cached.rows.length)return '<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>2026 · PPR</span></div>'+season+'<div class="espn-game-log-empty">No completed game stats yet.</div>';
+  return '<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>2026 · PPR</span></div>'+season+
     '<table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th><th>Stat Line</th><th class="gl-pts">PPR</th></tr></thead><tbody>'+
     cached.rows.map(g=>'<tr><td>'+g.week+'</td><td>'+g.opponent+'</td><td class="gl-stat">'+g.line+'</td><td class="gl-pts">'+g.points.toFixed(1)+'</td></tr>').join('')+
     '</tbody></table>';
@@ -438,11 +441,12 @@ function render(){
     return `<div class="espn-player-block">
       <div class="espn-live-row"${id?` data-espn-player-id="${id}"`:''}>
         <div class="espn-rank">#${i+1}</div>
-        <div class="espn-player">${teamLogo(p.team)}<div class="espn-player-copy"><div class="espn-player-name">${p.name}</div><div class="espn-player-stats">${statsSummary(p)}</div><button type="button" class="espn-gamelog-btn" data-game-log="${p.id}">${open?'Hide Game Log':'Game Log'}</button></div></div>
+        <div class="espn-player">${teamLogo(p.team)}<div class="espn-player-copy"><div class="espn-player-name">${p.name}</div></div></div>
         <div class="espn-pos">${p.position}</div>
         <div class="espn-team">${p.team}</div>
         <div class="espn-points">${p.points.toFixed(1)}</div>
         <div class="espn-selected-stat">${formatStat(p,activeStat)}</div>
+        <div><button type="button" class="espn-gamelog-btn" data-game-log="${p.id}">${open?'Hide':'Game Log'}</button></div>
       </div>
       <div class="espn-game-log" ${open?'':'hidden'}>${open?gameLogHtml(p):''}</div>
     </div>`;

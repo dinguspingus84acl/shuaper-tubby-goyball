@@ -105,7 +105,9 @@ function sideHtml(side,label){
 }
 
 function playerValue(rank){
-  return Math.max(.1,100*Math.exp(-0.02*(rank-1)));
+  // Stud-heavy curve: elite ranks separate sharply from the middle/depth.
+  // #1 ~= 150, #10 ~= 105, #20 ~= 70, #30 ~= 47, #50 ~= 21.
+  return Math.max(.1,150*Math.exp(-0.04*(rank-1)));
 }
 function activeModeLabel(){return tradeMode==='ROS'?'ROS':'Pre Season'}
 function syncSelectedToMode(){
@@ -120,8 +122,8 @@ function setTradeMode(mode){
   document.querySelectorAll('[data-trade-mode]').forEach(b=>b.classList.toggle('active',b.dataset.tradeMode===tradeMode));
   const note=document.getElementById('tradeNote');
   if(note)note.textContent=tradeMode==='ROS'
-    ?'ROS values use your ROS position rankings while keeping the cross-position value scale from your Pre Season Big Board. 2-for-1 and 3-for-1 deals include a consolidation premium for the single elite asset.'
-    :'Pre Season values use your Big Board overall rankings. 2-for-1 and 3-for-1 deals include a consolidation premium for the single elite asset.';
+    ?'ROS values use your ROS ranks with a stud-heavy value curve. Extra players in a package count less than the best player, so elite assets are much harder to buy with multiple mid pieces.'
+    :'Pre Season values use your Big Board with a stud-heavy value curve. Extra players in a package count less than the best player, so elite assets are much harder to buy with multiple mid pieces.';
   syncSelectedToMode();
   renderSide('left');renderSide('right');
   ['left','right'].forEach(side=>showMatches(side));
@@ -136,18 +138,26 @@ function allSelected(){
 function sum(side){
   return state[side].reduce((n,p)=>n+p.value,0);
 }
+function packageBase(side){
+  // Roster spots have value. The best asset counts fully; extra pieces have
+  // diminishing impact so two/three mid players cannot simply add up past a stud.
+  const weights=[1,.40,.20,.10,.07,.05];
+  return [...state[side]]
+    .sort((a,b)=>b.value-a.value)
+    .reduce((total,p,i)=>total+p.value*(weights[i]??.04),0);
+}
 function consolidationInfo(){
   const topCount=state.left.length,bottomCount=state.right.length;
   let premiumSide=null,premium=0,label='';
-  if(topCount===1&&bottomCount===2){premiumSide='left';premium=.12;label='2-for-1 consolidation'}
-  else if(bottomCount===1&&topCount===2){premiumSide='right';premium=.12;label='2-for-1 consolidation'}
-  else if(topCount===1&&bottomCount===3){premiumSide='left';premium=.22;label='3-for-1 consolidation'}
-  else if(bottomCount===1&&topCount===3){premiumSide='right';premium=.22;label='3-for-1 consolidation'}
+  if(topCount===1&&bottomCount===2){premiumSide='left';premium=.12;label='2-for-1 stud premium'}
+  else if(bottomCount===1&&topCount===2){premiumSide='right';premium=.12;label='2-for-1 stud premium'}
+  else if(topCount===1&&bottomCount===3){premiumSide='left';premium=.22;label='3-for-1 stud premium'}
+  else if(bottomCount===1&&topCount===3){premiumSide='right';premium=.22;label='3-for-1 stud premium'}
   return {premiumSide,premium,label};
 }
 function adjustedSum(side){
-  const raw=sum(side),c=consolidationInfo();
-  return c.premiumSide===side?raw*(1+c.premium):raw;
+  const base=packageBase(side),c=consolidationInfo();
+  return c.premiumSide===side?base*(1+c.premium):base;
 }
 function adjustmentText(side){
   const c=consolidationInfo();
@@ -156,8 +166,9 @@ function adjustmentText(side){
 }
 function renderSide(side){
   const list=document.getElementById('tradeList-'+side);
-  const raw=sum(side),total=adjustedSum(side),adj=adjustmentText(side);
-  document.getElementById('tradeTotal-'+side).innerHTML='Value '+total.toFixed(1)+(adj?'<div class="trade-raw-total">Raw '+raw.toFixed(1)+' · '+adj+'</div>':'');
+  const raw=sum(side),base=packageBase(side),total=adjustedSum(side),adj=adjustmentText(side);
+  document.getElementById('tradeTotal-'+side).innerHTML='Trade Score '+total.toFixed(1)+
+    '<div class="trade-raw-total">Player values '+raw.toFixed(1)+' · Package '+base.toFixed(1)+(adj?' · '+adj:'')+'</div>';
   if(!state[side].length){
     list.innerHTML='<div class="trade-empty">No players added</div>';
   }else{
@@ -178,13 +189,15 @@ function tradeRankLabel(p){
   return tradeMode==='ROS'?(p.position+' #'+p.positionRank+' ROS'):('#'+p.rank+' overall');
 }
 function whySideHtml(side,label){
-  const raw=sum(side),total=adjustedSum(side),adj=adjustmentText(side);
+  const raw=sum(side),base=packageBase(side),total=adjustedSum(side),adj=adjustmentText(side);
   const items=[...state[side]].sort((a,b)=>b.value-a.value);
+  const weights=[100,40,20,10,7,5];
   return '<div class="trade-why-side"><h4>'+label+'</h4>'+
-    (items.length?items.map(p=>'<div class="trade-why-line"><span>'+p.name+' · '+tradeRankLabel(p)+'</span><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
-    (adj?'<div class="trade-adjustment">'+adj+' for the single elite asset</div>':'')+
-    '<div class="trade-why-total"><span>'+(adj?'Adjusted total':'Total')+'</span><b>'+total.toFixed(1)+'</b></div>'+
-    (adj?'<div class="trade-raw-total">Raw package value '+raw.toFixed(1)+'</div>':'')+
+    (items.length?items.map((p,i)=>'<div class="trade-why-line"><span>'+p.name+' · '+tradeRankLabel(p)+(i?(' · '+(weights[i]??4)+'% package weight'):' · 100% package weight')+'</span><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
+    '<div class="trade-adjustment">Package score '+base.toFixed(1)+' — extra assets are discounted because roster spots matter.</div>'+
+    (adj?'<div class="trade-adjustment">'+adj+' for the single elite asset.</div>':'')+
+    '<div class="trade-why-total"><span>Final trade score</span><b>'+total.toFixed(1)+'</b></div>'+
+    '<div class="trade-raw-total">Straight player-value sum '+raw.toFixed(1)+'</div>'+
     '</div>';
 }
 function updateWhy(){
@@ -199,7 +212,7 @@ function hockeyBlurb(winner,pct){
   const side=winner==='left'?'Top':'Bottom';
   const other=winner==='left'?'Bottom':'Top';
   if(c.premiumSide===winner&&c.premium){
-    return side+' side gets the best player and keeps the bench clean — fewer passengers, more first-line minutes. That package got sent into the boards.';
+    return side+' side gets the first-line stud. Two middle-six bodies do not equal a game-breaker — keep the star and send the package into the boards.';
   }
   if(c.premiumSide&&c.premium&&c.premiumSide!==winner){
     return side+' side survives the stud tax and still comes out ahead. That is greasy work in the corners, but two points is two points.';

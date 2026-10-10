@@ -7,6 +7,7 @@ const MIN_SEASON=2000;
 const PRIMARY_DEFAULT_ID=3;
 const FALLBACK_DEFAULT_IDS=[1,4];
 const POSITION_BY_ID={1:'QB',2:'RB',3:'WR',4:'TE'};
+const TEAM_BY_ID={0:{abbr:'FA',name:'Free Agent'},1:{abbr:'ATL',name:'Falcons'},2:{abbr:'BUF',name:'Bills'},3:{abbr:'CHI',name:'Bears'},4:{abbr:'CIN',name:'Bengals'},5:{abbr:'CLE',name:'Browns'},6:{abbr:'DAL',name:'Cowboys'},7:{abbr:'DEN',name:'Broncos'},8:{abbr:'DET',name:'Lions'},9:{abbr:'GB',name:'Packers'},10:{abbr:'TEN',name:'Titans'},11:{abbr:'IND',name:'Colts'},12:{abbr:'KC',name:'Chiefs'},13:{abbr:'LV',name:'Raiders'},14:{abbr:'LAR',name:'Rams'},15:{abbr:'MIA',name:'Dolphins'},16:{abbr:'MIN',name:'Vikings'},17:{abbr:'NE',name:'Patriots'},18:{abbr:'NO',name:'Saints'},19:{abbr:'NYG',name:'Giants'},20:{abbr:'NYJ',name:'Jets'},21:{abbr:'PHI',name:'Eagles'},22:{abbr:'ARI',name:'Cardinals'},23:{abbr:'PIT',name:'Steelers'},24:{abbr:'LAC',name:'Chargers'},25:{abbr:'SF',name:'49ers'},26:{abbr:'SEA',name:'Seahawks'},27:{abbr:'TB',name:'Buccaneers'},28:{abbr:'WAS',name:'Commanders'},29:{abbr:'CAR',name:'Panthers'},30:{abbr:'JAX',name:'Jaguars'},33:{abbr:'BAL',name:'Ravens'},34:{abbr:'HOU',name:'Texans'}};
 const SLOT_IDS=[0,2,4,6];
 const identityCache=new Map();
 const playerSeasonCache=new Map();
@@ -17,16 +18,16 @@ const style=document.createElement('style');
 style.id='playerHistoryStyles';
 style.textContent=
 '.player-history-card{border:1px solid #ffffff16;border-radius:10px;overflow:hidden;background:#07182a}'+
-'.player-history-head,.player-history-row{display:grid;grid-template-columns:82px 1fr 100px;gap:10px;align-items:center;padding:10px 12px}'+
+'.player-history-head,.player-history-row{display:grid;grid-template-columns:72px minmax(100px,1.5fr) 74px 62px 92px;gap:10px;align-items:center;padding:10px 12px}'+
 '.player-history-head{color:#7f93aa;font-size:.58rem;font-weight:950;text-transform:uppercase;letter-spacing:.06em;background:#061522}'+
 '.player-history-row{border-top:1px solid #ffffff10;min-height:48px}'+
 '.player-history-year{font-weight:950}'+
-'.player-history-finish{font-weight:950;font-size:.95rem}'+
+'.player-history-team{font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-history-team .abbr{display:none}.player-history-finish{font-weight:950;font-size:.95rem}.player-history-games{text-align:center;font-weight:850;color:#d7e6f5}'+
 '.player-history-points{text-align:right;color:#b8c7d6;font-weight:800}'+
 '.player-history-note{padding:10px 12px;color:#7f93aa;font-size:.58rem;line-height:1.45;border-top:1px solid #ffffff10}'+
 '.player-history-empty{padding:14px 4px;color:#7f93aa;font-size:.66rem}'+
 '.player-history-error{color:#ff8b9d}'+
-'@media(max-width:520px){.player-history-head,.player-history-row{grid-template-columns:64px 1fr 82px;padding:9px 8px;gap:6px}.player-history-points{font-size:.68rem}}';
+'@media(max-width:620px){.player-history-head,.player-history-row{grid-template-columns:50px minmax(54px,1fr) 50px 44px 68px;padding:9px 6px;gap:4px}.player-history-team .full{display:none}.player-history-team .abbr{display:inline}.player-history-head{font-size:.52rem}.player-history-finish{font-size:.78rem}.player-history-games,.player-history-points{font-size:.66rem}}';
 document.head.appendChild(style);
 
 function statSource(s){return Number(s?.statSourceId ?? s?.statTypeId ?? -1)}
@@ -77,7 +78,12 @@ function toSeasonRow(entry,year){
   if(!position||!name||!id||!hasPlayedSeason(season))return null;
   const applied=Number(season?.appliedTotal);
   const points=Number.isFinite(applied)?applied:computedPpr(season);
-  return {id,name,position,points:Number.isFinite(Number(points))?Number(points):0};
+  const teamInfo=TEAM_BY_ID[Number(p.proTeamId)]||{abbr:'—',name:'—'};
+  const directGames=rawStat(season,210);
+  const avg=Number(season?.appliedAverage);
+  const pointValue=Number.isFinite(Number(points))?Number(points):0;
+  const games=directGames>0?Math.round(directGames):((Number.isFinite(avg)&&avg>0&&pointValue>0)?Math.max(1,Math.round(pointValue/avg)):null);
+  return {id,name,position,team:teamInfo.name,teamAbbr:teamInfo.abbr,games,points:pointValue};
 }
 function identityFromEntry(entry){
   const p=deepPlayer(entry);
@@ -283,7 +289,7 @@ async function rankSeason(playerSeason){
       const n=norm(row.name);
       i=posRows.findIndex(x=>norm(x.name)===n);
     }
-    if(i>=0)return {year,position:targetPosition,rank:i+1,points:row.points};
+    if(i>=0)return {year,position:targetPosition,rank:i+1,team:row.team,teamAbbr:row.teamAbbr,games:row.games,points:row.points};
   }catch(e){}
 
   try{
@@ -296,15 +302,15 @@ async function rankSeason(playerSeason){
         const n=norm(row.name);
         i=posRows.findIndex(x=>norm(x.name)===n);
       }
-      if(i>=0)return {year,position:targetPosition,rank:i+1,points:row.points};
+      if(i>=0)return {year,position:targetPosition,rank:i+1,team:row.team,teamAbbr:row.teamAbbr,games:row.games,points:row.points};
     }
   }catch(e){}
-  return {year,position:targetPosition,rank:null,points:row.points};
+  return {year,position:targetPosition,rank:null,team:row.team,teamAbbr:row.teamAbbr,games:row.games,points:row.points};
 }
 function readPlayerCache(player){
   try{
     const data=JSON.parse(localStorage.getItem('shuaEspnFinishHistory:'+player.id)||'null');
-    if(!data||data.version!==5||!Array.isArray(data.rows))return null;
+    if(!data||data.version!==6||!Array.isArray(data.rows))return null;
     if(Number(data.latestCompleted)!==LATEST_COMPLETED)return null;
     return data.rows;
   }catch(e){return null}
@@ -312,7 +318,7 @@ function readPlayerCache(player){
 function savePlayerCache(player,rows){
   try{
     localStorage.setItem('shuaEspnFinishHistory:'+player.id,JSON.stringify({
-      version:5,
+      version:6,
       latestCompleted:LATEST_COMPLETED,
       rows
     }));
@@ -339,15 +345,17 @@ function renderRows(rows,target){
   }
   target.innerHTML=
     '<div class="player-history-card">'+
-      '<div class="player-history-head"><div>Year</div><div>ESPN Finish</div><div style="text-align:right">PPR Pts</div></div>'+
+      '<div class="player-history-head"><div>Year</div><div>Team</div><div>Finish</div><div style="text-align:center">GP</div><div style="text-align:right">PPR Pts</div></div>'+
       good.map(r=>
         '<div class="player-history-row">'+
           '<div class="player-history-year">'+r.year+'</div>'+
-          '<div class="player-history-finish">'+(r.rank?('#'+r.rank+' '+r.position):('Rank unavailable'))+'</div>'+
+          '<div class="player-history-team"><span class="full">'+(r.team||'—')+'</span><span class="abbr">'+(r.teamAbbr||'—')+'</span></div>'+
+          '<div class="player-history-finish">'+(r.rank?('#'+r.rank):('—'))+'</div>'+
+          '<div class="player-history-games">'+(Number.isFinite(Number(r.games))?Number(r.games):'—')+'</div>'+
           '<div class="player-history-points">'+(Number.isFinite(Number(r.points))?Number(r.points).toFixed(1):'—')+'</div>'+
         '</div>'
       ).join('')+
-      '<div class="player-history-note">Completed ESPN fantasy seasons only. Finish is positional rank by full-PPR season points. Historical rows are detected from the player’s actual ESPN season stats, not estimated from experience metadata.</div>'+
+      '<div class="player-history-note">Completed ESPN fantasy seasons only. Finish is positional rank by full-PPR season points. GP is games played. Historical rows are detected from the player’s actual ESPN season stats, not estimated from experience metadata.</div>'+
     '</div>';
 }
 async function render(name,target){

@@ -22,12 +22,12 @@ style.textContent=
 '.player-history-head{color:#7f93aa;font-size:.58rem;font-weight:950;text-transform:uppercase;letter-spacing:.06em;background:#061522}'+
 '.player-history-row{border-top:1px solid #ffffff10;min-height:48px}'+
 '.player-history-year{font-weight:950}'+
-'.player-history-team{font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-history-team .abbr{display:none}.player-history-finish{font-weight:950;font-size:.95rem}.player-history-games{text-align:center;font-weight:850;color:#d7e6f5}'+
-'.player-history-points{text-align:right;color:#b8c7d6;font-weight:800}'+
+'.player-history-team{font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-history-team .abbr{display:none}.player-history-finish{font-weight:950;font-size:.95rem}.player-history-games{text-align:center;font-weight:950;color:#fff}.player-history-points{text-align:right;color:#fff;font-weight:950}'+
+
 '.player-history-note{padding:10px 12px;color:#7f93aa;font-size:.58rem;line-height:1.45;border-top:1px solid #ffffff10}'+
 '.player-history-empty{padding:14px 4px;color:#7f93aa;font-size:.66rem}'+
 '.player-history-error{color:#ff8b9d}'+
-'@media(max-width:620px){.player-history-head,.player-history-row{grid-template-columns:50px minmax(54px,1fr) 50px 44px 68px;padding:9px 6px;gap:4px}.player-history-team .full{display:none}.player-history-team .abbr{display:inline}.player-history-head{font-size:.52rem}.player-history-finish{font-size:.78rem}.player-history-games,.player-history-points{font-size:.66rem}}';
+'@media(max-width:620px){.player-history-head,.player-history-row{grid-template-columns:50px minmax(54px,1fr) 50px 44px 68px;padding:9px 6px;gap:4px}.player-history-team .full{display:none}.player-history-team .abbr{display:inline}.player-history-head{font-size:.52rem}.player-history-finish{font-size:.78rem}.player-history-games,.player-history-points{font-size:.66rem;font-weight:950;color:#fff}}';
 document.head.appendChild(style);
 
 function statSource(s){return Number(s?.statSourceId ?? s?.statTypeId ?? -1)}
@@ -310,7 +310,7 @@ async function rankSeason(playerSeason){
 function readPlayerCache(player){
   try{
     const data=JSON.parse(localStorage.getItem('shuaEspnFinishHistory:'+player.id)||'null');
-    if(!data||data.version!==6||!Array.isArray(data.rows))return null;
+    if(!data||data.version!==7||!Array.isArray(data.rows))return null;
     if(Number(data.latestCompleted)!==LATEST_COMPLETED)return null;
     return data.rows;
   }catch(e){return null}
@@ -318,7 +318,7 @@ function readPlayerCache(player){
 function savePlayerCache(player,rows){
   try{
     localStorage.setItem('shuaEspnFinishHistory:'+player.id,JSON.stringify({
-      version:6,
+      version:7,
       latestCompleted:LATEST_COMPLETED,
       rows
     }));
@@ -350,7 +350,7 @@ function renderRows(rows,target){
         '<div class="player-history-row">'+
           '<div class="player-history-year">'+r.year+'</div>'+
           '<div class="player-history-team"><span class="full">'+(r.team||'—')+'</span><span class="abbr">'+(r.teamAbbr||'—')+'</span></div>'+
-          '<div class="player-history-finish">'+(r.rank?('#'+r.rank):('—'))+'</div>'+
+          '<div class="player-history-finish">'+(r.rank?(r.rank):('—'))+'</div>'+
           '<div class="player-history-games">'+(Number.isFinite(Number(r.games))?Number(r.games):'—')+'</div>'+
           '<div class="player-history-points">'+(Number.isFinite(Number(r.points))?Number(r.points).toFixed(1):'—')+'</div>'+
         '</div>'

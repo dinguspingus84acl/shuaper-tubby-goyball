@@ -127,6 +127,7 @@ function ensureUi(){
   tabs.innerHTML=[
     ['overview','Overview'],
     ['gamelog','Game Log'],
+    ['history','History'],
     ['notes','Notes']
   ].map(([k,l])=>'<button type="button" class="unified-profile-tab" data-profile-tab="'+k+'">'+l+'</button>').join('');
 
@@ -134,7 +135,8 @@ function ensureUi(){
   panels.id='unifiedProfilePanels';
   panels.innerHTML=
     '<div id="unifiedOverviewPanel" class="unified-profile-panel" data-profile-panel="overview"></div>'+
-    '<div id="unifiedGameLogPanel" class="unified-profile-panel" data-profile-panel="gamelog" hidden></div>'+
+    '<div id="unifiedGameLogPanel" class="unified-profile-panel" data-profile-panel="gamelog" hidden></div>'+ 
+    '<div id="unifiedHistoryPanel" class="unified-profile-panel" data-profile-panel="history" hidden></div>'+
     '<div id="unifiedNotesPanel" class="unified-profile-panel" data-profile-panel="notes" hidden></div>';
 
   const profileTop=document.getElementById('profileTop');
@@ -160,6 +162,7 @@ function activateTab(key){
   const name=document.getElementById('modal')?.dataset.unifiedName;
   if(!name)return;
   if(key==='gamelog')loadGameLog(name);
+  if(key==='history')loadHistory(name);
 }
 function renderOverviewRanks(name){
   const p=playerByName(name)||basePositionPlayer(name);
@@ -189,6 +192,20 @@ async function loadOverviewEspnRank(name,pos){
     card.innerHTML='<span>ESPN '+pos+'</span><b>—</b>';
   }
 }
+async function loadHistory(name){
+  const panel=document.getElementById('unifiedHistoryPanel');
+  if(!panel)return;
+  if(panel.dataset.loadedFor===norm(name)&&panel.dataset.ready==='1')return;
+  panel.dataset.loadedFor=norm(name);
+  panel.dataset.ready='0';
+  panel.innerHTML='<div class="unified-profile-loading">Loading ESPN history…</div>';
+  if(window.ShuaPlayerHistory?.render){
+    await window.ShuaPlayerHistory.render(name,panel);
+    panel.dataset.ready='1';
+  }else{
+    panel.innerHTML='<div class="unified-profile-loading">ESPN history is unavailable right now.</div>';
+  }
+}
 async function loadGameLog(name){
   const panel=document.getElementById('unifiedGameLogPanel');
   if(!panel)return;
@@ -210,6 +227,8 @@ function prepareUnified(name){
   renderOverviewRanks(name);
   const gp=document.getElementById('unifiedGameLogPanel');
   if(gp){gp.dataset.loadedFor='';gp.dataset.ready='0';gp.innerHTML=''}
+  const hp=document.getElementById('unifiedHistoryPanel');
+  if(hp){hp.dataset.loadedFor='';hp.dataset.ready='0';hp.innerHTML=''}
   activateTab('overview');
 }
 async function openByName(name){

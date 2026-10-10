@@ -113,7 +113,7 @@ async function firstCareerYear(player){
       else if(yearsExp>0)first=Math.max(MIN_SEASON,CURRENT_SEASON-yearsExp);
     }
   }catch(e){}
-  first=Math.max(MIN_SEASON,Math.min(CURRENT_SEASON-1,first||CURRENT_SEASON-1));
+  first=Math.max(MIN_SEASON,Math.min(CURRENT_SEASON,first||CURRENT_SEASON));
   careerCache.set(key,first);
   return first;
 }
@@ -198,7 +198,7 @@ async function render(name,target){
     const years=[];
     for(let y=CURRENT_SEASON-1;y>=first;y--)years.push(y);
     const rows=await mapLimited(years,3,y=>findSeasonFinish(player,y));
-    savePlayerCache(player,rows);
+    if(rows.every(r=>r&&r.rank))savePlayerCache(player,rows);
     renderRows(player,rows,target);
   }catch(e){
     target.innerHTML='<div class="player-history-empty player-history-error">Could not load ESPN history right now.</div>';

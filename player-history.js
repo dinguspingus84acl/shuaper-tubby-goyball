@@ -320,7 +320,7 @@ function weekStat(stats,year,week){
 }
 function weekPoints(entry,year,week){
   const s=weekStat(deepStats(entry),year,week);
-  if(!s)return null;
+  if(!s||!hasPlayedSeason(s))return null;
   const applied=Number(s?.appliedTotal);
   if(Number.isFinite(applied))return applied;
   const p=computedPpr(s);

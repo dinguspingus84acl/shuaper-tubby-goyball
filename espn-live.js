@@ -69,6 +69,7 @@ const proSchedules=new Map();
 const gameLogCache=new Map();
 const gameLogModes=new Map();
 const gameLogYears=new Map();
+const careerYearsCache=new Map();
 
 const style=document.createElement('style');
 style.id='espnLiveStyles';
@@ -104,9 +105,11 @@ style.textContent=`
 .espn-game-log[hidden]{display:none!important}
 .espn-game-log-title{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0 7px;font-size:.68rem;font-weight:950}
 .espn-game-log-title span{color:#7f93aa;font-size:.58rem;font-weight:800}
-.espn-game-log-years{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 8px}
-.espn-game-log-year,.espn-game-log-tab{border:1px solid #ffffff20;background:#081a2d;color:#91a4ba;border-radius:8px;padding:6px 10px;font-size:.62rem;font-weight:950}
-.espn-game-log-year.active,.espn-game-log-tab.active{background:#183d63;color:#fff;border-color:#ffffff35}
+.espn-game-log-year-row{display:flex;align-items:center;gap:7px;padding:0 0 8px}
+.espn-game-log-year-label{color:#7f93aa;font-size:.58rem;font-weight:950;text-transform:uppercase;letter-spacing:.06em}
+.espn-game-log-year-select{min-width:92px;border:1px solid #ffffff20;background:#081a2d;color:#fff;border-radius:8px;padding:6px 28px 6px 9px;font-size:.65rem;font-weight:950}
+.espn-game-log-tab{border:1px solid #ffffff20;background:#081a2d;color:#91a4ba;border-radius:8px;padding:6px 10px;font-size:.62rem;font-weight:950}
+.espn-game-log-tab.active{background:#183d63;color:#fff;border-color:#ffffff35}
 .espn-game-log-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 8px}
 .espn-game-log-table-wrap{overflow-x:auto}
 .espn-game-log-table{width:100%;border-collapse:collapse;font-size:.62rem}
@@ -143,8 +146,10 @@ style.textContent=`
   .espn-game-log-table th,.espn-game-log-table td{display:table-cell!important;white-space:nowrap!important;padding:7px 8px!important;border-top:1px solid #ffffff10!important}
   .espn-game-log-table th:first-child,.espn-game-log-table td:first-child{position:sticky;left:0;z-index:2;background:#061522}
   .espn-game-log-table th:nth-child(2),.espn-game-log-table td:nth-child(2){min-width:58px}
-  .espn-game-log-years,.espn-game-log-tabs{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:6px}
-  .espn-game-log-year,.espn-game-log-tab{flex:0 0 auto}
+  .espn-game-log-tabs{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:6px}
+  .espn-game-log-tab{flex:0 0 auto}
+  .espn-game-log-year-row{justify-content:flex-start}
+  .espn-game-log-year-select{font-size:.7rem;min-height:36px}
 }
 `;
 document.head.appendChild(style);
@@ -377,10 +382,64 @@ function deepStats(entry){
 }
 function gameLogCacheKey(player,year){return String(player.id)+':'+year}
 function availableGameLogYears(player){
+  const cached=careerYearsCache.get(String(player.id));
+  if(cached?.length)return cached;
   const exp=Math.max(0,Number(player?.experienceYears)||0);
   const first=Math.max(2010,SEASON-exp);
   const years=[];
   for(let y=SEASON;y>=first;y--)years.push(y);
+  return years.length?years:[SEASON];
+}
+async function discoverGameLogYears(player){
+  const key=String(player.id);
+  const cached=careerYearsCache.get(key);
+  if(cached?.length)return cached;
+
+  let firstYear=null;
+  const exp=Math.max(0,Number(player?.experienceYears)||0);
+  if(exp>0)firstYear=Math.max(2010,SEASON-exp);
+
+  try{
+    const r=await fetch('https://site.api.espn.com/apis/common/v3/sports/football/nfl/athletes/'+player.id,{cache:'no-store',mode:'cors'});
+    if(r.ok){
+      const d=await r.json();
+      const a=d?.athlete||d;
+      const debut=Number(a?.debutYear||a?.debut?.year||0);
+      const draft=Number(a?.draft?.year||a?.draftYear||0);
+      const yearsExp=Number(a?.experience?.years||a?.experience||0);
+      if(debut)firstYear=debut;
+      else if(draft)firstYear=draft;
+      else if(yearsExp>0)firstYear=Math.max(2010,SEASON-yearsExp);
+    }
+  }catch(e){}
+
+  // Fallback for players where ESPN omits career metadata:
+  // look backward until we find the first season with actual weekly stats.
+  if(!firstYear||firstYear>=SEASON){
+    let oldestFound=SEASON,misses=0,foundOlder=false;
+    for(let y=SEASON-1;y>=Math.max(2010,SEASON-15);y--){
+      try{
+        const rows=await fetchGameLog(player,y);
+        if(rows.length){
+          oldestFound=y;
+          foundOlder=true;
+          misses=0;
+        }else{
+          misses++;
+          if(foundOlder&&misses>=2)break;
+        }
+      }catch(e){
+        misses++;
+        if(foundOlder&&misses>=2)break;
+      }
+    }
+    if(foundOlder)firstYear=oldestFound;
+  }
+
+  firstYear=Math.max(2010,Math.min(SEASON,firstYear||SEASON));
+  const years=[];
+  for(let y=SEASON;y>=firstYear;y--)years.push(y);
+  careerYearsCache.set(key,years);
   return years;
 }
 async function fetchGameLog(player,year=SEASON){
@@ -495,14 +554,16 @@ function gameLogHtml(player){
   const modes=gameLogModesFor(player.position);
   let mode=gameLogModes.get(String(player.id))||defaultGameLogMode(player.position);
   if(!modes.some(x=>x.key===mode))mode=modes[0].key;
-  const yearTabs='<div class="espn-game-log-years">'+years.map(y=>'<button type="button" class="espn-game-log-year'+(y===year?' active':'')+'" data-gl-year="'+y+'">'+y+'</button>').join('')+'</div>';
+  const yearSelect='<div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" data-gl-year-select>'+
+    years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+
+    '</select></div>';
   const tabs='<div class="espn-game-log-tabs">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" data-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
   const title='<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
-  if(!cached)return title+yearTabs+tabs+'<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
-  if(cached.error)return title+yearTabs+tabs+'<div class="espn-game-log-empty espn-error">Could not load '+year+' game log.</div>';
-  if(!cached.rows.length)return title+yearTabs+tabs+'<div class="espn-game-log-empty">No game stats found for '+year+'.</div>';
+  if(!cached)return title+yearSelect+tabs+'<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
+  if(cached.error)return title+yearSelect+tabs+'<div class="espn-game-log-empty espn-error">Could not load '+year+' game log.</div>';
+  if(!cached.rows.length)return title+yearSelect+tabs+'<div class="espn-game-log-empty">No game stats found for '+year+'.</div>';
   const cols=gameLogColumns(mode,player.position);
-  return title+yearTabs+tabs+
+  return title+yearSelect+tabs+
     '<div class="espn-game-log-table-wrap"><table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th>'+
     cols.map(c=>'<th class="'+(c.key==='pts'?'gl-pts':'')+'">'+c.label+'</th>').join('')+
     '</tr></thead><tbody>'+
@@ -520,10 +581,10 @@ function bindGameLogModeButtons(panel,player){
       bindGameLogModeButtons(panel,player);
     };
   });
-  panel.querySelectorAll('[data-gl-year]').forEach(btn=>{
-    btn.onclick=async e=>{
-      e.preventDefault();e.stopPropagation();
-      const year=Number(btn.dataset.glYear);
+  const select=panel.querySelector('[data-gl-year-select]');
+  if(select){
+    select.onchange=async e=>{
+      const year=Number(e.target.value);
       gameLogYears.set(String(player.id),year);
       panel.innerHTML=gameLogHtml(player);
       bindGameLogModeButtons(panel,player);
@@ -537,7 +598,7 @@ function bindGameLogModeButtons(panel,player){
         bindGameLogModeButtons(panel,player);
       }
     };
-  });
+  }
 }
 async function toggleGameLog(id){
   const player=rows.find(p=>String(p.id)===String(id));
@@ -831,7 +892,9 @@ window.ShuaEspnLive={
       const p=rows.find(x=>norm(x.name)===norm(name));
       if(!p){target.innerHTML='<div class="espn-game-log-empty">No ESPN game log found for this player.</div>';return}
       if(!gameLogYears.has(String(p.id)))gameLogYears.set(String(p.id),SEASON);
-      await fetchGameLog(p,gameLogYears.get(String(p.id)));
+      await discoverGameLogYears(p);
+      const year=gameLogYears.get(String(p.id));
+      await fetchGameLog(p,year);
       target.innerHTML=gameLogHtml(p);
       bindGameLogModeButtons(target,p);
     }catch(e){

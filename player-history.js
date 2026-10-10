@@ -16,6 +16,7 @@ const playerSeasonCache=new Map();
 const seasonBoardCache=new Map();
 const playerWeekCache=new Map();
 const weekBoardCache=new Map();
+const snapSeasonCache=new Map();
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
 
 const style=document.createElement('style');
@@ -320,7 +321,7 @@ function weekStat(stats,year,week){
 }
 function weekPoints(entry,year,week){
   const s=weekStat(deepStats(entry),year,week);
-  if(!s||!hasPlayedSeason(s))return null;
+  if(!s)return null;
   const applied=Number(s?.appliedTotal);
   if(Number.isFinite(applied))return applied;
   const p=computedPpr(s);
@@ -336,10 +337,73 @@ function weeklyPositionFilter(year,week,position){
     offset:0
   }});
 }
+
+function parseCsvLine(line){
+  const out=[];let cur='';let quoted=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='"'){
+      if(quoted&&line[i+1]==='"'){cur+='"';i++}
+      else quoted=!quoted;
+    }else if(ch===','&&!quoted){out.push(cur);cur=''}
+    else cur+=ch;
+  }
+  out.push(cur);
+  return out;
+}
+function snapPctNumber(v){
+  const n=Number(v);
+  if(!Number.isFinite(n))return null;
+  return n<=1.5?n*100:n;
+}
+async function fetchSnapSeason(year){
+  if(year<2013)return [];
+  if(snapSeasonCache.has(year))return snapSeasonCache.get(year);
+  const promise=(async()=>{
+    const url='https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_'+year+'.csv';
+    const res=await fetch(url,{cache:'force-cache'});
+    if(!res.ok)throw new Error('Snap data returned '+res.status);
+    const text=await res.text();
+    const lines=text.split(/\r?\n/).filter(Boolean);
+    if(lines.length<2)return[];
+    const head=parseCsvLine(lines[0]);
+    const ix=name=>head.indexOf(name);
+    const idx={week:ix('week'),player:ix('player'),position:ix('position'),team:ix('team'),gameType:ix('game_type'),offSnaps:ix('offense_snaps'),offPct:ix('offense_pct')};
+    if(Object.values(idx).some(v=>v<0))throw new Error('Unexpected snap-count columns');
+    return lines.slice(1).map(line=>{
+      const x=parseCsvLine(line);
+      return {
+        week:Number(x[idx.week]),
+        player:x[idx.player],
+        position:x[idx.position],
+        team:x[idx.team],
+        gameType:x[idx.gameType],
+        offenseSnaps:Number(x[idx.offSnaps])||0,
+        snapPct:snapPctNumber(x[idx.offPct])
+      };
+    }).filter(x=>x.gameType==='REG'&&x.week>=1&&x.week<=18);
+  })();
+  snapSeasonCache.set(year,promise);
+  try{return await promise}catch(e){snapSeasonCache.delete(year);return[]}
+}
+async function fetchPlayerSnaps(row){
+  const all=await fetchSnapSeason(row.year);
+  if(!all.length)return[];
+  const wanted=norm(row.name);
+  const sameName=all.filter(x=>norm(x.player)===wanted);
+  const samePos=sameName.filter(x=>!row.position||x.position===row.position);
+  const pool=samePos.length?samePos:sameName;
+  return pool.sort((a,b)=>a.week-b.week);
+}
+function formatSnapPct(v){
+  return Number.isFinite(Number(v))?Number(v).toFixed(1)+'%':'—';
+}
+
 async function fetchPlayerWeeks(row){
   const key=String(row.id)+':'+row.year;
   if(playerWeekCache.has(key))return playerWeekCache.get(key);
   const promise=(async()=>{
+    let espnEntry=null;
     const filter=playerFilter(row.id,row.year);
     const urls=[...defaultUrls(row.year,'kona_playercard'),...publicPlayerUrls(row.year,'kona_player_info')];
     for(const url of urls){
@@ -350,16 +414,33 @@ async function fetchPlayerWeeks(row){
           const wanted=norm(row.name);
           entry=list.find(x=>norm(deepPlayer(x)?.fullName||deepPlayer(x)?.displayName||deepPlayer(x)?.name)===wanted)||null;
         }
-        if(!entry)continue;
-        const weeks=[];
-        for(let week=1;week<=18;week++){
-          const pts=weekPoints(entry,row.year,week);
-          if(Number.isFinite(Number(pts)))weeks.push({week,points:Number(pts)});
-        }
-        if(weeks.length)return weeks;
+        if(entry){espnEntry=entry;break}
       }catch(e){}
     }
-    return [];
+
+    const espnByWeek=new Map();
+    if(espnEntry){
+      for(let week=1;week<=18;week++){
+        const pts=weekPoints(espnEntry,row.year,week);
+        if(Number.isFinite(Number(pts)))espnByWeek.set(week,Number(pts));
+      }
+    }
+
+    const snaps=await fetchPlayerSnaps(row);
+    if(snaps.length){
+      return snaps
+        .filter(s=>s.offenseSnaps>0)
+        .map(s=>({
+          week:s.week,
+          points:espnByWeek.has(s.week)?espnByWeek.get(s.week):0,
+          snapPct:s.snapPct,
+          offenseSnaps:s.offenseSnaps
+        }));
+    }
+
+    return [...espnByWeek.entries()].map(([week,points])=>({
+      week,points,snapPct:null,offenseSnaps:null
+    })).sort((a,b)=>a.week-b.week);
   })();
   playerWeekCache.set(key,promise);
   return promise;
@@ -393,7 +474,7 @@ async function fetchWeekBoard(year,week,position){
 }
 async function buildSeasonDetails(row){
   const weeks=await fetchPlayerWeeks(row);
-  if(!weeks.length)return {weeks:0,high:null,low:null,twenty:0,top12:null,top5:null};
+  if(!weeks.length)return {games:0,high:null,low:null,twenty:0,top12:null,top5:null,avgSnap:null,weeks:[]};
   let top12=0,top5=0,rankedWeeks=0;
   await mapLimited(weeks,3,async w=>{
     const board=await fetchWeekBoard(row.year,w.week,row.position);
@@ -410,13 +491,16 @@ async function buildSeasonDetails(row){
     if(rank<=5)top5++;
   });
   const pts=weeks.map(x=>x.points);
+  const snapVals=weeks.map(x=>x.snapPct).filter(x=>Number.isFinite(Number(x)));
   return {
-    weeks:weeks.length,
+    games:weeks.length,
     high:Math.max(...pts),
     low:Math.min(...pts),
     twenty:weeks.filter(x=>x.points>=20).length,
     top12:rankedWeeks?top12:null,
-    top5:rankedWeeks?top5:null
+    top5:rankedWeeks?top5:null,
+    avgSnap:snapVals.length?snapVals.reduce((a,b)=>a+Number(b),0)/snapVals.length:null,
+    weeks
   };
 }
 function teamLogoHtml(abbr){
@@ -436,23 +520,39 @@ async function toggleSeasonDetail(rowEl,row){
   detail.innerHTML='<div class="player-history-detail-loading">Loading '+row.year+' weekly breakdown…</div>';
   const d=await buildSeasonDetails(row);
   detail.dataset.loaded='1';
-  const ppg=Number.isFinite(Number(row.ppg))?Number(row.ppg).toFixed(1):((row.games&&row.points)?(row.points/row.games).toFixed(1):'—');
+
+  if(d.games>0){
+    row.games=d.games;
+    row.ppg=row.points/d.games;
+    const gpEl=rowEl.querySelector('.player-history-games');
+    const ppgEl=rowEl.querySelector('.player-history-ppg');
+    if(gpEl)gpEl.textContent=String(d.games);
+    if(ppgEl)ppgEl.textContent=Number(row.ppg).toFixed(1);
+  }
+
+  const ppg=Number.isFinite(Number(row.ppg))?Number(row.ppg).toFixed(1):'—';
+  const weeklyHtml=d.weeks.length?
+    '<div class="player-history-weekly">'+
+      '<div class="player-history-weekly-head"><div>Week</div><div style="text-align:right">PPR</div><div style="text-align:right">Snap %</div></div>'+
+      d.weeks.map(w=>'<div class="player-history-weekly-row"><div><b>'+w.week+'</b></div><div class="player-history-week-points">'+Number(w.points).toFixed(1)+'</div><div class="player-history-snap">'+formatSnapPct(w.snapPct)+'</div></div>').join('')+
+    '</div>':'';
+
   detail.innerHTML='<div class="player-history-detail-grid">'+
-    detailStat('Games Played',Number.isFinite(Number(row.games))?row.games:'—')+
+    detailStat('Games Played',d.games||'—')+
     detailStat('PPG',ppg)+
+    detailStat('Avg Snap %',formatSnapPct(d.avgSnap))+
     detailStat('Total PPR',Number.isFinite(Number(row.points))?Number(row.points).toFixed(1):'—')+
     detailStat('Weekly High',Number.isFinite(Number(d.high))?Number(d.high).toFixed(1):'—')+
     detailStat('Weekly Low',Number.isFinite(Number(d.low))?Number(d.low).toFixed(1):'—')+
     detailStat('20+ Pt Games',d.twenty)+
     detailStat('Top-12 Weeks',d.top12===null?'—':d.top12)+
     detailStat('Top-5 Weeks',d.top5===null?'—':d.top5)+
-  '</div>';
+  '</div>'+weeklyHtml;
 }
-
 function readPlayerCache(player){
   try{
     const data=JSON.parse(localStorage.getItem('shuaEspnFinishHistory:'+player.id)||'null');
-    if(!data||data.version!==8||!Array.isArray(data.rows))return null;
+    if(!data||data.version!==9||!Array.isArray(data.rows))return null;
     if(Number(data.latestCompleted)!==LATEST_COMPLETED)return null;
     return data.rows;
   }catch(e){return null}
@@ -460,7 +560,7 @@ function readPlayerCache(player){
 function savePlayerCache(player,rows){
   try{
     localStorage.setItem('shuaEspnFinishHistory:'+player.id,JSON.stringify({
-      version:8,
+      version:9,
       latestCompleted:LATEST_COMPLETED,
       rows
     }));

@@ -3,7 +3,7 @@
 
 const CURRENT_SEASON=2026;
 const LATEST_COMPLETED=CURRENT_SEASON-1;
-const MIN_SEASON=2010;
+const MIN_SEASON=2000;
 const PRIMARY_DEFAULT_ID=3;
 const FALLBACK_DEFAULT_IDS=[1,4];
 const POSITION_BY_ID={1:'QB',2:'RB',3:'WR',4:'TE'};
@@ -117,6 +117,17 @@ function boardFilter(year){
     filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+year]}
   }});
 }
+function rawBoardFilter(year){
+  return JSON.stringify({players:{
+    filterSlotIds:{value:SLOT_IDS},
+    filterStatsForSourceIds:{value:[0]},
+    filterStatsForSplitTypeIds:{value:[0]},
+    sortPercOwned:{sortPriority:1,sortAsc:false},
+    limit:3000,
+    offset:0,
+    filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+year]}
+  }});
+}
 async function fetchList(url,filter){
   const res=await fetch(url,{cache:'no-store',mode:'cors',headers:{
     'Accept':'application/json',
@@ -191,7 +202,7 @@ async function fetchPlayerSeason(player,year){
   if(playerSeasonCache.has(cacheKey))return playerSeasonCache.get(cacheKey);
   const promise=(async()=>{
     const filter=playerFilter(player.id,year);
-    const urls=[...defaultUrls(year,'kona_playercard'),...defaultUrls(year,'kona_player_info'),...publicPlayerUrls(year,'kona_player_info')];
+    const urls=[...publicPlayerUrls(year,'kona_player_info'),...defaultUrls(year,'kona_playercard'),...defaultUrls(year,'kona_player_info')];
     for(const url of urls){
       try{
         const list=await fetchList(url,filter);
@@ -220,7 +231,7 @@ async function fetchComputedBoard(year){
   const urls=publicPlayerUrls(year,'kona_player_info');
   for(const url of urls){
     try{
-      const list=await fetchList(url,universeFilter());
+      const list=await fetchList(url,rawBoardFilter(year));
       const rows=list.map(x=>toSeasonRow(x,year)).filter(Boolean);
       if(rows.length>=20)return rows;
     }catch(e){}

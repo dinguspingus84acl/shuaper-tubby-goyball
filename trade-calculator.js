@@ -44,14 +44,14 @@ style.textContent=`
 .trade-verdict{font-size:1.05rem;font-weight:950}
 .trade-edge{margin-top:3px;color:var(--m);font-size:.68rem}
 .trade-hockey{margin:8px auto 0;max-width:650px;color:#c9d8e7;font-size:.72rem;line-height:1.45;font-weight:800}
-.trade-adjustment{margin-top:5px;color:#8fb6da;font-size:.6rem;font-weight:850}
-.trade-raw-total{color:#7890a8;font-size:.58rem;font-weight:800}
+.trade-adjustment{display:none}
+.trade-raw-total{display:none}
 .trade-meter{height:8px;border-radius:999px;background:#0b2139;overflow:hidden;margin:9px auto 0;max-width:520px;display:flex}
 .trade-meter-left,.trade-meter-right{height:100%;transition:width .15s ease}
 .trade-meter-left{background:var(--g)}
 .trade-meter-right{background:#53a6cf}
 .trade-why{margin-top:11px;padding-top:10px;border-top:1px solid #ffffff14;text-align:left}
-.trade-why-title{font-size:.7rem;font-weight:950;margin-bottom:7px;color:#c7d6e5}
+.trade-why-title{font-size:.68rem;font-weight:950;margin-bottom:7px;color:#c7d6e5}
 .trade-why-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .trade-why-side{border:1px solid #ffffff12;border-radius:9px;background:#081a2d;padding:8px}
 .trade-why-side h4{margin:0 0 6px;font-size:.66rem}
@@ -122,8 +122,8 @@ function setTradeMode(mode){
   document.querySelectorAll('[data-trade-mode]').forEach(b=>b.classList.toggle('active',b.dataset.tradeMode===tradeMode));
   const note=document.getElementById('tradeNote');
   if(note)note.textContent=tradeMode==='ROS'
-    ?'ROS values use your ROS ranks with a stud-heavy curve. Elite secondary pieces keep most of their value; mid/depth add-ons are discounted much harder.'
-    :'Pre Season values use your Big Board with a stud-heavy curve. Elite secondary pieces keep most of their value; mid/depth add-ons are discounted much harder.';
+    ?'ROS trade values.'
+    :'Pre Season trade values.';
   syncSelectedToMode();
   renderSide('left');renderSide('right');
   ['left','right'].forEach(side=>showMatches(side));
@@ -183,9 +183,8 @@ function adjustmentText(side){
 }
 function renderSide(side){
   const list=document.getElementById('tradeList-'+side);
-  const raw=sum(side),base=packageBase(side),total=adjustedSum(side),adj=adjustmentText(side);
-  document.getElementById('tradeTotal-'+side).innerHTML='Trade Score '+total.toFixed(1)+
-    '<div class="trade-raw-total">Player values '+raw.toFixed(1)+' · Package '+base.toFixed(1)+(adj?' · '+adj:'')+'</div>';
+  const total=adjustedSum(side);
+  document.getElementById('tradeTotal-'+side).textContent='Score '+total.toFixed(1);
   if(!state[side].length){
     list.innerHTML='<div class="trade-empty">No players added</div>';
   }else{
@@ -206,39 +205,24 @@ function tradeRankLabel(p){
   return tradeMode==='ROS'?(p.position+' #'+p.positionRank+' ROS'):('#'+p.rank+' overall');
 }
 function whySideHtml(side,label){
-  const raw=sum(side),base=packageBase(side),total=adjustedSum(side),adj=adjustmentText(side);
+  const total=adjustedSum(side);
   const items=[...state[side]].sort((a,b)=>b.value-a.value);
   return '<div class="trade-why-side"><h4>'+label+'</h4>'+
-    (items.length?items.map((p,i)=>{
-      const w=Math.round(packageWeight(p,i)*100);
-      return '<div class="trade-why-line"><span>'+p.name+' · '+tradeRankLabel(p)+' · '+w+'% package weight</span><b>'+p.value.toFixed(1)+'</b></div>';
-    }).join(''):'<div class="trade-empty">No players added</div>')+
-    '<div class="trade-adjustment">Elite secondary pieces keep more value. Mid/depth add-ons get hit much harder for roster cost.</div>'+
-    (adj?'<div class="trade-adjustment">'+adj+' for the single elite asset.</div>':'')+
-    '<div class="trade-why-total"><span>Final trade score</span><b>'+total.toFixed(1)+'</b></div>'+
-    '<div class="trade-raw-total">Straight player-value sum '+raw.toFixed(1)+' · Package score '+base.toFixed(1)+'</div>'+
-    '</div>';
+    (items.length?items.map(p=>'<div class="trade-why-line"><span>'+p.name+' · '+tradeRankLabel(p)+'</span><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
+    '<div class="trade-why-total"><span>Score</span><b>'+total.toFixed(1)+'</b></div></div>';
 }
 function updateWhy(){
   const box=document.getElementById('tradeWhy');if(!box)return;
-  const a=adjustedSum('left'),b=adjustedSum('right'),delta=Math.abs(a-b),c=consolidationInfo();
-  box.innerHTML='<div class="trade-why-title">Why this result</div><div class="trade-why-grid">'+whySideHtml('left','Top Side')+whySideHtml('right','Bottom Side')+'</div>'+
-    '<div class="trade-why-delta">'+(state.left.length&&state.right.length?activeModeLabel()+' adjusted value difference: '+delta.toFixed(1)+(c.premium?'<br>'+c.label+' is active.':''):'Add players to both sides to compare value.')+'</div>';
+  const a=adjustedSum('left'),b=adjustedSum('right'),delta=Math.abs(a-b);
+  box.innerHTML='<div class="trade-why-title">Breakdown</div><div class="trade-why-grid">'+whySideHtml('left','Top Side')+whySideHtml('right','Bottom Side')+'</div>'+
+    '<div class="trade-why-delta">'+(state.left.length&&state.right.length?'Difference: '+delta.toFixed(1):'Add players to both sides.')+'</div>';
 }
 function hockeyBlurb(winner,pct){
-  const c=consolidationInfo();
-  if(!winner)return 'Dead even, boys. Nobody is getting walked to the parking lot after this one.';
+  if(!winner)return 'Dead even. Toss the puck.';
   const side=winner==='left'?'Top':'Bottom';
-  const other=winner==='left'?'Bottom':'Top';
-  if(c.premiumSide===winner&&c.premium){
-    return side+' side gets the first-line stud. Two middle-six bodies do not equal a game-breaker — keep the star and send the package into the boards.';
-  }
-  if(c.premiumSide&&c.premium&&c.premiumSide!==winner){
-    return side+' side survives the stud tax and still comes out ahead. That is greasy work in the corners, but two points is two points.';
-  }
-  if(pct>=20)return side+' side wins this one going bar-down. '+other+' side needs to bag skate after giving up that much value.';
-  if(pct>=10)return side+' side takes it — not a blowout, but enough daylight to wheel, snipe, celly and get off the ice.';
-  return side+' side squeaks it out. Little greasy, little lucky, but the puck crossed the line.';
+  if(pct>=20)return side+' side wins big. Absolute heater.';
+  if(pct>=10)return side+' side wins. Clean snipe.';
+  return side+' side by a hair. Greasy one.';
 }
 function updateVerdict(){
   const a=adjustedSum('left'),b=adjustedSum('right');
@@ -253,25 +237,23 @@ function updateVerdict(){
   ml.style.width=lp+'%';mr.style.width=(100-lp)+'%';
   if(!state.left.length||!state.right.length){
     verdict.textContent='Add players to both sides';
-    edge.textContent=tradeMode==='ROS'?'Trade values are calculated from your ROS ranks.':'Trade values are calculated from your Pre Season Big Board ranks.';
+    edge.textContent='';
     hockey.textContent='';
     return;
   }
   const diff=Math.abs(a-b);
   const pct=(diff/Math.max(a,b))*100;
-  const c=consolidationInfo();
-  const adjustment=c.premium?' · '+c.label+' +'+Math.round(c.premium*100)+'% applied':'';
   if(pct<=5){
     verdict.textContent='EVEN TRADE';
-    edge.textContent='Only '+pct.toFixed(1)+'% separates the two sides'+adjustment+'.';
+    edge.textContent=pct.toFixed(1)+'% difference';
     hockey.textContent=hockeyBlurb(null,pct);
   }else if(a>b){
     verdict.textContent='TOP SIDE WINS';
-    edge.textContent='Top side has a '+pct.toFixed(1)+'% adjusted value edge'+adjustment+'.';
+    edge.textContent=pct.toFixed(1)+'% edge';
     hockey.textContent=hockeyBlurb('left',pct);
   }else{
     verdict.textContent='BOTTOM SIDE WINS';
-    edge.textContent='Bottom side has a '+pct.toFixed(1)+'% adjusted value edge'+adjustment+'.';
+    edge.textContent=pct.toFixed(1)+'% edge';
     hockey.textContent=hockeyBlurb('right',pct);
   }
 }

@@ -755,6 +755,14 @@ window.ShuaEspnLive={
   getPlayerByName(name){
     return rows.find(p=>norm(p.name)===norm(name))||null;
   },
+  getPositionRank(name){
+    const p=rows.find(x=>norm(x.name)===norm(name));
+    if(!p)return null;
+    const ranked=rows.filter(x=>x.position===p.position)
+      .sort((a,b)=>b.points-a.points||((b.average??-Infinity)-(a.average??-Infinity))||a.name.localeCompare(b.name));
+    const i=ranked.findIndex(x=>String(x.id)===String(p.id));
+    return i>=0?i+1:null;
+  },
   async renderPlayerStats(name,target){
     if(!target)return;
     target.innerHTML='<div class="espn-game-log-empty">Loading ESPN data…</div>';

@@ -38,9 +38,17 @@ document.head.appendChild(style);
 
 function playerByName(name){
   const n=norm(name);
+  const aliases={kennethwalkeriii:'kennethwalker',kennethwalker:'kennethwalkeriii'};
   try{
-    return players.find(p=>norm(p.name)===n)||board.find(p=>norm(p.name)===n)||null;
+    return players.find(p=>norm(p.name)===n||norm(p.name)===aliases[n])||
+      board.find(p=>norm(p.name)===n||norm(p.name)===aliases[n])||null;
   }catch(e){return null}
+}
+function fixKnownHeadshot(name){
+  const n=norm(name);
+  if(n!=='kennethwalker'&&n!=='kennethwalkeriii')return;
+  const person=document.querySelector('#profileTop .person');
+  if(person)person.innerHTML='<img class="photo lg" src="https://a.espncdn.com/i/headshots/nfl/players/full/4567048.png" alt="Kenneth Walker III">';
 }
 function playerById(id){
   try{return players.find(p=>String(p.id)===String(id))||board.find(p=>String(p.id)===String(id))||null}catch(e){return null}
@@ -198,6 +206,7 @@ async function openByName(name){
   let p=playerByName(name);
   if(p){
     baseProfile(p.id);
+    fixKnownHeadshot(name);
     prepareUnified(p.name);
     return;
   }
@@ -209,7 +218,7 @@ async function openByName(name){
     document.getElementById('pn').textContent=ep.name;
     document.getElementById('pn').className='';
     document.getElementById('pm').textContent=ep.team+' · '+ep.position;
-    document.getElementById('profileTop').innerHTML='';
+    document.getElementById('profileTop').innerHTML=(norm(ep.name)==='kennethwalkeriii'||norm(ep.name)==='kennethwalker')?'<div class="person"><img class="photo lg" src="https://a.espncdn.com/i/headshots/nfl/players/full/4567048.png" alt="Kenneth Walker III"></div>':'';
     document.getElementById('injuryStatus').innerHTML='';
     document.getElementById('stats').innerHTML=
       '<div class="stat"><span>ESPN PPR points</span><b>'+ep.points.toFixed(1)+'</b></div>'+

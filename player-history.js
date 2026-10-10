@@ -2,12 +2,13 @@
 'use strict';
 
 const CURRENT_SEASON=2026;
-const PPR_PRESET_ID=3;
+const PPR_PRESET_ID=1;
 const MIN_SEASON=2010;
 const POSITION_BY_ID={1:'QB',2:'RB',3:'WR',4:'TE'};
-const SLOT_BY_POSITION={QB:0,RB:2,WR:4,TE:6};
-const boardCache=new Map();
+const SLOT_IDS=[0,2,4,6];
+const seasonCache=new Map();
 const careerCache=new Map();
+const identityCache=new Map();
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
 
 const style=document.createElement('style');
@@ -45,54 +46,118 @@ function parseEntry(entry,year){
   if(!position)return null;
   const season=seasonStat(deepStats(entry),year);
   const points=Number(season?.appliedTotal ?? entry?.appliedStatTotal ?? entry?.playerPoolEntry?.appliedStatTotal);
-  if(!Number.isFinite(points))return null;
   const name=p.fullName || p.displayName || p.name;
   const id=String(p.id ?? entry?.id ?? '');
-  if(!name||!id)return null;
-  return {id,name,position,points};
+  if(!name||!id||!Number.isFinite(points))return null;
+  return {
+    id,
+    name,
+    position,
+    points,
+    experienceYears:Number(p.proExperience ?? p.experience?.years ?? p.experience ?? 0)||0
+  };
 }
-function filterFor(year,position){
+function identityFromEntry(entry){
+  const p=deepPlayer(entry);
+  if(!p)return null;
+  const position=POSITION_BY_ID[Number(p.defaultPositionId)];
+  const name=p.fullName || p.displayName || p.name;
+  const id=String(p.id ?? entry?.id ?? '');
+  if(!position||!name||!id)return null;
+  return {
+    id,
+    name,
+    position,
+    experienceYears:Number(p.proExperience ?? p.experience?.years ?? p.experience ?? 0)||0
+  };
+}
+function allPlayersFilter(year){
   return JSON.stringify({players:{
-    filterSlotIds:{value:[SLOT_BY_POSITION[position]]},
+    filterSlotIds:{value:SLOT_IDS},
     filterStatsForSourceIds:{value:[0]},
     filterStatsForSplitTypeIds:{value:[0]},
     sortAppliedStatTotal:{sortAsc:false,sortPriority:1,value:'00'+year},
     sortPercOwned:{sortPriority:2,sortAsc:false},
-    limit:300,
-    offset:0,
-    filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+year]}
+    limit:1200,
+    offset:0
   }});
 }
-async function fetchPositionBoard(year,position){
-  const key=year+':'+position;
-  if(boardCache.has(key))return boardCache.get(key);
-  const promise=(async()=>{
-    const path='/apis/v3/games/ffl/seasons/'+year+'/segments/0/leaguedefaults/'+PPR_PRESET_ID+'?scoringPeriodId=0&view=kona_player_info';
-    const urls=[
-      'https://lm-api-reads.fantasy.espn.com'+path,
-      'https://fantasy.espn.com'+path
-    ];
-    let lastError=null;
-    for(const url of urls){
+function identityFilter(){
+  return JSON.stringify({players:{
+    filterSlotIds:{value:SLOT_IDS},
+    sortPercOwned:{sortPriority:1,sortAsc:false},
+    limit:1200,
+    offset:0
+  }});
+}
+async function fetchJsonWithFallback(paths,filter){
+  let lastError=null;
+  for(const path of paths){
+    for(const host of ['https://lm-api-reads.fantasy.espn.com','https://fantasy.espn.com']){
       try{
-        const res=await fetch(url,{cache:'force-cache',mode:'cors',headers:{
-          'Accept':'application/json',
-          'X-Fantasy-Filter':filterFor(year,position),
-          'X-Fantasy-Source':'kona'
-        }});
+        const res=await fetch(host+path,{
+          cache:'no-store',
+          mode:'cors',
+          headers:{
+            'Accept':'application/json',
+            'X-Fantasy-Filter':filter,
+            'X-Fantasy-Source':'kona'
+          }
+        });
         if(!res.ok)throw new Error('ESPN returned '+res.status);
         const data=await res.json();
         const list=Array.isArray(data)?data:(data.players||[]);
-        const parsed=list.map(x=>parseEntry(x,year)).filter(Boolean).filter(x=>x.position===position&&(x.points!==0));
-        parsed.sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name));
-        if(!parsed.length)throw new Error('No '+position+' data for '+year);
-        return parsed;
+        if(list.length)return list;
       }catch(e){lastError=e}
     }
-    throw lastError||new Error('ESPN history request failed');
+  }
+  throw lastError||new Error('ESPN request failed');
+}
+async function fetchSeasonBoard(year){
+  if(seasonCache.has(year))return seasonCache.get(year);
+  const promise=(async()=>{
+    const q='?scoringPeriodId=0&view=kona_player_info';
+    const paths=[
+      '/apis/v3/games/ffl/seasons/'+year+'/segments/0/leaguedefaults/'+PPR_PRESET_ID+q,
+      '/apis/v3/games/ffl/seasons/'+year+'/segments/1/leaguedefaults/'+PPR_PRESET_ID+q
+    ];
+    const list=await fetchJsonWithFallback(paths,allPlayersFilter(year));
+    const parsed=list.map(x=>parseEntry(x,year)).filter(Boolean);
+    if(!parsed.length)throw new Error('No ESPN PPR totals for '+year);
+    return parsed;
   })();
-  boardCache.set(key,promise);
-  try{return await promise}catch(e){boardCache.delete(key);throw e}
+  seasonCache.set(year,promise);
+  try{return await promise}catch(e){seasonCache.delete(year);throw e}
+}
+async function resolvePlayer(name){
+  const key=norm(name);
+  if(identityCache.has(key))return identityCache.get(key);
+
+  try{
+    if(window.ShuaEspnLive?.ensureData){
+      await window.ShuaEspnLive.ensureData();
+      const live=window.ShuaEspnLive.getPlayerByName?.(name);
+      if(live?.id){
+        const p={id:String(live.id),name:live.name,position:live.position,experienceYears:Number(live.experienceYears)||0};
+        identityCache.set(key,p);
+        return p;
+      }
+    }
+  }catch(e){}
+
+  const q='?scoringPeriodId=0&view=kona_player_info';
+  const paths=[
+    '/apis/v3/games/ffl/seasons/'+CURRENT_SEASON+'/segments/0/leaguedefaults/'+PPR_PRESET_ID+q,
+    '/apis/v3/games/ffl/seasons/'+CURRENT_SEASON+'/players'+q
+  ];
+  const list=await fetchJsonWithFallback(paths,identityFilter());
+  const aliases={kennethwalkeriii:'kennethwalker',kennethwalker:'kennethwalkeriii'};
+  const found=list.map(identityFromEntry).filter(Boolean).find(p=>{
+    const pn=norm(p.name);
+    return pn===key||pn===aliases[key]||aliases[pn]===key;
+  })||null;
+  if(found)identityCache.set(key,found);
+  return found;
 }
 async function firstCareerYear(player){
   const key=String(player.id);
@@ -101,7 +166,7 @@ async function firstCareerYear(player){
   const exp=Math.max(0,Number(player.experienceYears)||0);
   if(exp>0)first=Math.max(MIN_SEASON,CURRENT_SEASON-exp);
   try{
-    const r=await fetch('https://site.api.espn.com/apis/common/v3/sports/football/nfl/athletes/'+player.id,{cache:'force-cache',mode:'cors'});
+    const r=await fetch('https://site.api.espn.com/apis/common/v3/sports/football/nfl/athletes/'+player.id,{cache:'no-store',mode:'cors'});
     if(r.ok){
       const d=await r.json();
       const a=d?.athlete||d;
@@ -118,21 +183,22 @@ async function firstCareerYear(player){
   return first;
 }
 async function findSeasonFinish(player,year){
-  const preferred=player.position;
-  const order=[preferred].concat(Object.keys(SLOT_BY_POSITION).filter(x=>x!==preferred));
-  for(const position of order){
-    try{
-      const board=await fetchPositionBoard(year,position);
-      const i=board.findIndex(x=>String(x.id)===String(player.id));
-      if(i>=0)return {year,position,rank:i+1,points:board[i].points};
-    }catch(e){}
+  try{
+    const board=await fetchSeasonBoard(year);
+    const row=board.find(x=>String(x.id)===String(player.id));
+    if(!row)return {year,position:player.position,rank:null,points:null};
+    const ranked=board.filter(x=>x.position===row.position)
+      .sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name));
+    const i=ranked.findIndex(x=>String(x.id)===String(player.id));
+    return {year,position:row.position,rank:i>=0?i+1:null,points:row.points};
+  }catch(e){
+    return {year,position:player.position,rank:null,points:null,error:true};
   }
-  return {year,position:preferred,rank:null,points:null};
 }
 function readPlayerCache(player){
   try{
     const data=JSON.parse(localStorage.getItem('shuaEspnFinishHistory:'+player.id)||'null');
-    if(!data||data.version!==1||!Array.isArray(data.rows))return null;
+    if(!data||data.version!==2||!Array.isArray(data.rows))return null;
     if(Number(data.latestCompleted)!==CURRENT_SEASON-1)return null;
     return data.rows;
   }catch(e){return null}
@@ -140,7 +206,7 @@ function readPlayerCache(player){
 function savePlayerCache(player,rows){
   try{
     localStorage.setItem('shuaEspnFinishHistory:'+player.id,JSON.stringify({
-      version:1,
+      version:2,
       latestCompleted:CURRENT_SEASON-1,
       rows
     }));
@@ -171,7 +237,7 @@ function renderRows(player,rows,target){
       good.map(r=>
         '<div class="player-history-row">'+
           '<div class="player-history-year">'+r.year+'</div>'+
-          '<div class="player-history-finish">'+(r.rank?('#'+r.rank+' '+r.position):'—')+'</div>'+
+          '<div class="player-history-finish">'+(r.rank?('#'+r.rank+' '+r.position):(r.error?'Unavailable':'—'))+'</div>'+
           '<div class="player-history-points">'+(Number.isFinite(Number(r.points))?Number(r.points).toFixed(1):'—')+'</div>'+
         '</div>'
       ).join('')+
@@ -182,11 +248,9 @@ async function render(name,target){
   if(!target)return;
   target.innerHTML='<div class="player-history-empty">Loading ESPN career finishes…</div>';
   try{
-    if(!window.ShuaEspnLive?.ensureData)throw new Error('ESPN data module unavailable');
-    await window.ShuaEspnLive.ensureData();
-    const player=window.ShuaEspnLive.getPlayerByName?.(name);
+    const player=await resolvePlayer(name);
     if(!player){
-      target.innerHTML='<div class="player-history-empty">No ESPN player match found.</div>';
+      target.innerHTML='<div class="player-history-empty player-history-error">Could not match this player to ESPN.</div>';
       return;
     }
     const cached=readPlayerCache(player);
@@ -197,8 +261,12 @@ async function render(name,target){
     const first=await firstCareerYear(player);
     const years=[];
     for(let y=CURRENT_SEASON-1;y>=first;y--)years.push(y);
-    const rows=await mapLimited(years,3,y=>findSeasonFinish(player,y));
-    if(rows.every(r=>r&&r.rank))savePlayerCache(player,rows);
+    if(!years.length){
+      target.innerHTML='<div class="player-history-empty">No completed NFL seasons yet.</div>';
+      return;
+    }
+    const rows=await mapLimited(years,2,y=>findSeasonFinish(player,y));
+    if(rows.every(r=>r&&r.rank&&!r.error))savePlayerCache(player,rows);
     renderRows(player,rows,target);
   }catch(e){
     target.innerHTML='<div class="player-history-empty player-history-error">Could not load ESPN history right now.</div>';

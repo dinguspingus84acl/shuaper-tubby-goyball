@@ -122,8 +122,8 @@ function setTradeMode(mode){
   document.querySelectorAll('[data-trade-mode]').forEach(b=>b.classList.toggle('active',b.dataset.tradeMode===tradeMode));
   const note=document.getElementById('tradeNote');
   if(note)note.textContent=tradeMode==='ROS'
-    ?'ROS values use your ROS ranks with a stud-heavy value curve. Extra players in a package count less than the best player, so elite assets are much harder to buy with multiple mid pieces.'
-    :'Pre Season values use your Big Board with a stud-heavy value curve. Extra players in a package count less than the best player, so elite assets are much harder to buy with multiple mid pieces.';
+    ?'ROS values use your ROS ranks with a stud-heavy curve. Elite secondary pieces keep most of their value; mid/depth add-ons are discounted much harder.'
+    :'Pre Season values use your Big Board with a stud-heavy curve. Elite secondary pieces keep most of their value; mid/depth add-ons are discounted much harder.';
   syncSelectedToMode();
   renderSide('left');renderSide('right');
   ['left','right'].forEach(side=>showMatches(side));
@@ -138,21 +138,38 @@ function allSelected(){
 function sum(side){
   return state[side].reduce((n,p)=>n+p.value,0);
 }
+function qualityWeight(p){
+  const r=Number(p.rank)||999;
+  if(r<=5)return .95;
+  if(r<=10)return .90;
+  if(r<=15)return .80;
+  if(r<=20)return .55;
+  if(r<=30)return .40;
+  if(r<=50)return .25;
+  return .12;
+}
+function packageWeight(p,index){
+  if(index===0)return 1;
+  const q=qualityWeight(p);
+  if(index===1)return q;
+  if(index===2)return q*.65;
+  if(index===3)return q*.40;
+  return q*.25;
+}
 function packageBase(side){
-  // Roster spots have value. The best asset counts fully; extra pieces have
-  // diminishing impact so two/three mid players cannot simply add up past a stud.
-  const weights=[1,.40,.20,.10,.07,.05];
+  // The best asset counts fully. Extra assets are discounted by roster cost,
+  // but elite secondary pieces retain much more value than mid/depth pieces.
   return [...state[side]]
     .sort((a,b)=>b.value-a.value)
-    .reduce((total,p,i)=>total+p.value*(weights[i]??.04),0);
+    .reduce((total,p,i)=>total+p.value*packageWeight(p,i),0);
 }
 function consolidationInfo(){
   const topCount=state.left.length,bottomCount=state.right.length;
   let premiumSide=null,premium=0,label='';
-  if(topCount===1&&bottomCount===2){premiumSide='left';premium=.12;label='2-for-1 stud premium'}
-  else if(bottomCount===1&&topCount===2){premiumSide='right';premium=.12;label='2-for-1 stud premium'}
-  else if(topCount===1&&bottomCount===3){premiumSide='left';premium=.22;label='3-for-1 stud premium'}
-  else if(bottomCount===1&&topCount===3){premiumSide='right';premium=.22;label='3-for-1 stud premium'}
+  if(topCount===1&&bottomCount===2){premiumSide='left';premium=.06;label='2-for-1 stud premium'}
+  else if(bottomCount===1&&topCount===2){premiumSide='right';premium=.06;label='2-for-1 stud premium'}
+  else if(topCount===1&&bottomCount===3){premiumSide='left';premium=.10;label='3-for-1 stud premium'}
+  else if(bottomCount===1&&topCount===3){premiumSide='right';premium=.10;label='3-for-1 stud premium'}
   return {premiumSide,premium,label};
 }
 function adjustedSum(side){
@@ -191,13 +208,15 @@ function tradeRankLabel(p){
 function whySideHtml(side,label){
   const raw=sum(side),base=packageBase(side),total=adjustedSum(side),adj=adjustmentText(side);
   const items=[...state[side]].sort((a,b)=>b.value-a.value);
-  const weights=[100,40,20,10,7,5];
   return '<div class="trade-why-side"><h4>'+label+'</h4>'+
-    (items.length?items.map((p,i)=>'<div class="trade-why-line"><span>'+p.name+' · '+tradeRankLabel(p)+(i?(' · '+(weights[i]??4)+'% package weight'):' · 100% package weight')+'</span><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
-    '<div class="trade-adjustment">Package score '+base.toFixed(1)+' — extra assets are discounted because roster spots matter.</div>'+
+    (items.length?items.map((p,i)=>{
+      const w=Math.round(packageWeight(p,i)*100);
+      return '<div class="trade-why-line"><span>'+p.name+' · '+tradeRankLabel(p)+' · '+w+'% package weight</span><b>'+p.value.toFixed(1)+'</b></div>';
+    }).join(''):'<div class="trade-empty">No players added</div>')+
+    '<div class="trade-adjustment">Elite secondary pieces keep more value. Mid/depth add-ons get hit much harder for roster cost.</div>'+
     (adj?'<div class="trade-adjustment">'+adj+' for the single elite asset.</div>':'')+
     '<div class="trade-why-total"><span>Final trade score</span><b>'+total.toFixed(1)+'</b></div>'+
-    '<div class="trade-raw-total">Straight player-value sum '+raw.toFixed(1)+'</div>'+
+    '<div class="trade-raw-total">Straight player-value sum '+raw.toFixed(1)+' · Package score '+base.toFixed(1)+'</div>'+
     '</div>';
 }
 function updateWhy(){

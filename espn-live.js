@@ -60,6 +60,7 @@ const STAT_CONFIG={
 let rows=[];
 let activeFilter='ALL';
 let activeStat='points';
+let statView='TOTAL';
 let loading=false;
 let timer=null;
 let lastUpdated=null;
@@ -75,11 +76,11 @@ style.textContent=`
 .espn-live-shell{display:grid;gap:8px}
 .espn-live-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .espn-live-filters,.espn-stat-filters{display:flex;gap:6px;flex-wrap:wrap}
-.espn-filter,.espn-stat-btn,.espn-refresh{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 11px;font-weight:900}
-.espn-filter.active,.espn-stat-btn.active,.espn-refresh:active{background:#183d63!important;color:#fff!important}
+.espn-filter,.espn-stat-btn,.espn-view-btn,.espn-refresh{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 11px;font-weight:900}
+.espn-filter.active,.espn-stat-btn.active,.espn-view-btn.active,.espn-refresh:active{background:#183d63!important;color:#fff!important}
 .espn-stat-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 9px;border:1px solid #ffffff16;border-radius:10px;background:#07182a}
 .espn-stat-label{color:#7f93aa;font-size:.62rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
-.espn-stat-btn{padding:6px 9px;font-size:.65rem}
+.espn-stat-btn,.espn-view-btn{padding:6px 9px;font-size:.65rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
 .espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 92px;gap:8px;align-items:center}
@@ -165,13 +166,18 @@ section.innerHTML=`
       </div>
     </div>
     <div class="espn-stat-bar">
+      <span class="espn-stat-label">Stats</span>
+      <div class="espn-stat-filters">
+        <button type="button" class="espn-view-btn active" data-espn-view="TOTAL">Season</button>
+        <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
+      </div>
       <span class="espn-stat-label">Rank by</span>
       <div id="espnStatFilters" class="espn-stat-filters"></div>
     </div>
     <div class="espn-live-source">ESPN 2026 full-PPR actual stats · choose a position, then rank players by any relevant stat · auto-refreshes every 60 seconds while open</div>
     <div class="espn-live-card">
       <div class="espn-live-head">
-        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div style="text-align:right">PPR Pts</div><div id="espnSelectedStatHead" style="text-align:right">PPR Pts</div>
+        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div id="espnPointsHead" style="text-align:right">PPR Pts</div><div id="espnSelectedStatHead" style="text-align:right">PPR Pts</div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open ESPN Live to load current rankings.</div></div>
     </div>
@@ -219,6 +225,7 @@ function parsePlayer(entry){
     proTeamId:Number(p.proTeamId)||0,
     points:total,
     average:Number.isFinite(avg)?avg:null,
+    gamesPlayed:rawStat(season,210)||((Number.isFinite(avg)&&avg>0)?Math.max(1,Math.round(total/avg)):0),
     passAtt:rawStat(season,0),
     completions:rawStat(season,1),
     passYds:rawStat(season,3),
@@ -282,14 +289,30 @@ function configForFilter(){
 function statLabel(key){
   return (configForFilter().find(x=>x.key===key)||STAT_CONFIG.ALL.find(x=>x.key===key)||{label:key}).label;
 }
-function statValue(p,key){
+function rawPlayerStatValue(p,key){
   const v=p?.[key];
   if(v===null||v===undefined||!Number.isFinite(Number(v)))return 0;
   return Number(v);
 }
+function statValue(p,key){
+  const raw=rawPlayerStatValue(p,key);
+  if(statView!=='PERGAME')return raw;
+  if(key==='average')return raw;
+  if(key==='points'&&Number.isFinite(Number(p?.average)))return Number(p.average);
+  const gp=Number(p?.gamesPlayed)||0;
+  return gp>0?raw/gp:raw;
+}
+function displayStatLabel(key){
+  const label=statLabel(key);
+  if(statView!=='PERGAME'||key==='average')return label;
+  if(key==='points')return 'PPR/G';
+  return label+'/G';
+}
 function formatStat(p,key){
-  if(key==='points'||key==='average')return statValue(p,key).toFixed(1);
-  return Number.isInteger(statValue(p,key))?String(statValue(p,key)):statValue(p,key).toFixed(1);
+  const v=statValue(p,key);
+  if(statView==='PERGAME')return v.toFixed(1);
+  if(key==='points'||key==='average')return v.toFixed(1);
+  return Number.isInteger(v)?String(v):v.toFixed(1);
 }
 function rankRows(list,filter){
   const filtered=filter==='ALL'?list:list.filter(p=>p.position===filter);
@@ -418,10 +441,9 @@ function defaultGameLogMode(position){
   return position==='QB'?'pass':position==='RB'?'rush':'rec';
 }
 function categoryPoints(g,mode,position){
-  if(mode==='pass')return g.passYds*.04+g.passTD*4-g.interceptions*2-g.fumblesLost*2;
-  if(mode==='rush')return g.rushYds*.1+g.rushTD*6;
-  if(mode==='rec')return g.receptions+g.recYds*.1+g.recTD*6;
-  return g.totalPoints||0;
+  // PTS is the player's total PPR score for that game on every category tab.
+  // The remaining columns are the rushing/receiving/passing breakout.
+  return Number(g.totalPoints)||0;
 }
 function gameLogColumns(mode,position){
   if(mode==='pass')return [
@@ -576,7 +598,7 @@ function renderStatFilters(){
   const box=document.getElementById('espnStatFilters');
   const cfg=configForFilter();
   if(!cfg.some(x=>x.key===activeStat))activeStat='points';
-  box.innerHTML=cfg.map(x=>`<button type="button" class="espn-stat-btn${x.key===activeStat?' active':''}" data-espn-stat="${x.key}">${x.label}</button>`).join('');
+  box.innerHTML=cfg.map(x=>`<button type="button" class="espn-stat-btn${x.key===activeStat?' active':''}" data-espn-stat="${x.key}">${displayStatLabel(x.key)}</button>`).join('');
   box.querySelectorAll('[data-espn-stat]').forEach(b=>{
     b.onclick=()=>{
       activeStat=b.dataset.espnStat;
@@ -585,7 +607,9 @@ function renderStatFilters(){
     };
   });
   const head=document.getElementById('espnSelectedStatHead');
-  if(head)head.textContent=statLabel(activeStat);
+  if(head)head.textContent=displayStatLabel(activeStat);
+  const pointsHead=document.getElementById('espnPointsHead');
+  if(pointsHead)pointsHead.textContent=statView==='PERGAME'?'PPR/G':'PPR Pts';
 }
 function localPlayerId(name){
   try{
@@ -608,7 +632,7 @@ function render(){
       <div class="espn-player">${teamLogo(p.team)}<div class="espn-player-copy"><button type="button" class="espn-name-btn" data-espn-open-player="${p.id}">${p.name}</button></div></div>
       <div class="espn-pos">${p.position}</div>
       <div class="espn-team">${p.team}</div>
-      <div class="espn-points">${p.points.toFixed(1)}</div>
+      <div class="espn-points">${formatStat(p,'points')}</div>
       <div class="espn-selected-stat">${formatStat(p,activeStat)}</div>
     </div>`;
   }).join('');
@@ -702,6 +726,14 @@ document.querySelectorAll('[data-espn-filter]').forEach(b=>{
     activeFilter=b.dataset.espnFilter;
     activeStat='points';
     document.querySelectorAll('[data-espn-filter]').forEach(x=>x.classList.toggle('active',x===b));
+    renderStatFilters();
+    render();
+  };
+});
+document.querySelectorAll('[data-espn-view]').forEach(b=>{
+  b.onclick=()=>{
+    statView=b.dataset.espnView==='PERGAME'?'PERGAME':'TOTAL';
+    document.querySelectorAll('[data-espn-view]').forEach(x=>x.classList.toggle('active',x===b));
     renderStatFilters();
     render();
   };

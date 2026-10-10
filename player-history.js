@@ -291,7 +291,7 @@ async function rankSeason(playerSeason){
 function readPlayerCache(player){
   try{
     const data=JSON.parse(localStorage.getItem('shuaEspnFinishHistory:'+player.id)||'null');
-    if(!data||data.version!==3||!Array.isArray(data.rows))return null;
+    if(!data||data.version!==4||!Array.isArray(data.rows))return null;
     if(Number(data.latestCompleted)!==LATEST_COMPLETED)return null;
     return data.rows;
   }catch(e){return null}
@@ -299,7 +299,7 @@ function readPlayerCache(player){
 function savePlayerCache(player,rows){
   try{
     localStorage.setItem('shuaEspnFinishHistory:'+player.id,JSON.stringify({
-      version:3,
+      version:4,
       latestCompleted:LATEST_COMPLETED,
       rows
     }));

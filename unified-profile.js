@@ -18,9 +18,21 @@ style.textContent=`
 .unified-rank-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
 .unified-rank-card span,.unified-stat-item span{display:block;color:#7f93aa;font-size:.57rem;font-weight:800}
 .unified-rank-card b{display:block;margin-top:3px;font-size:1rem}
-#unifiedOverviewPanel #stats{margin-top:0}
-#unifiedOverviewPanel #stats .stat{min-width:0}
-#unifiedOverviewPanel #stats .unified-overview-rank{border:inherit;background:inherit;border-radius:inherit;padding:inherit}
+#unifiedOverviewPanel #stats{margin-top:0;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:stretch}
+#unifiedOverviewPanel #stats .stat{
+  min-width:0;
+  min-height:72px;
+  box-sizing:border-box;
+  border:1px solid var(--l);
+  border-radius:9px;
+  padding:12px;
+  background:#081a2d;
+  display:flex;
+  flex-direction:column;
+  justify-content:center
+}
+#unifiedOverviewPanel #stats .stat span{font-size:.62rem;line-height:1.15}
+#unifiedOverviewPanel #stats .stat b{font-size:1.05rem;line-height:1.1;margin-top:5px}
 .unified-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:7px}
 .unified-stat-item{border:1px solid #ffffff12;background:#07182a;border-radius:8px;padding:7px}
 .unified-stat-item b{display:block;margin-top:2px;font-size:.76rem}
@@ -30,6 +42,8 @@ style.textContent=`
 @media(max-width:700px){
   .unified-profile-tabs{gap:4px;padding-bottom:6px}
   .unified-profile-tab{padding:7px 8px;font-size:.58rem}
+  #unifiedOverviewPanel #stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  #unifiedOverviewPanel #stats .stat{min-height:66px;padding:10px}
   .unified-stat-grid{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
   .unified-stat-item{flex:0 0 92px}
 }

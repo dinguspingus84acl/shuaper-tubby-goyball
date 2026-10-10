@@ -17,7 +17,7 @@ style.textContent=`
 .trade-shell{display:grid;gap:10px}
 .trade-note{color:var(--m);font-size:.72rem;margin:0 0 2px}
 .trade-mode-toggle{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 2px}.trade-mode-btn{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 12px;font-weight:900}.trade-mode-btn.active{background:#183d63!important;color:#fff!important}
-.trade-sides{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.trade-sides{display:grid;grid-template-columns:1fr;gap:10px;align-items:start}
 .trade-side{border:1px solid var(--l);border-radius:12px;background:#091c30e8;overflow:visible;min-width:0}
 .trade-side-head{display:flex;justify-content:space-between;align-items:center;padding:10px 11px;border-bottom:1px solid var(--l)}
 .trade-side-head h3{margin:0;font-size:.88rem}
@@ -43,6 +43,9 @@ style.textContent=`
 .trade-result-card{border:1px solid var(--l);border-radius:12px;background:#07182a;padding:12px;text-align:center}
 .trade-verdict{font-size:1.05rem;font-weight:950}
 .trade-edge{margin-top:3px;color:var(--m);font-size:.68rem}
+.trade-hockey{margin:8px auto 0;max-width:650px;color:#c9d8e7;font-size:.72rem;line-height:1.45;font-weight:800}
+.trade-adjustment{margin-top:5px;color:#8fb6da;font-size:.6rem;font-weight:850}
+.trade-raw-total{color:#7890a8;font-size:.58rem;font-weight:800}
 .trade-meter{height:8px;border-radius:999px;background:#0b2139;overflow:hidden;margin:9px auto 0;max-width:520px;display:flex}
 .trade-meter-left,.trade-meter-right{height:100%;transition:width .15s ease}
 .trade-meter-left{background:var(--g)}
@@ -61,7 +64,6 @@ style.textContent=`
 .trade-actions{display:flex;justify-content:center;gap:7px}
 .trade-clear{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:7px 10px;font-weight:900}
 @media(max-width:700px){
-  .trade-sides{grid-template-columns:1fr}
   .trade-player{grid-template-columns:minmax(0,1fr) auto auto}
   .trade-why-grid{grid-template-columns:1fr}
 }
@@ -76,12 +78,13 @@ section.innerHTML=
     '<div class="trade-mode-toggle"><button type="button" class="trade-mode-btn active" data-trade-mode="PRESEASON">Pre Season</button><button type="button" class="trade-mode-btn" data-trade-mode="ROS">ROS</button></div>'+
     '<p id="tradeNote" class="trade-note">Pre Season values use your Big Board overall rankings.</p>'+
     '<div class="trade-sides">'+
-      sideHtml('left','Your Side')+
-      sideHtml('right','Their Side')+
+      sideHtml('left','Top Side')+
+      sideHtml('right','Bottom Side')+
     '</div>'+
     '<div class="trade-result-card">'+
       '<div id="tradeVerdict" class="trade-verdict">Add players to both sides</div>'+
       '<div id="tradeEdge" class="trade-edge">Trade values are calculated directly from your overall ranks.</div>'+
+      '<div id="tradeHockey" class="trade-hockey"></div>'+
       '<div class="trade-meter"><div id="tradeMeterLeft" class="trade-meter-left" style="width:50%"></div><div id="tradeMeterRight" class="trade-meter-right" style="width:50%"></div></div>'+
       '<div id="tradeWhy" class="trade-why"></div>'+
     '</div>'+
@@ -117,8 +120,8 @@ function setTradeMode(mode){
   document.querySelectorAll('[data-trade-mode]').forEach(b=>b.classList.toggle('active',b.dataset.tradeMode===tradeMode));
   const note=document.getElementById('tradeNote');
   if(note)note.textContent=tradeMode==='ROS'
-    ?'ROS values use your ROS position rankings while keeping the cross-position value scale from your Pre Season Big Board.'
-    :'Pre Season values use your Big Board overall rankings.';
+    ?'ROS values use your ROS position rankings while keeping the cross-position value scale from your Pre Season Big Board. 2-for-1 and 3-for-1 deals include a consolidation premium for the single elite asset.'
+    :'Pre Season values use your Big Board overall rankings. 2-for-1 and 3-for-1 deals include a consolidation premium for the single elite asset.';
   syncSelectedToMode();
   renderSide('left');renderSide('right');
   ['left','right'].forEach(side=>showMatches(side));
@@ -133,10 +136,28 @@ function allSelected(){
 function sum(side){
   return state[side].reduce((n,p)=>n+p.value,0);
 }
+function consolidationInfo(){
+  const topCount=state.left.length,bottomCount=state.right.length;
+  let premiumSide=null,premium=0,label='';
+  if(topCount===1&&bottomCount===2){premiumSide='left';premium=.12;label='2-for-1 consolidation'}
+  else if(bottomCount===1&&topCount===2){premiumSide='right';premium=.12;label='2-for-1 consolidation'}
+  else if(topCount===1&&bottomCount===3){premiumSide='left';premium=.22;label='3-for-1 consolidation'}
+  else if(bottomCount===1&&topCount===3){premiumSide='right';premium=.22;label='3-for-1 consolidation'}
+  return {premiumSide,premium,label};
+}
+function adjustedSum(side){
+  const raw=sum(side),c=consolidationInfo();
+  return c.premiumSide===side?raw*(1+c.premium):raw;
+}
+function adjustmentText(side){
+  const c=consolidationInfo();
+  if(c.premiumSide!==side)return '';
+  return c.label+' +'+Math.round(c.premium*100)+'%';
+}
 function renderSide(side){
   const list=document.getElementById('tradeList-'+side);
-  const total=sum(side);
-  document.getElementById('tradeTotal-'+side).textContent='Value '+total.toFixed(1);
+  const raw=sum(side),total=adjustedSum(side),adj=adjustmentText(side);
+  document.getElementById('tradeTotal-'+side).innerHTML='Value '+total.toFixed(1)+(adj?'<div class="trade-raw-total">Raw '+raw.toFixed(1)+' · '+adj+'</div>':'');
   if(!state[side].length){
     list.innerHTML='<div class="trade-empty">No players added</div>';
   }else{
@@ -157,22 +178,41 @@ function tradeRankLabel(p){
   return tradeMode==='ROS'?(p.position+' #'+p.positionRank+' ROS'):('#'+p.rank+' overall');
 }
 function whySideHtml(side,label){
-  const total=sum(side);
+  const raw=sum(side),total=adjustedSum(side),adj=adjustmentText(side);
   const items=[...state[side]].sort((a,b)=>b.value-a.value);
   return '<div class="trade-why-side"><h4>'+label+'</h4>'+
     (items.length?items.map(p=>'<div class="trade-why-line"><span>'+p.name+' · '+tradeRankLabel(p)+'</span><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
-    '<div class="trade-why-total"><span>Total</span><b>'+total.toFixed(1)+'</b></div></div>';
+    (adj?'<div class="trade-adjustment">'+adj+' for the single elite asset</div>':'')+
+    '<div class="trade-why-total"><span>'+(adj?'Adjusted total':'Total')+'</span><b>'+total.toFixed(1)+'</b></div>'+
+    (adj?'<div class="trade-raw-total">Raw package value '+raw.toFixed(1)+'</div>':'')+
+    '</div>';
 }
 function updateWhy(){
   const box=document.getElementById('tradeWhy');if(!box)return;
-  const a=sum('left'),b=sum('right'),delta=Math.abs(a-b);
-  box.innerHTML='<div class="trade-why-title">Why this result</div><div class="trade-why-grid">'+whySideHtml('left','Your Side')+whySideHtml('right','Their Side')+'</div>'+
-    '<div class="trade-why-delta">'+(state.left.length&&state.right.length?activeModeLabel()+' value difference: '+delta.toFixed(1):'Add players to both sides to compare value.')+'</div>';
+  const a=adjustedSum('left'),b=adjustedSum('right'),delta=Math.abs(a-b),c=consolidationInfo();
+  box.innerHTML='<div class="trade-why-title">Why this result</div><div class="trade-why-grid">'+whySideHtml('left','Top Side')+whySideHtml('right','Bottom Side')+'</div>'+
+    '<div class="trade-why-delta">'+(state.left.length&&state.right.length?activeModeLabel()+' adjusted value difference: '+delta.toFixed(1)+(c.premium?'<br>'+c.label+' is active.':''):'Add players to both sides to compare value.')+'</div>';
+}
+function hockeyBlurb(winner,pct){
+  const c=consolidationInfo();
+  if(!winner)return 'Dead even, boys. Nobody is getting walked to the parking lot after this one.';
+  const side=winner==='left'?'Top':'Bottom';
+  const other=winner==='left'?'Bottom':'Top';
+  if(c.premiumSide===winner&&c.premium){
+    return side+' side gets the best player and keeps the bench clean — fewer passengers, more first-line minutes. That package got sent into the boards.';
+  }
+  if(c.premiumSide&&c.premium&&c.premiumSide!==winner){
+    return side+' side survives the stud tax and still comes out ahead. That is greasy work in the corners, but two points is two points.';
+  }
+  if(pct>=20)return side+' side wins this one going bar-down. '+other+' side needs to bag skate after giving up that much value.';
+  if(pct>=10)return side+' side takes it — not a blowout, but enough daylight to wheel, snipe, celly and get off the ice.';
+  return side+' side squeaks it out. Little greasy, little lucky, but the puck crossed the line.';
 }
 function updateVerdict(){
-  const a=sum('left'),b=sum('right');
+  const a=adjustedSum('left'),b=adjustedSum('right');
   const verdict=document.getElementById('tradeVerdict');
   const edge=document.getElementById('tradeEdge');
+  const hockey=document.getElementById('tradeHockey');
   const ml=document.getElementById('tradeMeterLeft');
   const mr=document.getElementById('tradeMeterRight');
   const total=a+b;
@@ -182,19 +222,25 @@ function updateVerdict(){
   if(!state.left.length||!state.right.length){
     verdict.textContent='Add players to both sides';
     edge.textContent=tradeMode==='ROS'?'Trade values are calculated from your ROS ranks.':'Trade values are calculated from your Pre Season Big Board ranks.';
+    hockey.textContent='';
     return;
   }
   const diff=Math.abs(a-b);
   const pct=(diff/Math.max(a,b))*100;
+  const c=consolidationInfo();
+  const adjustment=c.premium?' · '+c.label+' +'+Math.round(c.premium*100)+'% applied':'';
   if(pct<=5){
     verdict.textContent='EVEN TRADE';
-    edge.textContent='Only '+pct.toFixed(1)+'% separates the two sides.';
+    edge.textContent='Only '+pct.toFixed(1)+'% separates the two sides'+adjustment+'.';
+    hockey.textContent=hockeyBlurb(null,pct);
   }else if(a>b){
-    verdict.textContent='YOUR SIDE WINS';
-    edge.textContent='Your side has a '+pct.toFixed(1)+'% rank-value edge.';
+    verdict.textContent='TOP SIDE WINS';
+    edge.textContent='Top side has a '+pct.toFixed(1)+'% adjusted value edge'+adjustment+'.';
+    hockey.textContent=hockeyBlurb('left',pct);
   }else{
-    verdict.textContent='THEIR SIDE WINS';
-    edge.textContent='Their side has a '+pct.toFixed(1)+'% rank-value edge.';
+    verdict.textContent='BOTTOM SIDE WINS';
+    edge.textContent='Bottom side has a '+pct.toFixed(1)+'% adjusted value edge'+adjustment+'.';
+    hockey.textContent=hockeyBlurb('right',pct);
   }
 }
 function addPlayer(side,name){

@@ -206,9 +206,21 @@ async function fetchPlayerSeason(player,year){
     for(const url of urls){
       try{
         const list=await fetchList(url,filter);
-        const entry=list.find(x=>String(deepPlayer(x)?.id ?? x?.id ?? '')===String(player.id))||list[0];
+        let entry=list.find(x=>String(deepPlayer(x)?.id ?? x?.id ?? '')===String(player.id))||null;
+        if(!entry){
+          const wanted=norm(player.name);
+          entry=list.find(x=>{
+            const p=deepPlayer(x);
+            const n=norm(p?.fullName||p?.displayName||p?.name);
+            const pos=POSITION_BY_ID[Number(p?.defaultPositionId)];
+            return n===wanted&&(!player.position||pos===player.position);
+          })||null;
+        }
         const row=entry?toSeasonRow(entry,year):null;
-        if(row)return row;
+        if(row){
+          if(player.position&&row.position!==player.position)continue;
+          return {...row,position:player.position||row.position};
+        }
       }catch(e){}
     }
     return null;
@@ -261,37 +273,38 @@ async function discoverPlayedSeasons(player){
 }
 async function rankSeason(playerSeason){
   const {year,row}=playerSeason;
+  const targetPosition=row.position;
   try{
     const board=await fetchSeasonBoard(year);
-    const posRows=board.filter(x=>x.position===row.position)
+    const posRows=board.filter(x=>x.position===targetPosition)
       .sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name));
     let i=posRows.findIndex(x=>String(x.id)===String(row.id));
     if(i<0){
       const n=norm(row.name);
       i=posRows.findIndex(x=>norm(x.name)===n);
     }
-    if(i>=0)return {year,position:row.position,rank:i+1,points:row.points};
+    if(i>=0)return {year,position:targetPosition,rank:i+1,points:row.points};
   }catch(e){}
 
   try{
     const board=await fetchComputedBoard(year);
     if(board?.length){
-      const posRows=board.filter(x=>x.position===row.position)
+      const posRows=board.filter(x=>x.position===targetPosition)
         .sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name));
       let i=posRows.findIndex(x=>String(x.id)===String(row.id));
       if(i<0){
         const n=norm(row.name);
         i=posRows.findIndex(x=>norm(x.name)===n);
       }
-      if(i>=0)return {year,position:row.position,rank:i+1,points:row.points};
+      if(i>=0)return {year,position:targetPosition,rank:i+1,points:row.points};
     }
   }catch(e){}
-  return {year,position:row.position,rank:null,points:row.points};
+  return {year,position:targetPosition,rank:null,points:row.points};
 }
 function readPlayerCache(player){
   try{
     const data=JSON.parse(localStorage.getItem('shuaEspnFinishHistory:'+player.id)||'null');
-    if(!data||data.version!==4||!Array.isArray(data.rows))return null;
+    if(!data||data.version!==5||!Array.isArray(data.rows))return null;
     if(Number(data.latestCompleted)!==LATEST_COMPLETED)return null;
     return data.rows;
   }catch(e){return null}
@@ -299,7 +312,7 @@ function readPlayerCache(player){
 function savePlayerCache(player,rows){
   try{
     localStorage.setItem('shuaEspnFinishHistory:'+player.id,JSON.stringify({
-      version:4,
+      version:5,
       latestCompleted:LATEST_COMPLETED,
       rows
     }));

@@ -16,20 +16,20 @@ style.textContent=`
 .unified-profile-panel{padding-top:10px}
 .unified-profile-panel[hidden]{display:none!important}
 .unified-rank-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.unified-rank-card{border:1px solid #ffffff15;background:#081a2d;border-radius:9px;padding:9px;min-width:0}
 .unified-rank-card span,.unified-stat-item span{display:block;color:#7f93aa;font-size:.57rem;font-weight:800}
 .unified-rank-card b{display:block;margin-top:3px;font-size:1rem}
+#unifiedOverviewPanel #stats{margin-top:0}
+#unifiedOverviewPanel #stats .stat{min-width:0}
+#unifiedOverviewPanel #stats .unified-overview-rank{border:inherit;background:inherit;border-radius:inherit;padding:inherit}
 .unified-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:7px}
 .unified-stat-item{border:1px solid #ffffff12;background:#07182a;border-radius:8px;padding:7px}
 .unified-stat-item b{display:block;margin-top:2px;font-size:.76rem}
-.unified-rank-note{margin-top:8px;color:#8093a7;font-size:.62rem;line-height:1.4}
 .unified-profile-loading{padding:14px 4px;color:#7f93aa;font-size:.66rem}
 #unifiedNotesPanel .note-box{margin-top:0}
 #espnProfileGameLogWrap{display:none!important}
 @media(max-width:700px){
   .unified-profile-tabs{gap:4px;padding-bottom:6px}
   .unified-profile-tab{padding:7px 8px;font-size:.58rem}
-  .unified-rank-grid{grid-template-columns:repeat(3,minmax(86px,1fr));overflow-x:auto}
   .unified-stat-grid{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
   .unified-stat-item{flex:0 0 92px}
 }
@@ -78,12 +78,24 @@ function rosRank(name,pos){
 function preseasonRank(name){
   return Number(basePositionPlayer(name)?.positionRank)||null;
 }
-function rankMovement(pre,ros){
-  if(!pre||!ros)return '—';
-  const d=pre-ros;
-  if(d>0)return '↑'+d;
-  if(d<0)return '↓'+Math.abs(d);
-  return '—';
+function espnPreseasonRank(name){
+  const p=basePositionPlayer(name);
+  const pre=Number(p?.positionRank);
+  const delta=Number(p?.additionalStats?.espnAdp);
+  if(!Number.isFinite(pre)||!Number.isFinite(delta))return null;
+  return Math.max(1,Math.round(pre+delta));
+}
+function normalizeEspnAdpCard(name){
+  const stats=document.getElementById('stats');
+  if(!stats)return;
+  const rank=espnPreseasonRank(name);
+  stats.querySelectorAll('.stat').forEach(card=>{
+    const label=card.querySelector('span');
+    if(label?.textContent?.trim()==='ESPN ADP'){
+      const value=card.querySelector('b');
+      if(value)value.textContent=rank?'#'+rank:'—';
+    }
+  });
 }
 function ensureUi(){
   const box=document.querySelector('#modal .profile');
@@ -116,9 +128,6 @@ function ensureUi(){
   tabs.insertAdjacentElement('afterend',panels);
 
   const overview=document.getElementById('unifiedOverviewPanel');
-  const rankSummary=document.createElement('div');
-  rankSummary.id='unifiedOverviewRanks';
-  overview.appendChild(rankSummary);
   if(injury)overview.appendChild(injury);
   if(stats)overview.appendChild(stats);
   if(notes)document.getElementById('unifiedNotesPanel').appendChild(notes);
@@ -143,17 +152,15 @@ function renderOverviewRanks(name){
   const pos=p?.position||'—';
   const pre=preseasonRank(name);
   const ros=rosRank(name,pos);
-  const ov=overallRank(name);
-  const move=rankMovement(pre,ros);
-  const box=document.getElementById('unifiedOverviewRanks');
-  if(!box)return;
-  box.innerHTML=
-    '<div class="unified-rank-grid">'+
-      '<div class="unified-rank-card"><span>ROS '+pos+'</span><b>'+(ros?'#'+ros:'—')+'</b></div>'+
-      '<div class="unified-rank-card"><span>Preseason '+pos+'</span><b>'+(pre?'#'+pre:'—')+'</b></div>'+
-      '<div class="unified-rank-card" id="unifiedEspnRankCard"><span>ESPN '+pos+'</span><b>…</b></div>'+
-    '</div>'+
-    '<div class="unified-rank-note">Overall #'+(ov||'—')+(move!=='—'?' · ROS movement '+move:'')+'</div>';
+  const stats=document.getElementById('stats');
+  if(!stats)return;
+  stats.querySelectorAll('.unified-overview-rank').forEach(x=>x.remove());
+  stats.insertAdjacentHTML('afterbegin',
+    '<div class="stat unified-overview-rank"><span>ROS '+pos+'</span><b>'+(ros?'#'+ros:'—')+'</b></div>'+
+    '<div class="stat unified-overview-rank"><span>Preseason '+pos+'</span><b>'+(pre?'#'+pre:'—')+'</b></div>'+
+    '<div class="stat unified-overview-rank" id="unifiedEspnRankCard"><span>ESPN '+pos+'</span><b>…</b></div>'
+  );
+  normalizeEspnAdpCard(name);
   loadOverviewEspnRank(name,pos);
 }
 async function loadOverviewEspnRank(name,pos){

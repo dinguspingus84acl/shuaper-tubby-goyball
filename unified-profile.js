@@ -100,9 +100,6 @@ function ensureUi(){
   tabs.className='unified-profile-tabs';
   tabs.innerHTML=[
     ['overview','Overview'],
-    ['ros','ROS'],
-    ['preseason','Preseason'],
-    ['espn','ESPN'],
     ['gamelog','Game Log'],
     ['notes','Notes']
   ].map(([k,l])=>'<button type="button" class="unified-profile-tab" data-profile-tab="'+k+'">'+l+'</button>').join('');
@@ -111,9 +108,6 @@ function ensureUi(){
   panels.id='unifiedProfilePanels';
   panels.innerHTML=
     '<div id="unifiedOverviewPanel" class="unified-profile-panel" data-profile-panel="overview"></div>'+
-    '<div id="unifiedRosPanel" class="unified-profile-panel" data-profile-panel="ros" hidden></div>'+
-    '<div id="unifiedPreseasonPanel" class="unified-profile-panel" data-profile-panel="preseason" hidden></div>'+
-    '<div id="unifiedEspnPanel" class="unified-profile-panel" data-profile-panel="espn" hidden></div>'+
     '<div id="unifiedGameLogPanel" class="unified-profile-panel" data-profile-panel="gamelog" hidden></div>'+
     '<div id="unifiedNotesPanel" class="unified-profile-panel" data-profile-panel="notes" hidden></div>';
 
@@ -122,6 +116,9 @@ function ensureUi(){
   tabs.insertAdjacentElement('afterend',panels);
 
   const overview=document.getElementById('unifiedOverviewPanel');
+  const rankSummary=document.createElement('div');
+  rankSummary.id='unifiedOverviewRanks';
+  overview.appendChild(rankSummary);
   if(injury)overview.appendChild(injury);
   if(stats)overview.appendChild(stats);
   if(notes)document.getElementById('unifiedNotesPanel').appendChild(notes);
@@ -139,43 +136,37 @@ function activateTab(key){
   document.querySelectorAll('[data-profile-panel]').forEach(p=>p.hidden=p.dataset.profilePanel!==key);
   const name=document.getElementById('modal')?.dataset.unifiedName;
   if(!name)return;
-  if(key==='espn')loadEspn(name);
   if(key==='gamelog')loadGameLog(name);
 }
-function renderRankPanels(name){
+function renderOverviewRanks(name){
   const p=playerByName(name)||basePositionPlayer(name);
   const pos=p?.position||'—';
   const pre=preseasonRank(name);
   const ros=rosRank(name,pos);
   const ov=overallRank(name);
   const move=rankMovement(pre,ros);
-
-  const rosPanel=document.getElementById('unifiedRosPanel');
-  const prePanel=document.getElementById('unifiedPreseasonPanel');
-
-  rosPanel.innerHTML=
+  const box=document.getElementById('unifiedOverviewRanks');
+  if(!box)return;
+  box.innerHTML=
     '<div class="unified-rank-grid">'+
-      '<div class="unified-rank-card"><span>ROS '+pos+' Rank</span><b>'+(ros?'#'+ros:'—')+'</b></div>'+
+      '<div class="unified-rank-card"><span>ROS '+pos+'</span><b>'+(ros?'#'+ros:'—')+'</b></div>'+
       '<div class="unified-rank-card"><span>Preseason '+pos+'</span><b>'+(pre?'#'+pre:'—')+'</b></div>'+
-      '<div class="unified-rank-card"><span>Movement</span><b>'+move+'</b></div>'+
+      '<div class="unified-rank-card" id="unifiedEspnRankCard"><span>ESPN '+pos+'</span><b>…</b></div>'+
     '</div>'+
-    '<div class="unified-rank-note">ROS is pulled from your current ROS rankings file. Movement compares ROS position rank with your preseason position rank.</div>';
-
-  prePanel.innerHTML=
-    '<div class="unified-rank-grid">'+
-      '<div class="unified-rank-card"><span>Preseason '+pos+' Rank</span><b>'+(pre?'#'+pre:'—')+'</b></div>'+
-      '<div class="unified-rank-card"><span>Overall Big Board</span><b>'+(ov?'#'+ov:'—')+'</b></div>'+
-      '<div class="unified-rank-card"><span>ROS '+pos+' Rank</span><b>'+(ros?'#'+ros:'—')+'</b></div>'+
-    '</div>'+
-    '<div class="unified-rank-note">Preseason rankings remain tied to your original positional rankings and Big Board.</div>';
+    '<div class="unified-rank-note">Overall #'+(ov||'—')+(move!=='—'?' · ROS movement '+move:'')+'</div>';
+  loadOverviewEspnRank(name,pos);
 }
-async function loadEspn(name){
-  const panel=document.getElementById('unifiedEspnPanel');
-  if(!panel||panel.dataset.loadedFor===norm(name))return;
-  panel.dataset.loadedFor=norm(name);
-  panel.innerHTML='<div class="unified-profile-loading">Loading ESPN live data…</div>';
-  if(window.ShuaEspnLive?.renderPlayerStats)await window.ShuaEspnLive.renderPlayerStats(name,panel);
-  else panel.innerHTML='<div class="unified-profile-loading">ESPN live data is unavailable right now.</div>';
+async function loadOverviewEspnRank(name,pos){
+  const card=document.getElementById('unifiedEspnRankCard');
+  if(!card)return;
+  try{
+    if(window.ShuaEspnLive?.ensureData)await window.ShuaEspnLive.ensureData();
+    const rank=window.ShuaEspnLive?.getPositionRank?.(name);
+    if(document.getElementById('modal')?.dataset.unifiedName!==name)return;
+    card.innerHTML='<span>ESPN '+pos+'</span><b>'+(rank?'#'+rank:'—')+'</b>';
+  }catch(e){
+    card.innerHTML='<span>ESPN '+pos+'</span><b>—</b>';
+  }
 }
 async function loadGameLog(name){
   const panel=document.getElementById('unifiedGameLogPanel');
@@ -195,10 +186,8 @@ function prepareUnified(name){
   ensureUi();
   const modal=document.getElementById('modal');
   modal.dataset.unifiedName=name;
-  renderRankPanels(name);
-  const ep=document.getElementById('unifiedEspnPanel');
+  renderOverviewRanks(name);
   const gp=document.getElementById('unifiedGameLogPanel');
-  if(ep){ep.dataset.loadedFor='';ep.innerHTML=''}
   if(gp){gp.dataset.loadedFor='';gp.dataset.ready='0';gp.innerHTML=''}
   activateTab('overview');
 }

@@ -89,6 +89,15 @@ async function verifyHistoricalYear(page,year){
       throw new Error('Phone featured card is not compact enough: '+JSON.stringify(phoneSheet));
   }
 
+  const teamNameFit=await page.locator('#featuredPlayerCard .featured-team-name').evaluate(el=>({
+    text:el.textContent.trim(),
+    clientWidth:el.clientWidth,
+    scrollWidth:el.scrollWidth,
+    fontSize:parseFloat(getComputedStyle(el).fontSize)
+  }));
+  if(phoneSheet.bodyPhone&&teamNameFit.scrollWidth>teamNameFit.clientWidth+1)
+    throw new Error('Player card team name is clipped: '+JSON.stringify(teamNameFit));
+
   const tabs=await page.locator('#unifiedProfileTabs .unified-profile-tab').allInnerTexts();
   if(!tabs.includes('History')||!tabs.includes('Game Log'))throw new Error('Missing History/Game Log tabs for '+firstName);
 
@@ -106,6 +115,13 @@ async function verifyHistoricalYear(page,year){
   const historyYears=yearTexts.map(x=>Number(x.replace(/[^0-9]/g,''))).filter(Boolean);
   const historyLogoCount=await page.locator('#unifiedHistoryPanel .player-history-row .player-history-team-logo').count();
   if(historyLogoCount<1)throw new Error('History team logos missing for '+firstName);
+  const historyYearLogoGap=await page.locator('#unifiedHistoryPanel .player-history-row').first().evaluate(row=>{
+    const year=row.querySelector('.player-history-year')?.getBoundingClientRect();
+    const logo=row.querySelector('.player-history-team-logo')?.getBoundingClientRect();
+    return year&&logo?logo.left-year.right:null;
+  });
+  if(phoneSheet.bodyPhone&&!(historyYearLogoGap!==null&&historyYearLogoGap>=2))
+    throw new Error('History team logo crowds year: gap='+historyYearLogoGap);
   if(new Set(historyYears).size!==historyYears.length)throw new Error('Duplicate History years for '+firstName+': '+historyYears.join(','));
   if(!historyYears.includes(Number(year)))throw new Error('History missing selected year '+year+' for '+firstName);
 
@@ -162,7 +178,7 @@ async function verifyHistoricalYear(page,year){
 
   if(phoneSheet.bodyPhone)await swipeDownToClose(page);
   else await page.click('#close');
-  return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350),phoneSheet,gameLogLayout,summaryText,opponentLogoCount,scoredPtsCount,controlsPosition};
+  return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350),phoneSheet,teamNameFit,historyYearLogoGap,gameLogLayout,summaryText,opponentLogoCount,scoredPtsCount,controlsPosition};
 }
 
 try{

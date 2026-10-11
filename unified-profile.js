@@ -124,8 +124,13 @@ style.textContent=`
 }
 .featured-player-card .featured-mini-logo{width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 0 8px color-mix(in srgb,var(--featured-accent) 30%,transparent))}
 .featured-player-card .featured-divider{height:38px;background:#ffffff22}
+.featured-player-card .featured-team-copy{min-width:0}
 .featured-player-card .featured-team-name{
-  font-size:1.04rem;font-weight:1000;letter-spacing:-.02em;color:#fff;line-height:1
+  font-size:1.04rem;font-weight:1000;letter-spacing:-.02em;color:#fff;line-height:1;
+  white-space:nowrap;overflow:visible
+}
+.featured-player-card.featured-team-long .featured-team-name{
+  font-size:.88rem;letter-spacing:-.035em
 }
 .featured-player-card .featured-team-meta{
   margin-top:7px;font-size:.68rem;font-weight:950;letter-spacing:.045em;color:#aeb9c6;
@@ -190,6 +195,7 @@ style.textContent=`
   .featured-player-card .featured-mini-logo{width:26px;height:26px}
   .featured-player-card .featured-divider{height:26px}
   .featured-player-card .featured-team-name{font-size:.66rem}
+  .featured-player-card.featured-team-long .featured-team-name{font-size:.58rem;letter-spacing:-.04em}
   .featured-player-card .featured-team-meta{font-size:.43rem;margin-top:4px}
   .featured-player-card .featured-right{padding:16px 9px 10px}
   .featured-player-card .featured-name{margin-bottom:10px;padding-right:17px}
@@ -259,7 +265,8 @@ style.textContent=`
 }
 .phone-mode .featured-player-card .featured-mini-logo{width:33px;height:33px}
 .phone-mode .featured-player-card .featured-divider{height:32px}
-.phone-mode .featured-player-card .featured-team-name{font-size:.94rem}
+.phone-mode .featured-player-card .featured-team-name{font-size:.88rem}
+.phone-mode .featured-player-card.featured-team-long .featured-team-name{font-size:.68rem;letter-spacing:-.045em}
 .phone-mode .featured-player-card .featured-team-meta{font-size:.6rem;margin-top:6px}
 .phone-mode .featured-player-card .featured-right{padding:22px 15px 16px}
 .phone-mode .featured-player-card .featured-name{margin-bottom:13px;padding-right:0}
@@ -557,6 +564,7 @@ function applyFeaturedProfile(name,seed=null){
   const nameLength=String(player.name||name).replace(/\s+/g,'').length;
   if(nameLength>=18)hero.classList.add('featured-name-xlong');
   else if(nameLength>=14)hero.classList.add('featured-name-long');
+  if(teamName.length>=9)hero.classList.add('featured-team-long');
   hero.style.setProperty('--featured-accent',accent);
 
   const historical=!!seedYear(seed);

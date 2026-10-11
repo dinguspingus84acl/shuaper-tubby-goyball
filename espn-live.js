@@ -209,26 +209,56 @@ function teamLogo(team){
   const slug=TEAM_SLUGS[team];
   return slug?`<img class="espn-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt="">`:'';
 }
-function playerHeadshot(player){
-  const explicit=String(player?.headshot||'').trim();
-  const id=String(player?.id||'');
-  let sleeper='';
+function faceUrlList(value){
+  if(Array.isArray(value))return [...new Set(value.map(String).map(x=>x.trim()).filter(Boolean))];
+  if(value&&typeof value==='object'){
+    const arr=Array.isArray(value.urls)?value.urls:Array.isArray(value.headshots)?value.headshots:[value.url||value.headshot||''];
+    return [...new Set(arr.map(String).map(x=>x.trim()).filter(Boolean))];
+  }
+  const s=String(value||'').trim();
+  return s?[s]:[];
+}
+function playerFaceCandidates(player){
+  const urls=[];
+  urls.push(...faceUrlList(player?.headshots));
+  urls.push(...faceUrlList(player?.headshot));
   try{
     if(typeof playerPhotoId==='function'){
       const sid=playerPhotoId(player?.name||'',player?.team||'',player?.position||'');
-      if(sid)sleeper='https://sleepercdn.com/content/nfl/players/thumb/'+sid+'.jpg';
+      if(sid)urls.push('https://sleepercdn.com/content/nfl/players/thumb/'+sid+'.jpg');
     }
   }catch(e){}
-  const espn=id&&/^\d+$/.test(id)?'https://a.espncdn.com/i/headshots/nfl/players/full/'+id+'.png':'';
-  const src=explicit||sleeper||espn;
-  const fallback=sleeper&&src!==sleeper?sleeper:(espn&&src!==espn?espn:'');
-  const initials=String(player?.name||'?').split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase()||'?';
-  if(!src)return '<span class="espn-headshot espn-headshot-fallback">'+initials+'</span>';
-  const onerror=fallback
-    ? "this.onerror=function(){this.outerHTML='<span class=&quot;espn-headshot espn-headshot-fallback&quot;>"+initials+"</span>'};this.src='"+fallback+"'"
-    : "this.outerHTML='<span class=&quot;espn-headshot espn-headshot-fallback&quot;>"+initials+"</span>'";
-  return '<img class="espn-headshot" src="'+src+'" alt="'+String(player?.name||'')+'" loading="lazy" onerror="'+onerror+'">';
+  const id=String(player?.id||'');
+  if(/^\d+$/.test(id))urls.push('https://a.espncdn.com/i/headshots/nfl/players/full/'+id+'.png');
+  return [...new Set(urls.filter(Boolean))];
 }
+window.ShuaAdvanceFace=window.ShuaAdvanceFace||function(img){
+  try{
+    const urls=String(img.dataset.faceUrls||'').split('|').map(decodeURIComponent).filter(Boolean);
+    let i=Number(img.dataset.faceIndex||0)+1;
+    if(i<urls.length){
+      img.dataset.faceIndex=String(i);
+      img.src=urls[i];
+      return;
+    }
+    const initials=img.dataset.faceInitials||'?';
+    img.outerHTML='<span class="'+(img.dataset.faceFallbackClass||'espn-headshot espn-headshot-fallback')+'">'+initials+'</span>';
+  }catch(e){
+    img.style.display='none';
+  }
+};
+function faceImgHtml(player,className='espn-headshot',fallbackClass='espn-headshot espn-headshot-fallback'){
+  const urls=playerFaceCandidates(player);
+  const initials=String(player?.name||'?').split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase()||'?';
+  if(!urls.length)return '<span class="'+fallbackClass+'">'+initials+'</span>';
+  const encoded=urls.map(encodeURIComponent).join('|');
+  return '<img class="'+className+'" src="'+urls[0]+'" alt="'+String(player?.name||'')+'" loading="lazy" data-face-urls="'+encoded+'" data-face-index="0" data-face-initials="'+initials+'" data-face-fallback-class="'+fallbackClass+'" onerror="window.ShuaAdvanceFace(this)">';
+}
+
+function playerHeadshot(player){
+  return faceImgHtml(player);
+}
+
 function statSource(s){return Number(s?.statSourceId ?? s?.statTypeId ?? -1)}
 function splitType(s){return Number(s?.statSplitTypeId ?? (Number(s?.scoringPeriodId||0)===0?0:1))}
 function seasonStat(stats,year=SEASON){
@@ -366,9 +396,9 @@ async function enrichHeadshots(list){
   if(!Array.isArray(list)||!list.length)return list||[];
   const map=await loadHeadshotIndex();
   return list.map(p=>{
-    if(p.headshot)return p;
-    const url=map[norm(p.name)];
-    return url?{...p,headshot:url}:p;
+    if((p.headshots&&p.headshots.length)||p.headshot)return p;
+    const urls=faceUrlList(map[norm(p.name)]);
+    return urls.length?{...p,headshot:urls[0],headshots:urls}:p;
   });
 }
 
@@ -1276,17 +1306,8 @@ window.ShuaEspnLive={
   },
   getHistoricalCareer,
   getCompleteCareer,
-  getPlayerHeadshotUrl(player){
-    const explicit=historicalHeadshot(player);
-    if(explicit)return explicit;
-    try{
-      if(typeof playerPhotoId==='function'){
-        const sid=playerPhotoId(player?.name||'',player?.team||'',player?.position||'');
-        if(sid)return 'https://sleepercdn.com/content/nfl/players/thumb/'+sid+'.jpg';
-      }
-    }catch(e){}
-    return player?.id&&/^\d+$/.test(String(player.id))?'https://a.espncdn.com/i/headshots/nfl/players/full/'+player.id+'.png':'';
-  },
+  getPlayerHeadshotUrl(player){return playerFaceCandidates(player)[0]||''},
+  getPlayerHeadshotUrls(player){return playerFaceCandidates(player)},
   getTeamLogoUrl(team){return historicalTeamLogoUrl(team)},
   async getHeadshotByName(name){
     const current=rows.find(p=>norm(p.name)===norm(name))||statsRows.find(p=>norm(p.name)===norm(name));
@@ -1302,7 +1323,7 @@ window.ShuaEspnLive={
       }
     }catch(e){}
     const map=await loadHeadshotIndex();
-    return map[norm(name)]||'';
+    return faceUrlList(map[norm(name)])[0]||'';
   },
   getPositionRank(name){
     const p=rows.find(x=>norm(x.name)===norm(name));

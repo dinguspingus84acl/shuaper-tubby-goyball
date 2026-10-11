@@ -127,8 +127,9 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-sort-head{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:900;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;width:100%;text-align:right}
 .espn-sort-head:hover{color:#fff}
 .espn-sort-head .sort-arrow{font-size:.68rem;color:#7fb6e5}
-.espn-sort-head.active{color:#fff}
-.phone-mode .espn-sort-head{pointer-events:auto;cursor:pointer}
+.espn-column-stat-select{width:100%;min-width:0;height:30px;border:1px solid #ffffff1f;border-radius:6px;background:#081a2d;color:#dbeafe;padding:0 22px 0 6px;font-size:.58rem;font-weight:950;outline:none;text-transform:none}
+.espn-column-stat-select:focus{border-color:#6aaee5}
+.phone-mode .espn-column-stat-select{height:32px;font-size:.56rem;padding-left:4px;padding-right:18px}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}.espn-headshot-fallback{display:flex;align-items:center;justify-content:center;color:#dbeafe;font-size:.68rem;font-weight:950}
@@ -269,7 +270,8 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 }
 
 @media(max-width:700px){
-  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 64px;gap:5px}
+  .phone-mode.stats-mode .espn-live-toolbar{padding-right:58px!important}
+  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 86px;gap:5px}
   .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
@@ -363,7 +365,7 @@ section.innerHTML=`
     <div id="espnLiveSource" class="espn-live-source">ESPN 2026 full-PPR stats · choose a position, then rank players by any relevant stat</div>
     <div class="espn-live-card">
       <div class="espn-live-head">
-        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div><button type="button" id="espnPointsHead" class="espn-sort-head" data-sort-stat="points">PPR Pts <span class="sort-arrow"></span></button></div><div><button type="button" id="espnSelectedStatHead" class="espn-sort-head active" data-sort-stat="selected">PPR Pts <span class="sort-arrow">▼</span></button></div>
+        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div><button type="button" id="espnPointsHead" class="espn-sort-head" data-sort-stat="points">PPR Pts <span class="sort-arrow"></span></button></div><div><select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Choose right column stat"></select></div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open Stats to load rankings.</div></div>
     </div>
@@ -823,10 +825,10 @@ function rankRows(list,filter){
 }
 function updateSortHeaders(){
   const points=document.getElementById('espnPointsHead');
-  const selected=document.getElementById('espnSelectedStatHead');
-  [points,selected].forEach(x=>{if(!x)return;x.classList.remove('active');const a=x.querySelector('.sort-arrow');if(a)a.textContent=''});
-  const target=activeStat==='points'?points:selected;
-  if(target){target.classList.add('active');const a=target.querySelector('.sort-arrow');if(a)a.textContent=sortDirection==='ASC'?'▲':'▼'}
+  if(points){
+    const a=points.querySelector('.sort-arrow');
+    if(a)a.textContent=activeStat==='points'?(sortDirection==='ASC'?'▲':'▼'):'';
+  }
 }
 function sortFromHeader(key){
   const next=key==='points'?'points':activeStat;
@@ -1328,11 +1330,14 @@ function openEspnPlayerProfile(player){
 }
 
 function renderStatFilters(){
-  const select=document.getElementById('espnStatSelect');
+  const topSelect=document.getElementById('espnStatSelect');
+  const columnSelect=document.getElementById('espnColumnStatSelect');
   const cfg=configForFilter();
   if(!cfg.some(x=>x.key===activeStat))activeStat='points';
-  if(select){
-    select.innerHTML=cfg.map(x=>'<option value="'+x.key+'">'+displayStatLabel(x.key)+'</option>').join('');
+  const options=cfg.map(x=>'<option value="'+x.key+'">'+displayStatLabel(x.key)+'</option>').join('');
+  const bind=select=>{
+    if(!select)return;
+    select.innerHTML=options;
     select.value=activeStat;
     select.onchange=()=>{
       activeStat=select.value||'points';
@@ -1341,9 +1346,9 @@ function renderStatFilters(){
       renderStatFilters();
       render();
     };
-  }
-  const head=document.getElementById('espnSelectedStatHead');
-  if(head){const label=displayStatLabel(activeStat);head.childNodes[0].nodeValue=label+' '}
+  };
+  bind(topSelect);
+  bind(columnSelect);
   const pointsHead=document.getElementById('espnPointsHead');
   if(pointsHead)pointsHead.childNodes[0].nodeValue=(statView==='PERGAME'?'PPR/G':'PPR Pts')+' ';
   updateSortHeaders();
@@ -1391,6 +1396,7 @@ function render(){
 }
 function setUpdatedLabel(message,error=false){
   const el=document.getElementById('espnLastUpdated');
+  if(!el)return;
   el.textContent=message;
   el.classList.toggle('espn-error',!!error);
 }
@@ -1444,7 +1450,7 @@ function updateStatsLabels(){
   const sub=document.getElementById('sub');
   const src=document.getElementById('espnLiveSource');
   if(sub)sub.textContent=statsSeason+' ESPN full-PPR scoring leaders — filter by position and rank by stat';
-  if(src)src.textContent=(statsSeason<=2017?'ESPN '+statsSeason+' full-PPR stats · local historical data fills missing rows':'ESPN '+statsSeason+' full-PPR stats')+' · choose a position, then use the Rank by dropdown'+(statsSeason===SEASON?' · current season auto-refreshes every 60 seconds':'');
+  if(src)src.textContent=(statsSeason<=2017?'ESPN '+statsSeason+' full-PPR stats · local historical data fills missing rows':'ESPN '+statsSeason+' full-PPR stats')+' · choose a position, then use the Rank by dropdown';
 }
 async function loadStatsSeason(year,{force=false}={}){
   year=Number(year)||SEASON;
@@ -1570,7 +1576,6 @@ if(statsYearSelect){
 }
 syncStatsControls();
 document.getElementById('espnPointsHead')?.addEventListener('click',()=>sortFromHeader('points'));
-document.getElementById('espnSelectedStatHead')?.addEventListener('click',()=>sortFromHeader('selected'));
 document.getElementById('close')?.addEventListener('click',hideProfileGameLog);
 document.getElementById('modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('modal'))hideProfileGameLog()});
 

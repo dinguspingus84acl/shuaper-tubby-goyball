@@ -1,0 +1,29 @@
+name: historical profile browser smoke test
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/historical-profile-smoke.mjs'
+      - '.github/workflows/historical-profile-smoke.yml'
+      - 'espn-live.js'
+      - 'player-history.js'
+      - 'unified-profile.js'
+      - 'site-enhancements.js'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.57.0 >/dev/null
+          npx playwright install --with-deps chromium
+      - name: Run historical profile smoke test
+        run: node scripts/historical-profile-smoke.mjs

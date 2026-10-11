@@ -150,12 +150,24 @@ async function verifyHistoricalYear(page,year){
   if(badOpponent)throw new Error('Game Log opponent still includes @/vs prefix: '+badOpponent);
 
   const summaryText=await detail.locator('.espn-game-log-summary').first().innerText();
-  if(!/Season/i.test(summaryText)||!/PPG/i.test(summaryText)||!/PPR/i.test(summaryText)||!/GP/i.test(summaryText))
+  if(!/Season/i.test(summaryText)||!/PPG/i.test(summaryText)||!/PPR/i.test(summaryText)||!/GP/i.test(summaryText)||!/ESPN/i.test(summaryText))
     throw new Error('Game Log season summary missing or incomplete: '+summaryText);
   const opponentLogoCount=await detail.locator('.espn-game-log-opponent-logo').count();
   if(opponentLogoCount<1)throw new Error('Game Log opponent logos missing for '+firstName+' '+year);
   const scoredPtsCount=await detail.locator('.gl-pts-high,.gl-pts-mid,.gl-pts-low').count();
   if(scoredPtsCount<1)throw new Error('Game Log PTS color coding missing for '+firstName+' '+year);
+  if(firstName==='David Johnson'&&Number(year)===2016){
+    const ptsCells=await detail.locator('.espn-game-log-table tbody td.gl-pts').evaluateAll(nodes=>nodes.map(el=>({
+      value:parseFloat(el.textContent),
+      high:el.classList.contains('gl-pts-high'),
+      low:el.classList.contains('gl-pts-low')
+    })));
+    const badHigh=ptsCells.find(x=>Number.isFinite(x.value)&&x.value>20&&!x.high);
+    const badLow=ptsCells.find(x=>Number.isFinite(x.value)&&x.value<10&&!x.low);
+    if(badHigh)throw new Error('RB score over 20 is not green: '+JSON.stringify(badHigh));
+    if(badLow)throw new Error('Score under 10 is not red: '+JSON.stringify(badLow));
+  }
+
   const scoreColorStyle=await detail.locator('.gl-pts-high,.gl-pts-mid,.gl-pts-low').first().evaluate(el=>{
     const s=getComputedStyle(el);
     return {color:s.color,background:s.backgroundColor};
@@ -195,6 +207,31 @@ async function verifyHistoricalYear(page,year){
   return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350),phoneSheet,teamNameFit,historyYearLogoGap,historyWidth,gameLogLayout,summaryText,opponentLogoCount,scoredPtsCount,scoreColorStyle,controlsPosition};
 }
 
+async function verifyKennethWalker(page){
+  await page.evaluate(()=>document.querySelector('.pos[data-pos="RB"]')?.click());
+  await page.waitForFunction(()=>!document.getElementById('tableCard')?.hidden&&document.querySelectorAll('#rows tr').length>5,{timeout:30000});
+  const row=page.locator('#rows tr').filter({hasText:/Kenneth Walker/i}).first();
+  if(await row.count()!==1)throw new Error('Kenneth Walker ranking row not found');
+  await row.click();
+  await page.waitForSelector('#modal.open',{timeout:30000});
+
+  await selectProfileTab(page,'history');
+  await page.waitForFunction(()=>document.querySelectorAll('#unifiedHistoryPanel .player-history-row').length>1,{timeout:120000});
+  const historyYears=(await page.locator('#unifiedHistoryPanel .player-history-year').allInnerTexts())
+    .map(x=>Number(x.replace(/[^0-9]/g,''))).filter(Boolean);
+  if(historyYears.length<2)throw new Error('Kenneth Walker history did not expand beyond current season: '+historyYears.join(','));
+
+  await selectProfileTab(page,'gamelog');
+  await page.waitForFunction(()=>document.querySelector('#unifiedGameLogPanel .espn-game-log-year-select'),{timeout:120000});
+  const gameYears=(await page.locator('#unifiedGameLogPanel .espn-game-log-year-select option').allTextContents())
+    .map(Number).filter(Boolean);
+  if(gameYears.length<2)throw new Error('Kenneth Walker Game Log has only one season: '+gameYears.join(','));
+  if(!gameYears.some(y=>y<2026))throw new Error('Kenneth Walker Game Log missing prior seasons: '+gameYears.join(','));
+
+  await swipeDownToClose(page);
+  return {historyYears,gameYears};
+}
+
 try{
   await sleep(1200);
   const browser=await chromium.launch({headless:true});
@@ -232,6 +269,7 @@ try{
   const checks=[];
   checks.push(await verifyHistoricalYear(page,2016));
   checks.push(await verifyHistoricalYear(page,2004));
+  const kenneth=await verifyKennethWalker(page);
 
   const desktop=await browser.newPage({viewport:{width:1280,height:900}});
   desktop.on('pageerror',e=>errors.push('DESKTOP PAGEERROR '+e.message));
@@ -240,7 +278,7 @@ try{
   await openStats(desktop,2016);
   checks.push(await verifyHistoricalYear(desktop,2016));
 
-  console.log('RESULT',JSON.stringify({checks,phoneTopControls,phoneRankName,errors},null,2));
+  console.log('RESULT',JSON.stringify({checks,kenneth,phoneTopControls,phoneRankName,errors},null,2));
   await browser.close();
 } finally {
   server.kill('SIGTERM');

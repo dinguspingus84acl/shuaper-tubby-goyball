@@ -272,12 +272,29 @@ style.textContent=`
 .phone-mode .featured-player-card .featured-bio-value{font-size:.9rem;margin-top:4px}
 .phone-mode .featured-player-profile .unified-profile-tabs{
   position:sticky;top:0;z-index:20;
+  display:grid!important;grid-template-columns:1fr!important;gap:4px!important;
   width:calc(100% - 16px);margin:0 8px!important;padding:5px!important;
   border-radius:0 0 11px 11px!important;
   box-shadow:0 8px 18px #0007
 }
 .phone-mode .featured-player-profile .unified-profile-tab{
-  min-height:36px!important;padding:7px 2px!important;font-size:.54rem!important
+  display:none!important;width:100%!important;min-height:36px!important;
+  padding:7px 10px!important;font-size:.58rem!important;justify-content:space-between;align-items:center
+}
+.phone-mode .featured-player-profile .unified-profile-tab.active{
+  display:flex!important
+}
+.phone-mode .featured-player-profile .unified-profile-tab.active:after{
+  content:"⌄";font-size:.72rem;color:#8da1b6;margin-left:auto
+}
+.phone-mode .featured-player-profile .unified-profile-tabs.phone-tab-menu-open{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important
+}
+.phone-mode .featured-player-profile .unified-profile-tabs.phone-tab-menu-open .unified-profile-tab{
+  display:flex!important
+}
+.phone-mode .featured-player-profile .unified-profile-tabs.phone-tab-menu-open .unified-profile-tab.active:after{
+  content:"⌃"
 }
 .phone-mode .featured-player-profile #unifiedProfilePanels{
   min-height:calc(100dvh - 342px);
@@ -642,11 +659,18 @@ function ensureUi(){
   tabs.addEventListener('click',e=>{
     const btn=e.target.closest('[data-profile-tab]');
     if(!btn)return;
+    const phone=document.body.classList.contains('phone-mode');
+    if(phone&&!tabs.classList.contains('phone-tab-menu-open')&&btn.classList.contains('active')){
+      e.preventDefault();
+      tabs.classList.add('phone-tab-menu-open');
+      return;
+    }
     activateTab(btn.dataset.profileTab);
   });
   return box;
 }
 function activateTab(key){
+  document.getElementById('unifiedProfileTabs')?.classList.remove('phone-tab-menu-open');
   const tabs=document.querySelectorAll('[data-profile-tab]');
   tabs.forEach(b=>b.classList.toggle('active',b.dataset.profileTab===key));
   document.querySelectorAll('[data-profile-panel]').forEach(p=>p.hidden=p.dataset.profilePanel!==key);

@@ -45,7 +45,6 @@ function addStyles(){
     .phone-mode .positions{display:none!important}
     body.utility-tab-mode #positionToggle{display:none!important}
     .phone-mode #phoneMenuButton{display:flex!important}
-    .phone-mode #phoneSearchButton{display:flex!important}
     @media(min-width:901px){.search{flex:0 1 285px!important;min-width:180px!important}}
     .home-btn.active{background:linear-gradient(90deg,#b51635,#203fa7)!important;color:#fff!important}
     .myguys-btn{border-color:#35d07f66!important}.myguys-btn.active{background:#145c3d!important;color:#fff!important;border-color:#35d07f!important}
@@ -62,8 +61,6 @@ function addStyles(){
     #tableCard tbody tr[data-id].selected-player-row td:first-child{box-shadow:inset 4px 0 0 var(--g)}
     #tableCard tbody tr[data-id].selected-player-row{box-shadow:0 0 0 1px rgba(53,208,127,.24),0 8px 24px rgba(0,0,0,.16)}
     .phone-mode #tableCard tbody tr[data-id].selected-player-row{background:linear-gradient(90deg,rgba(53,208,127,.18),rgba(24,61,99,.12))!important;box-shadow:inset 4px 0 0 var(--g),0 0 0 1px rgba(53,208,127,.2)!important}
-    .rank-move{display:inline-flex;align-items:center;margin-left:7px;padding:2px 5px;border-radius:999px;font-size:.55rem;font-weight:1000;vertical-align:middle}
-    .rank-move.up{color:#74e39b;background:#35d07f17}.rank-move.down{color:#ef8798;background:#ff174417}
 
     /* Desktop row hover */
     body:not(.phone-mode) #tableCard tbody tr[data-id]:not(.selected-player-row){cursor:pointer;transition:transform .14s ease,filter .14s ease,box-shadow .14s ease}
@@ -119,7 +116,6 @@ function addStyles(){
 
     #phoneMenuButton{display:none;position:fixed;top:14px;right:14px;z-index:120;width:48px;height:48px;border:1px solid #ffffff35;border-radius:12px;background:#061322eb;box-shadow:0 8px 24px #0008;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0}
     #phoneMenuButton span{display:block;width:23px;height:3px;border-radius:3px;background:#fff}
-    #phoneSearchButton{display:none;position:fixed;top:14px;right:70px;z-index:120;width:48px;height:48px;border:1px solid #ffffff35;border-radius:12px;background:#061322eb;color:#fff;box-shadow:0 8px 24px #0008;align-items:center;justify-content:center;padding:0;font-size:1.15rem;font-weight:1000}
     #phoneMenuBackdrop{display:none;position:fixed;inset:0;z-index:108;background:rgba(0,0,0,.58);backdrop-filter:blur(2px)}
     #phoneMenuDrawer{position:fixed;top:0;right:0;bottom:0;z-index:110;width:min(82vw,330px);transform:translateX(105%);transition:transform .22s ease;background:linear-gradient(180deg,#07182a,#04101e);border-left:1px solid #ffffff25;box-shadow:-18px 0 40px #0009;padding:78px 16px 24px;overflow-y:auto}
     #phoneMenuDrawer h3{margin:0 0 14px;color:#91a4ba;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase}
@@ -277,9 +273,6 @@ function ensureMobileMenu(){
   const backdrop=document.createElement('div');backdrop.id='phoneMenuBackdrop';
   const drawer=document.createElement('aside');drawer.id='phoneMenuDrawer';drawer.innerHTML='<h3>Fantasy Menu</h3><div id="phoneMenuItems"></div>';
   document.body.append(button,backdrop,drawer);
-  const searchButton=document.createElement('button');
-  searchButton.id='phoneSearchButton';searchButton.type='button';searchButton.setAttribute('aria-label','Search players');searchButton.textContent='⌕';
-  document.body.appendChild(searchButton);
   const movedSearch=document.querySelector('.tools>.search');
   if(movedSearch){
     movedSearch.id='phoneMenuSearchWrap';
@@ -287,7 +280,6 @@ function ensureMobileMenu(){
     movedSearch.hidden=false;
   }
   button.onclick=()=>document.body.classList.contains('mobile-menu-open')?closeMobileMenu():openMobileMenu();
-  searchButton.onclick=()=>{openMobileMenu();setTimeout(()=>document.getElementById('search')?.focus(),30)};
   backdrop.onclick=closeMobileMenu;
 }
 function openMobileMenu(){refreshMobileMenu();document.body.classList.add('mobile-menu-open')}
@@ -332,6 +324,12 @@ function fallbackFaceName(el){
   if(roster){
     const b=roster.querySelector('.roster-name-line b')||roster.querySelector('b');
     if(b?.textContent&&b.textContent.trim()!=='Empty')return b.textContent.trim();
+  }
+  const depth=el.closest('.depth-player');
+  if(depth){
+    const spans=depth.querySelectorAll('span');
+    const name=spans[spans.length-1]?.textContent?.trim();
+    if(name)return name;
   }
   const person=el.closest('.person');
   if(person){
@@ -495,32 +493,6 @@ function ensureBackToTop(){
   sync();
 }
 
-function applyRankMovementBadges(){
-  document.querySelectorAll('#rows .rank-move').forEach(x=>x.remove());
-  let pos='';
-  try{pos=String(position||'')}catch(e){}
-  if(!POSITIONS.includes(pos))return;
-  let ros=[];
-  try{ros=rosRankings?.[pos]||[]}catch(e){return}
-  if(!ros.length)return;
-  const rosMap=new Map(ros.map(r=>[canon(r.name),Number(r.rank)]));
-  document.querySelectorAll('#rows tr[data-id]').forEach(tr=>{
-    const nameEl=tr.querySelector('.rank-player-copy b,.photo-cell b');
-    const name=nameEl?.textContent?.trim();
-    if(!name||!nameEl)return;
-    let p=null;
-    try{p=players.find(x=>x.position===pos&&canon(x.name)===canon(name))||null}catch(e){}
-    const pre=Number(p?.positionRank),next=Number(rosMap.get(canon(name)));
-    if(!Number.isFinite(pre)||!Number.isFinite(next)||pre===next)return;
-    const delta=pre-next;
-    const badge=document.createElement('span');
-    badge.className='rank-move '+(delta>0?'up':'down');
-    badge.textContent=(delta>0?'↑ ':'↓ ')+Math.abs(delta);
-    badge.title='Preseason #'+pre+' → ROS #'+next;
-    nameEl.insertAdjacentElement('afterend',badge);
-  });
-}
-
 function installRankingSkeleton(){
   const rows=document.getElementById('rows'),boardEl=document.getElementById('board');
   if(rows&&!rows.children.length)rows.innerHTML=Array.from({length:9},()=>'<tr class="ranking-skeleton-row" aria-hidden="true"><td></td><td></td><td></td><td></td><td></td><td></td></tr>').join('');
@@ -600,12 +572,12 @@ function install(){
       setTimeout(()=>document.getElementById('search')?.focus(),30);
     }
   });
-  const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();upgradeFallbackFaces();applyColors();applySelectedPlayerRow();applyRankMovementBadges();updateRankingPlayerNav()}));
+  const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();upgradeFallbackFaces();applyColors();applySelectedPlayerRow();updateRankingPlayerNav()}));
   obs.observe(document.body,{subtree:true,childList:true});
   loadData().catch(console.error);
   loadHistoricalHeadshots();
   requestAnimationFrame(()=>{
-    decorateTeamLogos();upgradeFallbackFaces();applyColors();applyRankMovementBadges();
+    decorateTeamLogos();upgradeFallbackFaces();applyColors();
     const saved=readPageState();
     if(!saved?.section||saved.section==='HOME')showHome();else leaveHome();
     setTimeout(()=>{installListAnimations();restoreSavedPageState()},90);

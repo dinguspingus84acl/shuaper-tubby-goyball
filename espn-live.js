@@ -204,7 +204,8 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-selected-stat{color:#dbeafe;background:transparent;box-shadow:none}
 #espnLiveRows>.espn-live-row.stats-selected{background:#0d2a42!important;box-shadow:inset 4px 0 0 #35d07f}
 #espnSelectedStatHead{background:transparent;box-shadow:none;border-radius:0;padding:0}
-.espn-team{color:var(--m);font-size:.68rem}
+.espn-team{display:flex;align-items:center;gap:6px;color:var(--m);font-size:.68rem;white-space:nowrap}
+.espn-team .espn-team-logo{width:20px;height:20px;flex-basis:20px}
 .espn-status{padding:18px;text-align:center;color:var(--m)}
 .espn-error{color:#ff8b9d}
 .espn-live-source{font-size:.62rem;color:#73879e}
@@ -1415,7 +1416,7 @@ function render(){
       <div class="espn-rank">#${i+1}</div>
       <div class="espn-player">${playerHeadshot(p)}<div class="espn-player-copy"><button type="button" class="espn-name-btn" data-espn-open-player="${p.id}">${p.name}</button><div class="espn-player-meta">${teamLogo(p.team)}<span>${p.team}</span></div></div></div>
       <div class="espn-pos">${p.position}</div>
-      <div class="espn-team">${p.team}</div>
+      <div class="espn-team">${teamLogo(p.team)}<span>${p.team}</span></div>
       <div class="espn-points">${formatStat(p,'points')}</div>
       <div class="espn-selected-stat">${formatStat(p,activeStat)}</div>
     </div>`;

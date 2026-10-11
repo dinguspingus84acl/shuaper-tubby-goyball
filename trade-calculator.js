@@ -28,6 +28,9 @@ style.textContent=`
 .trade-result{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;border:0;border-top:1px solid #ffffff12;background:#081a2d;color:#fff;padding:8px 10px;text-align:left}
 .trade-result:first-child{border-top:0}
 .trade-result-player{display:flex;align-items:center;gap:7px;min-width:0}
+.trade-headshot{width:32px!important;height:32px!important;flex:0 0 32px!important;border-radius:50%!important;object-fit:cover!important;border:1px solid #ffffff25!important}
+.trade-player-name .trade-headshot{width:30px!important;height:30px!important;flex-basis:30px!important}
+.trade-why-player .trade-headshot{width:22px!important;height:22px!important;flex-basis:22px!important}
 .trade-result-name{font-weight:900;font-size:.76rem;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .trade-result-meta{color:#8296aa;font-size:.62rem;white-space:nowrap}
 .trade-list{display:grid;gap:4px;padding:0 8px 8px}
@@ -91,7 +94,7 @@ section.innerHTML=
       '<div class="trade-meter"><div id="tradeMeterLeft" class="trade-meter-left" style="width:50%"></div><div id="tradeMeterRight" class="trade-meter-right" style="width:50%"></div></div>'+
       '<div id="tradeWhy" class="trade-why"></div>'+
     '</div>'+
-    '<div class="trade-actions"><button type="button" id="tradeSwap" class="trade-clear">Swap Sides</button><button type="button" id="tradeClear" class="trade-clear">Clear Trade</button></div>'+
+    '<div class="trade-actions"><button type="button" id="tradeClear" class="trade-clear">Clear Trade</button></div>'+
   '</div>';
 const depth=document.getElementById('depthSection');
 if(depth&&depth.parentNode===main)main.insertBefore(section,depth.nextSibling);else main.appendChild(section);
@@ -130,6 +133,11 @@ function setTradeMode(mode){
   syncSelectedToMode();
   renderSide('left');renderSide('right');
   ['left','right'].forEach(side=>showMatches(side));
+}
+function tradeHeadshot(p){
+  try{
+    return typeof pic==='function'?pic(p.name,'sm trade-headshot',p.team||'',p.position||''):'';
+  }catch(e){return ''}
 }
 function teamLogo(team){
   const slug=TEAM_SLUGS[team];
@@ -194,7 +202,7 @@ function renderSide(side){
     list.innerHTML=state[side].map(p=>
       '<div class="trade-player">'+
         '<div class="trade-player-main">'+
-          '<div class="trade-player-name">'+teamLogo(p.team)+'<button type="button" class="trade-player-link" data-trade-profile="'+encodeURIComponent(p.name)+'">'+p.name+'</button></div>'+
+          '<div class="trade-player-name">'+tradeHeadshot(p)+teamLogo(p.team)+'<button type="button" class="trade-player-link" data-trade-profile="'+encodeURIComponent(p.name)+'">'+p.name+'</button></div>'+
           '<div class="trade-player-meta">'+(tradeMode==='ROS'?'ROS '+p.position+' #'+p.positionRank:'Pre Season #'+p.rank+' overall')+(p.team&&p.team!=='—'?' · '+p.team:'')+'</div>'+
         '</div>'+
         '<div class="trade-value">'+p.value.toFixed(1)+'</div>'+
@@ -211,7 +219,7 @@ function whySideHtml(side,label){
   const total=adjustedSum(side);
   const items=[...state[side]].sort((a,b)=>b.value-a.value);
   return '<div class="trade-why-side"><h4>'+label+'</h4>'+
-    (items.length?items.map(p=>'<div class="trade-why-line"><div class="trade-why-player">'+teamLogo(p.team)+'<span>'+p.name+' · '+tradeRankLabel(p)+'</span></div><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
+    (items.length?items.map(p=>'<div class="trade-why-line"><div class="trade-why-player">'+tradeHeadshot(p)+teamLogo(p.team)+'<span>'+p.name+' · '+tradeRankLabel(p)+'</span></div><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
     '<div class="trade-why-total"><span>Score</span><b>'+total.toFixed(1)+'</b></div></div>';
 }
 function updateWhy(){
@@ -283,7 +291,7 @@ function showMatches(side){
   }
   results.innerHTML=matches.map(p=>
     '<button type="button" class="trade-result" data-add="'+side+'" data-name="'+encodeURIComponent(p.name)+'">'+
-      '<span class="trade-result-player">'+teamLogo(p.team)+'<span class="trade-result-name">'+p.name+'</span></span>'+
+      '<span class="trade-result-player">'+tradeHeadshot(p)+teamLogo(p.team)+'<span class="trade-result-name">'+p.name+'</span></span>'+
       '<span class="trade-result-meta">'+p.position+' · '+(tradeMode==='ROS'?'ROS #'+p.positionRank:'Overall #'+p.rank)+' · Value '+p.value.toFixed(1)+'</span>'+
     '</button>'
   ).join('');
@@ -357,12 +365,6 @@ document.addEventListener('click',e=>{
   input.addEventListener('focus',()=>showMatches(side));
 });
 
-document.getElementById('tradeSwap').onclick=()=>{
-  const left=state.left;
-  state.left=state.right;
-  state.right=left;
-  renderSide('left');renderSide('right');
-};
 document.getElementById('tradeClear').onclick=()=>{
   state.left=[];state.right=[];
   renderSide('left');renderSide('right');

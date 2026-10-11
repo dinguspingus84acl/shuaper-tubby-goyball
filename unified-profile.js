@@ -405,6 +405,47 @@ function fixKnownHeadshot(name){
 function playerById(id){
   try{return players.find(p=>String(p.id)===String(id))||board.find(p=>String(p.id)===String(id))||null}catch(e){return null}
 }
+
+let initialProfilePreloadScheduled=false;
+function preloadNamesFromBoard(limit=18){
+  const names=[];
+  try{
+    (board||[]).slice(0,limit).forEach(p=>{if(p?.name)names.push(p.name)});
+  }catch(e){}
+  if(names.length)return names;
+  try{
+    document.querySelectorAll('#rows tr[data-id] .photo-cell b').forEach(el=>{
+      if(names.length<limit&&el.textContent?.trim())names.push(el.textContent.trim());
+    });
+  }catch(e){}
+  return names;
+}
+function scheduleInitialProfilePreload(){
+  if(initialProfilePreloadScheduled)return;
+  initialProfilePreloadScheduled=true;
+  const run=()=>{
+    const names=preloadNamesFromBoard(18);
+    if(!names.length){
+      initialProfilePreloadScheduled=false;
+      setTimeout(scheduleInitialProfilePreload,700);
+      return;
+    }
+    window.ShuaEspnLive?.prefetchPlayers?.(names,{gameLogs:6,concurrency:3});
+  };
+  if('requestIdleCallback' in window)requestIdleCallback(run,{timeout:2200});
+  else setTimeout(run,900);
+}
+function warmAdjacentProfiles(name){
+  try{
+    const seq=visibleRankingSequence();
+    const index=seq.findIndex(x=>norm(x.name)===norm(name));
+    if(index<0)return;
+    const near=[seq[index-1],seq[index+1],seq[index-2],seq[index+2]]
+      .filter(Boolean).map(x=>x.name).filter(Boolean);
+    if(near.length)window.ShuaEspnLive?.prefetchPlayers?.(near,{gameLogs:2,concurrency:2});
+  }catch(e){}
+}
+
 function visibleRankingSequence(){
   if(document.body.classList.contains('stats-mode')&&window.ShuaEspnLive?.getCurrentStatsSequence){
     const statsSeq=window.ShuaEspnLive.getCurrentStatsSequence();
@@ -1199,6 +1240,7 @@ function prepareUnified(name,seed=null){
   const hp=document.getElementById('unifiedHistoryPanel');
   if(hp){hp.dataset.loadedFor='';hp.dataset.ready='0';hp.innerHTML=''}
   activateTab(preferredProfileTab||'overview');
+  warmAdjacentProfiles(name);
 }
 async function openByName(name,seed=null){
   let p=playerByName(name);
@@ -1249,4 +1291,5 @@ window.profile=function(id){
 
 ensureUi();
 installKeyboardPlayerNav();
+scheduleInitialProfilePreload();
 })();

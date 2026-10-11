@@ -1672,9 +1672,53 @@ document.addEventListener('keydown',e=>{
   }
 });
 
+
+const profilePreloadInFlight=new Map();
+function warmImage(url){
+  url=String(url||'').trim();
+  if(!url)return;
+  try{const img=new Image();img.decoding='async';img.loading='eager';img.src=url}catch(e){}
+}
+async function prefetchProfilePlayer(name,{gameLog=false}={}){
+  const key=nameKey(name);
+  if(!key)return null;
+  const existing=profilePreloadInFlight.get(key);
+  if(existing)return existing;
+  const task=(async()=>{
+    await ensureCurrentRows().catch(()=>{});
+    const p=rows.find(x=>nameKey(x.name)===key)||statsRows.find(x=>nameKey(x.name)===key)||null;
+    if(!p)return null;
+    playerFaceCandidates(p).slice(0,2).forEach(warmImage);
+    warmImage(historicalTeamLogoUrl(p.team));
+    if(gameLog)await fetchGameLog(p,SEASON).catch(()=>{});
+    return p;
+  })().finally(()=>profilePreloadInFlight.delete(key));
+  profilePreloadInFlight.set(key,task);
+  return task;
+}
+async function prefetchProfilePlayers(names,{gameLogs=0,concurrency=3}={}){
+  const unique=[...new Set((names||[]).map(String).map(x=>x.trim()).filter(Boolean))];
+  if(!unique.length)return;
+  await ensureCurrentRows().catch(()=>{});
+  let cursor=0;
+  const workers=Array.from({length:Math.max(1,Math.min(Number(concurrency)||3,4))},async()=>{
+    while(cursor<unique.length){
+      const idx=cursor++;
+      await prefetchProfilePlayer(unique[idx],{gameLog:idx<Number(gameLogs||0)}).catch(()=>{});
+    }
+  });
+  await Promise.all(workers);
+}
+
 window.ShuaEspnLive={
   async ensureData(){
     return ensureCurrentRows();
+  },
+  prefetchPlayer(name,options){
+    return prefetchProfilePlayer(name,options);
+  },
+  prefetchPlayers(names,options){
+    return prefetchProfilePlayers(names,options);
   },
   getCurrentStatsSequence(){
     return rankRows(statsRows,activeFilter).map((p,i)=>({

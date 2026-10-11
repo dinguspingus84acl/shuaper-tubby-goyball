@@ -122,14 +122,14 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .phone-mode .espn-stat-select{width:100%;height:38px;font-size:.72rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
-.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 92px;gap:8px;align-items:center}
+.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 150px;gap:8px;align-items:center}
 .espn-live-head{padding:8px 10px;color:var(--m);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#07182a}
 .espn-sort-head{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:900;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;width:100%;text-align:right}
 .espn-sort-head:hover{color:#fff}
 .espn-sort-head .sort-arrow{font-size:.68rem;color:#7fb6e5}
-.espn-column-stat-select{width:100%;min-width:0;height:30px;border:1px solid #ffffff1f;border-radius:6px;background:#081a2d;color:#dbeafe;padding:0 22px 0 6px;font-size:.58rem;font-weight:950;outline:none;text-transform:none}
+.espn-column-stat-select{width:100%;min-width:0;height:30px;border:1px solid #ffffff1f;border-radius:6px;background:#081a2d;color:#dbeafe;padding:0 24px 0 7px;font-size:.6rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap}
 .espn-column-stat-select:focus{border-color:#6aaee5}
-.phone-mode .espn-column-stat-select{height:32px;font-size:.56rem;padding-left:4px;padding-right:18px}
+.phone-mode .espn-column-stat-select{height:32px;font-size:.58rem;padding-left:5px;padding-right:20px}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}.espn-headshot-fallback{display:flex;align-items:center;justify-content:center;color:#dbeafe;font-size:.68rem;font-weight:950}
@@ -271,7 +271,7 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 
 @media(max-width:700px){
   .phone-mode.stats-mode .espn-live-toolbar{padding-right:58px!important}
-  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 86px;gap:5px}
+  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 126px;gap:5px}
   .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
@@ -806,6 +806,29 @@ function displayStatLabel(key){
   if(key==='points')return 'PPR/G';
   return label+'/G';
 }
+function fullStatLabel(key){
+  const labels={
+    points:'PPR Points',
+    average:'Points Per Game',
+    passYds:'Passing Yards',
+    passTD:'Passing Touchdowns',
+    completions:'Completions',
+    passAtt:'Pass Attempts',
+    rushAtt:'Rush Attempts',
+    rushYds:'Rushing Yards',
+    rushTD:'Rushing Touchdowns',
+    targets:'Targets',
+    receptions:'Receptions',
+    recYds:'Receiving Yards',
+    recTD:'Receiving Touchdowns'
+  };
+  let label=labels[key]||statLabel(key);
+  if(statView==='PERGAME'&&key!=='average'){
+    if(key==='points')return 'PPR Points Per Game';
+    return label+' Per Game';
+  }
+  return label;
+}
 function formatStat(p,key){
   const v=statValue(p,key);
   if(statView==='PERGAME')return v.toFixed(1);
@@ -1334,7 +1357,7 @@ function renderStatFilters(){
   const columnSelect=document.getElementById('espnColumnStatSelect');
   const cfg=configForFilter();
   if(!cfg.some(x=>x.key===activeStat))activeStat='points';
-  const options=cfg.map(x=>'<option value="'+x.key+'">'+displayStatLabel(x.key)+'</option>').join('');
+  const options=cfg.map(x=>'<option value="'+x.key+'">'+fullStatLabel(x.key)+'</option>').join('');
   const bind=select=>{
     if(!select)return;
     select.innerHTML=options;

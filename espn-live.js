@@ -271,6 +271,7 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 
 @media(max-width:700px){
   .phone-mode.stats-mode .espn-live-toolbar{padding-right:58px!important}
+  .phone-mode.stats-mode .espn-live-head,.phone-mode.stats-mode .espn-live-row{grid-template-columns:34px minmax(0,1fr) 148px!important;gap:5px!important}
   .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 148px;gap:5px}
   .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
@@ -1327,6 +1328,8 @@ function hideProfileGameLog(){
   if(wrap)wrap.hidden=true;
 }
 function openEspnPlayerProfile(player){
+  const modal=document.getElementById('modal');
+  if(modal)modal.dataset.statsName=player.name;
   if(window.openUnifiedPlayerProfileByName){
     window.openUnifiedPlayerProfileByName(player.name,player);
     return;
@@ -1607,6 +1610,21 @@ document.addEventListener('click',e=>{
 window.ShuaEspnLive={
   async ensureData(){
     return ensureCurrentRows();
+  },
+  getCurrentStatsSequence(){
+    return rankRows(statsRows,activeFilter).map((p,i)=>({
+      id:'stats:'+encodeURIComponent(p.name),
+      name:p.name,
+      rank:'#'+(i+1),
+      position:p.position,
+      team:p.team
+    }));
+  },
+  openStatsPlayerByName(name){
+    const p=statsRows.find(x=>nameKey(x.name)===nameKey(name))||rows.find(x=>nameKey(x.name)===nameKey(name));
+    if(!p)return false;
+    openEspnPlayerProfile(p);
+    return true;
   },
   getPlayerByName(name){
     return rows.find(p=>nameKey(p.name)===nameKey(name))||null;

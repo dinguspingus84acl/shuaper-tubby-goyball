@@ -43,6 +43,7 @@ function addStyles(){
   st.textContent=`
     .tools>.search{display:none!important}
     .phone-mode .positions{display:none!important}
+    body.utility-tab-mode #positionToggle{display:none!important}
     .phone-mode #phoneMenuButton{display:flex!important}
     @media(min-width:901px){.search{flex:0 1 285px!important;min-width:180px!important}}
     .home-btn.active{background:linear-gradient(90deg,#b51635,#203fa7)!important;color:#fff!important}
@@ -193,11 +194,20 @@ function ensureHome(){
 }
 function showHome(){
   hideTagged();
+  syncUtilityTabMode('HOME');
   document.body.classList.add('fantasy-home-mode');
   document.querySelectorAll('.positions .pos').forEach(x=>x.classList.toggle('active',x.dataset.pos==='HOME'));
   closeMobileMenu();
 }
 function leaveHome(){document.body.classList.remove('fantasy-home-mode')}
+const UTILITY_TABS=new Set(['MYGUYS','DND','MOCK','DEPTH','COMPARE','TRADE']);
+function syncUtilityTabMode(pos){
+  document.body.classList.toggle('utility-tab-mode',UTILITY_TABS.has(String(pos||'')));
+  if(UTILITY_TABS.has(String(pos||''))){
+    const toggle=document.getElementById('positionToggle');
+    if(toggle)toggle.hidden=true;
+  }
+}
 
 function addNav(){
   const nav=document.querySelector('.positions');if(!nav)return;
@@ -221,6 +231,7 @@ function addNav(){
 
 function openTagged(kind,button){
   leaveHome();
+  syncUtilityTabMode(kind);
   currentKind=kind;currentPos='ALL';
   try{position=kind}catch(e){}
   document.querySelectorAll('.positions .pos').forEach(x=>x.classList.toggle('active',x===button));
@@ -541,7 +552,10 @@ function install(){
   addStyles();installRankingSkeleton();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();ensureBackToTop();installListAnimations();
   document.addEventListener('click',e=>{
     const b=e.target.closest('.positions .pos');
-    if(b&&!['HOME','MYGUYS','DND'].includes(b.dataset.pos)){leaveHome();hideTagged();closeMobileMenu();}
+    if(b){
+      syncUtilityTabMode(b.dataset.pos);
+      if(!['HOME','MYGUYS','DND'].includes(b.dataset.pos)){leaveHome();hideTagged();closeMobileMenu();}
+    }
     if(b||e.target.closest('[data-posview],[data-view],.team-btn'))setTimeout(savePageState,0);
   },true);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileMenu()});

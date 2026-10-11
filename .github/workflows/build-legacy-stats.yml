@@ -25,7 +25,7 @@ jobs:
       - name: Commit generated legacy stats
         shell: bash
         run: |
-          if git diff --quiet -- legacy-stats; then
+          if [ -z "$(git status --porcelain -- legacy-stats)" ]; then
             echo "Legacy stats already up to date"
             exit 0
           fi

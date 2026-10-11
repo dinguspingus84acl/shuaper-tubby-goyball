@@ -58,6 +58,9 @@ const STAT_CONFIG={
 };
 
 let rows=[];
+let statsRows=[];
+let statsSeason=SEASON;
+let statsLastUpdated=null;
 let activeFilter='ALL';
 let activeStat='points';
 let statView='TOTAL';
@@ -78,8 +81,8 @@ style.textContent=`
 .espn-live-shell{display:grid;gap:8px}
 .espn-live-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .espn-live-filters,.espn-stat-filters{display:flex;gap:6px;flex-wrap:wrap}
-.espn-filter,.espn-stat-btn,.espn-view-btn,.espn-refresh{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 11px;font-weight:900}
-.espn-filter.active,.espn-stat-btn.active,.espn-view-btn.active,.espn-refresh:active{background:#183d63!important;color:#fff!important}
+.espn-filter,.espn-stat-btn,.espn-view-btn,.espn-refresh,.espn-year-select{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 11px;font-weight:900}
+.espn-filter.active,.espn-stat-btn.active,.espn-view-btn.active,.espn-refresh:active{background:#183d63!important;color:#fff!important}.espn-year-select{background:#081a2d;color:#fff;min-width:82px}
 .espn-stat-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 9px;border:1px solid #ffffff16;border-radius:10px;background:#07182a}
 .espn-stat-label{color:#7f93aa;font-size:.62rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
 .espn-stat-btn,.espn-view-btn{padding:6px 9px;font-size:.65rem}
@@ -89,7 +92,7 @@ style.textContent=`
 .espn-live-head{padding:8px 10px;color:var(--m);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#07182a}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
-.espn-player{display:flex;align-items:center;gap:7px;min-width:0}
+.espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}
 .espn-player-copy{min-width:0}
 .espn-player-name{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .espn-name-btn{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:950;text-align:left;cursor:pointer;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -133,6 +136,7 @@ style.textContent=`
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
   .espn-live-row{padding:7px 8px;min-height:56px}
   .espn-player-name{font-size:.72rem}
+  .espn-headshot{width:34px;height:34px;flex-basis:34px}
   .espn-selected-stat{font-size:.72rem}
   .espn-stat-bar{align-items:flex-start}
   .espn-stat-label{width:100%}
@@ -168,6 +172,7 @@ section.innerHTML=`
         <button type="button" class="espn-filter" data-espn-filter="TE">TE</button>
       </div>
       <div class="espn-live-meta">
+        <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
         <span id="espnLastUpdated">Not loaded yet</span>
         <button type="button" id="espnRefresh" class="espn-refresh">Refresh</button>
       </div>
@@ -181,12 +186,12 @@ section.innerHTML=`
       <span class="espn-stat-label">Rank by</span>
       <div id="espnStatFilters" class="espn-stat-filters"></div>
     </div>
-    <div class="espn-live-source">ESPN 2026 full-PPR actual stats · choose a position, then rank players by any relevant stat · auto-refreshes every 60 seconds while open</div>
+    <div id="espnLiveSource" class="espn-live-source">ESPN 2026 full-PPR stats · choose a position, then rank players by any relevant stat</div>
     <div class="espn-live-card">
       <div class="espn-live-head">
         <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div id="espnPointsHead" style="text-align:right">PPR Pts</div><div id="espnSelectedStatHead" style="text-align:right">PPR Pts</div>
       </div>
-      <div id="espnLiveRows"><div class="espn-status">Open ESPN Live to load current rankings.</div></div>
+      <div id="espnLiveRows"><div class="espn-status">Open Stats to load rankings.</div></div>
     </div>
   </div>
 `;
@@ -201,25 +206,30 @@ function teamLogo(team){
   const slug=TEAM_SLUGS[team];
   return slug?`<img class="espn-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt="">`:'';
 }
+function playerHeadshot(player){
+  const id=String(player?.id||'');
+  if(!id)return '';
+  return '<img class="espn-headshot" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+id+'.png" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+}
 function statSource(s){return Number(s?.statSourceId ?? s?.statTypeId ?? -1)}
 function splitType(s){return Number(s?.statSplitTypeId ?? (Number(s?.scoringPeriodId||0)===0?0:1))}
-function seasonStat(stats){
-  const exact=stats.find(s=>Number(s?.seasonId)===SEASON&&statSource(s)===0&&splitType(s)===0);
+function seasonStat(stats,year=SEASON){
+  const exact=stats.find(s=>Number(s?.seasonId)===year&&statSource(s)===0&&splitType(s)===0);
   if(exact)return exact;
-  return stats.find(s=>Number(s?.seasonId)===SEASON&&statSource(s)===0&&Number(s?.scoringPeriodId||0)===0)||null;
+  return stats.find(s=>Number(s?.seasonId)===year&&statSource(s)===0&&Number(s?.scoringPeriodId||0)===0)||null;
 }
 function rawStat(season,id){
   const value=season?.stats?.[id] ?? season?.stats?.[String(id)] ?? 0;
   const num=Number(value);
   return Number.isFinite(num)?num:0;
 }
-function parsePlayer(entry){
+function parsePlayer(entry,year=SEASON){
   const p=entry?.player || entry?.playerPoolEntry?.player || entry;
   if(!p)return null;
   const position=POSITION_BY_ID[Number(p.defaultPositionId)];
   if(!position)return null;
   const stats=p.stats || entry?.playerPoolEntry?.stats || entry?.stats || [];
-  const season=seasonStat(Array.isArray(stats)?stats:[]);
+  const season=seasonStat(Array.isArray(stats)?stats:[],year);
   const total=Number(season?.appliedTotal ?? entry?.appliedStatTotal ?? entry?.playerPoolEntry?.appliedStatTotal ?? 0);
   const avg=Number(season?.appliedAverage);
   const name=p.fullName || p.displayName || p.name;
@@ -249,22 +259,22 @@ function parsePlayer(entry){
     fumblesLost:rawStat(season,72)
   };
 }
-function endpointFilter(){
+function endpointFilter(year=SEASON){
   return JSON.stringify({
     players:{
       filterSlotIds:{value:[0,2,4,6]},
       filterStatsForSourceIds:{value:[0]},
       filterStatsForSplitTypeIds:{value:[0]},
-      sortAppliedStatTotal:{sortAsc:false,sortPriority:1,value:'002026'},
+      sortAppliedStatTotal:{sortAsc:false,sortPriority:1,value:'00'+year},
       sortPercOwned:{sortPriority:2,sortAsc:false},
       limit:700,
       offset:0,
-      filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['002026']}
+      filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+year]}
     }
   });
 }
-async function fetchEspn(){
-  const path=`/apis/v3/games/ffl/seasons/${SEASON}/segments/0/leaguedefaults/${PPR_PRESET_ID}?scoringPeriodId=0&view=kona_player_info`;
+async function fetchEspn(year=SEASON){
+  const path=`/apis/v3/games/ffl/seasons/${year}/segments/0/leaguedefaults/${PPR_PRESET_ID}?scoringPeriodId=0&view=kona_player_info`;
   const urls=[
     'https://lm-api-reads.fantasy.espn.com'+path,
     'https://fantasy.espn.com'+path
@@ -277,14 +287,14 @@ async function fetchEspn(){
         mode:'cors',
         headers:{
           'Accept':'application/json',
-          'X-Fantasy-Filter':endpointFilter(),
+          'X-Fantasy-Filter':endpointFilter(year),
           'X-Fantasy-Source':'kona'
         }
       });
       if(!res.ok)throw new Error('ESPN returned '+res.status);
       const data=await res.json();
       const list=Array.isArray(data)?data:(data.players||[]);
-      const parsed=list.map(parsePlayer).filter(Boolean).filter(p=>p.points!==0||p.average!==null);
+      const parsed=list.map(x=>parsePlayer(x,year)).filter(Boolean).filter(p=>p.points!==0||p.average!==null);
       if(!parsed.length)throw new Error('ESPN returned no fantasy scoring rows');
       return parsed;
     }catch(err){lastError=err}
@@ -742,15 +752,15 @@ function localPlayerId(name){
 }
 function render(){
   const box=document.getElementById('espnLiveRows');
-  if(!rows.length){
+  if(!statsRows.length){
     if(!loading)box.innerHTML='<div class="espn-status">No ESPN scoring data loaded.</div>';
     return;
   }
-  const ranked=rankRows(rows,activeFilter);
+  const ranked=rankRows(statsRows,activeFilter);
   box.innerHTML=ranked.map((p,i)=>{
     return `<div class="espn-live-row">
       <div class="espn-rank">#${i+1}</div>
-      <div class="espn-player">${teamLogo(p.team)}<div class="espn-player-copy"><button type="button" class="espn-name-btn" data-espn-open-player="${p.id}">${p.name}</button></div></div>
+      <div class="espn-player">${playerHeadshot(p)}<div class="espn-player-copy"><button type="button" class="espn-name-btn" data-espn-open-player="${p.id}">${p.name}</button></div></div>
       <div class="espn-pos">${p.position}</div>
       <div class="espn-team">${p.team}</div>
       <div class="espn-points">${formatStat(p,'points')}</div>
@@ -761,7 +771,7 @@ function render(){
     btn.onclick=e=>{
       e.preventDefault();
       e.stopPropagation();
-      const player=rows.find(p=>String(p.id)===String(btn.dataset.espnOpenPlayer));
+      const player=statsRows.find(p=>String(p.id)===String(btn.dataset.espnOpenPlayer));
       if(player)openEspnPlayerProfile(player);
     };
   });
@@ -771,57 +781,118 @@ function setUpdatedLabel(message,error=false){
   el.textContent=message;
   el.classList.toggle('espn-error',!!error);
 }
+function currentCacheKey(){return 'shuaEspnLivePprStats'}
+function statsCacheKey(year){return 'shuaEspnStats:'+year}
 function hydrateRowsFromCache(){
   if(rows.length)return true;
   try{
-    const cached=JSON.parse(localStorage.getItem('shuaEspnLivePprStats')||localStorage.getItem('shuaEspnLivePpr')||'null');
+    const cached=JSON.parse(localStorage.getItem(currentCacheKey())||localStorage.getItem('shuaEspnLivePpr')||'null');
     if(cached?.rows?.length){
       rows=cached.rows;
       lastUpdated=new Date(cached.ts||Date.now());
+      if(statsSeason===SEASON&&!statsRows.length){statsRows=[...rows];statsLastUpdated=lastUpdated}
       return true;
     }
   }catch(e){}
   return false;
 }
-async function refresh(){
-  if(loading)return;
+async function ensureCurrentRows(){
+  if(rows.length)return rows;
+  if(hydrateRowsFromCache()){
+    fetchEspn(SEASON).then(fresh=>{
+      if(!fresh.length)return;
+      rows=fresh;
+      lastUpdated=new Date();
+      try{localStorage.setItem(currentCacheKey(),JSON.stringify({ts:lastUpdated.getTime(),rows}))}catch(e){}
+      if(statsSeason===SEASON){statsRows=[...rows];statsLastUpdated=lastUpdated;if(!section.hidden){render();updateStatsLabels()}}
+    }).catch(()=>{});
+    return rows;
+  }
+  const fresh=await fetchEspn(SEASON);
+  rows=fresh;
+  lastUpdated=new Date();
+  try{localStorage.setItem(currentCacheKey(),JSON.stringify({ts:lastUpdated.getTime(),rows}))}catch(e){}
+  return rows;
+}
+function hydrateStatsCache(year){
+  try{
+    const key=year===SEASON?currentCacheKey():statsCacheKey(year);
+    const cached=JSON.parse(localStorage.getItem(key)||'null');
+    if(cached?.rows?.length){
+      statsRows=cached.rows;
+      statsLastUpdated=new Date(cached.ts||Date.now());
+      if(year===SEASON&&!rows.length){rows=[...cached.rows];lastUpdated=statsLastUpdated}
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+function updateStatsLabels(){
+  const sub=document.getElementById('sub');
+  const src=document.getElementById('espnLiveSource');
+  const updated=document.getElementById('espnLastUpdated');
+  const refreshBtn=document.getElementById('espnRefresh');
+  if(sub)sub.textContent=statsSeason+' ESPN full-PPR scoring leaders — filter by position and rank by stat';
+  if(src)src.textContent='ESPN '+statsSeason+' full-PPR stats · choose a position, then rank players by any relevant stat'+(statsSeason===SEASON?' · current season auto-refreshes every 60 seconds':'');
+  if(updated){
+    if(statsLastUpdated)updated.textContent=(statsSeason===SEASON?'Updated ':'Loaded ')+statsLastUpdated.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+    else updated.textContent='Not loaded yet';
+    updated.classList.remove('espn-error');
+  }
+  if(refreshBtn)refreshBtn.textContent=statsSeason===SEASON?'Refresh':'Reload';
+}
+async function loadStatsSeason(year,{force=false}={}){
+  year=Number(year)||SEASON;
+  statsSeason=year;
+  const select=document.getElementById('espnStatsYear');
+  if(select&&Number(select.value)!==year)select.value=String(year);
+  statsRows=[];
+  statsLastUpdated=null;
+  updateStatsLabels();
+
+  if(!force&&hydrateStatsCache(year)){
+    render();
+    updateStatsLabels();
+    if(year===SEASON){
+      ensureCurrentRows().catch(()=>{});
+    }
+    return statsRows;
+  }
+
+  const box=document.getElementById('espnLiveRows');
+  if(box)box.innerHTML='<div class="espn-status">Loading '+year+' ESPN stats…</div>';
   loading=true;
   const button=document.getElementById('espnRefresh');
-  button.disabled=true;
-  button.textContent='Refreshing…';
-  if(!rows.length)document.getElementById('espnLiveRows').innerHTML='<div class="espn-status">Loading ESPN PPR stats…</div>';
+  if(button){button.disabled=true;button.textContent='Loading…'}
   try{
-    const fresh=await fetchEspn();
-    rows=fresh;
-    lastUpdated=new Date();
-    try{localStorage.setItem('shuaEspnLivePprStats',JSON.stringify({ts:lastUpdated.getTime(),rows}))}catch(e){}
+    const fresh=year===SEASON?await ensureCurrentRows():await fetchEspn(year);
+    if(statsSeason!==year)return statsRows;
+    statsRows=[...fresh];
+    statsLastUpdated=new Date();
+    try{
+      localStorage.setItem(year===SEASON?currentCacheKey():statsCacheKey(year),JSON.stringify({ts:statsLastUpdated.getTime(),rows:statsRows}));
+    }catch(e){}
     render();
-    setUpdatedLabel('Updated '+lastUpdated.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}));
+    updateStatsLabels();
   }catch(err){
-    if(!rows.length){
-      try{
-        const cached=JSON.parse(localStorage.getItem('shuaEspnLivePprStats')||localStorage.getItem('shuaEspnLivePpr')||'null');
-        if(cached?.rows?.length){
-          rows=cached.rows;
-          lastUpdated=new Date(cached.ts||Date.now());
-          render();
-          setUpdatedLabel('ESPN refresh failed · showing cached data',true);
-        }else{
-          document.getElementById('espnLiveRows').innerHTML='<div class="espn-status espn-error">Could not reach ESPN right now. Tap Refresh to try again.</div>';
-          setUpdatedLabel('ESPN connection failed',true);
-        }
-      }catch(e){
-        document.getElementById('espnLiveRows').innerHTML='<div class="espn-status espn-error">Could not reach ESPN right now. Tap Refresh to try again.</div>';
-        setUpdatedLabel('ESPN connection failed',true);
+    if(statsSeason===year){
+      if(!statsRows.length&&hydrateStatsCache(year)){
+        render();
+        updateStatsLabels();
+        const el=document.getElementById('espnLastUpdated');if(el){el.textContent='Refresh failed · showing cached data';el.classList.add('espn-error')}
+      }else if(!statsRows.length&&box){
+        box.innerHTML='<div class="espn-status espn-error">Could not load '+year+' ESPN stats.</div>';
+        const el=document.getElementById('espnLastUpdated');if(el){el.textContent='ESPN connection failed';el.classList.add('espn-error')}
       }
-    }else{
-      setUpdatedLabel('Refresh failed · keeping last update',true);
     }
   }finally{
     loading=false;
-    button.disabled=false;
-    button.textContent='Refresh';
+    if(button){button.disabled=false;button.textContent=statsSeason===SEASON?'Refresh':'Reload'}
   }
+  return statsRows;
+}
+async function refresh(){
+  return loadStatsSeason(statsSeason,{force:true});
 }
 function showEspn(){
   try{position='ESPN'}catch(e){}
@@ -831,12 +902,13 @@ function showEspn(){
   const ids=['teamControls','overallToggle','positionToggle','board','tableCard','mockSection','depthSection','tradeSection'];
   ids.forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true});
   section.hidden=false;
-  document.getElementById('title').textContent='ESPN Live PPR';
-  document.getElementById('sub').textContent='2026 scoring leaders — filter by position and rank by stat';
+  document.getElementById('title').textContent='Stats';
   renderStatFilters();
-  if(!rows.length)refresh();
+  updateStatsLabels();
+  if(!statsRows.length)loadStatsSeason(statsSeason);
+  else render();
   if(timer)clearInterval(timer);
-  timer=setInterval(()=>{if(!section.hidden)refresh()},REFRESH_MS);
+  timer=setInterval(()=>{if(!section.hidden&&statsSeason===SEASON)loadStatsSeason(SEASON,{force:true})},REFRESH_MS);
 }
 function hideEspn(){
   section.hidden=true;
@@ -846,7 +918,7 @@ function hideEspn(){
 const button=document.createElement('button');
 button.className='pos espn-live-btn';
 button.dataset.pos='ESPN';
-button.textContent='ESPN Live';
+button.textContent='Stats';
 const tradeBtn=nav.querySelector('[data-pos="TRADE"]');
 const depthBtn=nav.querySelector('[data-pos="DEPTH"]');
 if(tradeBtn)tradeBtn.insertAdjacentElement('afterend',button);
@@ -871,6 +943,22 @@ document.querySelectorAll('[data-espn-view]').forEach(b=>{
     render();
   };
 });
+const statsYearSelect=document.getElementById('espnStatsYear');
+if(statsYearSelect){
+  const years=[];
+  for(let y=SEASON;y>=2010;y--)years.push(y);
+  statsYearSelect.innerHTML=years.map(y=>'<option value="'+y+'">'+y+'</option>').join('');
+  statsYearSelect.value=String(statsSeason);
+  statsYearSelect.onchange=e=>{
+    activeStat='points';
+    statView='TOTAL';
+    document.querySelectorAll('[data-espn-view]').forEach(x=>x.classList.toggle('active',x.dataset.espnView==='TOTAL'));
+    renderStatFilters();
+    loadStatsSeason(Number(e.target.value));
+    if(timer){clearInterval(timer);timer=null}
+    if(Number(e.target.value)===SEASON)timer=setInterval(()=>{if(!section.hidden&&statsSeason===SEASON)loadStatsSeason(SEASON,{force:true})},REFRESH_MS);
+  };
+}
 document.getElementById('espnRefresh').onclick=refresh;
 document.getElementById('close')?.addEventListener('click',hideProfileGameLog);
 document.getElementById('modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('modal'))hideProfileGameLog()});
@@ -882,12 +970,7 @@ document.addEventListener('click',e=>{
 
 window.ShuaEspnLive={
   async ensureData(){
-    if(!rows.length&&hydrateRowsFromCache()){
-      refresh().catch(()=>{});
-      return rows;
-    }
-    if(!rows.length)await refresh();
-    return rows;
+    return ensureCurrentRows();
   },
   getPlayerByName(name){
     return rows.find(p=>norm(p.name)===norm(name))||null;
@@ -904,7 +987,7 @@ window.ShuaEspnLive={
     if(!target)return;
     target.innerHTML='<div class="espn-game-log-empty">Loading ESPN data…</div>';
     try{
-      if(!rows.length)await refresh();
+      await ensureCurrentRows();
       const p=rows.find(x=>norm(x.name)===norm(name));
       if(!p){target.innerHTML='<div class="espn-game-log-empty">No ESPN data found for this player.</div>';return}
       const posRows=rows.filter(x=>x.position===p.position).sort((a,b)=>b.points-a.points||((b.average??-Infinity)-(a.average??-Infinity)));
@@ -959,5 +1042,7 @@ window.ShuaEspnLive={
     }
   }
 };
+hydrateRowsFromCache();
+if(rows.length){statsRows=[...rows];statsLastUpdated=lastUpdated}
 renderStatFilters();
 })();

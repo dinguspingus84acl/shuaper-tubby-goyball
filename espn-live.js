@@ -93,7 +93,7 @@ style.textContent=`
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}
-.espn-player-copy{min-width:0}
+.espn-player-copy{min-width:0;display:grid;gap:3px}.espn-player-meta{display:flex;align-items:center;gap:4px;color:#8ca0b5;font-size:.58rem;font-weight:850;line-height:1}.espn-player-meta .espn-team-logo{width:16px;height:16px;flex-basis:16px}
 .espn-player-name{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .espn-name-btn{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:950;text-align:left;cursor:pointer;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .espn-name-btn:hover{text-decoration:underline}
@@ -130,17 +130,17 @@ style.textContent=`
 .espn-error{color:#ff8b9d}
 .espn-live-source{font-size:.62rem;color:#73879e}
 @media(max-width:700px){
-  .espn-live-head,.espn-live-row{grid-template-columns:38px minmax(0,1fr) 54px 66px}
+  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 64px;gap:5px}
   .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
-  .espn-live-row{padding:7px 8px;min-height:56px}
-  .espn-player-name{font-size:.72rem}
+  .espn-live-row{padding:7px 6px;min-height:58px}
+  .espn-player-name{font-size:.72rem}.espn-player{gap:7px}.espn-player-meta{font-size:.54rem}.espn-player-meta .espn-team-logo{width:14px;height:14px;flex-basis:14px}
   .espn-headshot{width:34px;height:34px;flex-basis:34px}
   .espn-selected-stat{font-size:.72rem}
-  .espn-stat-bar{align-items:flex-start}
+  .espn-live-toolbar{display:grid;grid-template-columns:1fr;gap:7px}.espn-live-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}.espn-filter{padding:7px 3px;font-size:.62rem;min-width:0}.espn-live-meta{display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:6px;width:100%;align-items:center}.espn-year-select,.espn-refresh{min-height:38px;padding:6px 8px}.espn-live-meta #espnLastUpdated{font-size:.58rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.espn-stat-bar{align-items:flex-start;padding:7px}
   .espn-stat-label{width:100%}
-  .espn-stat-filters{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:2px}
+  .espn-stat-filters{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.espn-stat-filters::-webkit-scrollbar{display:none}
   .espn-stat-btn{flex:0 0 auto}
   .espn-game-log-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .espn-game-log-table{display:table!important;width:max-content!important;min-width:100%!important;border-collapse:collapse!important}
@@ -760,7 +760,7 @@ function render(){
   box.innerHTML=ranked.map((p,i)=>{
     return `<div class="espn-live-row">
       <div class="espn-rank">#${i+1}</div>
-      <div class="espn-player">${playerHeadshot(p)}<div class="espn-player-copy"><button type="button" class="espn-name-btn" data-espn-open-player="${p.id}">${p.name}</button></div></div>
+      <div class="espn-player">${playerHeadshot(p)}<div class="espn-player-copy"><button type="button" class="espn-name-btn" data-espn-open-player="${p.id}">${p.name}</button><div class="espn-player-meta">${teamLogo(p.team)}<span>${p.team}</span></div></div></div>
       <div class="espn-pos">${p.position}</div>
       <div class="espn-team">${p.team}</div>
       <div class="espn-points">${formatStat(p,'points')}</div>

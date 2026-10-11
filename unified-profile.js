@@ -69,6 +69,20 @@ style.textContent=`
 #unifiedNotesPanel .note-box{margin-top:0}
 #espnProfileGameLogWrap{display:none!important}
 
+/* Final player-sequence controls: owned here so later profile wrapping cannot replace them. */
+#rankingPlayerNav{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;padding:7px 6px;background:#07111de8;border-left:1px solid #ffffff18;border-right:1px solid #ffffff18}
+#rankingPlayerNav[hidden]{display:none!important}
+#rankingPlayerNav button{min-width:0;min-height:44px;border:1px solid #ffffff22;border-radius:9px;background:#0a1c30;color:#fff;padding:7px 10px;font-weight:950;line-height:1.12;transition:background .14s ease,border-color .14s ease,transform .14s ease}
+#rankingPlayerNav button:first-child{text-align:left}#rankingPlayerNav button:last-child{text-align:right}
+#rankingPlayerNav button:not(:disabled):hover{background:#14395d;border-color:#ffffff48;transform:translateY(-1px)}
+#rankingPlayerNav button:disabled{opacity:.3;cursor:default}
+#rankingPlayerNav .ranking-nav-rank{display:block;color:#91a4ba;font-size:.58rem;margin-bottom:3px}
+#rankingPlayerNav .ranking-nav-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.76rem}
+.phone-mode #rankingPlayerNav{width:calc(100% - 16px);margin:0 8px;padding:5px;gap:5px}
+.phone-mode #rankingPlayerNav button{min-height:38px;padding:5px 7px}
+.phone-mode #rankingPlayerNav .ranking-nav-name{font-size:.63rem}
+.phone-mode #rankingPlayerNav .ranking-nav-rank{font-size:.51rem}
+
 .featured-player-profile{position:relative;width:min(790px,100%);padding:12px}
 .featured-player-profile>small,.featured-player-profile>#pn,.featured-player-profile>#pm,.featured-player-profile>#profileTop{display:none!important}
 .featured-player-profile .closem{
@@ -340,6 +354,92 @@ function fixKnownHeadshot(name){
 }
 function playerById(id){
   try{return players.find(p=>String(p.id)===String(id))||board.find(p=>String(p.id)===String(id))||null}catch(e){return null}
+}
+function visibleRankingSequence(){
+  const rows=[...document.querySelectorAll('#rows tr[data-id]')].filter(tr=>tr.offsetParent!==null||!document.getElementById('tableCard')?.hidden);
+  if(rows.length)return rows.map(tr=>({
+    id:String(tr.dataset.id||''),
+    rank:(tr.querySelector('.rank')?.textContent||'').trim(),
+    name:(tr.querySelector('.photo-cell b')?.textContent||'Player').trim()
+  })).filter(x=>x.id);
+  try{
+    let arr=[];
+    if(typeof position!=='undefined'&&position==='ALL')arr=[...(board||[])];
+    else if(typeof list==='function'&&typeof position!=='undefined'&&['QB','RB','WR','TE'].includes(position))arr=list();
+    else arr=[...(board||[])];
+    return arr.map((p,i)=>({id:String(p.id||''),rank:'#'+(p.overallRank||p.positionRank||i+1),name:p.name||'Player'})).filter(x=>x.id);
+  }catch(e){return []}
+}
+function activeSequenceIndex(id){
+  const seq=visibleRankingSequence();
+  return {seq,index:seq.findIndex(x=>String(x.id)===String(id))};
+}
+function ensurePlayerNav(){
+  const box=document.querySelector('#modal .profile');
+  const tabs=document.getElementById('unifiedProfileTabs');
+  if(!box||!tabs)return null;
+  let nav=document.getElementById('rankingPlayerNav');
+  if(!nav){
+    nav=document.createElement('div');nav.id='rankingPlayerNav';
+    nav.innerHTML='<button type="button" data-player-step="prev"></button><button type="button" data-player-step="next"></button>';
+  }
+  if(nav.parentNode!==box||nav.nextSibling!==tabs)box.insertBefore(nav,tabs);
+  return nav;
+}
+function paintPlayerNav(id){
+  const nav=ensurePlayerNav();if(!nav)return;
+  if(historicalSeed()){nav.hidden=true;return}
+  const {seq,index}=activeSequenceIndex(id);
+  if(index<0||!seq.length){nav.hidden=true;return}
+  nav.hidden=false;
+  const prev=seq[index-1]||null,next=seq[index+1]||null;
+  const paint=(btn,item,dir)=>{
+    btn.disabled=!item;btn.dataset.targetId=item?.id||'';
+    btn.innerHTML=item
+      ?'<span class="ranking-nav-rank">'+(dir==='prev'?'← ':'')+item.rank+(dir==='next'?' →':'')+'</span><span class="ranking-nav-name">'+item.name+'</span>'
+      :'<span class="ranking-nav-rank">'+(dir==='prev'?'← Start':'End →')+'</span><span class="ranking-nav-name">No more players</span>';
+  };
+  paint(nav.querySelector('[data-player-step="prev"]'),prev,'prev');
+  paint(nav.querySelector('[data-player-step="next"]'),next,'next');
+  nav.querySelectorAll('button[data-target-id]').forEach(btn=>btn.onclick=()=>{
+    const target=btn.dataset.targetId;if(target)openAdjacentPlayer(target,btn.dataset.playerStep==='next'?'next':'prev',false);
+  });
+}
+function markSelectedRankingRow(id){
+  document.querySelectorAll('#rows tr.selected-player-row').forEach(tr=>tr.classList.remove('selected-player-row'));
+  const row=[...document.querySelectorAll('#rows tr[data-id]')].find(tr=>String(tr.dataset.id)===String(id));
+  if(row)row.classList.add('selected-player-row');
+}
+function adjacentPlayerId(id,dir){
+  const {seq,index}=activeSequenceIndex(id);
+  if(index<0)return '';
+  return seq[index+(dir==='next'?1:-1)]?.id||'';
+}
+function openAdjacentPlayer(targetId,dir,animate=true){
+  if(!targetId)return false;
+  const profileBox=document.querySelector('#modal .profile');
+  const doOpen=()=>{
+    window.profile(targetId);
+    const p=document.querySelector('#modal .profile');
+    if(p)p.scrollTop=0;
+    if(animate&&document.body.classList.contains('phone-mode')&&p){
+      p.style.transition='none';
+      p.style.transform='translateX('+(dir==='next'?'100vw':'-100vw')+')';
+      p.style.opacity='.9';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        p.style.transition='transform .2s ease-out, opacity .2s ease-out';
+        p.style.transform='translateX(0)';p.style.opacity='1';
+        setTimeout(()=>{if(p.isConnected){p.style.transition='';p.style.transform='';p.style.opacity=''}},220);
+      }));
+    }
+  };
+  if(animate&&document.body.classList.contains('phone-mode')&&profileBox){
+    profileBox.style.transition='transform .16s ease-in, opacity .16s ease-in';
+    profileBox.style.transform='translateX('+(dir==='next'?'-105vw':'105vw')+')';
+    profileBox.style.opacity='.84';
+    setTimeout(doOpen,155);
+  }else doOpen();
+  return true;
 }
 function basePositionPlayer(name){
   const n=norm(name);
@@ -761,67 +861,87 @@ function dismissPhoneProfile(){
 }
 function installPhoneSwipeDismiss(){
   const profile=document.querySelector('#modal .profile');
-  if(!profile||profile.dataset.phoneSwipeDismiss==='1')return;
-  profile.dataset.phoneSwipeDismiss='1';
+  if(!profile||profile.dataset.phoneSwipeDismiss==='2')return;
+  profile.dataset.phoneSwipeDismiss='2';
 
-  let tracking=false,dragging=false,startY=0,startX=0,lastY=0,startTime=0,suppressClickUntil=0;
+  let tracking=false,mode='',startY=0,startX=0,lastY=0,lastX=0,startTime=0,suppressClickUntil=0;
+  let horizontalAllowed=false;
 
-  const cancel=()=>{
-    tracking=false;dragging=false;
+  const reset=()=>{
+    tracking=false;mode='';horizontalAllowed=false;
     profile.style.transition='transform .18s ease-out, opacity .18s ease-out';
-    profile.style.transform='';
-    profile.style.opacity='';
-    const modal=document.getElementById('modal');
-    if(modal)modal.style.background='';
+    profile.style.transform='';profile.style.opacity='';
+    const modal=document.getElementById('modal');if(modal)modal.style.background='';
     setTimeout(()=>{if(profile.isConnected)profile.style.transition=''},190);
   };
 
   profile.addEventListener('touchstart',e=>{
-    if(!isPhoneProfileSheet()||e.touches.length!==1||profile.scrollTop>1)return;
+    if(!isPhoneProfileSheet()||e.touches.length!==1)return;
     const t=e.touches[0];
-    tracking=true;dragging=false;startY=t.clientY;lastY=t.clientY;startX=t.clientX;startTime=performance.now();
+    tracking=true;mode='';startY=lastY=t.clientY;startX=lastX=t.clientX;startTime=performance.now();
+    horizontalAllowed=!!e.target.closest('#featuredPlayerCard');
   },{passive:true});
 
   profile.addEventListener('touchmove',e=>{
     if(!tracking||e.touches.length!==1)return;
     const t=e.touches[0],dy=t.clientY-startY,dx=t.clientX-startX;
-    lastY=t.clientY;
-    if(dy<=0){if(dragging)e.preventDefault();return}
-    if(!dragging){
-      if(dy<8)return;
-      if(dy<Math.abs(dx)*1.15){tracking=false;return}
-      dragging=true;
+    lastY=t.clientY;lastX=t.clientX;
+    if(!mode){
+      if(Math.max(Math.abs(dx),Math.abs(dy))<9)return;
+      if(horizontalAllowed&&Math.abs(dx)>Math.abs(dy)*1.15)mode='horizontal';
+      else if(dy>0&&profile.scrollTop<=1&&Math.abs(dy)>Math.abs(dx)*1.05)mode='vertical';
+      else{tracking=false;return}
     }
-    e.preventDefault();
-    const pull=Math.min(220,dy*.66);
-    const progress=Math.min(1,pull/220);
-    profile.style.transition='none';
-    profile.style.transform='translateY('+pull+'px)';
-    profile.style.opacity=String(1-progress*.18);
-    const modal=document.getElementById('modal');
-    if(modal)modal.style.background='rgba(2,6,13,'+(1-progress*.72)+')';
+    if(mode==='horizontal'){
+      e.preventDefault();
+      const currentId=document.getElementById('modal')?.dataset.id||'';
+      const dir=dx<0?'next':'prev';
+      const canMove=!!adjacentPlayerId(currentId,dir);
+      const resisted=canMove?dx:dx*.22;
+      const pull=Math.max(-180,Math.min(180,resisted*.72));
+      profile.style.transition='none';profile.style.transform='translateX('+pull+'px)';
+      profile.style.opacity=String(1-Math.min(.13,Math.abs(pull)/1300));
+      return;
+    }
+    if(mode==='vertical'){
+      if(dy<=0)return;
+      e.preventDefault();
+      const pull=Math.min(220,dy*.66),progress=Math.min(1,pull/220);
+      profile.style.transition='none';profile.style.transform='translateY('+pull+'px)';
+      profile.style.opacity=String(1-progress*.18);
+      const modal=document.getElementById('modal');if(modal)modal.style.background='rgba(2,6,13,'+(1-progress*.72)+')';
+    }
   },{passive:false});
 
   profile.addEventListener('touchend',()=>{
-    if(!tracking){cancel();return}
-    const dy=lastY-startY;
-    const elapsed=Math.max(1,performance.now()-startTime);
-    const velocity=dy/elapsed;
+    if(!tracking){reset();return}
+    const dy=lastY-startY,dx=lastX-startX,elapsed=Math.max(1,performance.now()-startTime);
     tracking=false;
-    if(dragging&&(dy>=105||(dy>=58&&velocity>=.48))){
-      suppressClickUntil=Date.now()+400;
-      profile.style.transition='transform .18s ease-in, opacity .18s ease-in';
-      profile.style.transform='translateY(105dvh)';
-      profile.style.opacity='.82';
-      setTimeout(dismissPhoneProfile,180);
-    }else cancel();
-    dragging=false;
+    if(mode==='horizontal'){
+      const velocity=Math.abs(dx)/elapsed,dir=dx<0?'next':'prev';
+      const currentId=document.getElementById('modal')?.dataset.id||'';
+      const target=adjacentPlayerId(currentId,dir);
+      if(target&&(Math.abs(dx)>=72||(Math.abs(dx)>=42&&velocity>=.42))){
+        suppressClickUntil=Date.now()+450;
+        openAdjacentPlayer(target,dir,true);
+      }else reset();
+      mode='';return;
+    }
+    if(mode==='vertical'){
+      const velocity=dy/elapsed;
+      if(dy>=105||(dy>=58&&velocity>=.48)){
+        suppressClickUntil=Date.now()+400;
+        profile.style.transition='transform .18s ease-in, opacity .18s ease-in';
+        profile.style.transform='translateY(105dvh)';profile.style.opacity='.82';
+        setTimeout(dismissPhoneProfile,180);
+      }else reset();
+      mode='';return;
+    }
+    reset();
   },{passive:true});
 
-  profile.addEventListener('touchcancel',cancel,{passive:true});
-  profile.addEventListener('click',e=>{
-    if(Date.now()<suppressClickUntil){e.preventDefault();e.stopPropagation()}
-  },true);
+  profile.addEventListener('touchcancel',reset,{passive:true});
+  profile.addEventListener('click',e=>{if(Date.now()<suppressClickUntil){e.preventDefault();e.stopPropagation()}},true);
 }
 
 function prepareUnified(name,seed=null){
@@ -833,6 +953,8 @@ function prepareUnified(name,seed=null){
   modal.dataset.unifiedName=name;
   applyFeaturedProfile(name,seed);
   renderOverviewRanks(name);
+  const currentId=document.getElementById('modal')?.dataset.id||playerByName(name)?.id||'';
+  if(currentId){markSelectedRankingRow(currentId);paintPlayerNav(currentId)}else document.getElementById('rankingPlayerNav')?.setAttribute('hidden','');
   const gp=document.getElementById('unifiedGameLogPanel');
   if(gp){gp.dataset.loadedFor='';gp.dataset.ready='0';gp.innerHTML=''}
   const hp=document.getElementById('unifiedHistoryPanel');
@@ -875,6 +997,7 @@ window.profile=function(id){
   activeSeed=null;
   const p=playerById(id);
   baseProfile(id);
+  const modal=document.getElementById('modal');if(modal)modal.dataset.id=String(id||'');
   if(p)prepareUnified(p.name);
 };
 

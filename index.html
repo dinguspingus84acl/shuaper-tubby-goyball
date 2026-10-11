@@ -8,17 +8,25 @@ body.phone-mode{overflow-x:hidden}
 .phone-mode main{padding-top:7px!important}
 .phone-mode .head{display:none!important}
 .phone-mode #tableCard tbody tr{
-  grid-template-columns:38px minmax(0,1fr)!important;
-  min-height:48px!important
+  grid-template-columns:40px minmax(0,1fr)!important;
+  min-height:54px!important
 }
 .phone-mode #tableCard tbody td{padding:7px 5px!important}
 .phone-mode #tableCard tbody td:nth-child(3),.phone-mode #tableCard tbody td:nth-child(4),
 .phone-mode #tableCard tbody td:nth-child(5),.phone-mode #tableCard tbody td:nth-child(6){display:none!important}
 .phone-mode #tableCard .photo-cell{gap:7px!important}
 .phone-mode #tableCard .rank-player-copy{min-width:0!important}
-.phone-mode #tableCard .rank-player-copy>b{font-size:.72rem!important;line-height:1.05}
-.phone-mode #tableCard .phone-rank-meta{display:flex!important;margin-top:3px}
+.phone-mode #tableCard .rank-player-copy>b{
+  font-size:.9rem!important;line-height:1.12!important;font-weight:1000!important;
+  letter-spacing:-.01em!important
+}
+.phone-mode #tableCard .phone-rank-meta{
+  display:flex!important;margin-top:4px!important;font-size:.62rem!important
+}
 .phone-mode #tableCard .phone-rank-meta .lineup-team-logo{width:14px!important;height:14px!important;flex-basis:14px!important}
+.phone-mode #tableCard .photo{
+  width:36px!important;height:36px!important;flex:0 0 36px!important
+}
 .phone-mode .tools{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:7px!important;padding:8px!important;width:100%!important}
 .phone-mode .search{width:100%!important;min-width:0!important;max-width:none!important}
 .phone-mode .search input{height:40px!important;font-size:16px!important}

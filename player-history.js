@@ -603,7 +603,7 @@ async function mapLimited(items,limit,fn){
 function renderRows(player,rows,target){
   const good=rows.filter(Boolean).sort((a,b)=>b.year-a.year);
   if(!good.length){
-    target.innerHTML='<div class="player-history-empty">No completed ESPN fantasy seasons found for this player.</div>';
+    target.innerHTML='<div class="player-history-empty">No fantasy seasons found for this player.</div>';
     return;
   }
   target.innerHTML=
@@ -631,9 +631,17 @@ function renderRows(player,rows,target){
 }
 async function render(name,target){
   if(!target)return;
-  target.innerHTML='<div class="player-history-empty">Loading ESPN career finishes…</div>';
+  target.innerHTML='<div class="player-history-empty">Loading career history…</div>';
   try{
-    if(window.ShuaEspnLive?.getHistoricalCareer){
+    if(window.ShuaEspnLive?.getCompleteCareer){
+      try{
+        const career=await window.ShuaEspnLive.getCompleteCareer(name);
+        if(career?.length){
+          renderRows({name,id:career[0].id,position:career[0].position},career,target);
+          return;
+        }
+      }catch(e){}
+    }else if(window.ShuaEspnLive?.getHistoricalCareer){
       try{
         const historical=await window.ShuaEspnLive.getHistoricalCareer(name);
         if(historical?.length){
@@ -660,7 +668,7 @@ async function render(name,target){
     if(good.every(r=>r.rank))savePlayerCache(player,good);
     renderRows(player,good,target);
   }catch(e){
-    target.innerHTML='<div class="player-history-empty player-history-error">Could not load ESPN history right now.</div>';
+    target.innerHTML='<div class="player-history-empty player-history-error">Could not load player history right now.</div>';
   }
 }
 

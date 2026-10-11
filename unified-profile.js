@@ -6,19 +6,23 @@ if(typeof profile!=='function'||!document.getElementById('modal'))return;
 const baseProfile=profile;
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
 const ROS_ALIASES={chigoziemokonkwo:'chigokonkwo',chigokonkwo:'chigoziemokonkwo'};
-const FEATURED_PROFILE_CARDS={
-  jahmyrgibbs:{variant:'gibbs',age:'24',height:'5\'9"',weight:'202 lbs',exp:'4',number:'0',espnId:'4429795'},
-  bijanrobinson:{variant:'bijan',age:'24',height:'5\'11"',weight:'215 lbs',exp:'4',number:'7',espnId:'4430807'},
-  kennethwalkeriii:{variant:'walker',age:'25',height:'5\'9"',weight:'211 lbs',exp:'5',number:'9',espnId:'4567048'},
-  kennethwalker:{variant:'walker',age:'25',height:'5\'9"',weight:'211 lbs',exp:'5',number:'9',espnId:'4567048'}
+const COMPACT_PROFILE_V2=true; // ROLLBACK: change to false to restore the original player-card view.
+const PROFILE_BIO_OVERRIDES={
+  jahmyrgibbs:{age:'24',height:'5\'9"',weight:'202 lbs',exp:'4',number:'0'},
+  bijanrobinson:{age:'24',height:'5\'11"',weight:'215 lbs',exp:'4',number:'7'},
+  kennethwalkeriii:{age:'25',height:'5\'9"',weight:'211 lbs',exp:'5',number:'9'},
+  kennethwalker:{age:'25',height:'5\'9"',weight:'211 lbs',exp:'5',number:'9'}
 };
-const FEATURED_TEAM_META={
-  DET:{name:'LIONS',abbr:'DET',logo:'det'},
-  ATL:{name:'FALCONS',abbr:'ATL',logo:'atl'},
-  KAN:{name:'CHIEFS',abbr:'KC',logo:'kc'},
-  KC:{name:'CHIEFS',abbr:'KC',logo:'kc'},
-  SEA:{name:'SEAHAWKS',abbr:'SEA',logo:'sea'}
+const TEAM_NAMES={
+  ARI:'CARDINALS',ATL:'FALCONS',BAL:'RAVENS',BUF:'BILLS',CAR:'PANTHERS',CHI:'BEARS',CIN:'BENGALS',CLE:'BROWNS',
+  DAL:'COWBOYS',DEN:'BRONCOS',DET:'LIONS',GB:'PACKERS',GNB:'PACKERS',HOU:'TEXANS',IND:'COLTS',JAX:'JAGUARS',JAC:'JAGUARS',
+  KC:'CHIEFS',KAN:'CHIEFS',LAC:'CHARGERS',SD:'CHARGERS',LAR:'RAMS',STL:'RAMS',LV:'RAIDERS',LVR:'RAIDERS',OAK:'RAIDERS',
+  MIA:'DOLPHINS',MIN:'VIKINGS',NE:'PATRIOTS',NWE:'PATRIOTS',NO:'SAINTS',NOR:'SAINTS',NYG:'GIANTS',NYJ:'JETS',
+  PHI:'EAGLES',PIT:'STEELERS',SEA:'SEAHAWKS',SF:'49ERS',SFO:'49ERS',TB:'BUCCANEERS',TAM:'BUCCANEERS',
+  TEN:'TITANS',WAS:'COMMANDERS',WSH:'COMMANDERS'
 };
+const TEAM_CANON={GNB:'GB',KAN:'KC',LVR:'LV',NWE:'NE',NOR:'NO',SFO:'SF',TAM:'TB',WSH:'WAS',JAC:'JAX',OAK:'LV',STL:'LAR',SD:'LAC'};
+let sleeperBioPromise=null;
 let activeSeed=null;
 
 const style=document.createElement('style');
@@ -54,163 +58,114 @@ style.textContent=`
 #unifiedNotesPanel .note-box{margin-top:0}
 #espnProfileGameLogWrap{display:none!important}
 
-.featured-player-profile{position:relative;width:min(1120px,100%);padding:14px}
+.featured-player-profile{position:relative;width:min(790px,100%);padding:12px}
 .featured-player-profile>small,.featured-player-profile>#pn,.featured-player-profile>#pm,.featured-player-profile>#profileTop{display:none!important}
 .featured-player-profile .closem{
-  position:absolute;right:24px;top:24px;z-index:12;
-  background:#050b13cc;border-color:#ffffff28;border-radius:999px;
-  width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center
+  position:absolute;right:18px;top:18px;z-index:12;
+  background:#050b13dd;border-color:#ffffff28;border-radius:999px;
+  width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center
 }
 .featured-player-card{
-  --featured-accent:#21b8ff;--featured-accent2:#6fd8ff;
-  position:relative;overflow:hidden;
-  min-height:430px;border:1px solid #ffffff24;border-radius:22px;
+  --featured-accent:#3d8cff;
+  position:relative;overflow:hidden;isolation:isolate;
+  height:278px;border:1px solid #ffffff24;border-radius:18px;
   background:
-    radial-gradient(circle at 18% 35%,color-mix(in srgb,var(--featured-accent) 16%,transparent),transparent 36%),
-    linear-gradient(135deg,#050a10 0%,#07111d 47%,#04080d 100%);
-  box-shadow:inset 0 1px 0 #ffffff18,0 22px 60px #0008;
-  display:grid;grid-template-columns:42% 58%;
-  isolation:isolate
+    radial-gradient(circle at 18% 32%,color-mix(in srgb,var(--featured-accent) 17%,transparent),transparent 34%),
+    linear-gradient(135deg,#05090f 0%,#09111a 48%,#04080d 100%);
+  box-shadow:inset 0 1px 0 #ffffff17,0 16px 34px #0007;
+  display:grid;grid-template-columns:38% 62%
 }
 .featured-player-card:before{
   content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
   background:
-    linear-gradient(115deg,transparent 0 56%,#ffffff05 56% 61%,transparent 61%),
-    radial-gradient(circle at 86% 82%,#ffffff05 0 1px,transparent 1.5px);
-  background-size:auto,18px 18px
+    linear-gradient(118deg,transparent 0 58%,#ffffff04 58% 63%,transparent 63%),
+    radial-gradient(circle at 89% 80%,#ffffff06 0 1px,transparent 1.4px);
+  background-size:auto,16px 16px
 }
-.featured-player-card .featured-left{
-  position:relative;min-width:0;min-height:430px;overflow:hidden
+.featured-player-card .featured-left{position:relative;min-width:0;overflow:hidden}
+.featured-player-card .featured-portrait-box{
+  position:absolute;left:12px;right:12px;top:12px;bottom:76px;
+  border-radius:14px;overflow:hidden;border:1px solid #ffffff20;
+  background:linear-gradient(145deg,#080d14,#111822);
+  box-shadow:inset 0 1px 0 #ffffff12
 }
 .featured-player-card .featured-bg-logo{
-  position:absolute;left:-10%;top:3%;width:90%;height:72%;object-fit:contain;
-  opacity:.27;filter:grayscale(.15) drop-shadow(0 0 24px color-mix(in srgb,var(--featured-accent) 26%,transparent))
+  position:absolute;left:-11%;top:-4%;width:104%;height:104%;object-fit:contain;
+  opacity:.28;filter:drop-shadow(0 0 18px color-mix(in srgb,var(--featured-accent) 24%,transparent))
 }
 .featured-player-card .featured-photo{
-  position:absolute;z-index:2;left:50%;bottom:0;transform:translateX(-50%);
-  width:auto!important;height:88%!important;max-width:104%;border:0!important;border-radius:0!important;
+  position:absolute;z-index:2;left:50%;bottom:-1px;transform:translateX(-50%);
+  width:auto!important;height:98%!important;max-width:125%!important;border:0!important;border-radius:0!important;
   object-fit:contain!important;object-position:center bottom;background:transparent!important;
-  filter:drop-shadow(0 18px 26px #000a)
+  filter:drop-shadow(0 11px 18px #0009)
 }
 .featured-player-card .featured-team-strip{
-  position:absolute;z-index:4;left:0;right:0;bottom:0;
-  padding:28px 28px 22px;background:linear-gradient(90deg,#06101ceF 0%,#06101cf2 65%,transparent 100%);
-  border-top:1px solid color-mix(in srgb,var(--featured-accent) 55%,#ffffff18)
+  position:absolute;z-index:4;left:12px;right:12px;bottom:10px;height:56px;
+  display:grid;grid-template-columns:42px 1px minmax(0,1fr);gap:10px;align-items:center;
+  padding:0 4px;background:transparent
 }
-.featured-player-card .featured-team-name{font-size:2rem;font-weight:1000;letter-spacing:-.025em;color:#fff;line-height:1}
-.featured-player-card .featured-team-meta{margin-top:11px;font-size:1rem;font-weight:950;letter-spacing:.055em;color:#b8c4d1}
+.featured-player-card .featured-mini-logo{width:40px;height:40px;object-fit:contain}
+.featured-player-card .featured-divider{height:38px;background:#ffffff22}
+.featured-player-card .featured-team-name{
+  font-size:1.04rem;font-weight:1000;letter-spacing:-.02em;color:#fff;line-height:1
+}
+.featured-player-card .featured-team-meta{
+  margin-top:7px;font-size:.68rem;font-weight:950;letter-spacing:.045em;color:#aeb9c6;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
 .featured-player-card .featured-team-meta strong{color:var(--featured-accent)}
-.featured-player-card .featured-team-strip:after{
-  content:"";display:block;width:82%;height:4px;border-radius:999px;margin-top:17px;
-  background:linear-gradient(90deg,var(--featured-accent),transparent)
-}
 .featured-player-card .featured-right{
   position:relative;z-index:3;display:flex;flex-direction:column;justify-content:center;
-  padding:46px 40px 40px;min-width:0
+  padding:30px 26px 26px;min-width:0
 }
-.featured-player-card .featured-name{margin:0 0 34px;color:#fff;text-transform:uppercase;line-height:.88;letter-spacing:-.055em}
-.featured-player-card .featured-first{display:block;font-size:3rem;font-weight:1000}
-.featured-player-card .featured-last{display:block;font-size:4.55rem;font-weight:1000;margin-top:9px}
+.featured-player-card .featured-name{
+  margin:0 0 22px;color:#fff;text-transform:uppercase;line-height:.9;letter-spacing:-.05em;
+  overflow:hidden
+}
+.featured-player-card .featured-first{display:block;font-size:1.65rem;font-weight:1000}
+.featured-player-card .featured-last{
+  display:block;font-size:2.55rem;font-weight:1000;margin-top:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
 .featured-player-card .featured-bio{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;
-  align-items:stretch
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px
 }
-.featured-player-card .featured-bio-item{padding:0 18px;border-left:1px solid #ffffff24}
-.featured-player-card .featured-bio-item:first-child{border-left:0;padding-left:0}
-.featured-player-card .featured-bio-label{display:block;color:#96a3b2;font-size:.82rem;font-weight:950;letter-spacing:.085em}
-.featured-player-card .featured-bio-value{display:block;color:#fff;font-size:2.55rem;font-weight:1000;letter-spacing:-.045em;margin-top:10px;white-space:nowrap}
-.featured-player-card.featured-gibbs{--featured-accent:#20b9ff;--featured-accent2:#7ddcff}
-.featured-player-card.featured-gibbs .featured-left:after{
-  content:"";position:absolute;z-index:1;right:-30%;top:-10%;width:58%;height:125%;
-  transform:skewX(-25deg);background:linear-gradient(180deg,#20b9ff22,transparent);border-right:2px solid #20b9ff88
-}
-.featured-player-card.featured-bijan{--featured-accent:#ef1b3c;--featured-accent2:#ff7388}
-.featured-player-card.featured-bijan .featured-left{padding:36px 28px 110px}
-.featured-player-card.featured-bijan .featured-portrait-box{
-  position:absolute;left:26px;right:26px;top:24px;bottom:118px;border-radius:22px;overflow:hidden;
-  border:1px solid #ffffff2a;background:linear-gradient(140deg,#090d13,#24070d);
-  box-shadow:inset 0 1px 0 #ffffff18
-}
-.featured-player-card.featured-bijan .featured-portrait-box .featured-bg-logo{width:100%;height:100%;left:-13%;top:0}
-.featured-player-card.featured-bijan .featured-portrait-box .featured-photo{height:98%!important;max-width:120%}
-.featured-player-card.featured-bijan .featured-team-strip{
-  display:grid;grid-template-columns:84px 1px minmax(0,1fr);gap:20px;align-items:center;
-  background:transparent;padding:0 26px 26px;border-top:0
-}
-.featured-player-card.featured-bijan .featured-team-strip:after{display:none}
-.featured-player-card.featured-bijan .featured-mini-logo{width:80px;height:80px;object-fit:contain}
-.featured-player-card.featured-bijan .featured-divider{height:72px;background:#ffffff26}
-.featured-player-card.featured-bijan .featured-team-copy .featured-team-name{font-size:1.8rem}
-.featured-player-card.featured-bijan .featured-bio{gap:10px}
-.featured-player-card.featured-bijan .featured-bio-item{
-  border:1px solid #ffffff1e!important;border-radius:18px;padding:22px 15px!important;
+.featured-player-card .featured-bio-item{
+  min-width:0;border:1px solid #ffffff19;border-radius:11px;padding:11px 7px;
   background:linear-gradient(145deg,#0d141d,#080c12);text-align:center
 }
-.featured-player-card.featured-bijan .featured-name{margin-bottom:26px}
-.featured-player-card.featured-walker{
-  --featured-accent:#e31837;--featured-accent2:#ffb81c;border-radius:10px;
-  background:
-    linear-gradient(125deg,#07090c 0 53%,#0c0807 53% 100%),
-    radial-gradient(circle at 18% 30%,#e3183722,transparent 35%)
+.featured-player-card .featured-bio-label{
+  display:block;color:#8f9cab;font-size:.54rem;font-weight:950;letter-spacing:.075em;white-space:nowrap
 }
-.featured-player-card.featured-walker:after{
-  content:"";position:absolute;inset:0;z-index:-1;
-  background:
-    repeating-linear-gradient(120deg,transparent 0 74px,#ffffff035 75px 77px,transparent 78px 150px),
-    radial-gradient(circle at 87% 75%,#ffffff07 0 1px,transparent 1.5px);
-  background-size:auto,14px 14px
+.featured-player-card .featured-bio-value{
+  display:block;color:#fff;font-size:1.12rem;font-weight:1000;letter-spacing:-.025em;
+  margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
-.featured-player-card.featured-walker .featured-left:before{
-  content:"#9";position:absolute;right:-2%;top:-11%;z-index:0;
-  font-size:12rem;font-weight:1000;color:#ffffff08;letter-spacing:-.08em
-}
-.featured-player-card.featured-walker .featured-bg-logo{width:105%;height:78%;left:-20%;top:-4%;opacity:.34}
-.featured-player-card.featured-walker .featured-team-strip{
-  clip-path:polygon(0 0,88% 0,100% 30%,88% 100%,0 100%);
-  background:linear-gradient(90deg,#17070aed,#090b0fee);border-top:2px solid var(--featured-accent)
-}
-.featured-player-card.featured-walker .featured-team-name{font-style:italic;font-size:2.2rem}
-.featured-player-card.featured-walker .featured-right{padding-top:36px}
-.featured-player-card.featured-walker .featured-last{
-  background:linear-gradient(180deg,#fff 0 18%,var(--featured-accent2) 18% 42%,var(--featured-accent) 60% 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  font-style:italic
-}
-.featured-player-card.featured-walker .featured-first{font-style:italic}
-.featured-player-card.featured-walker .featured-bio{
-  transform:skewX(-7deg);border:1px solid #ffffff25;border-top:2px solid var(--featured-accent);
-  background:#06090dd9
-}
-.featured-player-card.featured-walker .featured-bio-item{padding:20px 18px;border-left:1px solid #ffffff20;text-align:center}
-.featured-player-card.featured-walker .featured-bio-label,.featured-player-card.featured-walker .featured-bio-value{transform:skewX(7deg)}
-.featured-player-card.featured-walker .featured-bio-value{font-style:italic}
-.featured-player-card .featured-slogan{
-  position:absolute;right:28px;top:28px;color:#ffffff54;font-size:.68rem;font-weight:850;letter-spacing:.18em;line-height:1.7
-}
-.featured-player-card .featured-slogan:after{content:"";display:block;width:44px;height:3px;background:var(--featured-accent);margin-top:8px}
-.featured-player-profile .unified-profile-tabs{margin-top:12px}
+.featured-player-profile .unified-profile-tabs{margin-top:8px}
 @media(max-width:760px){
-  .featured-player-profile{width:100%;padding:10px}
-  .featured-player-profile .closem{right:16px;top:16px}
-  .featured-player-card{grid-template-columns:1fr;min-height:0}
-  .featured-player-card .featured-left{min-height:325px}
-  .featured-player-card .featured-right{padding:24px 18px 22px}
-  .featured-player-card .featured-name{margin:0 0 22px}
-  .featured-player-card .featured-first{font-size:2rem}
-  .featured-player-card .featured-last{font-size:3rem}
-  .featured-player-card .featured-bio{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .featured-player-card .featured-bio-item,.featured-player-card .featured-bio-item:first-child{
-    border:1px solid #ffffff18;padding:12px;border-radius:12px;text-align:center
+  .featured-player-profile{width:100%!important;padding:7px!important}
+  .featured-player-profile .closem{right:11px!important;top:11px!important;width:27px;height:27px}
+  .featured-player-card{
+    height:204px;grid-template-columns:39% 61%;border-radius:13px
   }
-  .featured-player-card .featured-bio-value{font-size:1.65rem;margin-top:5px}
-  .featured-player-card .featured-bio-label{font-size:.62rem}
-  .featured-player-card.featured-bijan .featured-left{min-height:360px;padding:0}
-  .featured-player-card.featured-bijan .featured-portrait-box{left:16px;right:16px;top:16px;bottom:112px}
-  .featured-player-card.featured-bijan .featured-team-strip{grid-template-columns:58px 1px minmax(0,1fr);gap:12px;padding:0 18px 20px}
-  .featured-player-card.featured-bijan .featured-mini-logo{width:54px;height:54px}
-  .featured-player-card.featured-bijan .featured-divider{height:52px}
-  .featured-player-card.featured-bijan .featured-team-copy .featured-team-name{font-size:1.35rem}
-  .featured-player-card.featured-walker .featured-slogan{display:none}
+  .featured-player-card .featured-portrait-box{left:7px;right:7px;top:7px;bottom:57px;border-radius:10px}
+  .featured-player-card .featured-team-strip{
+    left:7px;right:7px;bottom:5px;height:46px;
+    grid-template-columns:31px 1px minmax(0,1fr);gap:7px
+  }
+  .featured-player-card .featured-mini-logo{width:29px;height:29px}
+  .featured-player-card .featured-divider{height:31px}
+  .featured-player-card .featured-team-name{font-size:.76rem}
+  .featured-player-card .featured-team-meta{font-size:.49rem;margin-top:5px}
+  .featured-player-card .featured-right{padding:20px 11px 14px}
+  .featured-player-card .featured-name{margin-bottom:13px;padding-right:19px}
+  .featured-player-card .featured-first{font-size:1rem}
+  .featured-player-card .featured-last{font-size:1.42rem;margin-top:4px}
+  .featured-player-card .featured-bio{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+  .featured-player-card .featured-bio-item{padding:7px 4px;border-radius:8px}
+  .featured-player-card .featured-bio-label{font-size:.43rem}
+  .featured-player-card .featured-bio-value{font-size:.76rem;margin-top:3px}
+  .featured-player-profile .unified-profile-tabs{margin-top:6px}
 }
 @media(max-width:700px){
   .unified-profile-tabs{gap:4px;padding-bottom:6px}
@@ -299,24 +254,38 @@ function seedFace(seed){
   return '<div class="person"><img class="photo lg" src="'+list[0]+'" alt="'+String(seed?.name||'')+'" data-face-urls="'+encoded+'" data-face-index="0" data-face-initials="'+initials+'" data-face-fallback-class="photo lg fallback" onerror="window.ShuaAdvanceFace(this)"></div>';
 }
 
-function featuredLogoUrl(team){
-  const t=FEATURED_TEAM_META[String(team||'').toUpperCase()];
-  if(t?.logo)return 'https://a.espncdn.com/i/teamlogos/nfl/500/'+t.logo+'.png';
-  return window.ShuaEspnLive?.getTeamLogoUrl?.(team)||'';
+function canonicalTeam(team){
+  const raw=String(team||'').trim().toUpperCase();
+  return TEAM_CANON[raw]||raw;
 }
-function featuredFaceHtml(player,cfg){
-  const urls=[];
-  if(cfg?.espnId)urls.push('https://a.espncdn.com/i/headshots/nfl/players/full/'+cfg.espnId+'.png');
+function featuredTeamName(team){
+  const raw=String(team||'').trim().toUpperCase();
+  return TEAM_NAMES[raw]||TEAM_NAMES[canonicalTeam(raw)]||raw||'TEAM';
+}
+function featuredLogoUrl(team){
+  const raw=String(team||'').trim().toUpperCase();
   try{
-    const extra=window.ShuaEspnLive?.getPlayerHeadshotUrls?.(player)||[];
-    if(Array.isArray(extra))urls.push(...extra);
+    const live=window.ShuaEspnLive?.getTeamLogoUrl?.(raw);
+    if(live)return live;
   }catch(e){}
+  try{
+    const slug=typeof teams==='object'?(teams[raw]||teams[canonicalTeam(raw)]):'';
+    if(slug)return 'https://a.espncdn.com/i/teamlogos/nfl/500/'+slug+'.png';
+  }catch(e){}
+  return '';
+}
+function featuredFaceHtml(player){
+  const urls=[];
   try{
     if(typeof playerPhotoId==='function'){
       const sid=playerPhotoId(player?.name||'',player?.team||'',player?.position||'');
       if(sid)urls.push('https://sleepercdn.com/content/nfl/players/full/'+sid+'.png');
       if(sid)urls.push('https://sleepercdn.com/content/nfl/players/thumb/'+sid+'.jpg');
     }
+  }catch(e){}
+  try{
+    const extra=window.ShuaEspnLive?.getPlayerHeadshotUrls?.(player)||[];
+    if(Array.isArray(extra))urls.push(...extra);
   }catch(e){}
   const list=[...new Set(urls.filter(Boolean))];
   const initials=String(player?.name||'?').split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase()||'?';
@@ -334,61 +303,152 @@ function clearFeaturedProfile(){
   box.classList.remove('featured-player-profile','featured-profile-gibbs','featured-profile-bijan','featured-profile-walker');
   document.getElementById('featuredPlayerCard')?.remove();
 }
+function heightLabel(value){
+  if(value===null||value===undefined||value==='')return '—';
+  const raw=String(value).trim();
+  if(/\d+['’-]\d+/.test(raw)){
+    const m=raw.match(/(\d+)['’-](\d+)/);
+    return m?m[1]+"'"+m[2]+'"':raw;
+  }
+  const n=Number(raw);
+  if(Number.isFinite(n)&&n>=48&&n<=90)return Math.floor(n/12)+"'"+(n%12)+'"';
+  return raw;
+}
+function weightLabel(value){
+  const n=Number(value);
+  return Number.isFinite(n)&&n>0?Math.round(n)+' lbs':(value?String(value):'—');
+}
+function ageLabel(value,birthDate,seasonYear=null){
+  if(seasonYear&&birthDate){
+    const y=Number(String(birthDate).slice(0,4));
+    if(Number.isFinite(y))return String(Math.max(0,Number(seasonYear)-y));
+  }
+  const n=Number(value);
+  return Number.isFinite(n)&&n>0?String(Math.floor(n)):'—';
+}
+function expLabel(value){
+  const n=Number(value);
+  return Number.isFinite(n)&&n>=0?(n===0?'R':String(n)):'—';
+}
+async function getSleeperBio(name,position='',team=''){
+  if(!sleeperBioPromise){
+    sleeperBioPromise=fetch('https://api.sleeper.app/v1/players/nfl',{cache:'force-cache'})
+      .then(r=>{if(!r.ok)throw new Error('Sleeper player data '+r.status);return r.json()})
+      .then(data=>{
+        const map=new Map();
+        Object.values(data||{}).forEach(p=>{
+          const full=p.full_name||[p.first_name,p.last_name].filter(Boolean).join(' ').trim();
+          if(!full)return;
+          const key=norm(full);
+          if(!map.has(key))map.set(key,[]);
+          map.get(key).push(p);
+        });
+        return map;
+      })
+      .catch(()=>new Map());
+  }
+  const map=await sleeperBioPromise;
+  const wanted=norm(name);
+  let list=map.get(wanted)||[];
+  if(!list.length){
+    const base=wanted.replace(/(jr|sr|ii|iii|iv)$/,'');
+    for(const [key,rows] of map){if(key.replace(/(jr|sr|ii|iii|iv)$/,'')===base){list=rows;break}}
+  }
+  const pos=String(position||'').toUpperCase();
+  const tm=canonicalTeam(team);
+  return list.find(p=>(!pos||String(p.position||'').toUpperCase()===pos)&&(!tm||canonicalTeam(p.team)===tm))||
+    list.find(p=>!pos||String(p.position||'').toUpperCase()===pos)||
+    list[0]||null;
+}
+function fillFeaturedBio(player,seed,bio){
+  const card=document.getElementById('featuredPlayerCard');
+  if(!card)return;
+  const year=seedYear(seed);
+  if(year){
+    const vals={
+      year:String(year),
+      points:Number.isFinite(Number(seed?.points))?Number(seed.points).toFixed(1):'—',
+      ppg:Number.isFinite(Number(seed?.average))?Number(seed.average).toFixed(1):'—',
+      games:Number.isFinite(Number(seed?.gamesPlayed))?String(Number(seed.gamesPlayed)):'—'
+    };
+    [['YEAR',vals.year],['PPR PTS',vals.points],['PPG',vals.ppg],['GP',vals.games]].forEach(([label,value],i)=>{
+      const el=card.querySelectorAll('.featured-bio-item')[i];
+      if(el){el.querySelector('.featured-bio-label').textContent=label;el.querySelector('.featured-bio-value').textContent=value}
+    });
+    return;
+  }
+  const override=PROFILE_BIO_OVERRIDES[norm(player?.name)]||{};
+  const values={
+    age:override.age||ageLabel(bio?.age,bio?.birth_date),
+    height:override.height||heightLabel(bio?.height),
+    weight:override.weight||weightLabel(bio?.weight),
+    exp:override.exp||expLabel(bio?.years_exp)
+  };
+  [['AGE',values.age],['HEIGHT',values.height],['WEIGHT',values.weight],['EXP',values.exp]].forEach(([label,value],i)=>{
+    const el=card.querySelectorAll('.featured-bio-item')[i];
+    if(el){el.querySelector('.featured-bio-label').textContent=label;el.querySelector('.featured-bio-value').textContent=value}
+  });
+  const meta=card.querySelector('.featured-team-meta');
+  if(meta){
+    const number=override.number??bio?.number??bio?.jersey_number;
+    meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong> · '+canonicalTeam(player?.team||bio?.team||'—')+(number!==null&&number!==undefined&&String(number)!==''?' · #'+number:'');
+  }
+}
 function applyFeaturedProfile(name,seed=null){
   clearFeaturedProfile();
-  if(seedYear(seed))return false;
-  const cfg=FEATURED_PROFILE_CARDS[norm(name)];
-  if(!cfg)return false;
-  const player=playerByName(name);
+  if(!COMPACT_PROFILE_V2)return false;
+  const player=seed||playerByName(name);
   if(!player)return false;
-  const team=FEATURED_TEAM_META[String(player.team||'').toUpperCase()];
-  if(!team)return false;
-  const logo=featuredLogoUrl(player.team);
-  const parts=featuredNameParts(player.name);
+  const team=String(player.team||'').toUpperCase();
+  const teamName=featuredTeamName(team);
+  const logo=featuredLogoUrl(team);
+  const parts=featuredNameParts(player.name||name);
   const box=document.querySelector('#modal .profile');
   const tabs=document.getElementById('unifiedProfileTabs');
   if(!box||!tabs)return false;
 
-  box.classList.add('featured-player-profile','featured-profile-'+cfg.variant);
+  box.classList.add('featured-player-profile');
 
   const hero=document.createElement('section');
   hero.id='featuredPlayerCard';
-  hero.className='featured-player-card featured-'+cfg.variant;
+  hero.className='featured-player-card';
 
-  const teamMeta='<strong>'+String(player.position||'RB')+'</strong> · '+team.abbr+' · #'+cfg.number;
+  const historical=!!seedYear(seed);
+  const initialMeta='<strong>'+String(player.position||'—')+'</strong> · '+canonicalTeam(team)+(historical?' · '+seedYear(seed):'');
   const stat=(label,value)=>'<div class="featured-bio-item"><span class="featured-bio-label">'+label+'</span><b class="featured-bio-value">'+value+'</b></div>';
 
-  let left='';
-  if(cfg.variant==='bijan'){
-    left='<div class="featured-left">'+
+  hero.innerHTML=
+    '<div class="featured-left">'+
       '<div class="featured-portrait-box">'+
         (logo?'<img class="featured-bg-logo" src="'+logo+'" alt="">':'')+
-        featuredFaceHtml(player,cfg)+
+        featuredFaceHtml(player)+
       '</div>'+
       '<div class="featured-team-strip">'+
-        (logo?'<img class="featured-mini-logo" src="'+logo+'" alt="'+team.name+' logo">':'<span></span>')+
+        (logo?'<img class="featured-mini-logo" src="'+logo+'" alt="'+teamName+' logo">':'<span></span>')+
         '<span class="featured-divider"></span>'+
-        '<div class="featured-team-copy"><div class="featured-team-name">'+team.name+'</div><div class="featured-team-meta">'+teamMeta+'</div></div>'+
+        '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div><div class="featured-team-meta">'+initialMeta+'</div></div>'+
       '</div>'+
-    '</div>';
-  }else{
-    left='<div class="featured-left">'+
-      (logo?'<img class="featured-bg-logo" src="'+logo+'" alt="">':'')+
-      featuredFaceHtml(player,cfg)+
-      '<div class="featured-team-strip"><div class="featured-team-name">'+team.name+'</div><div class="featured-team-meta">'+teamMeta+'</div></div>'+
-    '</div>';
-  }
-
-  const slogan=cfg.variant==='walker'?'<div class="featured-slogan">SPEED<br>BUILDS<br>DYNASTIES</div>':'';
-  hero.innerHTML=left+
-    '<div class="featured-right">'+slogan+
+    '</div>'+
+    '<div class="featured-right">'+
       '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last">'+parts.last+'</span></h2>'+
       '<div class="featured-bio">'+
-        stat('AGE',cfg.age)+stat('HEIGHT',cfg.height)+stat('WEIGHT',cfg.weight)+stat('EXP',cfg.exp)+
+        (historical
+          ? stat('YEAR',String(seedYear(seed)))+stat('PPR PTS',Number.isFinite(Number(seed?.points))?Number(seed.points).toFixed(1):'—')+stat('PPG',Number.isFinite(Number(seed?.average))?Number(seed.average).toFixed(1):'—')+stat('GP',Number.isFinite(Number(seed?.gamesPlayed))?String(Number(seed.gamesPlayed)):'—')
+          : stat('AGE','…')+stat('HEIGHT','…')+stat('WEIGHT','…')+stat('EXP','…'))+
       '</div>'+
     '</div>';
 
   tabs.insertAdjacentElement('beforebegin',hero);
+
+  if(historical){
+    fillFeaturedBio(player,seed,null);
+  }else{
+    const override=PROFILE_BIO_OVERRIDES[norm(player.name)]||null;
+    if(override)fillFeaturedBio(player,null,null);
+    getSleeperBio(player.name,player.position,player.team).then(bio=>{
+      if(document.getElementById('modal')?.dataset.unifiedName===name)fillFeaturedBio(player,null,bio);
+    }).catch(()=>{});
+  }
   return true;
 }
 

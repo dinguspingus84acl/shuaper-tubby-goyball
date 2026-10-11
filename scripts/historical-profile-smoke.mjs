@@ -107,13 +107,30 @@ async function verifyHistoricalYear(page,year){
   const detail=page.locator('#unifiedHistoryPanel .player-history-detail.open').first();
   const detailText=await detail.innerText();
   if(/Could not load/.test(detailText))throw new Error('Game log failed for '+firstName+' '+year);
+
+  const gameLogLayout=await detail.locator('.espn-game-log-table').evaluate(table=>{
+    const wrap=table.closest('.espn-game-log-table-wrap');
+    const td=table.querySelector('tbody td.gl-stat, tbody td.gl-pts, tbody td');
+    return {
+      tableWidth:table.getBoundingClientRect().width,
+      wrapWidth:wrap?.getBoundingClientRect().width||0,
+      tdFont:td?parseFloat(getComputedStyle(td).fontSize):0
+    };
+  });
+  if(phoneSheet.bodyPhone){
+    if(gameLogLayout.tableWidth>gameLogLayout.wrapWidth+2)
+      throw new Error('Phone Game Log table overflows available width: '+JSON.stringify(gameLogLayout));
+    if(gameLogLayout.tdFont<12.5)
+      throw new Error('Phone Game Log numbers are still too small: '+JSON.stringify(gameLogLayout));
+  }
+
   const options=await detail.locator('select option').allTextContents();
   const logYears=options.map(Number).filter(Boolean);
   if(logYears.length&&new Set(logYears).size!==logYears.length)throw new Error('Duplicate Game Log years for '+firstName+': '+logYears.join(','));
 
   if(phoneSheet.bodyPhone)await swipeDownToClose(page);
   else await page.click('#close');
-  return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350),phoneSheet};
+  return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350),phoneSheet,gameLogLayout};
 }
 
 try{

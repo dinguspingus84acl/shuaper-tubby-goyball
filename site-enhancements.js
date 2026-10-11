@@ -239,7 +239,7 @@ function refreshMobileMenu(){
 
 async function loadHistoricalHeadshots(){
   try{
-    const r=await fetch('legacy-stats/headshots.json',{cache:'force-cache'});
+    const r=await fetch('legacy-stats/headshots.json?v=20261010-headshots8',{cache:'force-cache'});
     if(!r.ok)return;
     const d=await r.json();
     historicalHeadshots=d?.headshots||{};

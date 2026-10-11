@@ -6,6 +6,7 @@ if(typeof profile!=='function'||!document.getElementById('modal'))return;
 const baseProfile=profile;
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
 const ROS_ALIASES={chigoziemokonkwo:'chigokonkwo',chigokonkwo:'chigoziemokonkwo'};
+let activeSeed=null;
 
 const style=document.createElement('style');
 style.id='unifiedProfileStyles';
@@ -111,6 +112,30 @@ function normalizeEspnAdpCard(name){
     }
   });
 }
+function historicalSeed(){return activeSeed&&activeSeed.__historical?activeSeed:null}
+function seedYear(seed){return Number(seed?.seasonYear||seed?.year||0)||null}
+function seedTeamLogo(seed){
+  const url=window.ShuaEspnLive?.getTeamLogoUrl?.(seed?.team);
+  return url?'<div class="team-logo"><img src="'+url+'" alt=""></div>':'';
+}
+function seedFace(seed){
+  const url=window.ShuaEspnLive?.getPlayerHeadshotUrl?.(seed);
+  return url?'<div class="person"><img class="photo lg" src="'+url+'" alt="'+String(seed?.name||'')+'" onerror="this.parentElement.innerHTML=\'<div class=&quot;photo lg fallback&quot;>?</div>\'"></div>':'<div class="person"><div class="photo lg fallback">?</div></div>';
+}
+function renderHistoricalOverview(seed){
+  const stats=document.getElementById('stats');
+  if(!stats)return;
+  const yr=seedYear(seed);
+  const rank=Number(seed?.rank)||null;
+  stats.innerHTML=
+    '<div class="stat"><span>'+(yr?yr+' ':'')+String(seed?.position||'')+' Finish</span><b>'+(rank||'—')+'</b></div>'+
+    '<div class="stat"><span>PPR Points</span><b>'+(Number.isFinite(Number(seed?.points))?Number(seed.points).toFixed(1):'—')+'</b></div>'+
+    '<div class="stat"><span>PPG</span><b>'+(Number.isFinite(Number(seed?.average))?Number(seed.average).toFixed(1):'—')+'</b></div>'+
+    '<div class="stat"><span>Games</span><b>'+(Number.isFinite(Number(seed?.gamesPlayed))?Number(seed.gamesPlayed):'—')+'</b></div>'+
+    '<div class="stat"><span>Team</span><b>'+String(seed?.team||'—')+'</b></div>'+
+    '<div class="stat"><span>Position</span><b>'+String(seed?.position||'—')+'</b></div>';
+}
+
 function ensureUi(){
   const box=document.querySelector('#modal .profile');
   if(!box)return null;
@@ -165,6 +190,8 @@ function activateTab(key){
   if(key==='history')loadHistory(name);
 }
 function renderOverviewRanks(name){
+  const hist=historicalSeed();
+  if(hist){renderHistoricalOverview(hist);return}
   const p=playerByName(name)||basePositionPlayer(name);
   const pos=p?.position||'—';
   const pre=preseasonRank(name);
@@ -220,8 +247,9 @@ async function loadGameLog(name){
     panel.innerHTML='<div class="unified-profile-loading">Game log is unavailable right now.</div>';
   }
 }
-function prepareUnified(name){
+function prepareUnified(name,seed=null){
   ensureUi();
+  activeSeed=seed?{...seed,__historical:!!(seed.source==='nflverse'||seed.seasonYear||seed.year)}:null;
   const modal=document.getElementById('modal');
   modal.dataset.unifiedName=name;
   renderOverviewRanks(name);
@@ -231,36 +259,40 @@ function prepareUnified(name){
   if(hp){hp.dataset.loadedFor='';hp.dataset.ready='0';hp.innerHTML=''}
   activateTab('overview');
 }
-async function openByName(name){
+async function openByName(name,seed=null){
   let p=playerByName(name);
   if(p){
+    activeSeed=null;
     baseProfile(p.id);
     fixKnownHeadshot(name);
     prepareUnified(p.name);
     return;
   }
   try{
-    if(window.ShuaEspnLive?.ensureData)await window.ShuaEspnLive.ensureData();
-    const ep=window.ShuaEspnLive?.getPlayerByName?.(name);
+    let ep=seed||null;
+    if(!ep&&window.ShuaEspnLive?.getAnyPlayerByName)ep=await window.ShuaEspnLive.getAnyPlayerByName(name);
+    if(!ep){
+      if(window.ShuaEspnLive?.ensureData)await window.ShuaEspnLive.ensureData();
+      ep=window.ShuaEspnLive?.getPlayerByName?.(name);
+    }
     if(!ep)return;
+
     const modal=document.getElementById('modal');
     document.getElementById('pn').textContent=ep.name;
     document.getElementById('pn').className='';
-    document.getElementById('pm').textContent=ep.team+' · '+ep.position;
-    document.getElementById('profileTop').innerHTML=(norm(ep.name)==='kennethwalkeriii'||norm(ep.name)==='kennethwalker')?'<div class="person"><img class="photo lg" src="https://a.espncdn.com/i/headshots/nfl/players/full/4567048.png" alt="Kenneth Walker III"></div>':'';
+    const yr=seedYear(ep);
+    document.getElementById('pm').textContent=(yr?yr+' · ':'')+(ep.team||'—')+' · '+(ep.position||'—');
+    document.getElementById('profileTop').innerHTML=seedFace(ep)+seedTeamLogo(ep);
     document.getElementById('injuryStatus').innerHTML='';
-    document.getElementById('stats').innerHTML=
-      '<div class="stat"><span>ESPN PPR points</span><b>'+ep.points.toFixed(1)+'</b></div>'+
-      '<div class="stat"><span>ESPN PPG</span><b>'+(ep.average===null?'—':ep.average.toFixed(1))+'</b></div>';
     document.getElementById('playerNotes').textContent='No notes provided.';
     modal.classList.add('open');
     document.body.style.overflow='hidden';
-    prepareUnified(ep.name);
+    prepareUnified(ep.name,ep);
   }catch(e){}
 }
-
 window.openUnifiedPlayerProfileByName=openByName;
 window.profile=function(id){
+  activeSeed=null;
   const p=playerById(id);
   baseProfile(id);
   if(p)prepareUnified(p.name);

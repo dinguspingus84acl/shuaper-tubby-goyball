@@ -112,6 +112,9 @@ style.textContent=`
 .espn-stat-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 9px;border:1px solid #ffffff16;border-radius:10px;background:#07182a}
 .espn-stat-label{color:#7f93aa;font-size:.62rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
 .espn-stat-btn,.espn-view-btn{padding:6px 9px;font-size:.65rem}
+.espn-stat-select{min-width:170px;height:34px;border:1px solid #ffffff25;border-radius:8px;background:#0b2139;color:#fff;padding:0 32px 0 10px;font-size:.68rem;font-weight:950;outline:none}
+.espn-stat-select:focus{border-color:#6aaee5;box-shadow:0 0 0 2px #3d8cff22}
+.phone-mode .espn-stat-select{width:100%;height:38px;font-size:.72rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
 .espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 92px;gap:8px;align-items:center}
@@ -343,7 +346,7 @@ section.innerHTML=`
         <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
       </div>
       <span class="espn-stat-label">Rank by</span>
-      <div id="espnStatFilters" class="espn-stat-filters"></div>
+      <select id="espnStatSelect" class="espn-stat-select" aria-label="Rank players by stat"></select>
     </div>
     <div id="espnLiveSource" class="espn-live-source">ESPN 2026 full-PPR stats · choose a position, then rank players by any relevant stat</div>
     <div class="espn-live-card">
@@ -1314,19 +1317,20 @@ function openEspnPlayerProfile(player){
 }
 
 function renderStatFilters(){
-  const box=document.getElementById('espnStatFilters');
+  const select=document.getElementById('espnStatSelect');
   const cfg=configForFilter();
   if(!cfg.some(x=>x.key===activeStat))activeStat='points';
-  box.innerHTML=cfg.map(x=>`<button type="button" class="espn-stat-btn${x.key===activeStat?' active':''}" data-espn-stat="${x.key}">${displayStatLabel(x.key)}</button>`).join('');
-  box.querySelectorAll('[data-espn-stat]').forEach(b=>{
-    b.onclick=()=>{
-      activeStat=b.dataset.espnStat;
+  if(select){
+    select.innerHTML=cfg.map(x=>'<option value="'+x.key+'">'+displayStatLabel(x.key)+'</option>').join('');
+    select.value=activeStat;
+    select.onchange=()=>{
+      activeStat=select.value||'points';
       sortDirection='DESC';
       saveStatsUiState();
       renderStatFilters();
       render();
     };
-  });
+  }
   const head=document.getElementById('espnSelectedStatHead');
   if(head){const label=displayStatLabel(activeStat);head.childNodes[0].nodeValue=label+' '}
   const pointsHead=document.getElementById('espnPointsHead');
@@ -1431,7 +1435,7 @@ function updateStatsLabels(){
   const updated=document.getElementById('espnLastUpdated');
   const refreshBtn=document.getElementById('espnRefresh');
   if(sub)sub.textContent=statsSeason+' ESPN full-PPR scoring leaders — filter by position and rank by stat';
-  if(src)src.textContent=(statsSeason<=2017?'ESPN '+statsSeason+' full-PPR stats · local historical data fills missing rows':'ESPN '+statsSeason+' full-PPR stats')+' · choose a position, then rank players by any relevant stat'+(statsSeason===SEASON?' · current season auto-refreshes every 60 seconds':'');
+  if(src)src.textContent=(statsSeason<=2017?'ESPN '+statsSeason+' full-PPR stats · local historical data fills missing rows':'ESPN '+statsSeason+' full-PPR stats')+' · choose a position, then use the Rank by dropdown'+(statsSeason===SEASON?' · current season auto-refreshes every 60 seconds':'');
   if(updated){
     if(statsLastUpdated)updated.textContent=(statsSeason===SEASON?'Updated ':'Loaded ')+statsLastUpdated.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
     else updated.textContent='Not loaded yet';

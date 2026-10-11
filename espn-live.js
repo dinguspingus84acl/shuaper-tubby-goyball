@@ -94,7 +94,7 @@ style.textContent=`
 .espn-live-head{padding:8px 10px;color:var(--m);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#07182a}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
-.espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}
+.espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}.espn-headshot-fallback{display:flex;align-items:center;justify-content:center;color:#dbeafe;font-size:.68rem;font-weight:950}
 .espn-player-copy{min-width:0;display:grid;gap:3px}.espn-player-meta{display:flex;align-items:center;gap:4px;color:#8ca0b5;font-size:.58rem;font-weight:850;line-height:1}.espn-player-meta .espn-team-logo{width:16px;height:16px;flex-basis:16px}
 .espn-player-name{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .espn-name-btn{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:950;text-align:left;cursor:pointer;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -211,9 +211,10 @@ function teamLogo(team){
 function playerHeadshot(player){
   const explicit=String(player?.headshot||'').trim();
   const id=String(player?.id||'');
-  const src=explicit||(id?'https://a.espncdn.com/i/headshots/nfl/players/full/'+id+'.png':'');
-  if(!src)return '';
-  return '<img class="espn-headshot" src="'+src+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+  const src=explicit||(id&&/^\d+$/.test(id)?'https://a.espncdn.com/i/headshots/nfl/players/full/'+id+'.png':'');
+  const initials=String(player?.name||'?').split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase()||'?';
+  if(!src)return '<span class="espn-headshot espn-headshot-fallback">'+initials+'</span>';
+  return '<img class="espn-headshot" src="'+src+'" alt="'+String(player?.name||'')+'" loading="lazy" onerror="this.outerHTML=\'<span class=&quot;espn-headshot espn-headshot-fallback&quot;>'+initials+'</span>\'">';
 }
 function statSource(s){return Number(s?.statSourceId ?? s?.statTypeId ?? -1)}
 function splitType(s){return Number(s?.statSplitTypeId ?? (Number(s?.scoringPeriodId||0)===0?0:1))}
@@ -1250,9 +1251,8 @@ window.ShuaEspnLive={
         if(hist.some(x=>Number(x.year)===Number(year))){
           hist=await hydrateHistoricalCareerYear(hist,name,Number(year));
           const row=hist.find(x=>Number(x.year)===Number(year));
-          const one=[row];
-          target.innerHTML=historicalGameLogHtml(row,one,Number(year));
-          bindHistoricalGameLog(target,row,one,Number(year));
+          target.innerHTML=historicalGameLogHtml(row,hist,Number(year));
+          bindHistoricalGameLog(target,row,hist,Number(year));
           return;
         }
       }

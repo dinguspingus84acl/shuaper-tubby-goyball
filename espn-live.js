@@ -1023,7 +1023,7 @@ function setUpdatedLabel(message,error=false){
   el.classList.toggle('espn-error',!!error);
 }
 function currentCacheKey(){return 'shuaEspnLivePprStats'}
-function statsCacheKey(year){return 'shuaEspnStatsV4:'+year}
+function statsCacheKey(year){return 'shuaEspnStatsV5:'+year}
 function hydrateRowsFromCache(){
   if(rows.length)return true;
   try{

@@ -17,6 +17,28 @@ async function openStats(page,year){
   await page.selectOption('#espnStatsYear',String(year));
   await page.waitForFunction(()=>document.querySelectorAll('#espnLiveRows .espn-live-row').length>10,{timeout:120000});
 }
+async function swipeDownToClose(page){
+  await page.evaluate(()=>{
+    const profile=document.querySelector('#modal .profile');
+    if(profile)profile.scrollTop=0;
+  });
+  const viewport=page.viewportSize()||{width:390,height:844};
+  const x=Math.round(viewport.width/2);
+  const cdp=await page.context().newCDPSession(page);
+  try{
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y:70}]});
+    await new Promise(r=>setTimeout(r,45));
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:145}]});
+    await new Promise(r=>setTimeout(r,45));
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:245}]});
+    await new Promise(r=>setTimeout(r,45));
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  }finally{
+    await cdp.detach();
+  }
+  await page.waitForFunction(()=>!document.getElementById('modal')?.classList.contains('open'),{timeout:5000});
+}
+
 async function verifyHistoricalYear(page,year){
   await page.selectOption('#espnStatsYear',String(year));
   await page.waitForFunction(y=>{
@@ -89,8 +111,9 @@ async function verifyHistoricalYear(page,year){
   const logYears=options.map(Number).filter(Boolean);
   if(logYears.length&&new Set(logYears).size!==logYears.length)throw new Error('Duplicate Game Log years for '+firstName+': '+logYears.join(','));
 
-  await page.click('#close');
-  return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350)};
+  if(phoneSheet.bodyPhone)await swipeDownToClose(page);
+  else await page.click('#close');
+  return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350),phoneSheet};
 }
 
 try{

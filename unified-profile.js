@@ -33,6 +33,7 @@ let sleeperBioPromise=null;
 let activeSeed=null;
 let preferredProfileTab=(()=>{try{return sessionStorage.getItem('shuaProfileTab')||'overview'}catch(e){return'overview'}})();
 let swipeHintShownThisSession=false;
+let compareSelection=[];
 
 const style=document.createElement('style');
 style.id='unifiedProfileStyles';
@@ -102,6 +103,33 @@ style.textContent=`
 .phone-mode #rankingPlayerNav button{min-height:38px;padding:5px 7px}
 .phone-mode #rankingPlayerNav .ranking-nav-name{font-size:.63rem}
 .phone-mode #rankingPlayerNav .ranking-nav-rank{font-size:.51rem}
+
+.player-compare-actionbar{display:flex;align-items:center;justify-content:flex-end;padding:6px;background:#07111de8;border-left:1px solid #ffffff18;border-right:1px solid #ffffff18}
+.player-compare-btn{border:1px solid #5aa6e866;border-radius:8px;background:#0c2b47;color:#eaf5ff;min-height:36px;padding:7px 11px;font-size:.67rem;font-weight:1000}
+.player-compare-btn:hover{background:#153d61;border-color:#74b9f0}
+.player-compare-btn.selected{background:#145c3d;border-color:#35d07f;color:#fff}
+#compareTray{position:fixed;left:50%;bottom:18px;z-index:135;transform:translateX(-50%);display:flex;align-items:center;gap:9px;max-width:min(92vw,580px);padding:8px 10px;border:1px solid #ffffff2c;border-radius:999px;background:#061522f4;color:#fff;box-shadow:0 10px 28px #0009;backdrop-filter:blur(10px)}
+#compareTray[hidden]{display:none!important}
+#compareTray strong{font-size:.68rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#compareTray span{color:#8fa5bb;font-size:.61rem;white-space:nowrap}
+#compareTray button{border:0;background:transparent;color:#a9bfd3;font-weight:1000;padding:2px 4px}
+#playerCompareOverlay{position:fixed;inset:0;z-index:220;display:flex;align-items:center;justify-content:center;padding:18px;background:#01050bdd;backdrop-filter:blur(6px)}
+#playerCompareOverlay[hidden]{display:none!important}
+.player-compare-shell{width:min(1040px,100%);max-height:94vh;overflow:auto;border:1px solid #ffffff20;border-radius:16px;background:#061522;box-shadow:0 22px 60px #000b}
+.player-compare-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #ffffff18;background:#07182af2}
+.player-compare-top h2{margin:0;font-size:1rem}
+.player-compare-close{width:32px;height:32px;border:1px solid #ffffff25;border-radius:999px;background:#081a2d;color:#fff;font-size:1.05rem}
+.player-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#ffffff12}
+.player-compare-card{min-width:0;background:#061522;padding:14px}
+.player-compare-player{display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid #ffffff14}
+.player-compare-face{width:64px;height:64px;border-radius:50%;object-fit:cover;background:#17314a;border:2px solid #ffffff35}
+.player-compare-title{min-width:0}.player-compare-title strong{display:block;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-compare-team{display:flex;align-items:center;gap:6px;margin-top:5px;color:#91a4ba;font-size:.66rem;font-weight:900}.player-compare-team img{width:22px;height:22px;object-fit:contain}
+.player-compare-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}
+.player-compare-stat{border:1px solid #ffffff12;border-radius:8px;background:#081a2d;padding:8px}.player-compare-stat span{display:block;color:#7f93aa;font-size:.56rem;font-weight:850}.player-compare-stat b{display:block;margin-top:3px;font-size:.86rem}
+.player-compare-recent{margin-top:11px}.player-compare-recent>span{display:block;color:#7f93aa;font-size:.57rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}.player-compare-games{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.player-compare-game{border:1px solid #ffffff12;border-radius:7px;background:#07182a;padding:6px 4px;text-align:center}.player-compare-game small{display:block;color:#7f93aa;font-size:.49rem}.player-compare-game b{display:block;margin-top:2px;font-size:.72rem}
+.phone-mode .player-compare-actionbar{width:calc(100% - 16px);margin:0 8px;padding:5px}
+.phone-mode #compareTray{bottom:max(10px,env(safe-area-inset-bottom));max-width:94vw}
+@media(max-width:620px){#playerCompareOverlay{padding:5px}.player-compare-shell{max-height:99vh;border-radius:11px}.player-compare-card{padding:9px}.player-compare-player{gap:6px}.player-compare-face{width:46px;height:46px}.player-compare-title strong{font-size:.78rem}.player-compare-team{font-size:.53rem}.player-compare-team img{width:17px;height:17px}.player-compare-stats{grid-template-columns:1fr;gap:5px}.player-compare-stat{padding:6px}.player-compare-stat span{font-size:.48rem}.player-compare-stat b{font-size:.72rem}.player-compare-games{gap:3px}.player-compare-game{padding:5px 2px}.player-compare-game b{font-size:.6rem}.player-compare-game small{font-size:.42rem}}
 
 .featured-player-profile{position:relative;width:min(790px,100%);padding:12px}
 .featured-player-profile>small,.featured-player-profile>#pn,.featured-player-profile>#pm,.featured-player-profile>#profileTop{display:none!important}
@@ -740,6 +768,102 @@ function renderHistoricalOverview(seed){
     '<div class="stat"><span>Position</span><b>'+String(seed?.position||'—')+'</b></div>';
 }
 
+function compareLocalSnapshot(name){
+  const p=playerByName(name)||basePositionPlayer(name)||{};
+  const pos=p.position||'—';
+  return {
+    name:String(name||p.name||'Player'),
+    position:pos,
+    team:p.team||'—',
+    overall:overallRank(name),
+    preseason:preseasonRank(name),
+    ros:rosRank(name,pos)
+  };
+}
+function updateCompareTray(){
+  let tray=document.getElementById('compareTray');
+  if(!compareSelection.length){if(tray)tray.hidden=true;return}
+  if(!tray){
+    tray=document.createElement('div');tray.id='compareTray';
+    tray.innerHTML='<strong id="compareTrayName"></strong><span>Choose another player to compare</span><button type="button" aria-label="Clear comparison">×</button>';
+    document.body.appendChild(tray);
+    tray.querySelector('button').onclick=()=>{compareSelection=[];updateCompareTray();updateCompareAction(document.getElementById('modal')?.dataset.unifiedName||'')};
+  }
+  tray.hidden=false;
+  const n=document.getElementById('compareTrayName');if(n)n.textContent='Compare: '+compareSelection[0];
+}
+function updateCompareAction(name){
+  const btn=document.getElementById('playerCompareBtn');if(!btn)return;
+  const selected=compareSelection.some(x=>norm(x)===norm(name));
+  btn.classList.toggle('selected',selected);
+  btn.textContent=selected?'Added to Compare':'Compare';
+}
+function ensureCompareAction(name){
+  const box=document.querySelector('#modal .profile'),hero=document.getElementById('featuredPlayerCard');
+  if(!box||!hero)return;
+  let bar=document.getElementById('playerCompareActionbar');
+  if(!bar){
+    bar=document.createElement('div');bar.id='playerCompareActionbar';bar.className='player-compare-actionbar';
+    bar.innerHTML='<button type="button" id="playerCompareBtn" class="player-compare-btn">Compare</button>';
+  }
+  if(bar.previousSibling!==hero)hero.insertAdjacentElement('afterend',bar);
+  updateCompareAction(name);
+  const btn=document.getElementById('playerCompareBtn');
+  btn.onclick=async()=>{
+    const current=document.getElementById('modal')?.dataset.unifiedName||name;
+    const idx=compareSelection.findIndex(x=>norm(x)===norm(current));
+    if(idx>=0){compareSelection.splice(idx,1);updateCompareTray();updateCompareAction(current);return}
+    if(compareSelection.length>=2)compareSelection=[];
+    compareSelection.push(current);
+    updateCompareTray();updateCompareAction(current);
+    if(compareSelection.length===2){
+      await openPlayerComparison(compareSelection[0],compareSelection[1]);
+    }
+  };
+}
+function compareNum(v,d=1){return Number.isFinite(Number(v))?Number(v).toFixed(d):'—'}
+function compareRank(v){return Number.isFinite(Number(v))&&Number(v)>0?'#'+Number(v):'—'}
+function compareCardHtml(local,espn){
+  const logo=espn?.teamLogo||featuredLogoUrl(local.team);
+  const face=espn?.headshot||'';
+  const teamName=featuredTeamName(espn?.team||local.team);
+  const recent=(espn?.recent||[]).slice(-5);
+  const latest=espn?.latestFinish;
+  const recentHtml=recent.length?recent.map(g=>'<div class="player-compare-game"><small>W'+g.week+(g.opponent?' · '+g.opponent:'')+'</small><b>'+compareNum(g.points)+'</b></div>').join(''):'<div class="player-compare-game"><small>Recent</small><b>—</b></div>';
+  return '<div class="player-compare-card">'+
+    '<div class="player-compare-player">'+
+      (face?'<img class="player-compare-face" src="'+face+'" alt="">':'<div class="player-compare-face"></div>')+
+      '<div class="player-compare-title"><strong>'+local.name+'</strong><div class="player-compare-team">'+(logo?'<img src="'+logo+'" alt="">':'')+'<span>'+teamName+' · '+local.position+'</span></div></div>'+
+    '</div>'+
+    '<div class="player-compare-stats">'+
+      '<div class="player-compare-stat"><span>Overall Rank</span><b>'+compareRank(local.overall)+'</b></div>'+
+      '<div class="player-compare-stat"><span>ROS '+local.position+'</span><b>'+compareRank(local.ros)+'</b></div>'+
+      '<div class="player-compare-stat"><span>Preseason '+local.position+'</span><b>'+compareRank(local.preseason)+'</b></div>'+
+      '<div class="player-compare-stat"><span>ESPN '+local.position+'</span><b>'+compareRank(espn?.espnRank)+'</b></div>'+
+      '<div class="player-compare-stat"><span>2026 PPG</span><b>'+compareNum(espn?.ppg)+'</b></div>'+
+      '<div class="player-compare-stat"><span>2026 PPR</span><b>'+compareNum(espn?.points)+'</b></div>'+
+      '<div class="player-compare-stat"><span>Latest Finish</span><b>'+(latest?latest.year+' '+latest.position+compareRank(latest.rank):'—')+'</b></div>'+
+      '<div class="player-compare-stat"><span>Latest Finish PPG</span><b>'+compareNum(latest?.ppg)+'</b></div>'+
+    '</div>'+
+    '<div class="player-compare-recent"><span>Last 5 Games</span><div class="player-compare-games">'+recentHtml+'</div></div>'+
+  '</div>';
+}
+async function openPlayerComparison(a,b){
+  let overlay=document.getElementById('playerCompareOverlay');
+  if(!overlay){
+    overlay=document.createElement('div');overlay.id='playerCompareOverlay';overlay.hidden=true;
+    overlay.innerHTML='<div class="player-compare-shell"><div class="player-compare-top"><h2>Player Comparison</h2><button type="button" class="player-compare-close">×</button></div><div id="playerCompareGrid" class="player-compare-grid"></div></div>';
+    document.body.appendChild(overlay);
+    overlay.querySelector('.player-compare-close').onclick=()=>{overlay.hidden=true};
+    overlay.onclick=e=>{if(e.target===overlay)overlay.hidden=true};
+  }
+  const grid=document.getElementById('playerCompareGrid');
+  overlay.hidden=false;grid.innerHTML='<div class="unified-profile-loading">Loading comparison…</div><div class="unified-profile-loading">Loading comparison…</div>';
+  const locals=[compareLocalSnapshot(a),compareLocalSnapshot(b)];
+  const snaps=await Promise.all([a,b].map(n=>window.ShuaEspnLive?.getComparisonSnapshot?window.ShuaEspnLive.getComparisonSnapshot(n):Promise.resolve({})));
+  if(overlay.hidden)return;
+  grid.innerHTML=compareCardHtml(locals[0],snaps[0])+compareCardHtml(locals[1],snaps[1]);
+}
 function ensureStickyIdentity(name){
   const box=document.querySelector('#modal .profile');if(!box)return;
   let bar=document.getElementById('playerStickyIdentity');
@@ -792,6 +916,10 @@ function installKeyboardPlayerNav(){
   if(document.documentElement.dataset.playerKeyboardNav==='1')return;
   document.documentElement.dataset.playerKeyboardNav='1';
   document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      const overlay=document.getElementById('playerCompareOverlay');
+      if(overlay&&!overlay.hidden){overlay.hidden=true;e.preventDefault();return}
+    }
     if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
     const modal=document.getElementById('modal');
     if(!modal?.classList.contains('open')||historicalSeed())return;
@@ -1041,6 +1169,7 @@ function prepareUnified(name,seed=null){
   modal.dataset.unifiedName=name;
   applyFeaturedProfile(name,seed);
   renderOverviewRanks(name);
+  ensureCompareAction(name);
   ensureStickyIdentity(name);
   ensureSwipeHint();
   const currentId=document.getElementById('modal')?.dataset.id||playerByName(name)?.id||'';

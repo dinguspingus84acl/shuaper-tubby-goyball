@@ -36,6 +36,24 @@ async function verifyHistoricalYear(page,year){
 
   await first.locator('.espn-name-btn').click();
   await page.waitForSelector('#modal.open',{timeout:30000});
+
+  const phoneSheet=await page.locator('#modal .profile').evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    const close=document.getElementById('close');
+    return {
+      bodyPhone:document.body.classList.contains('phone-mode'),
+      width:r.width,height:r.height,top:r.top,left:r.left,
+      innerWidth:window.innerWidth,innerHeight:window.innerHeight,
+      closeDisplay:close?getComputedStyle(close).display:'missing'
+    };
+  });
+  if(phoneSheet.bodyPhone){
+    if(phoneSheet.width<phoneSheet.innerWidth-2||phoneSheet.height<phoneSheet.innerHeight-2)
+      throw new Error('Phone profile does not fill viewport: '+JSON.stringify(phoneSheet));
+    if(phoneSheet.closeDisplay!=='none')
+      throw new Error('Phone profile close button should be hidden: '+JSON.stringify(phoneSheet));
+  }
+
   const tabs=await page.locator('#unifiedProfileTabs .unified-profile-tab').allInnerTexts();
   if(!tabs.includes('History')||!tabs.includes('Game Log'))throw new Error('Missing History/Game Log tabs for '+firstName);
 

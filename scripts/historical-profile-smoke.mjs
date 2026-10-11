@@ -39,6 +39,22 @@ async function swipeDownToClose(page){
   await page.waitForFunction(()=>!document.getElementById('modal')?.classList.contains('open'),{timeout:5000});
 }
 
+async function selectProfileTab(page,key){
+  const phone=await page.evaluate(()=>document.body.classList.contains('phone-mode'));
+  if(phone){
+    const visibleBefore=await page.locator('#unifiedProfileTabs .unified-profile-tab:visible').count();
+    if(visibleBefore!==1)throw new Error('Phone profile should show exactly one tab heading, saw '+visibleBefore);
+    await page.locator('#unifiedProfileTabs .unified-profile-tab.active').click();
+    await page.waitForFunction(()=>document.getElementById('unifiedProfileTabs')?.classList.contains('phone-tab-menu-open'));
+  }
+  await page.locator('[data-profile-tab="'+key+'"]').click();
+  if(phone){
+    await page.waitForFunction(()=>!document.getElementById('unifiedProfileTabs')?.classList.contains('phone-tab-menu-open'));
+    const visibleAfter=await page.locator('#unifiedProfileTabs .unified-profile-tab:visible').count();
+    if(visibleAfter!==1)throw new Error('Phone profile tab heading did not collapse after selecting '+key);
+  }
+}
+
 async function verifyHistoricalYear(page,year){
   await page.selectOption('#espnStatsYear',String(year));
   await page.waitForFunction(y=>{
@@ -87,7 +103,7 @@ async function verifyHistoricalYear(page,year){
   const profileFaceLoaded=await profileFace.evaluate(el=>el.complete&&el.naturalWidth>0);
   if(!rowFaceLoaded||!profileFaceLoaded)throw new Error('Face did not load for '+firstName+' in '+year);
 
-  await page.click('[data-profile-tab="history"]');
+  await selectProfileTab(page,'history');
   await page.waitForFunction(()=>document.querySelectorAll('#unifiedHistoryPanel .player-history-row').length>0,{timeout:120000});
   const yearTexts=await page.locator('#unifiedHistoryPanel .player-history-year').allInnerTexts();
   const historyYears=yearTexts.map(x=>Number(x.replace(/[^0-9]/g,''))).filter(Boolean);
@@ -107,6 +123,10 @@ async function verifyHistoricalYear(page,year){
   const detail=page.locator('#unifiedHistoryPanel .player-history-detail.open').first();
   const detailText=await detail.innerText();
   if(/Could not load/.test(detailText))throw new Error('Game log failed for '+firstName+' '+year);
+
+  const opponentLabels=await detail.locator('.espn-game-log-table tbody tr td:nth-child(2)').allInnerTexts();
+  const badOpponent=opponentLabels.find(x=>/^\s*(?:@|vs\.?\b)/i.test(x));
+  if(badOpponent)throw new Error('Game Log opponent still includes @/vs prefix: '+badOpponent);
 
   const gameLogLayout=await detail.locator('.espn-game-log-table').evaluate(table=>{
     const wrap=table.closest('.espn-game-log-table-wrap');

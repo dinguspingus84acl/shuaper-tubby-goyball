@@ -72,18 +72,21 @@ style.textContent=`
 .player-sticky-identity{display:none;position:sticky;top:0;z-index:32;min-height:46px;align-items:center;gap:10px;padding:7px 10px;border:1px solid #ffffff20;border-radius:9px;background:#061522f7;box-shadow:0 8px 20px #0008;backdrop-filter:blur(10px)}
 .player-sticky-identity.visible{display:flex}
 .player-sticky-main{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
+.player-sticky-face{width:32px;height:32px;flex:0 0 32px;border-radius:50%;overflow:hidden;background:#17314a;border:1px solid #ffffff28;display:flex;align-items:center;justify-content:center}
+.player-sticky-face .featured-photo{width:100%!important;height:100%!important;object-fit:cover!important;border-radius:50%!important;font-size:.62rem!important;display:flex!important;align-items:center!important;justify-content:center!important}
 .player-sticky-name{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.82rem;font-weight:1000;color:#fff}
 .player-sticky-divider{width:1px;height:24px;background:#ffffff22;flex:0 0 1px}
 .player-sticky-team{display:flex;align-items:center;gap:7px;min-width:0;color:#c8d5e2;font-size:.67rem;font-weight:950;white-space:nowrap}
 .player-sticky-team-logo{width:24px;height:24px;object-fit:contain;flex:0 0 24px;filter:drop-shadow(0 2px 5px #0007)}
 .player-sticky-team-name{max-width:150px;overflow:hidden;text-overflow:ellipsis}
 .player-sticky-position{flex:0 0 auto;border:1px solid color-mix(in srgb,var(--profile-accent,#3d8cff) 50%,#ffffff20);border-radius:999px;padding:4px 7px;background:color-mix(in srgb,var(--profile-accent,#3d8cff) 16%,#081a2d);color:#fff;font-size:.6rem;font-weight:1000}
-.phone-mode .player-sticky-identity{width:calc(100% - 16px);margin:0 8px;min-height:44px;padding:6px 8px;border-radius:9px}
-.phone-mode .player-sticky-name{font-size:.75rem;max-width:36vw}
-.phone-mode .player-sticky-team{gap:5px;font-size:.58rem}
-.phone-mode .player-sticky-team-logo{width:21px;height:21px;flex-basis:21px}
-.phone-mode .player-sticky-team-name{max-width:29vw}
-.phone-mode .player-sticky-position{font-size:.54rem;padding:3px 6px}
+.phone-mode .player-sticky-identity{width:calc(100% - 16px);margin:0 8px;min-height:56px;padding:8px 9px;border-radius:10px}
+.phone-mode .player-sticky-face{width:36px;height:36px;flex-basis:36px}
+.phone-mode .player-sticky-name{font-size:.82rem;max-width:31vw}
+.phone-mode .player-sticky-team{gap:6px;font-size:.62rem}
+.phone-mode .player-sticky-team-logo{width:23px;height:23px;flex-basis:23px}
+.phone-mode .player-sticky-team-name{max-width:27vw}
+.phone-mode .player-sticky-position{font-size:.58rem;padding:4px 7px}
 .player-swipe-hint{display:none;position:fixed;left:50%;bottom:max(18px,calc(10px + env(safe-area-inset-bottom)));z-index:140;transform:translateX(-50%);padding:8px 12px;border:1px solid #ffffff2c;border-radius:999px;background:#061522ef;color:#e6eef7;font-size:.65rem;font-weight:950;box-shadow:0 8px 26px #0009;pointer-events:none;animation:swipeHintIn .18s ease both}
 .phone-mode .player-swipe-hint{display:block}
 @keyframes swipeHintIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
@@ -892,8 +895,11 @@ function ensureStickyIdentity(name){
   const pos=String(p?.position||'—').toUpperCase();
   const teamName=featuredTeamName(team);
   const logo=featuredLogoUrl(team);
+  const stickyPlayer={...p,name:String(name||p?.name||'Player'),team,pos};
+  const face=featuredFaceHtml(stickyPlayer);
   bar.innerHTML=
     '<div class="player-sticky-main">'+
+      '<span class="player-sticky-face">'+face+'</span>'+
       '<strong class="player-sticky-name">'+String(name||p?.name||'Player')+'</strong>'+
       '<span class="player-sticky-divider"></span>'+
       '<span class="player-sticky-team">'+
@@ -905,7 +911,7 @@ function ensureStickyIdentity(name){
   const sync=()=>{
     const visible=box.scrollTop>90;
     bar.classList.toggle('visible',visible);
-    box.style.setProperty('--sticky-player-name-height',visible?'46px':'0px');
+    box.style.setProperty('--sticky-player-name-height',visible?(document.body.classList.contains('phone-mode')?'58px':'46px'):'0px');
   };
   if(box.dataset.stickyIdentityInstalled!=='1'){
     box.dataset.stickyIdentityInstalled='1';

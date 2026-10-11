@@ -212,10 +212,22 @@ function teamLogo(team){
 function playerHeadshot(player){
   const explicit=String(player?.headshot||'').trim();
   const id=String(player?.id||'');
-  const src=explicit||(id&&/^\d+$/.test(id)?'https://a.espncdn.com/i/headshots/nfl/players/full/'+id+'.png':'');
+  let sleeper='';
+  try{
+    if(typeof playerPhotoId==='function'){
+      const sid=playerPhotoId(player?.name||'',player?.team||'',player?.position||'');
+      if(sid)sleeper='https://sleepercdn.com/content/nfl/players/thumb/'+sid+'.jpg';
+    }
+  }catch(e){}
+  const espn=id&&/^\d+$/.test(id)?'https://a.espncdn.com/i/headshots/nfl/players/full/'+id+'.png':'';
+  const src=explicit||sleeper||espn;
+  const fallback=sleeper&&src!==sleeper?sleeper:(espn&&src!==espn?espn:'');
   const initials=String(player?.name||'?').split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase()||'?';
   if(!src)return '<span class="espn-headshot espn-headshot-fallback">'+initials+'</span>';
-  return '<img class="espn-headshot" src="'+src+'" alt="'+String(player?.name||'')+'" loading="lazy" onerror="this.outerHTML=\'<span class=&quot;espn-headshot espn-headshot-fallback&quot;>'+initials+'</span>\'">';
+  const onerror=fallback
+    ? "this.onerror=function(){this.outerHTML='<span class=&quot;espn-headshot espn-headshot-fallback&quot;>"+initials+"</span>'};this.src='"+fallback+"'"
+    : "this.outerHTML='<span class=&quot;espn-headshot espn-headshot-fallback&quot;>"+initials+"</span>'";
+  return '<img class="espn-headshot" src="'+src+'" alt="'+String(player?.name||'')+'" loading="lazy" onerror="'+onerror+'">';
 }
 function statSource(s){return Number(s?.statSourceId ?? s?.statTypeId ?? -1)}
 function splitType(s){return Number(s?.statSplitTypeId ?? (Number(s?.scoringPeriodId||0)===0?0:1))}
@@ -438,6 +450,43 @@ async function getHistoricalCareer(name){
   }));
   return results.filter(Boolean).sort((a,b)=>b.year-a.year);
 }
+function liveCareerRow(name){
+  const key=norm(name);
+  const p=rows.find(x=>norm(x.name)===key)||null;
+  if(!p)return null;
+  const posRows=rows.filter(x=>x.position===p.position).sort((a,b)=>b.points-a.points||((b.average??-Infinity)-(a.average??-Infinity))||a.name.localeCompare(b.name));
+  const i=posRows.findIndex(x=>String(x.id)===String(p.id));
+  return {
+    ...p,
+    year:SEASON,
+    seasonYear:SEASON,
+    rank:i>=0?i+1:null,
+    games:p.gamesPlayed,
+    ppg:p.average,
+    teamAbbr:p.team,
+    source:'espn-live'
+  };
+}
+async function getCompleteCareer(name){
+  const historical=await getHistoricalCareer(name).catch(()=>[]);
+  let live=liveCareerRow(name);
+  if(!live){
+    try{
+      await ensureCurrentRows();
+      live=liveCareerRow(name);
+    }catch(e){}
+  }
+  const all=[...(live?[live]:[]),...historical];
+  const seen=new Set();
+  return all
+    .filter(x=>{
+      const key=Number(x.year);
+      if(!Number.isFinite(key)||seen.has(key))return false;
+      seen.add(key);return true;
+    })
+    .sort((a,b)=>b.year-a.year);
+}
+
 async function loadHistoricalPlayerYear(name,year){
   const key=norm(name);
   const rows=await fetchHistoricalSeason(Number(year));
@@ -623,7 +672,7 @@ function availableGameLogYears(player){
   return years.length?years:[SEASON];
 }
 async function discoverGameLogYears(player){
-  const localCareer=await getHistoricalCareer(player.name).catch(()=>[]);
+  const localCareer=await getCompleteCareer(player.name).catch(()=>[]);
   if(localCareer.length){
     const years=localCareer.map(x=>Number(x.year)).filter(Number.isFinite).sort((a,b)=>b-a);
     if(rows.some(x=>norm(x.name)===norm(player.name))&&!years.includes(SEASON))years.unshift(SEASON);
@@ -1218,10 +1267,26 @@ window.ShuaEspnLive={
     return rows.find(p=>norm(p.name)===norm(name))||null;
   },
   async getAnyPlayerByName(name,preferredYear){
-    return rows.find(p=>norm(p.name)===norm(name))||statsRows.find(p=>norm(p.name)===norm(name))||await getAnyHistoricalPlayer(name,preferredYear);
+    if(preferredYear&&Number(preferredYear)===SEASON){
+      await ensureCurrentRows().catch(()=>{});
+      const live=rows.find(p=>norm(p.name)===norm(name));
+      if(live)return {...live,seasonYear:SEASON,year:SEASON,source:'espn-live'};
+    }
+    return statsRows.find(p=>norm(p.name)===norm(name))||rows.find(p=>norm(p.name)===norm(name))||await getAnyHistoricalPlayer(name,preferredYear);
   },
   getHistoricalCareer,
-  getPlayerHeadshotUrl(player){return historicalHeadshot(player)||(player?.id?/^\d+$/.test(String(player.id))?'https://a.espncdn.com/i/headshots/nfl/players/full/'+player.id+'.png':'':'')},
+  getCompleteCareer,
+  getPlayerHeadshotUrl(player){
+    const explicit=historicalHeadshot(player);
+    if(explicit)return explicit;
+    try{
+      if(typeof playerPhotoId==='function'){
+        const sid=playerPhotoId(player?.name||'',player?.team||'',player?.position||'');
+        if(sid)return 'https://sleepercdn.com/content/nfl/players/thumb/'+sid+'.jpg';
+      }
+    }catch(e){}
+    return player?.id&&/^\d+$/.test(String(player.id))?'https://a.espncdn.com/i/headshots/nfl/players/full/'+player.id+'.png':'';
+  },
   getTeamLogoUrl(team){return historicalTeamLogoUrl(team)},
   async getHeadshotByName(name){
     const current=rows.find(p=>norm(p.name)===norm(name))||statsRows.find(p=>norm(p.name)===norm(name));
@@ -1230,6 +1295,12 @@ window.ShuaEspnLive={
       if(direct)return direct;
       if(/^\d+$/.test(String(current.id||'')))return 'https://a.espncdn.com/i/headshots/nfl/players/full/'+current.id+'.png';
     }
+    try{
+      if(typeof playerPhotoId==='function'){
+        const sid=playerPhotoId(name,'','');
+        if(sid)return 'https://sleepercdn.com/content/nfl/players/thumb/'+sid+'.jpg';
+      }
+    }catch(e){}
     const map=await loadHeadshotIndex();
     return map[norm(name)]||'';
   },

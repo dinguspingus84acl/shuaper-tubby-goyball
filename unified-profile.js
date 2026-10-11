@@ -54,7 +54,7 @@ style.textContent=`
 #unifiedNotesPanel .note-box{margin-top:0}
 #espnProfileGameLogWrap{display:none!important}
 
-.featured-player-profile{width:min(1120px,100%);padding:14px}
+.featured-player-profile{position:relative;width:min(1120px,100%);padding:14px}
 .featured-player-profile>small,.featured-player-profile>#pn,.featured-player-profile>#pm,.featured-player-profile>#profileTop{display:none!important}
 .featured-player-profile .closem{
   position:absolute;right:24px;top:24px;z-index:12;

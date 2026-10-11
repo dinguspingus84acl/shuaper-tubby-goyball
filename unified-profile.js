@@ -69,10 +69,21 @@ style.textContent=`
 .unified-stat-item b{display:block;margin-top:2px;font-size:.76rem}
 .unified-profile-loading{padding:14px 4px;color:#7f93aa;font-size:.66rem}
 #unifiedNotesPanel .note-box{margin-top:0}
-.player-sticky-identity{display:none;position:sticky;top:0;z-index:32;min-height:38px;align-items:center;justify-content:space-between;gap:10px;padding:7px 12px;border:1px solid #ffffff18;border-radius:9px;background:#061522f5;box-shadow:0 8px 20px #0007;backdrop-filter:blur(10px)}
+.player-sticky-identity{display:none;position:sticky;top:0;z-index:32;min-height:46px;align-items:center;gap:10px;padding:7px 10px;border:1px solid #ffffff20;border-radius:9px;background:#061522f7;box-shadow:0 8px 20px #0008;backdrop-filter:blur(10px)}
 .player-sticky-identity.visible{display:flex}
-.player-sticky-identity strong{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.78rem}
-.player-sticky-identity span{color:#91a4ba;font-size:.62rem;font-weight:900;white-space:nowrap}
+.player-sticky-main{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
+.player-sticky-name{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.82rem;font-weight:1000;color:#fff}
+.player-sticky-divider{width:1px;height:24px;background:#ffffff22;flex:0 0 1px}
+.player-sticky-team{display:flex;align-items:center;gap:7px;min-width:0;color:#c8d5e2;font-size:.67rem;font-weight:950;white-space:nowrap}
+.player-sticky-team-logo{width:24px;height:24px;object-fit:contain;flex:0 0 24px;filter:drop-shadow(0 2px 5px #0007)}
+.player-sticky-team-name{max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.player-sticky-position{flex:0 0 auto;border:1px solid color-mix(in srgb,var(--profile-accent,#3d8cff) 50%,#ffffff20);border-radius:999px;padding:4px 7px;background:color-mix(in srgb,var(--profile-accent,#3d8cff) 16%,#081a2d);color:#fff;font-size:.6rem;font-weight:1000}
+.phone-mode .player-sticky-identity{width:calc(100% - 16px);margin:0 8px;min-height:44px;padding:6px 8px;border-radius:9px}
+.phone-mode .player-sticky-name{font-size:.75rem;max-width:36vw}
+.phone-mode .player-sticky-team{gap:5px;font-size:.58rem}
+.phone-mode .player-sticky-team-logo{width:21px;height:21px;flex-basis:21px}
+.phone-mode .player-sticky-team-name{max-width:29vw}
+.phone-mode .player-sticky-position{font-size:.54rem;padding:3px 6px}
 .player-swipe-hint{display:none;position:fixed;left:50%;bottom:max(18px,calc(10px + env(safe-area-inset-bottom)));z-index:140;transform:translateX(-50%);padding:8px 12px;border:1px solid #ffffff2c;border-radius:999px;background:#061522ef;color:#e6eef7;font-size:.65rem;font-weight:950;box-shadow:0 8px 26px #0009;pointer-events:none;animation:swipeHintIn .18s ease both}
 .phone-mode .player-swipe-hint{display:block}
 @keyframes swipeHintIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
@@ -737,19 +748,32 @@ function ensureStickyIdentity(name){
     const close=document.getElementById('close');
     if(close?.parentNode===box)close.insertAdjacentElement('afterend',bar);else box.prepend(bar);
   }
-  const p=playerByName(name)||basePositionPlayer(name);
-  bar.innerHTML='<strong>'+String(name||'Player')+'</strong><span>'+String(p?.position||'—')+' · '+String(p?.team||'—')+'</span>';
+  const seed=historicalSeed();
+  const p=seed||playerByName(name)||basePositionPlayer(name)||{};
+  const team=String(p?.team||'').toUpperCase();
+  const pos=String(p?.position||'—').toUpperCase();
+  const teamName=featuredTeamName(team);
+  const logo=featuredLogoUrl(team);
+  bar.innerHTML=
+    '<div class="player-sticky-main">'+
+      '<strong class="player-sticky-name">'+String(name||p?.name||'Player')+'</strong>'+
+      '<span class="player-sticky-divider"></span>'+
+      '<span class="player-sticky-team">'+
+        (logo?'<img class="player-sticky-team-logo" src="'+logo+'" alt="'+teamName+' logo">':'')+
+        '<span class="player-sticky-team-name">'+teamName+'</span>'+
+      '</span>'+
+    '</div>'+
+    '<span class="player-sticky-position">'+pos+'</span>';
+  const sync=()=>{
+    const visible=box.scrollTop>90;
+    bar.classList.toggle('visible',visible);
+    box.style.setProperty('--sticky-player-name-height',visible?'46px':'0px');
+  };
   if(box.dataset.stickyIdentityInstalled!=='1'){
     box.dataset.stickyIdentityInstalled='1';
-    box.addEventListener('scroll',()=>{
-      const visible=box.scrollTop>150;
-      bar.classList.toggle('visible',visible);
-      box.style.setProperty('--sticky-player-name-height',visible?'38px':'0px');
-    },{passive:true});
+    box.addEventListener('scroll',sync,{passive:true});
   }
-  const visible=box.scrollTop>150;
-  bar.classList.toggle('visible',visible);
-  box.style.setProperty('--sticky-player-name-height',visible?'38px':'0px');
+  sync();
 }
 function ensureSwipeHint(){
   if(!document.body.classList.contains('phone-mode')||swipeHintShownThisSession)return;

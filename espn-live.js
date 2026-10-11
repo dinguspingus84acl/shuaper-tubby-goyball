@@ -117,6 +117,22 @@ style.textContent=`
 .espn-game-log-tab{border:1px solid #ffffff20;background:#081a2d;color:#91a4ba;border-radius:8px;padding:6px 10px;font-size:.62rem;font-weight:950}
 .espn-game-log-tab.active{background:#183d63;color:#fff;border-color:#ffffff35}
 .espn-game-log-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 8px}
+.espn-game-log-summary{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin:0 0 8px;padding:8px 10px;border:1px solid #ffffff12;border-radius:9px;
+  background:#07182a;color:#dbe7f3;font-variant-numeric:tabular-nums
+}
+.espn-game-log-summary strong{font-size:.7rem}
+.espn-game-log-summary span{color:#8da1b7;font-size:.62rem;font-weight:850}
+.espn-game-log-controls{
+  position:sticky;top:0;z-index:7;background:#061522;
+  padding-top:4px
+}
+.espn-game-log-opponent{display:flex;align-items:center;gap:6px;min-width:0}
+.espn-game-log-opponent-logo{width:18px;height:18px;object-fit:contain;flex:0 0 18px}
+.espn-game-log-table .gl-pts-high{color:#b7f3c8!important;background:#39d17b12}
+.espn-game-log-table .gl-pts-mid{color:#e8f0f7!important;background:#ffffff08}
+.espn-game-log-table .gl-pts-low{color:#d8a7af!important;background:#c94b6110}
 .espn-game-log-table-wrap{overflow-x:auto}
 .espn-game-log-table{
   width:auto;min-width:540px;max-width:100%;border-collapse:collapse;
@@ -155,9 +171,18 @@ style.textContent=`
     padding:10px 14px 8px;border-left:1px solid #ffffff12;border-right:1px solid #ffffff12;
     background:#07182a
   }
+  .espn-game-log-controls{
+    position:sticky;top:0;z-index:8;
+    border-left:1px solid #ffffff12;border-right:1px solid #ffffff12;
+    background:#07182a;box-shadow:0 8px 18px #0005
+  }
+  .espn-game-log-year-row{border-left:0!important;border-right:0!important}
   .espn-game-log-tabs{
-    padding:0 14px 11px;border-left:1px solid #ffffff12;border-right:1px solid #ffffff12;
+    padding:0 14px 11px;border-left:0;border-right:0;
     background:#07182a
+  }
+  .espn-game-log-summary{
+    margin:0 0 10px;padding:10px 12px;border-radius:10px
   }
   .espn-game-log-tab{padding:7px 13px;font-size:.68rem}
   .espn-game-log-table-wrap{
@@ -221,6 +246,16 @@ style.textContent=`
     width:48px!important;text-align:left!important
   }
   .espn-game-log-table .gl-col-turnovers{width:58px!important}
+  .espn-game-log-controls{
+    position:sticky!important;top:0!important;z-index:9!important;
+    margin:0!important;padding-top:4px!important;background:#061522!important;
+    box-shadow:0 6px 14px #0006
+  }
+  .espn-game-log-summary{padding:7px 8px!important;margin-bottom:6px!important}
+  .espn-game-log-summary strong{font-size:.65rem!important}
+  .espn-game-log-summary span{font-size:.56rem!important}
+  .espn-game-log-opponent{gap:4px}
+  .espn-game-log-opponent-logo{width:15px;height:15px;flex-basis:15px}
   .espn-game-log-tabs{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:6px}
   .espn-game-log-tab{flex:0 0 auto}
   .espn-game-log-year-row{justify-content:flex-start}
@@ -620,14 +655,19 @@ function historicalGameLogHtml(player,career,year){
   const tabs='<div class="espn-game-log-tabs">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" data-hist-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
   const title='<div class="espn-game-log-title"><strong>'+seasonRow.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
   const games=Array.isArray(seasonRow.games)?seasonRow.games:[];
-  if(!games.length)return title+yearSelect+tabs+'<div class="espn-game-log-empty">No game stats found for '+year+'.</div>';
+  const histGp=Number(seasonRow.gamesPlayed)||games.filter(g=>g?.hasStats).length;
+  const histPts=Number.isFinite(Number(seasonRow.points))?Number(seasonRow.points):games.reduce((sum,g)=>sum+(g?.hasStats?Number(g.totalPoints||0):0),0);
+  const histPpg=Number.isFinite(Number(seasonRow.average))?Number(seasonRow.average):(Number.isFinite(Number(seasonRow.ppg))?Number(seasonRow.ppg):(histGp?histPts/histGp:null));
+  const summary=gameLogSummaryHtml(year,histPts,histPpg,histGp);
+  const controls='<div class="espn-game-log-controls">'+yearSelect+tabs+'</div>';
+  if(!games.length)return title+summary+controls+'<div class="espn-game-log-empty">No game stats found for '+year+'.</div>';
   const cols=gameLogColumns(mode,seasonRow.position);
-  return title+yearSelect+tabs+
+  return title+summary+controls+
     '<div class="espn-game-log-table-wrap"><table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th>'+
     cols.map(col=>'<th class="'+(col.key==='pts'?'gl-pts ':'')+'gl-col-'+col.key+'">'+col.label+'</th>').join('')+
     '</tr></thead><tbody>'+
-    games.map(g=>'<tr><td>'+g.week+'</td><td>'+cleanGameLogOpponent(g.opponent)+'</td>'+
-      cols.map(col=>'<td class="'+(col.key==='pts'?'gl-pts ':'gl-stat ')+'gl-col-'+col.key+'">'+gameLogCell(g,col.key,mode,seasonRow.position)+'</td>').join('')+
+    games.map(g=>'<tr><td>'+g.week+'</td><td>'+gameLogOpponentHtml(g.opponent)+'</td>'+
+      cols.map(col=>'<td class="'+(col.key==='pts'?'gl-pts'+gameLogPointsClass(g,mode,seasonRow.position)+' ':'gl-stat ')+'gl-col-'+col.key+'">'+gameLogCell(g,col.key,mode,seasonRow.position)+'</td>').join('')+
     '</tr>').join('')+
     '</tbody></table></div>';
 }
@@ -959,6 +999,27 @@ function cleanGameLogOpponent(value){
     .replace(/^vs\.?\s*/i,'')
     .trim();
 }
+function gameLogOpponentHtml(value){
+  const opp=cleanGameLogOpponent(value)||'—';
+  const slug=TEAM_SLUGS[opp]||TEAM_SLUGS[String(opp).toUpperCase()];
+  const logo=slug?'<img class="espn-game-log-opponent-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/'+slug+'.png" alt="">':'';
+  return '<span class="espn-game-log-opponent">'+logo+'<span>'+opp+'</span></span>';
+}
+function gameLogPointsClass(g,mode,position){
+  const pts=categoryPoints(g,mode,position);
+  if(pts===null||!Number.isFinite(Number(pts)))return '';
+  const n=Number(pts);
+  return n>=25?' gl-pts-high':n<10?' gl-pts-low':' gl-pts-mid';
+}
+function gameLogSummaryHtml(year,points,ppg,gp){
+  const total=Number(points);
+  const avg=Number(ppg);
+  const games=Number(gp);
+  const ppr=Number.isFinite(total)?total.toFixed(1):'—';
+  const ppgText=Number.isFinite(avg)?avg.toFixed(1):'—';
+  const gpText=Number.isFinite(games)?String(Math.round(games)):'—';
+  return '<div class="espn-game-log-summary"><strong>'+year+' Season</strong><span>'+ppgText+' PPG · '+ppr+' PPR · '+gpText+' GP</span></div>';
+}
 function gameLogCell(g,key,mode,position){
   if(!g?.hasStats)return '—';
   if(key==='pts'){
@@ -984,16 +1045,21 @@ function gameLogHtml(player,opts={}){
     '</select></div>':'';
   const tabs='<div class="espn-game-log-tabs">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" data-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
   const title='<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
-  if(!cached)return title+yearSelect+tabs+'<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
-  if(cached.error)return title+yearSelect+tabs+'<div class="espn-game-log-empty espn-error">Could not load '+year+' game log.</div>';
-  if(!cached.rows.length)return title+yearSelect+tabs+'<div class="espn-game-log-empty">No game stats found for '+year+'.</div>';
+  const controls='<div class="espn-game-log-controls">'+yearSelect+tabs+'</div>';
+  if(!cached)return title+controls+'<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
+  if(cached.error)return title+controls+'<div class="espn-game-log-empty espn-error">Could not load '+year+' game log.</div>';
+  if(!cached.rows.length)return title+controls+'<div class="espn-game-log-empty">No game stats found for '+year+'.</div>';
+  const played=cached.rows.filter(g=>g?.hasStats);
+  const totalPts=played.reduce((sum,g)=>sum+Number(g.totalPoints||0),0);
+  const gp=played.length;
+  const summary=gameLogSummaryHtml(year,totalPts,gp?totalPts/gp:null,gp);
   const cols=gameLogColumns(mode,player.position);
-  return title+yearSelect+tabs+
+  return title+summary+controls+
     '<div class="espn-game-log-table-wrap"><table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th>'+
     cols.map(c=>'<th class="'+(c.key==='pts'?'gl-pts ':'')+'gl-col-'+c.key+'">'+c.label+'</th>').join('')+
     '</tr></thead><tbody>'+
-    cached.rows.map(g=>'<tr class="'+(!g.hasStats?'gl-unplayed':'')+'"><td>'+g.week+'</td><td>'+cleanGameLogOpponent(g.opponent)+'</td>'+
-      cols.map(c=>'<td class="'+(c.key==='pts'?'gl-pts ':'gl-stat ')+'gl-col-'+c.key+'">'+gameLogCell(g,c.key,mode,player.position)+'</td>').join('')+
+    cached.rows.map(g=>'<tr class="'+(!g.hasStats?'gl-unplayed':'')+'"><td>'+g.week+'</td><td>'+gameLogOpponentHtml(g.opponent)+'</td>'+
+      cols.map(c=>'<td class="'+(c.key==='pts'?'gl-pts'+gameLogPointsClass(g,mode,player.position)+' ':'gl-stat ')+'gl-col-'+c.key+'">'+gameLogCell(g,c.key,mode,player.position)+'</td>').join('')+
     '</tr>').join('')+
     '</tbody></table></div>';
 }

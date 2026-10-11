@@ -51,6 +51,8 @@ async function verifyHistoricalYear(page,year){
   await page.waitForFunction(()=>document.querySelectorAll('#unifiedHistoryPanel .player-history-row').length>0,{timeout:120000});
   const yearTexts=await page.locator('#unifiedHistoryPanel .player-history-year').allInnerTexts();
   const historyYears=yearTexts.map(x=>Number(x.replace(/[^0-9]/g,''))).filter(Boolean);
+  const historyLogoCount=await page.locator('#unifiedHistoryPanel .player-history-row .player-history-team-logo').count();
+  if(historyLogoCount<1)throw new Error('History team logos missing for '+firstName);
   if(new Set(historyYears).size!==historyYears.length)throw new Error('Duplicate History years for '+firstName+': '+historyYears.join(','));
   if(!historyYears.includes(Number(year)))throw new Error('History missing selected year '+year+' for '+firstName);
 

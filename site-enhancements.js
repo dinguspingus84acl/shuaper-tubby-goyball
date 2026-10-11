@@ -63,11 +63,12 @@ function addStyles(){
 
     /* Desktop row hover */
     @media(hover:hover) and (pointer:fine){
-      #tableCard tbody tr[data-id]:not(.selected-player-row){cursor:pointer}
-      #tableCard tbody tr[data-id]:not(.selected-player-row):hover td{background:rgba(255,255,255,.045)}
-      #tableCard tbody tr[data-id]:not(.selected-player-row):hover td:first-child{box-shadow:inset 3px 0 0 rgba(145,164,186,.58)}
-      #tableCard tbody tr[data-id]:not(.selected-player-row):hover .photo{transform:scale(1.055)}
-      #tableCard tbody tr[data-id] .photo{transition:transform .16s ease}
+      #tableCard tbody tr[data-id]:not(.selected-player-row){cursor:pointer;transition:transform .14s ease,filter .14s ease,box-shadow .14s ease}
+      #tableCard tbody tr[data-id]:not(.selected-player-row):hover{transform:translateY(-1px);filter:brightness(1.16);box-shadow:inset 4px 0 0 #5f8fb8,0 5px 16px rgba(0,0,0,.28)}
+      #tableCard tbody tr[data-id]:not(.selected-player-row):hover td{background:#102943!important}
+      #tableCard tbody tr[data-id]:not(.selected-player-row):hover .rank{color:#fff!important}
+      #tableCard tbody tr[data-id]:not(.selected-player-row):hover .photo{transform:scale(1.09);border-color:#ffffffcc}
+      #tableCard tbody tr[data-id] .photo{transition:transform .14s ease,border-color .14s ease}
     }
 
     /* Previous / next ranking navigation inside player cards */

@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const YEARS = Array.from({length:16},(_,i)=>2010+i);
+const HEADSHOT_FALLBACKS={mattcole:'https://a.espncdn.com/i/headshots/nfl/players/full/4041703.png',salcannella:'https://a.espncdn.com/i/headshots/nfl/players/full/4242536.png',jakobiekeeneyjames:'https://a.espncdn.com/i/headshots/nfl/players/full/5178972.png'};
 const OUT_DIR = path.resolve('legacy-stats');
 
 function parseCsvLine(line){
@@ -92,6 +93,7 @@ async function loadYear(year){
     p.name=name||p.name;
     p.team=teamCode(r.team||p.team);
     if(!p.headshot && r.headshot_url) p.headshot=r.headshot_url;
+    if(!p.headshot&&HEADSHOT_FALLBACKS[norm(name)])p.headshot=HEADSHOT_FALLBACKS[norm(name)];
     const g=gameRow(r);
     if(g.week>0 && g.week<=18){
       p.games.push(g);

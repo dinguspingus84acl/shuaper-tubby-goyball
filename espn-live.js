@@ -130,9 +130,9 @@ style.textContent=`
 }
 .espn-game-log-opponent{display:flex;align-items:center;gap:6px;min-width:0}
 .espn-game-log-opponent-logo{width:18px;height:18px;object-fit:contain;flex:0 0 18px}
-.espn-game-log-table .gl-pts-high{color:#b7f3c8!important;background:#39d17b12}
-.espn-game-log-table .gl-pts-mid{color:#e8f0f7!important;background:#ffffff08}
-.espn-game-log-table .gl-pts-low{color:#d8a7af!important;background:#c94b6110}
+.espn-game-log-table .gl-pts-high{color:#74e39b!important;background:transparent!important}
+.espn-game-log-table .gl-pts-mid{color:#f3f7fb!important;background:transparent!important}
+.espn-game-log-table .gl-pts-low{color:#ef8798!important;background:transparent!important}
 .espn-game-log-table-wrap{overflow-x:auto}
 .espn-game-log-table{
   width:auto;min-width:540px;max-width:100%;border-collapse:collapse;
@@ -238,7 +238,7 @@ style.textContent=`
   }
   .espn-game-log-table th{font-size:.58rem!important;letter-spacing:.02em!important}
   .espn-game-log-table td{font-size:.82rem!important;font-weight:900!important}
-  .espn-game-log-table .gl-pts{font-size:.88rem!important;font-weight:1000!important;color:#fff!important}
+  .espn-game-log-table .gl-pts{font-size:.88rem!important;font-weight:1000!important}
   .espn-game-log-table th:first-child,.espn-game-log-table td:first-child{
     width:34px!important;position:sticky;left:0;z-index:2;background:#061522
   }
@@ -246,6 +246,9 @@ style.textContent=`
     width:48px!important;text-align:left!important
   }
   .espn-game-log-table .gl-col-turnovers{width:58px!important}
+  .espn-game-log-table .gl-pts-high{color:#74e39b!important;background:transparent!important}
+  .espn-game-log-table .gl-pts-mid{color:#f3f7fb!important;background:transparent!important}
+  .espn-game-log-table .gl-pts-low{color:#ef8798!important;background:transparent!important}
   .espn-game-log-controls{
     position:sticky!important;top:0!important;z-index:9!important;
     margin:0!important;padding-top:4px!important;background:#061522!important;

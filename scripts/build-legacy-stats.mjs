@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-const YEARS = Array.from({length:16},(_,i)=>2010+i);
+const YEARS = Array.from({length:27},(_,i)=>1999+i);
 const HEADSHOT_FALLBACKS={mattcole:'https://a.espncdn.com/i/headshots/nfl/players/full/4041703.png',salcannella:'https://a.espncdn.com/i/headshots/nfl/players/full/4242536.png',jakobiekeeneyjames:'https://a.espncdn.com/i/headshots/nfl/players/full/5178972.png'};
 const OUT_DIR = path.resolve('legacy-stats');
 
@@ -125,6 +125,7 @@ async function loadYear(year){
 
 await fs.mkdir(OUT_DIR,{recursive:true});
 const careerIndex={};
+const headshotIndex={};
 for(const year of YEARS){
   const rows=await loadYear(year);
   const payload={year,source:'nflverse weekly player stats (CC BY 4.0)',generatedAt:new Date().toISOString(),rows};
@@ -141,6 +142,7 @@ for(const year of YEARS){
       careerIndex[key]={name:p.name,position:p.position,headshot:p.headshot||'',years:[],history:[]};
     }
     if(!careerIndex[key].headshot&&p.headshot)careerIndex[key].headshot=p.headshot;
+    if(p.headshot)headshotIndex[key]=p.headshot;
     if(!careerIndex[key].years.includes(year))careerIndex[key].years.push(year);
     careerIndex[key].history.push({
       year,
@@ -168,4 +170,6 @@ await fs.writeFile(path.join(OUT_DIR,'index.json'),JSON.stringify({
   maxYear:YEARS.at(-1),
   players:careerIndex
 }));
+await fs.writeFile(path.join(OUT_DIR,'headshots.json'),JSON.stringify({generatedAt:new Date().toISOString(),headshots:headshotIndex}));
 console.log(`career index: ${Object.keys(careerIndex).length} players`);
+console.log(`headshots: ${Object.keys(headshotIndex).length} players`);

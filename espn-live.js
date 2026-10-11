@@ -403,7 +403,7 @@ async function getHistoricalCareer(name){
       const position=player.position||meta.position;
       const posRows=seasonRows.filter(p=>p.position===position).sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name));
       const i=posRows.findIndex(p=>norm(p.name)===key);
-      return {...player,year,rank:i>=0?i+1:null};
+      return {...player,year,rank:i>=0?i+1:null,games:player.gamesPlayed,ppg:player.average,teamAbbr:player.team};
     }catch(e){return null}
   }));
   return results.filter(Boolean).sort((a,b)=>b.year-a.year);

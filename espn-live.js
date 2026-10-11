@@ -66,6 +66,24 @@ let statsLastUpdated=null;
 let activeFilter='ALL';
 let activeStat='points';
 let statView='TOTAL';
+const STATS_UI_STATE_KEY='shuaEspnStatsUiStateV2';
+try{
+  const saved=JSON.parse(localStorage.getItem(STATS_UI_STATE_KEY)||'null');
+  if(saved){
+    const yr=Number(saved.statsSeason);if(Number.isFinite(yr)&&yr>=1999&&yr<=SEASON)statsSeason=yr;
+    if(['ALL','QB','RB','WR','TE'].includes(saved.activeFilter))activeFilter=saved.activeFilter;
+    if(typeof saved.activeStat==='string'&&saved.activeStat)activeStat=saved.activeStat;
+    if(['TOTAL','PERGAME'].includes(saved.statView))statView=saved.statView;
+  }
+}catch(e){}
+function saveStatsUiState(){
+  try{localStorage.setItem(STATS_UI_STATE_KEY,JSON.stringify({statsSeason,activeFilter,activeStat,statView}))}catch(e){}
+}
+function syncStatsControls(){
+  document.querySelectorAll('[data-espn-filter]').forEach(x=>x.classList.toggle('active',x.dataset.espnFilter===activeFilter));
+  document.querySelectorAll('[data-espn-view]').forEach(x=>x.classList.toggle('active',x.dataset.espnView===statView));
+  const y=document.getElementById('espnStatsYear');if(y)y.value=String(statsSeason);
+}
 let loading=false;
 let timer=null;
 let lastUpdated=null;
@@ -158,7 +176,8 @@ style.textContent=`
 .espn-team-logo{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
 .espn-pos{font-weight:900}
 .espn-points,.espn-selected-stat{text-align:right;font-weight:900}
-.espn-selected-stat{color:#dbeafe}
+.espn-selected-stat{color:#dbeafe;background:rgba(47,126,184,.105);box-shadow:inset 1px 0 0 rgba(110,180,235,.16),inset -1px 0 0 rgba(110,180,235,.08)}
+#espnSelectedStatHead{background:rgba(47,126,184,.14);box-shadow:inset 1px 0 0 rgba(110,180,235,.18),inset -1px 0 0 rgba(110,180,235,.09);border-radius:5px;padding:5px 6px}
 .espn-team{color:var(--m);font-size:.68rem}
 .espn-status{padding:18px;text-align:center;color:var(--m)}
 .espn-error{color:#ff8b9d}
@@ -182,6 +201,9 @@ style.textContent=`
     transform:scale(1.09);border-color:#ffffffcc
   }
   .espn-live-row .espn-headshot{transition:transform .14s ease,border-color .14s ease}
+  #espnLiveRows>.espn-live-row{position:relative;cursor:pointer;padding-right:30px}
+  #espnLiveRows>.espn-live-row:after{content:"›";position:absolute;right:9px;top:50%;transform:translate(-5px,-50%);font-size:1.35rem;font-weight:1000;color:#9db1c5;opacity:0;transition:opacity .14s ease,transform .14s ease}
+  #espnLiveRows>.espn-live-row:hover:after{opacity:1;transform:translate(0,-50%)}
   .espn-game-log-title{
     padding:14px 14px 10px;font-size:.82rem;
     border:1px solid #ffffff12;border-bottom:0;border-radius:12px 12px 0 0;
@@ -1271,6 +1293,7 @@ function renderStatFilters(){
   box.querySelectorAll('[data-espn-stat]').forEach(b=>{
     b.onclick=()=>{
       activeStat=b.dataset.espnStat;
+      saveStatsUiState();
       renderStatFilters();
       render();
     };
@@ -1296,7 +1319,7 @@ function render(){
   }
   const ranked=rankRows(statsRows,activeFilter);
   box.innerHTML=ranked.map((p,i)=>{
-    return `<div class="espn-live-row">
+    return `<div class="espn-live-row" data-espn-player-id="${p.id}">
       <div class="espn-rank">#${i+1}</div>
       <div class="espn-player">${playerHeadshot(p)}<div class="espn-player-copy"><button type="button" class="espn-name-btn" data-espn-open-player="${p.id}">${p.name}</button><div class="espn-player-meta">${teamLogo(p.team)}<span>${p.team}</span></div></div></div>
       <div class="espn-pos">${p.position}</div>
@@ -1310,6 +1333,13 @@ function render(){
       e.preventDefault();
       e.stopPropagation();
       const player=statsRows.find(p=>String(p.id)===String(btn.dataset.espnOpenPlayer));
+      if(player)openEspnPlayerProfile(player);
+    };
+  });
+  box.querySelectorAll('.espn-live-row[data-espn-player-id]').forEach(row=>{
+    row.onclick=e=>{
+      if(e.target.closest('button,a,input,select'))return;
+      const player=statsRows.find(p=>String(p.id)===String(row.dataset.espnPlayerId));
       if(player)openEspnPlayerProfile(player);
     };
   });
@@ -1382,6 +1412,7 @@ function updateStatsLabels(){
 async function loadStatsSeason(year,{force=false}={}){
   year=Number(year)||SEASON;
   statsSeason=year;
+  saveStatsUiState();
   const select=document.getElementById('espnStatsYear');
   if(select&&Number(select.value)!==year)select.value=String(year);
   statsRows=[];
@@ -1442,6 +1473,7 @@ function showEspn(){
   ids.forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true});
   section.hidden=false;
   document.getElementById('title').textContent='Stats';
+  syncStatsControls();
   renderStatFilters();
   updateStatsLabels();
   if(!statsRows.length)loadStatsSeason(statsSeason);
@@ -1468,8 +1500,10 @@ button.onclick=e=>{e.preventDefault();showEspn()};
 document.querySelectorAll('[data-espn-filter]').forEach(b=>{
   b.onclick=()=>{
     activeFilter=b.dataset.espnFilter;
-    activeStat='points';
+    const cfg=STAT_CONFIG[activeFilter]||STAT_CONFIG.ALL;
+    if(!cfg.some(x=>x.key===activeStat))activeStat='points';
     document.querySelectorAll('[data-espn-filter]').forEach(x=>x.classList.toggle('active',x===b));
+    saveStatsUiState();
     renderStatFilters();
     render();
   };
@@ -1478,6 +1512,7 @@ document.querySelectorAll('[data-espn-view]').forEach(b=>{
   b.onclick=()=>{
     statView=b.dataset.espnView==='PERGAME'?'PERGAME':'TOTAL';
     document.querySelectorAll('[data-espn-view]').forEach(x=>x.classList.toggle('active',x===b));
+    saveStatsUiState();
     renderStatFilters();
     render();
   };
@@ -1489,15 +1524,16 @@ if(statsYearSelect){
   statsYearSelect.innerHTML=years.map(y=>'<option value="'+y+'">'+y+'</option>').join('');
   statsYearSelect.value=String(statsSeason);
   statsYearSelect.onchange=e=>{
-    activeStat='points';
-    statView='TOTAL';
-    document.querySelectorAll('[data-espn-view]').forEach(x=>x.classList.toggle('active',x.dataset.espnView==='TOTAL'));
+    statsSeason=Number(e.target.value)||SEASON;
+    saveStatsUiState();
+    syncStatsControls();
     renderStatFilters();
-    loadStatsSeason(Number(e.target.value));
+    loadStatsSeason(statsSeason);
     if(timer){clearInterval(timer);timer=null}
     if(Number(e.target.value)===SEASON)timer=setInterval(()=>{if(!section.hidden&&statsSeason===SEASON)loadStatsSeason(SEASON,{force:true})},REFRESH_MS);
   };
 }
+syncStatsControls();
 document.getElementById('espnRefresh').onclick=refresh;
 document.getElementById('close')?.addEventListener('click',hideProfileGameLog);
 document.getElementById('modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('modal'))hideProfileGameLog()});

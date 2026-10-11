@@ -248,7 +248,7 @@ style.textContent=`
 }
 .phone-mode .featured-player-profile #featuredPlayerCard{
   width:calc(100% - 16px);height:254px;margin:8px 8px 0;
-  grid-template-columns:38% 62%;border-radius:15px 15px 0 0
+  grid-template-columns:43% 57%;border-radius:15px 15px 0 0
 }
 .phone-mode .featured-player-card .featured-portrait-box{
   left:8px;right:8px;top:8px;bottom:61px;border-radius:11px
@@ -261,11 +261,11 @@ style.textContent=`
 }
 .phone-mode .featured-player-card .featured-team-strip{
   left:8px;right:8px;bottom:5px;height:49px;
-  grid-template-columns:38px 1px minmax(0,1fr);gap:9px;padding:0 8px;border-radius:9px
+  grid-template-columns:30px 1px minmax(0,1fr);gap:6px;padding:0 6px;border-radius:9px
 }
-.phone-mode .featured-player-card .featured-mini-logo{width:33px;height:33px}
-.phone-mode .featured-player-card .featured-divider{height:32px}
-.phone-mode .featured-player-card .featured-team-name{font-size:.88rem}
+.phone-mode .featured-player-card .featured-mini-logo{width:29px;height:29px}
+.phone-mode .featured-player-card .featured-divider{height:29px}
+.phone-mode .featured-player-card .featured-team-name{font-size:.82rem}
 .phone-mode .featured-player-card.featured-team-long .featured-team-name{font-size:.68rem;letter-spacing:-.045em}
 .phone-mode .featured-player-card .featured-team-meta{font-size:.6rem;margin-top:6px}
 .phone-mode .featured-player-card .featured-right{padding:22px 15px 16px}

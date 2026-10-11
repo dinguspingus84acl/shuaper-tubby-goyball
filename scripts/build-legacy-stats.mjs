@@ -59,6 +59,56 @@ function gameRow(r){
     fumblesLost:n(r.sack_fumbles_lost)+n(r.rushing_fumbles_lost)+n(r.receiving_fumbles_lost)
   };
 }
+
+async function loadIdentityMap(){
+  const url='https://raw.githubusercontent.com/Lolindhir/fantasy-app/main/source-data/providers/nflverse/ff-player-ids/raw-latest.csv';
+  const res=await fetch(url);
+  if(!res.ok)throw new Error('identity map: '+res.status+' '+res.statusText);
+  const text=await res.text();
+  const lines=text.split(/\r?\n/).filter(Boolean);
+  if(lines.length<2)return new Map();
+  const headers=parseCsvLine(lines[0]);
+  const idx=Object.fromEntries(headers.map((h,i)=>[h,i]));
+  const get=(cells,name)=>idx[name]===undefined?'':cells[idx[name]];
+  const map=new Map();
+  for(const line of lines.slice(1)){
+    const cells=parseCsvLine(line);
+    const name=get(cells,'name')||get(cells,'merge_name');
+    const merge=get(cells,'merge_name')||name;
+    const position=String(get(cells,'position')||'').toUpperCase();
+    if(!name)return;
+    const row={
+      espnId:String(get(cells,'espn_id')||'').trim(),
+      sleeperId:String(get(cells,'sleeper_id')||'').trim(),
+      name,
+      mergeName:merge,
+      position
+    };
+    for(const raw of [name,merge]){
+      const key=norm(raw);
+      if(!key)continue;
+      if(!map.has(key))map.set(key,[]);
+      map.get(key).push(row);
+    }
+  }
+  return map;
+}
+function headshotCandidates(name,position,sourceUrl,identityMap){
+  const key=norm(name);
+  const rows=identityMap.get(key)||[];
+  const matches=rows.filter(x=>!position||x.position===position);
+  const chosen=matches.length?matches:rows;
+  const urls=[];
+  for(const x of chosen){
+    if(/^\d+$/.test(x.espnId))urls.push('https://a.espncdn.com/i/headshots/nfl/players/full/'+x.espnId+'.png');
+    if(x.sleeperId)urls.push('https://sleepercdn.com/content/nfl/players/thumb/'+x.sleeperId+'.jpg');
+  }
+  const manual=HEADSHOT_FALLBACKS[key];
+  if(manual)urls.push(manual);
+  if(sourceUrl)urls.push(sourceUrl);
+  return [...new Set(urls.filter(Boolean))];
+}
+
 async function loadYear(year){
   const url=`https://raw.githubusercontent.com/Lolindhir/fantasy-app/main/source-data/providers/nflverse/player-stats/raw-${year}.csv`;
   const res=await fetch(url);
@@ -82,7 +132,7 @@ async function loadYear(year){
     let p=byPlayer.get(key);
     if(!p){
       p={
-        id,name,position,team:'—',headshot:r.headshot_url||'',seasonYear:year,
+        id,name,position,team:'—',headshot:'',headshots:[],seasonYear:year,
         points:0,average:null,gamesPlayed:0,
         passAtt:0,completions:0,passYds:0,passTD:0,interceptions:0,
         rushAtt:0,rushYds:0,rushTD:0,recYds:0,recTD:0,receptions:0,targets:0,fumblesLost:0,
@@ -94,8 +144,11 @@ async function loadYear(year){
     p.name=name||p.name;
     if((!p.id||p.id.includes(':'))&&r.player_id)p.id=String(r.player_id);
     p.team=teamCode(r.team||p.team);
-    if(!p.headshot && r.headshot_url) p.headshot=r.headshot_url;
-    if(!p.headshot&&HEADSHOT_FALLBACKS[norm(name)])p.headshot=HEADSHOT_FALLBACKS[norm(name)];
+    const candidates=headshotCandidates(name,position,r.headshot_url||'',identityMap);
+    if(candidates.length){
+      p.headshots=[...new Set([...(p.headshots||[]),...candidates])];
+      p.headshot=p.headshots[0]||'';
+    }
     const g=gameRow(r);
     if(g.week>0 && g.week<=18){
       const gameKey=String(r.game_id||g.week);
@@ -137,6 +190,8 @@ async function loadYear(year){
 }
 
 await fs.mkdir(OUT_DIR,{recursive:true});
+const identityMap=await loadIdentityMap();
+console.log(`identity map: ${identityMap.size} normalized names`);
 const careerIndex={};
 const headshotIndex={};
 for(const year of YEARS){
@@ -152,10 +207,11 @@ for(const year of YEARS){
   for(const p of rows){
     const key=norm(p.name);
     if(!careerIndex[key]){
-      careerIndex[key]={name:p.name,position:p.position,headshot:p.headshot||'',years:[],history:[]};
+      careerIndex[key]={name:p.name,position:p.position,headshot:p.headshot||'',headshots:p.headshots||[],years:[],history:[]};
     }
     if(!careerIndex[key].headshot&&p.headshot)careerIndex[key].headshot=p.headshot;
-    if(p.headshot)headshotIndex[key]=p.headshot;
+    careerIndex[key].headshots=[...new Set([...(careerIndex[key].headshots||[]),...(p.headshots||[])])];
+    if(careerIndex[key].headshots.length){careerIndex[key].headshot=careerIndex[key].headshots[0];headshotIndex[key]=careerIndex[key].headshots;}
     if(!careerIndex[key].years.includes(year))careerIndex[key].years.push(year);
     const summary={
       year,
@@ -165,6 +221,7 @@ for(const year of YEARS){
       team:p.team,
       teamAbbr:p.team,
       headshot:p.headshot||'',
+      headshots:p.headshots||[],
       rank:rankByPlayer.get(p.id+'|'+p.position)||null,
       points:p.points,
       average:p.average,

@@ -246,14 +246,26 @@ function fallbackFaceName(el){
   return '';
 }
 function upgradeFallbackFaces(){
-  if(!historicalHeadshots||!Object.keys(historicalHeadshots).length)return;
-  document.querySelectorAll('.photo.fallback').forEach(el=>{
-    const name=fallbackFaceName(el);
+  document.querySelectorAll('.photo.fallback,.espn-headshot-fallback').forEach(el=>{
+    let name=fallbackFaceName(el);
+    if(!name&&el.classList.contains('espn-headshot-fallback')){
+      name=el.closest('.espn-player')?.querySelector('.espn-name-btn')?.textContent?.trim()||'';
+    }
     if(!name)return;
-    const src=historicalHeadshots[norm(name)];
+    let src=historicalHeadshots?.[norm(name)]||'';
+    if(!src){
+      try{
+        if(typeof playerPhotoId==='function'){
+          const row=el.closest('.espn-player');
+          const team=row?.querySelector('.espn-player-meta span')?.textContent?.trim()||'';
+          const sid=playerPhotoId(name,team,'');
+          if(sid)src='https://sleepercdn.com/content/nfl/players/thumb/'+sid+'.jpg';
+        }
+      }catch(e){}
+    }
     if(!src)return;
     const img=document.createElement('img');
-    img.className=[...el.classList].filter(x=>x!=='fallback').join(' ');
+    img.className=el.classList.contains('espn-headshot-fallback')?'espn-headshot':[...el.classList].filter(x=>x!=='fallback').join(' ');
     img.src=src;
     img.alt=name;
     img.loading='lazy';

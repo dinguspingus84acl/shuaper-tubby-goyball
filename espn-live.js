@@ -1223,6 +1223,16 @@ window.ShuaEspnLive={
   getHistoricalCareer,
   getPlayerHeadshotUrl(player){return historicalHeadshot(player)||(player?.id?/^\d+$/.test(String(player.id))?'https://a.espncdn.com/i/headshots/nfl/players/full/'+player.id+'.png':'':'')},
   getTeamLogoUrl(team){return historicalTeamLogoUrl(team)},
+  async getHeadshotByName(name){
+    const current=rows.find(p=>norm(p.name)===norm(name))||statsRows.find(p=>norm(p.name)===norm(name));
+    if(current){
+      const direct=String(current.headshot||'').trim();
+      if(direct)return direct;
+      if(/^\d+$/.test(String(current.id||'')))return 'https://a.espncdn.com/i/headshots/nfl/players/full/'+current.id+'.png';
+    }
+    const map=await loadHeadshotIndex();
+    return map[norm(name)]||'';
+  },
   getPositionRank(name){
     const p=rows.find(x=>norm(x.name)===norm(name));
     if(!p)return null;

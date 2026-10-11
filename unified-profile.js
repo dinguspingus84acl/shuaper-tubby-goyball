@@ -403,6 +403,10 @@ function playerById(id){
   try{return players.find(p=>String(p.id)===String(id))||board.find(p=>String(p.id)===String(id))||null}catch(e){return null}
 }
 function visibleRankingSequence(){
+  if(document.body.classList.contains('stats-mode')&&window.ShuaEspnLive?.getCurrentStatsSequence){
+    const statsSeq=window.ShuaEspnLive.getCurrentStatsSequence();
+    if(Array.isArray(statsSeq)&&statsSeq.length)return statsSeq;
+  }
   const rows=[...document.querySelectorAll('#rows tr[data-id]')].filter(tr=>tr.offsetParent!==null||!document.getElementById('tableCard')?.hidden);
   if(rows.length)return rows.map(tr=>({
     id:String(tr.dataset.id||''),
@@ -419,6 +423,11 @@ function visibleRankingSequence(){
 }
 function activeSequenceIndex(id){
   const seq=visibleRankingSequence();
+  if(document.body.classList.contains('stats-mode')){
+    const modal=document.getElementById('modal');
+    const currentName=modal?.dataset.statsName||modal?.dataset.unifiedName||'';
+    return {seq,index:seq.findIndex(x=>norm(x.name)===norm(currentName))};
+  }
   return {seq,index:seq.findIndex(x=>String(x.id)===String(id))};
 }
 function ensurePlayerNav(){
@@ -466,7 +475,12 @@ function openAdjacentPlayer(targetId,dir,animate=true){
   if(!targetId)return false;
   const profileBox=document.querySelector('#modal .profile');
   const doOpen=()=>{
-    window.profile(targetId);
+    if(String(targetId).startsWith('stats:')){
+      const name=decodeURIComponent(String(targetId).slice(6));
+      window.ShuaEspnLive?.openStatsPlayerByName?.(name);
+    }else{
+      window.profile(targetId);
+    }
     const p=document.querySelector('#modal .profile');
     if(p)p.scrollTop=0;
     if(animate&&document.body.classList.contains('phone-mode')&&p){
@@ -1164,7 +1178,8 @@ function prepareUnified(name,seed=null){
   ensureUi();
   resetPhoneProfileSheet();
   installPhoneSwipeDismiss();
-  activeSeed=seed?{...seed,__historical:!!(seed.source==='nflverse'||seed.seasonYear||seed.year)}:null;
+  const sy=seedYear(seed);
+  activeSeed=seed?{...seed,__historical:!!(seed.source==='nflverse'||(sy&&sy<2026))}:null;
   const modal=document.getElementById('modal');
   modal.dataset.unifiedName=name;
   applyFeaturedProfile(name,seed);
@@ -1184,6 +1199,8 @@ async function openByName(name,seed=null){
   if(p&&!seedYear(seed)){
     activeSeed=null;
     baseProfile(p.id);
+    const modal=document.getElementById('modal');
+    if(modal&&document.body.classList.contains('stats-mode'))modal.dataset.statsName=name;
     fixKnownHeadshot(name);
     prepareUnified(p.name);
     return;
@@ -1198,6 +1215,7 @@ async function openByName(name,seed=null){
     if(!ep)return;
 
     const modal=document.getElementById('modal');
+    if(modal&&document.body.classList.contains('stats-mode'))modal.dataset.statsName=ep.name;
     document.getElementById('pn').textContent=ep.name;
     document.getElementById('pn').className='';
     const yr=seedYear(ep);
@@ -1215,7 +1233,11 @@ window.profile=function(id){
   activeSeed=null;
   const p=playerById(id);
   baseProfile(id);
-  const modal=document.getElementById('modal');if(modal)modal.dataset.id=String(id||'');
+  const modal=document.getElementById('modal');
+  if(modal){
+    modal.dataset.id=String(id||'');
+    if(!document.body.classList.contains('stats-mode'))delete modal.dataset.statsName;
+  }
   if(p)prepareUnified(p.name);
 };
 

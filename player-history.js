@@ -10,7 +10,8 @@ const POSITION_BY_ID={1:'QB',2:'RB',3:'WR',4:'TE'};
 const SLOT_BY_POSITION={QB:0,RB:2,WR:4,TE:6};
 const TEAM_BY_ID={0:{abbr:'FA',name:'Free Agent'},1:{abbr:'ATL',name:'Falcons'},2:{abbr:'BUF',name:'Bills'},3:{abbr:'CHI',name:'Bears'},4:{abbr:'CIN',name:'Bengals'},5:{abbr:'CLE',name:'Browns'},6:{abbr:'DAL',name:'Cowboys'},7:{abbr:'DEN',name:'Broncos'},8:{abbr:'DET',name:'Lions'},9:{abbr:'GB',name:'Packers'},10:{abbr:'TEN',name:'Titans'},11:{abbr:'IND',name:'Colts'},12:{abbr:'KC',name:'Chiefs'},13:{abbr:'LV',name:'Raiders'},14:{abbr:'LAR',name:'Rams'},15:{abbr:'MIA',name:'Dolphins'},16:{abbr:'MIN',name:'Vikings'},17:{abbr:'NE',name:'Patriots'},18:{abbr:'NO',name:'Saints'},19:{abbr:'NYG',name:'Giants'},20:{abbr:'NYJ',name:'Jets'},21:{abbr:'PHI',name:'Eagles'},22:{abbr:'ARI',name:'Cardinals'},23:{abbr:'PIT',name:'Steelers'},24:{abbr:'LAC',name:'Chargers'},25:{abbr:'SF',name:'49ers'},26:{abbr:'SEA',name:'Seahawks'},27:{abbr:'TB',name:'Buccaneers'},28:{abbr:'WAS',name:'Commanders'},29:{abbr:'CAR',name:'Panthers'},30:{abbr:'JAX',name:'Jaguars'},33:{abbr:'BAL',name:'Ravens'},34:{abbr:'HOU',name:'Texans'}};
 const SLOT_IDS=[0,2,4,6];
-const TEAM_SLUGS={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',DAL:'dal',DEN:'den',DET:'det',GB:'gb',HOU:'hou',IND:'ind',JAX:'jax',KC:'kc',LAC:'lac',LAR:'lar',LV:'lv',MIA:'mia',MIN:'min',NE:'ne',NO:'no',NYG:'nyg',NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SF:'sf',TB:'tb',TEN:'ten',WAS:'wsh'};
+const TEAM_SLUGS={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',DAL:'dal',DEN:'den',DET:'det',GB:'gb',GNB:'gb',HOU:'hou',IND:'ind',JAX:'jax',JAC:'jax',KC:'kc',KAN:'kc',LAC:'lac',SD:'lac',LAR:'lar',STL:'lar',LV:'lv',LVR:'lv',OAK:'lv',MIA:'mia',MIN:'min',NE:'ne',NWE:'ne',NO:'no',NOR:'no',NYG:'nyg',NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SF:'sf',SFO:'sf',TB:'tb',TAM:'tb',TEN:'ten',WAS:'wsh',WSH:'wsh'};
+const TEAM_NAMES={ARI:'Cardinals',ATL:'Falcons',BAL:'Ravens',BUF:'Bills',CAR:'Panthers',CHI:'Bears',CIN:'Bengals',CLE:'Browns',DAL:'Cowboys',DEN:'Broncos',DET:'Lions',GB:'Packers',GNB:'Packers',HOU:'Texans',IND:'Colts',JAX:'Jaguars',JAC:'Jaguars',KC:'Chiefs',KAN:'Chiefs',LAC:'Chargers',SD:'Chargers',LAR:'Rams',STL:'Rams',LV:'Raiders',LVR:'Raiders',OAK:'Raiders',MIA:'Dolphins',MIN:'Vikings',NE:'Patriots',NWE:'Patriots',NO:'Saints',NOR:'Saints',NYG:'Giants',NYJ:'Jets',PHI:'Eagles',PIT:'Steelers',SEA:'Seahawks',SF:'49ers',SFO:'49ers',TB:'Buccaneers',TAM:'Buccaneers',TEN:'Titans',WAS:'Commanders',WSH:'Commanders'};
 const identityCache=new Map();
 const playerSeasonCache=new Map();
 const seasonBoardCache=new Map();
@@ -547,9 +548,21 @@ async function buildSeasonDetails(row){
     weeks
   };
 }
+function historyTeamAbbr(value){
+  const raw=String(value||'').trim().toUpperCase();
+  const aliases={GNB:'GB',KAN:'KC',LVR:'LV',NWE:'NE',NOR:'NO',SFO:'SF',TAM:'TB',WSH:'WAS',JAC:'JAX',OAK:'LV',STL:'LAR',SD:'LAC'};
+  return aliases[raw]||raw;
+}
+function historyTeamName(value){
+  const raw=String(value||'').trim().toUpperCase();
+  return TEAM_NAMES[raw]||TEAM_NAMES[historyTeamAbbr(raw)]||String(value||'—');
+}
 function teamLogoHtml(abbr){
-  const slug=TEAM_SLUGS[abbr];
-  return slug?'<img class="player-history-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/'+slug+'.png" alt="">':'';
+  const raw=String(abbr||'').trim().toUpperCase();
+  const canonical=historyTeamAbbr(raw);
+  const slug=TEAM_SLUGS[raw]||TEAM_SLUGS[canonical];
+  const label=historyTeamName(raw);
+  return slug?'<img class="player-history-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/'+slug+'.png" alt="'+label+' logo" loading="lazy">':'';
 }
 function detailStat(label,value){
   return '<div class="player-history-detail-stat"><span>'+label+'</span><b>'+value+'</b></div>';
@@ -613,7 +626,7 @@ function renderRows(player,rows,target){
         const ppg=Number.isFinite(Number(r.ppg))?Number(r.ppg).toFixed(1):((r.games&&r.points)?(r.points/r.games).toFixed(1):'—');
         return '<div class="player-history-row" data-history-index="'+i+'" role="button" tabindex="0">'+
           '<div class="player-history-year"><span class="player-history-chevron">›</span>'+r.year+'</div>'+
-          '<div class="player-history-team">'+teamLogoHtml(r.teamAbbr)+'<span class="full">'+(r.team||'—')+'</span><span class="abbr">'+(r.teamAbbr||'—')+'</span></div>'+
+          '<div class="player-history-team">'+teamLogoHtml(r.teamAbbr||r.team)+'<span class="full">'+historyTeamName(r.teamAbbr||r.team)+'</span><span class="abbr">'+historyTeamAbbr(r.teamAbbr||r.team)+'</span></div>'+
           '<div class="player-history-finish">'+(r.rank?r.rank:'—')+'</div>'+
           '<div class="player-history-games">'+(Number.isFinite(Number(r.games))?Number(r.games):'—')+'</div>'+
           '<div class="player-history-ppg">'+ppg+'</div>'+

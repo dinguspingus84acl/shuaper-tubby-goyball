@@ -106,10 +106,15 @@ style.textContent=`
 #espnLiveSection{margin-top:8px}
 .espn-live-shell{display:grid;gap:8px}
 .espn-live-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+body.stats-mode #positionToggle{display:none!important}
+body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-live-filters,.espn-stat-filters{display:flex;gap:6px;flex-wrap:wrap}
 .espn-filter,.espn-stat-btn,.espn-view-btn,.espn-refresh,.espn-year-select{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 11px;font-weight:900}
 .espn-filter.active,.espn-stat-btn.active,.espn-view-btn.active,.espn-refresh:active{background:#183d63!important;color:#fff!important}.espn-year-select{background:#081a2d;color:#fff;min-width:82px}
-.espn-stat-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 9px;border:1px solid #ffffff16;border-radius:10px;background:#07182a}
+.espn-stat-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 9px;border:1px solid #ffffff16;border-radius:10px;background:#07182a}
+.espn-stat-primary{display:flex;align-items:center;gap:7px;flex:1 1 auto;min-width:0}
+.espn-rank-control{display:flex;align-items:center;gap:6px;min-width:0}
+.espn-rank-control .espn-stat-label{margin:0}
 .espn-stat-label{color:#7f93aa;font-size:.62rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
 .espn-stat-btn,.espn-view-btn{padding:6px 9px;font-size:.65rem}
 .espn-stat-select{min-width:170px;height:34px;border:1px solid #ffffff25;border-radius:8px;background:#0b2139;color:#fff;padding:0 32px 0 10px;font-size:.68rem;font-weight:950;outline:none}
@@ -123,7 +128,7 @@ style.textContent=`
 .espn-sort-head:hover{color:#fff}
 .espn-sort-head .sort-arrow{font-size:.68rem;color:#7fb6e5}
 .espn-sort-head.active{color:#fff}
-.phone-mode .espn-sort-head{pointer-events:none}
+.phone-mode .espn-sort-head{pointer-events:auto;cursor:pointer}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}.espn-headshot-fallback{display:flex;align-items:center;justify-content:center;color:#dbeafe;font-size:.68rem;font-weight:950}
@@ -186,8 +191,8 @@ style.textContent=`
 .espn-team-logo{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
 .espn-pos{font-weight:900}
 .espn-points,.espn-selected-stat{text-align:right;font-weight:900}
-.espn-selected-stat{color:#dbeafe;background:rgba(47,126,184,.105);box-shadow:inset 1px 0 0 rgba(110,180,235,.16),inset -1px 0 0 rgba(110,180,235,.08)}
-#espnSelectedStatHead{background:rgba(47,126,184,.14);box-shadow:inset 1px 0 0 rgba(110,180,235,.18),inset -1px 0 0 rgba(110,180,235,.09);border-radius:5px;padding:5px 6px}
+.espn-selected-stat{color:#dbeafe;background:transparent;box-shadow:none}
+#espnSelectedStatHead{background:transparent;box-shadow:none;border-radius:0;padding:0}
 .espn-team{color:var(--m);font-size:.68rem}
 .espn-status{padding:18px;text-align:center;color:var(--m)}
 .espn-error{color:#ff8b9d}
@@ -272,8 +277,13 @@ style.textContent=`
   .espn-player-name{font-size:.72rem}.espn-player{gap:7px}.espn-player-meta{font-size:.54rem}.espn-player-meta .espn-team-logo{width:14px;height:14px;flex-basis:14px}
   .espn-headshot{width:34px;height:34px;flex-basis:34px}
   .espn-selected-stat{font-size:.72rem}
-  .espn-live-toolbar{display:grid;grid-template-columns:1fr;gap:7px}.espn-live-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}.espn-filter{padding:7px 3px;font-size:.62rem;min-width:0}.espn-live-meta{display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:6px;width:100%;align-items:center}.espn-year-select,.espn-refresh{min-height:38px;padding:6px 8px}.espn-live-meta #espnLastUpdated{font-size:.58rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.espn-stat-bar{align-items:flex-start;padding:7px}
-  .espn-stat-label{width:100%}
+  .espn-live-toolbar{display:grid;grid-template-columns:1fr;gap:7px}.espn-live-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}.espn-filter{padding:7px 3px;font-size:.62rem;min-width:0}.espn-live-meta{display:flex;justify-content:flex-end;width:100%;align-items:center}.espn-year-select{min-height:38px;padding:6px 8px}.espn-stat-bar{display:flex!important;align-items:center!important;gap:6px!important;padding:6px 7px!important;flex-wrap:wrap!important}
+  .espn-stat-primary{display:flex!important;align-items:center!important;gap:6px!important;width:100%!important}
+  .espn-stat-primary>.espn-stat-label{width:auto!important;flex:0 0 auto}
+  .espn-rank-control{display:flex!important;align-items:center!important;gap:5px!important;flex:1 1 180px!important;min-width:0!important}
+  .espn-rank-control .espn-stat-label{width:auto!important;flex:0 0 auto}
+  .espn-rank-control .espn-stat-select{flex:1 1 auto!important;min-width:0!important;width:auto!important}
+  .espn-stat-label{width:auto}
   .espn-stat-filters{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.espn-stat-filters::-webkit-scrollbar{display:none}
   .espn-stat-btn{flex:0 0 auto}
   .espn-game-log-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -335,18 +345,20 @@ section.innerHTML=`
       </div>
       <div class="espn-live-meta">
         <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
-        <span id="espnLastUpdated">Not loaded yet</span>
-        <button type="button" id="espnRefresh" class="espn-refresh">Refresh</button>
       </div>
     </div>
     <div class="espn-stat-bar">
-      <span class="espn-stat-label">Stats</span>
-      <div class="espn-stat-filters">
-        <button type="button" class="espn-view-btn active" data-espn-view="TOTAL">Season</button>
-        <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
+      <div class="espn-stat-primary">
+        <span class="espn-stat-label">Stats</span>
+        <div class="espn-stat-filters">
+          <button type="button" class="espn-view-btn active" data-espn-view="TOTAL">Season</button>
+          <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
+        </div>
+        <label class="espn-rank-control">
+          <span class="espn-stat-label">Rank by</span>
+          <select id="espnStatSelect" class="espn-stat-select" aria-label="Rank players by stat"></select>
+        </label>
       </div>
-      <span class="espn-stat-label">Rank by</span>
-      <select id="espnStatSelect" class="espn-stat-select" aria-label="Rank players by stat"></select>
     </div>
     <div id="espnLiveSource" class="espn-live-source">ESPN 2026 full-PPR stats · choose a position, then rank players by any relevant stat</div>
     <div class="espn-live-card">
@@ -817,7 +829,6 @@ function updateSortHeaders(){
   if(target){target.classList.add('active');const a=target.querySelector('.sort-arrow');if(a)a.textContent=sortDirection==='ASC'?'▲':'▼'}
 }
 function sortFromHeader(key){
-  if(document.body.classList.contains('phone-mode'))return;
   const next=key==='points'?'points':activeStat;
   if(activeStat===next)sortDirection=sortDirection==='DESC'?'ASC':'DESC';
   else{activeStat=next;sortDirection='DESC'}
@@ -1432,16 +1443,8 @@ function hydrateStatsCache(year){
 function updateStatsLabels(){
   const sub=document.getElementById('sub');
   const src=document.getElementById('espnLiveSource');
-  const updated=document.getElementById('espnLastUpdated');
-  const refreshBtn=document.getElementById('espnRefresh');
   if(sub)sub.textContent=statsSeason+' ESPN full-PPR scoring leaders — filter by position and rank by stat';
   if(src)src.textContent=(statsSeason<=2017?'ESPN '+statsSeason+' full-PPR stats · local historical data fills missing rows':'ESPN '+statsSeason+' full-PPR stats')+' · choose a position, then use the Rank by dropdown'+(statsSeason===SEASON?' · current season auto-refreshes every 60 seconds':'');
-  if(updated){
-    if(statsLastUpdated)updated.textContent=(statsSeason===SEASON?'Updated ':'Loaded ')+statsLastUpdated.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
-    else updated.textContent='Not loaded yet';
-    updated.classList.remove('espn-error');
-  }
-  if(refreshBtn)refreshBtn.textContent=statsSeason===SEASON?'Refresh':'Reload';
 }
 async function loadStatsSeason(year,{force=false}={}){
   year=Number(year)||SEASON;
@@ -1465,8 +1468,6 @@ async function loadStatsSeason(year,{force=false}={}){
   const box=document.getElementById('espnLiveRows');
   if(box)box.innerHTML='<div class="espn-status">Loading '+year+' ESPN stats…</div>';
   loading=true;
-  const button=document.getElementById('espnRefresh');
-  if(button){button.disabled=true;button.textContent='Loading…'}
   try{
     const fresh=year===SEASON?(force?await fetchEspn(SEASON):await ensureCurrentRows()):await fetchStatsSeasonData(year);
     if(statsSeason!==year)return statsRows;
@@ -1483,15 +1484,12 @@ async function loadStatsSeason(year,{force=false}={}){
       if(!statsRows.length&&hydrateStatsCache(year)){
         render();
         updateStatsLabels();
-        const el=document.getElementById('espnLastUpdated');if(el){el.textContent='Refresh failed · showing cached data';el.classList.add('espn-error')}
       }else if(!statsRows.length&&box){
         box.innerHTML='<div class="espn-status espn-error">Could not load '+year+' ESPN stats.</div>';
-        const el=document.getElementById('espnLastUpdated');if(el){el.textContent='ESPN connection failed';el.classList.add('espn-error')}
       }
     }
   }finally{
     loading=false;
-    if(button){button.disabled=false;button.textContent=statsSeason===SEASON?'Refresh':'Reload'}
   }
   return statsRows;
 }
@@ -1501,9 +1499,10 @@ async function refresh(){
 function showEspn(){
   try{position='ESPN'}catch(e){}
   document.body.classList.remove('fantasy-home-mode','mobile-menu-open');
+  document.body.classList.add('stats-mode');
   document.querySelectorAll('.positions .pos').forEach(b=>b.classList.toggle('active',b.dataset.pos==='ESPN'));
   const tagged=document.getElementById('taggedControls');if(tagged)tagged.classList.remove('open');
-  const ids=['teamControls','overallToggle','positionToggle','board','tableCard','mockSection','depthSection','tradeSection'];
+  const ids=['teamControls','overallToggle','positionToggle','board','tableCard','mockSection','depthSection','tradeSection','compareSection'];
   ids.forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true});
   section.hidden=false;
   document.getElementById('title').textContent='Stats';
@@ -1517,6 +1516,7 @@ function showEspn(){
 }
 function hideEspn(){
   section.hidden=true;
+  document.body.classList.remove('stats-mode');
   if(timer){clearInterval(timer);timer=null}
 }
 
@@ -1571,7 +1571,6 @@ if(statsYearSelect){
 syncStatsControls();
 document.getElementById('espnPointsHead')?.addEventListener('click',()=>sortFromHeader('points'));
 document.getElementById('espnSelectedStatHead')?.addEventListener('click',()=>sortFromHeader('selected'));
-document.getElementById('espnRefresh').onclick=refresh;
 document.getElementById('close')?.addEventListener('click',hideProfileGameLog);
 document.getElementById('modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('modal'))hideProfileGameLog()});
 

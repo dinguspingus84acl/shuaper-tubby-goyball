@@ -27,6 +27,7 @@ style.textContent=`
 .trade-results{position:absolute;left:8px;right:8px;top:51px;z-index:30;background:#081a2d;border:1px solid #ffffff25;border-radius:9px;overflow:hidden;max-height:260px;overflow-y:auto;display:none;box-shadow:0 12px 30px #0008}
 .trade-result{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;border:0;border-top:1px solid #ffffff12;background:#081a2d;color:#fff;padding:8px 10px;text-align:left}
 .trade-result:first-child{border-top:0}
+.trade-result-player{display:flex;align-items:center;gap:7px;min-width:0}
 .trade-result-name{font-weight:900;font-size:.76rem;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .trade-result-meta{color:#8296aa;font-size:.62rem;white-space:nowrap}
 .trade-list{display:grid;gap:4px;padding:0 8px 8px}
@@ -57,7 +58,9 @@ style.textContent=`
 .trade-why-side h4{margin:0 0 6px;font-size:.66rem}
 .trade-why-line{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-top:1px solid #ffffff0d;font-size:.62rem}
 .trade-why-line:first-of-type{border-top:0}
-.trade-why-line span:first-child{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trade-why-player{display:flex;align-items:center;gap:5px;min-width:0}
+.trade-why-player span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trade-why-player .trade-team-logo{width:15px;height:15px;flex-basis:15px}
 .trade-why-line b{white-space:nowrap}
 .trade-why-total{display:flex;justify-content:space-between;gap:8px;padding-top:6px;margin-top:4px;border-top:1px solid #ffffff1b;font-size:.65rem;font-weight:950}
 .trade-why-delta{text-align:center;margin-top:7px;color:var(--m);font-size:.62rem}
@@ -191,7 +194,7 @@ function renderSide(side){
     list.innerHTML=state[side].map(p=>
       '<div class="trade-player">'+
         '<div class="trade-player-main">'+
-          '<div class="trade-player-name"><button type="button" class="trade-player-link" data-trade-profile="'+encodeURIComponent(p.name)+'">'+p.name+'</button>'+teamLogo(p.team)+'</div>'+
+          '<div class="trade-player-name">'+teamLogo(p.team)+'<button type="button" class="trade-player-link" data-trade-profile="'+encodeURIComponent(p.name)+'">'+p.name+'</button></div>'+
           '<div class="trade-player-meta">'+(tradeMode==='ROS'?'ROS '+p.position+' #'+p.positionRank:'Pre Season #'+p.rank+' overall')+(p.team&&p.team!=='—'?' · '+p.team:'')+'</div>'+
         '</div>'+
         '<div class="trade-value">'+p.value.toFixed(1)+'</div>'+
@@ -208,7 +211,7 @@ function whySideHtml(side,label){
   const total=adjustedSum(side);
   const items=[...state[side]].sort((a,b)=>b.value-a.value);
   return '<div class="trade-why-side"><h4>'+label+'</h4>'+
-    (items.length?items.map(p=>'<div class="trade-why-line"><span>'+p.name+' · '+tradeRankLabel(p)+'</span><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
+    (items.length?items.map(p=>'<div class="trade-why-line"><div class="trade-why-player">'+teamLogo(p.team)+'<span>'+p.name+' · '+tradeRankLabel(p)+'</span></div><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
     '<div class="trade-why-total"><span>Score</span><b>'+total.toFixed(1)+'</b></div></div>';
 }
 function updateWhy(){
@@ -280,7 +283,7 @@ function showMatches(side){
   }
   results.innerHTML=matches.map(p=>
     '<button type="button" class="trade-result" data-add="'+side+'" data-name="'+encodeURIComponent(p.name)+'">'+
-      '<span class="trade-result-name">'+p.name+'</span>'+
+      '<span class="trade-result-player">'+teamLogo(p.team)+'<span class="trade-result-name">'+p.name+'</span></span>'+
       '<span class="trade-result-meta">'+(tradeMode==='ROS'?p.position+' #'+p.positionRank:'Overall #'+p.rank)+' · '+p.value.toFixed(1)+'</span>'+
     '</button>'
   ).join('');

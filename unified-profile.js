@@ -37,7 +37,11 @@ style.id='unifiedProfileStyles';
 style.textContent=`
 .unified-profile-tabs{display:flex;gap:5px;overflow-x:auto;padding:9px 0 7px;margin-top:8px;border-bottom:1px solid #ffffff18;-webkit-overflow-scrolling:touch}
 .unified-profile-tab{flex:0 0 auto;border:1px solid #ffffff1b;background:#081a2d;color:#8da1b6;border-radius:8px;padding:7px 9px;font-size:.62rem;font-weight:950}
-.unified-profile-tab.active{background:#183d63;color:#fff;border-color:#ffffff32}
+.unified-profile-tab.active{
+  background:color-mix(in srgb,var(--profile-accent,#3d8cff) 18%,#10243a);
+  color:#fff;border-color:color-mix(in srgb,var(--profile-accent,#3d8cff) 48%,#ffffff28);
+  box-shadow:inset 0 -2px 0 var(--profile-accent,#3d8cff)
+}
 .unified-profile-panel{padding-top:10px}
 .unified-profile-panel[hidden]{display:none!important}
 .unified-rank-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
@@ -77,13 +81,14 @@ style.textContent=`
   position:relative;overflow:hidden;isolation:isolate;
   height:258px;border:1px solid color-mix(in srgb,var(--featured-accent) 28%,#ffffff24);border-radius:16px 16px 0 0;
   background:
-    radial-gradient(circle at 18% 32%,color-mix(in srgb,var(--featured-accent) 17%,transparent),transparent 34%),
-    linear-gradient(135deg,#05090f 0%,#09111a 48%,#04080d 100%);
+    radial-gradient(circle at 16% 30%,color-mix(in srgb,var(--featured-accent) 27%,transparent),transparent 39%),
+    linear-gradient(120deg,color-mix(in srgb,var(--featured-accent) 9%,#05090f) 0%,#09111a 46%,#04080d 100%);
   box-shadow:inset 0 1px 0 #ffffff17,0 16px 34px #0007;
   display:grid;grid-template-columns:38% 62%
 }
 .featured-player-card:before{
   content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  border-top:3px solid color-mix(in srgb,var(--featured-accent) 72%,#fff 8%);
   background:
     linear-gradient(118deg,transparent 0 58%,#ffffff04 58% 63%,transparent 63%),
     radial-gradient(circle at 89% 80%,#ffffff06 0 1px,transparent 1.4px);
@@ -98,7 +103,7 @@ style.textContent=`
 }
 .featured-player-card .featured-bg-logo{
   position:absolute;left:-15%;top:-8%;width:114%;height:114%;object-fit:contain;
-  opacity:.38;filter:drop-shadow(0 0 24px color-mix(in srgb,var(--featured-accent) 38%,transparent))
+  opacity:.44;filter:drop-shadow(0 0 28px color-mix(in srgb,var(--featured-accent) 46%,transparent))
 }
 .featured-player-card .featured-photo{
   position:absolute;z-index:2;left:50%;bottom:-8px;transform:translateX(-50%);
@@ -236,28 +241,28 @@ style.textContent=`
   pointer-events:none
 }
 .phone-mode .featured-player-profile #featuredPlayerCard{
-  width:calc(100% - 16px);height:278px;margin:10px 8px 0;
+  width:calc(100% - 16px);height:254px;margin:8px 8px 0;
   grid-template-columns:38% 62%;border-radius:15px 15px 0 0
 }
 .phone-mode .featured-player-card .featured-portrait-box{
-  left:8px;right:8px;top:8px;bottom:67px;border-radius:11px
+  left:8px;right:8px;top:8px;bottom:61px;border-radius:11px
 }
 .phone-mode .featured-player-card .featured-photo{
-  height:122%!important;max-width:158%!important;bottom:-14px
+  height:124%!important;max-width:160%!important;bottom:-15px
 }
 .phone-mode .featured-player-card .featured-bg-logo{
   width:122%;height:122%;left:-20%;top:-12%;opacity:.42
 }
 .phone-mode .featured-player-card .featured-team-strip{
-  left:8px;right:8px;bottom:6px;height:54px;
+  left:8px;right:8px;bottom:5px;height:49px;
   grid-template-columns:38px 1px minmax(0,1fr);gap:9px;padding:0 8px;border-radius:9px
 }
-.phone-mode .featured-player-card .featured-mini-logo{width:36px;height:36px}
-.phone-mode .featured-player-card .featured-divider{height:35px}
+.phone-mode .featured-player-card .featured-mini-logo{width:33px;height:33px}
+.phone-mode .featured-player-card .featured-divider{height:32px}
 .phone-mode .featured-player-card .featured-team-name{font-size:.94rem}
 .phone-mode .featured-player-card .featured-team-meta{font-size:.6rem;margin-top:6px}
-.phone-mode .featured-player-card .featured-right{padding:28px 15px 20px}
-.phone-mode .featured-player-card .featured-name{margin-bottom:17px;padding-right:0}
+.phone-mode .featured-player-card .featured-right{padding:22px 15px 16px}
+.phone-mode .featured-player-card .featured-name{margin-bottom:13px;padding-right:0}
 .phone-mode .featured-player-card .featured-first{font-size:1.25rem}
 .phone-mode .featured-player-card .featured-last-row{gap:7px;margin-top:5px}
 .phone-mode .featured-player-card .featured-last{font-size:1.92rem}
@@ -267,7 +272,7 @@ style.textContent=`
 .phone-mode .featured-player-card .featured-bio{
   grid-template-columns:repeat(2,minmax(0,1fr));gap:7px
 }
-.phone-mode .featured-player-card .featured-bio-item{padding:9px 5px;border-radius:9px}
+.phone-mode .featured-player-card .featured-bio-item{padding:7px 5px;border-radius:9px}
 .phone-mode .featured-player-card .featured-bio-label{font-size:.49rem}
 .phone-mode .featured-player-card .featured-bio-value{font-size:.9rem;margin-top:4px}
 .phone-mode .featured-player-profile .unified-profile-tabs{
@@ -282,7 +287,7 @@ style.textContent=`
   padding:7px 2px!important;font-size:.54rem!important;white-space:nowrap!important
 }
 .phone-mode .featured-player-profile #unifiedProfilePanels{
-  min-height:calc(100dvh - 342px);
+  min-height:calc(100dvh - 316px);
   padding:10px 10px max(18px,env(safe-area-inset-bottom))
 }
 .phone-mode .featured-player-profile .unified-profile-panel{padding-top:6px}
@@ -435,6 +440,7 @@ function clearFeaturedProfile(){
   const box=document.querySelector('#modal .profile');
   if(!box)return;
   box.classList.remove('featured-player-profile','featured-profile-gibbs','featured-profile-bijan','featured-profile-walker');
+  box.style.removeProperty('--profile-accent');
   document.getElementById('featuredPlayerCard')?.remove();
 }
 function heightLabel(value){
@@ -542,6 +548,8 @@ function applyFeaturedProfile(name,seed=null){
   if(!box||!tabs)return false;
 
   box.classList.add('featured-player-profile');
+  const accent=TEAM_ACCENTS[canonicalTeam(team)]||'#3d8cff';
+  box.style.setProperty('--profile-accent',accent);
 
   const hero=document.createElement('section');
   hero.id='featuredPlayerCard';
@@ -549,7 +557,7 @@ function applyFeaturedProfile(name,seed=null){
   const nameLength=String(player.name||name).replace(/\s+/g,'').length;
   if(nameLength>=18)hero.classList.add('featured-name-xlong');
   else if(nameLength>=14)hero.classList.add('featured-name-long');
-  hero.style.setProperty('--featured-accent',TEAM_ACCENTS[canonicalTeam(team)]||'#3d8cff');
+  hero.style.setProperty('--featured-accent',accent);
 
   const historical=!!seedYear(seed);
   const initialMeta='<strong>'+String(player.position||'—')+'</strong> · '+canonicalTeam(team)+(historical?' · '+seedYear(seed):'');

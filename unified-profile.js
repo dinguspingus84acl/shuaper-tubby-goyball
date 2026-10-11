@@ -33,7 +33,6 @@ let sleeperBioPromise=null;
 let activeSeed=null;
 let preferredProfileTab=(()=>{try{return sessionStorage.getItem('shuaProfileTab')||'overview'}catch(e){return'overview'}})();
 let swipeHintShownThisSession=false;
-let compareSelection=[];
 
 const style=document.createElement('style');
 style.id='unifiedProfileStyles';
@@ -104,7 +103,7 @@ style.textContent=`
 .phone-mode #rankingPlayerNav .ranking-nav-name{font-size:.63rem}
 .phone-mode #rankingPlayerNav .ranking-nav-rank{font-size:.51rem}
 
-.player-compare-actionbar{display:flex;align-items:center;justify-content:flex-end;padding:6px;background:#07111de8;border-left:1px solid #ffffff18;border-right:1px solid #ffffff18}
+.player-compare-actionbar,#compareTray,#playerCompareOverlay{display:none!important}
 .player-compare-btn{border:1px solid #5aa6e866;border-radius:8px;background:#0c2b47;color:#eaf5ff;min-height:36px;padding:7px 11px;font-size:.67rem;font-weight:1000}
 .player-compare-btn:hover{background:#153d61;border-color:#74b9f0}
 .player-compare-btn.selected{background:#145c3d;border-color:#35d07f;color:#fff}
@@ -1170,7 +1169,6 @@ function prepareUnified(name,seed=null){
   modal.dataset.unifiedName=name;
   applyFeaturedProfile(name,seed);
   renderOverviewRanks(name);
-  ensureCompareAction(name);
   ensureStickyIdentity(name);
   ensureSwipeHint();
   const currentId=document.getElementById('modal')?.dataset.id||playerByName(name)?.id||'';

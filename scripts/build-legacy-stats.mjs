@@ -93,19 +93,62 @@ async function loadIdentityMap(){
   }
   return map;
 }
-function headshotCandidates(name,position,sourceUrl,identityMap){
+async function loadPlayerRegistry(){
+  const url='https://raw.githubusercontent.com/Lolindhir/fantasy-app/main/source-data/providers/nflverse/players/raw-latest.csv';
+  const res=await fetch(url);
+  if(!res.ok)throw new Error('player registry: '+res.status+' '+res.statusText);
+  const text=await res.text();
+  const lines=text.split(/\r?\n/).filter(Boolean);
+  if(lines.length<2)return new Map();
+  const headers=parseCsvLine(lines[0]);
+  const idx=Object.fromEntries(headers.map((h,i)=>[h,i]));
+  const get=(cells,name)=>idx[name]===undefined?'':cells[idx[name]];
+  const map=new Map();
+  for(const line of lines.slice(1)){
+    const cells=parseCsvLine(line);
+    const names=[
+      get(cells,'display_name'),
+      [get(cells,'first_name'),get(cells,'last_name')].filter(Boolean).join(' '),
+      get(cells,'football_name'),
+      get(cells,'short_name')
+    ].filter(Boolean);
+    const row={
+      espnId:String(get(cells,'espn_id')||'').trim(),
+      headshot:String(get(cells,'headshot')||'').trim(),
+      position:String(get(cells,'position')||'').toUpperCase(),
+      displayName:get(cells,'display_name')
+    };
+    for(const raw of names){
+      const key=norm(raw);
+      if(!key)continue;
+      if(!map.has(key))map.set(key,[]);
+      map.get(key).push(row);
+    }
+  }
+  return map;
+}
+
+function headshotCandidates(name,position,sourceUrl,identityMap,playerRegistry){
   const key=norm(name);
+  const urls=[];
+
+  const registryRows=playerRegistry.get(key)||[];
+  const registryMatches=registryRows.filter(x=>!position||x.position===position);
+  for(const x of (registryMatches.length?registryMatches:registryRows)){
+    if(/^\d+$/.test(x.espnId))urls.push('https://a.espncdn.com/i/headshots/nfl/players/full/'+x.espnId+'.png');
+    if(x.headshot&&!/\/NA(?:\.|$)/i.test(x.headshot))urls.push(x.headshot);
+  }
+
   const rows=identityMap.get(key)||[];
   const matches=rows.filter(x=>!position||x.position===position);
-  const chosen=matches.length?matches:rows;
-  const urls=[];
-  for(const x of chosen){
+  for(const x of (matches.length?matches:rows)){
     if(/^\d+$/.test(x.espnId))urls.push('https://a.espncdn.com/i/headshots/nfl/players/full/'+x.espnId+'.png');
-    if(x.sleeperId)urls.push('https://sleepercdn.com/content/nfl/players/thumb/'+x.sleeperId+'.jpg');
+    if(x.sleeperId&&x.sleeperId.toUpperCase()!=='NA'&&x.sleeperId!=='0')urls.push('https://sleepercdn.com/content/nfl/players/thumb/'+x.sleeperId+'.jpg');
   }
+
   const manual=HEADSHOT_FALLBACKS[key];
   if(manual)urls.push(manual);
-  if(sourceUrl)urls.push(sourceUrl);
+  if(sourceUrl&&!/\/NA(?:\.|$)/i.test(sourceUrl))urls.push(sourceUrl);
   return [...new Set(urls.filter(Boolean))];
 }
 
@@ -144,7 +187,7 @@ async function loadYear(year){
     p.name=name||p.name;
     if((!p.id||p.id.includes(':'))&&r.player_id)p.id=String(r.player_id);
     p.team=teamCode(r.team||p.team);
-    const candidates=headshotCandidates(name,position,r.headshot_url||'',identityMap);
+    const candidates=headshotCandidates(name,position,r.headshot_url||'',identityMap,playerRegistry);
     if(candidates.length){
       p.headshots=[...new Set([...(p.headshots||[]),...candidates])];
       p.headshot=p.headshots[0]||'';
@@ -191,7 +234,9 @@ async function loadYear(year){
 
 await fs.mkdir(OUT_DIR,{recursive:true});
 const identityMap=await loadIdentityMap();
+const playerRegistry=await loadPlayerRegistry();
 console.log(`identity map: ${identityMap.size} normalized names`);
+console.log(`player registry: ${playerRegistry.size} normalized names`);
 const careerIndex={};
 const headshotIndex={};
 for(const year of YEARS){

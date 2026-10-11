@@ -75,6 +75,7 @@ const gameLogYears=new Map();
 const careerYearsCache=new Map();
 const historicalSeasonCache=new Map();
 let historicalIndexPromise=null;
+let headshotIndexPromise=null;
 
 const style=document.createElement('style');
 style.id='espnLiveStyles';
@@ -339,6 +340,26 @@ async function loadHistoricalIndex(){
   })();
   try{return await historicalIndexPromise}catch(e){historicalIndexPromise=null;throw e}
 }
+async function loadHeadshotIndex(){
+  if(headshotIndexPromise)return headshotIndexPromise;
+  headshotIndexPromise=(async()=>{
+    const res=await fetch('legacy-stats/headshots.json',{cache:'force-cache'});
+    if(!res.ok)throw new Error('Historical headshot index returned '+res.status);
+    const data=await res.json();
+    return data?.headshots||{};
+  })();
+  try{return await headshotIndexPromise}catch(e){headshotIndexPromise=null;return{}}
+}
+async function enrichHeadshots(list){
+  if(!Array.isArray(list)||!list.length)return list||[];
+  const map=await loadHeadshotIndex();
+  return list.map(p=>{
+    if(p.headshot)return p;
+    const url=map[norm(p.name)];
+    return url?{...p,headshot:url}:p;
+  });
+}
+
 async function fetchHistoricalSeason(year){
   year=Number(year);
   if(historicalSeasonCache.has(year))return historicalSeasonCache.get(year);
@@ -376,7 +397,8 @@ function mergeLegacyStats(espnRows,legacyRows){
 async function fetchStatsSeasonData(year){
   if(year>2017){
     const modern=await fetchEspn(year);
-    return modern.map(p=>({...p,seasonYear:year,source:p.source||'espn'}));
+    const enriched=year<=2025?await enrichHeadshots(modern):modern;
+    return enriched.map(p=>({...p,seasonYear:year,source:p.source||'espn'}));
   }
   const [espnResult,legacyResult]=await Promise.allSettled([
     fetchEspn(year),
@@ -595,19 +617,26 @@ function availableGameLogYears(player){
   const cached=careerYearsCache.get(String(player.id));
   if(cached?.length)return cached;
   const exp=Math.max(0,Number(player?.experienceYears)||0);
-  const first=Math.max(2010,SEASON-exp);
+  const first=Math.max(1999,SEASON-exp);
   const years=[];
   for(let y=SEASON;y>=first;y--)years.push(y);
   return years.length?years:[SEASON];
 }
 async function discoverGameLogYears(player){
+  const localCareer=await getHistoricalCareer(player.name).catch(()=>[]);
+  if(localCareer.length){
+    const years=localCareer.map(x=>Number(x.year)).filter(Number.isFinite).sort((a,b)=>b-a);
+    if(rows.some(x=>norm(x.name)===norm(player.name))&&!years.includes(SEASON))years.unshift(SEASON);
+    careerYearsCache.set(String(player.id),years);
+    return years;
+  }
   const key=String(player.id);
   const cached=careerYearsCache.get(key);
   if(cached?.length)return cached;
 
   let firstYear=null;
   const exp=Math.max(0,Number(player?.experienceYears)||0);
-  if(exp>0)firstYear=Math.max(2010,SEASON-exp);
+  if(exp>0)firstYear=Math.max(1999,SEASON-exp);
 
   try{
     const r=await fetch('https://site.api.espn.com/apis/common/v3/sports/football/nfl/athletes/'+player.id,{cache:'no-store',mode:'cors'});
@@ -619,7 +648,7 @@ async function discoverGameLogYears(player){
       const yearsExp=Number(a?.experience?.years||a?.experience||0);
       if(debut)firstYear=debut;
       else if(draft)firstYear=draft;
-      else if(yearsExp>0)firstYear=Math.max(2010,SEASON-yearsExp);
+      else if(yearsExp>0)firstYear=Math.max(1999,SEASON-yearsExp);
     }
   }catch(e){}
 
@@ -627,7 +656,7 @@ async function discoverGameLogYears(player){
   // look backward until we find the first season with actual weekly stats.
   if(!firstYear||firstYear>=SEASON){
     let oldestFound=SEASON,misses=0,foundOlder=false;
-    for(let y=SEASON-1;y>=Math.max(2010,SEASON-15);y--){
+    for(let y=SEASON-1;y>=Math.max(1999,SEASON-27);y--){
       try{
         const rows=await fetchGameLog(player,y);
         if(rows.length){
@@ -646,13 +675,25 @@ async function discoverGameLogYears(player){
     if(foundOlder)firstYear=oldestFound;
   }
 
-  firstYear=Math.max(2010,Math.min(SEASON,firstYear||SEASON));
+  firstYear=Math.max(1999,Math.min(SEASON,firstYear||SEASON));
   const years=[];
   for(let y=SEASON;y>=firstYear;y--)years.push(y);
   careerYearsCache.set(key,years);
   return years;
 }
 async function fetchGameLog(player,year=SEASON){
+  year=Number(year)||SEASON;
+  if(year>=1999&&year<=2025){
+    try{
+      const historical=await loadHistoricalPlayerYear(player.name,year);
+      if(historical&&Array.isArray(historical.games)&&historical.games.length){
+        const localRows=historical.games.map(g=>({...g,hasStats:true}));
+        const localKey=gameLogCacheKey(player,year);
+        gameLogCache.set(localKey,{ts:Date.now(),rows:localRows,source:'local'});
+        return localRows;
+      }
+    }catch(e){}
+  }
   const cacheKey=gameLogCacheKey(player,year);
   const cached=gameLogCache.get(cacheKey);
   const ttl=year===SEASON?REFRESH_MS:86400000;
@@ -1033,7 +1074,7 @@ function updateStatsLabels(){
   const updated=document.getElementById('espnLastUpdated');
   const refreshBtn=document.getElementById('espnRefresh');
   if(sub)sub.textContent=statsSeason+' ESPN full-PPR scoring leaders — filter by position and rank by stat';
-  if(src)src.textContent=(statsSeason<=2017?'ESPN '+statsSeason+' full-PPR stats · local legacy data fills missing rows':'ESPN '+statsSeason+' full-PPR stats')+' · choose a position, then rank players by any relevant stat'+(statsSeason===SEASON?' · current season auto-refreshes every 60 seconds':'');
+  if(src)src.textContent=(statsSeason<=2017?'ESPN '+statsSeason+' full-PPR stats · local historical data fills missing rows':'ESPN '+statsSeason+' full-PPR stats')+' · choose a position, then rank players by any relevant stat'+(statsSeason===SEASON?' · current season auto-refreshes every 60 seconds':'');
   if(updated){
     if(statsLastUpdated)updated.textContent=(statsSeason===SEASON?'Updated ':'Loaded ')+statsLastUpdated.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
     else updated.textContent='Not loaded yet';
@@ -1147,7 +1188,7 @@ document.querySelectorAll('[data-espn-view]').forEach(b=>{
 const statsYearSelect=document.getElementById('espnStatsYear');
 if(statsYearSelect){
   const years=[];
-  for(let y=SEASON;y>=2010;y--)years.push(y);
+  for(let y=SEASON;y>=1999;y--)years.push(y);
   statsYearSelect.innerHTML=years.map(y=>'<option value="'+y+'">'+y+'</option>').join('');
   statsYearSelect.value=String(statsSeason);
   statsYearSelect.onchange=e=>{
@@ -1246,7 +1287,7 @@ window.ShuaEspnLive={
     if(!target)return;
     target.innerHTML='<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
     try{
-      if(Number(year)>=2010&&Number(year)<=2025){
+      if(Number(year)>=1999&&Number(year)<=2025){
         let hist=await getHistoricalCareer(name);
         if(hist.some(x=>Number(x.year)===Number(year))){
           hist=await hydrateHistoricalCareerYear(hist,name,Number(year));

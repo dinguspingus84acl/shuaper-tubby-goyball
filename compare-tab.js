@@ -22,6 +22,7 @@ const style=document.createElement('style');
 style.id='compareTabStyles';
 style.textContent=`
 #compareSection{margin-top:8px}
+body:not(.phone-mode) .positions .compare-tab-btn{display:inline-flex!important;align-items:center;justify-content:center}
 .compare-shell{display:grid;gap:14px}
 .compare-picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .compare-picker{position:relative;border:1px solid #ffffff18;border-radius:12px;background:#07182a;padding:12px}
@@ -232,7 +233,7 @@ async function renderCompare(){
 }
 function showCompare(){
   try{position='COMPARE'}catch(e){}
-  document.body.classList.remove('fantasy-home-mode','mobile-menu-open');
+  document.body.classList.remove('fantasy-home-mode','mobile-menu-open','stats-mode');
   document.querySelectorAll('.positions .pos').forEach(b=>b.classList.toggle('active',b.dataset.pos==='COMPARE'));
   const tagged=document.getElementById('taggedControls');if(tagged)tagged.classList.remove('open');
   ['teamControls','overallToggle','positionToggle','board','tableCard','mockSection','depthSection','tradeSection','espnLiveSection'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true});

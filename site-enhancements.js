@@ -61,6 +61,37 @@ function addStyles(){
     #tableCard tbody tr[data-id].selected-player-row{box-shadow:0 0 0 1px rgba(53,208,127,.24),0 8px 24px rgba(0,0,0,.16)}
     .phone-mode #tableCard tbody tr[data-id].selected-player-row{background:linear-gradient(90deg,rgba(53,208,127,.18),rgba(24,61,99,.12))!important;box-shadow:inset 4px 0 0 var(--g),0 0 0 1px rgba(53,208,127,.2)!important}
 
+    /* Desktop row hover */
+    @media(hover:hover) and (pointer:fine){
+      #tableCard tbody tr[data-id]:not(.selected-player-row){cursor:pointer}
+      #tableCard tbody tr[data-id]:not(.selected-player-row):hover td{background:rgba(255,255,255,.045)}
+      #tableCard tbody tr[data-id]:not(.selected-player-row):hover td:first-child{box-shadow:inset 3px 0 0 rgba(145,164,186,.58)}
+      #tableCard tbody tr[data-id]:not(.selected-player-row):hover .photo{transform:scale(1.055)}
+      #tableCard tbody tr[data-id] .photo{transition:transform .16s ease}
+    }
+
+    /* Previous / next ranking navigation inside player cards */
+    .ranking-player-nav{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;margin:7px 0;padding:0}
+    .ranking-player-nav button{min-width:0;min-height:42px;border:1px solid #ffffff20;border-radius:9px;background:#081a2d;color:#fff;padding:7px 10px;font-weight:900;line-height:1.12}
+    .ranking-player-nav button:first-child{text-align:left}.ranking-player-nav button:last-child{text-align:right}
+    .ranking-player-nav button:not(:disabled):hover{background:#102d49;border-color:#ffffff38}
+    .ranking-player-nav button:disabled{opacity:.28;cursor:default}
+    .ranking-player-nav .ranking-nav-rank{display:block;color:var(--m);font-size:.57rem;margin-bottom:2px}
+    .ranking-player-nav .ranking-nav-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.72rem}
+    .featured-player-profile>.ranking-player-nav{margin:0;padding:7px 6px;background:#07111de8;border-left:1px solid #ffffff18;border-right:1px solid #ffffff18}
+    .phone-mode .featured-player-profile>.ranking-player-nav{width:calc(100% - 16px);margin:0 8px!important;padding:5px!important}
+    .phone-mode .ranking-player-nav button{min-height:38px;padding:5px 7px}
+    .phone-mode .ranking-player-nav .ranking-nav-name{font-size:.62rem}
+
+    /* Ranking loading skeleton */
+    .ranking-skeleton-row td{height:62px;position:relative;overflow:hidden}
+    .ranking-skeleton-row td:after,.ranking-skeleton-pick:after{content:"";display:block;height:13px;border-radius:999px;background:linear-gradient(90deg,#ffffff0b,#ffffff22,#ffffff0b);background-size:220% 100%;animation:shuaSkeleton 1.15s ease-in-out infinite}
+    .ranking-skeleton-row td:nth-child(1):after{width:34px}.ranking-skeleton-row td:nth-child(2):after{width:min(220px,78%)}.ranking-skeleton-row td:nth-child(3):after{width:48px}.ranking-skeleton-row td:nth-child(4):after{width:52px}.ranking-skeleton-row td:nth-child(5):after{width:60px}.ranking-skeleton-row td:nth-child(6):after{width:min(280px,88%)}
+    .ranking-skeleton-pick{min-width:125px;min-height:78px;border-radius:8px;background:#0a2036;border:1px solid #ffffff10;padding:12px;display:flex;align-items:center}
+    .ranking-skeleton-pick:after{width:76%;height:14px}
+    @keyframes shuaSkeleton{0%{background-position:100% 0}100%{background-position:-120% 0}}
+    @media(prefers-reduced-motion:reduce){.ranking-skeleton-row td:after,.ranking-skeleton-pick:after{animation:none}}
+
     #fantasyHome{display:none;position:fixed;inset:0;z-index:10;background:#010315;align-items:center;justify-content:center;overflow:hidden}
     #fantasyHome img{width:min(88vw,900px);height:min(88vh,900px);object-fit:contain;filter:drop-shadow(0 0 34px rgba(69,39,255,.18))}
     body.fantasy-home-mode #fantasyHome{display:flex}
@@ -318,6 +349,7 @@ function decorateTeamLogos(){
   });
 }
 let selectedPlayerId='';
+let rankingScrollY=0;
 function updateRankingStickyOffset(){
   const bar=document.querySelector('.sticky');
   const h=bar?Math.max(0,Math.ceil(bar.getBoundingClientRect().height)):0;
@@ -333,6 +365,57 @@ function clearSelectedPlayerRow(){
   selectedPlayerId='';
   document.querySelectorAll('#rows tr.selected-player-row').forEach(tr=>tr.classList.remove('selected-player-row'));
 }
+function rankingRows(){return [...document.querySelectorAll('#rows tr[data-id]')].filter(tr=>tr.dataset.id)}
+function rankingRowInfo(tr){
+  if(!tr)return null;
+  return {
+    id:tr.dataset.id||'',
+    rank:(tr.querySelector('.rank')?.textContent||'').trim(),
+    name:(tr.querySelector('.photo-cell b')?.textContent||'Player').trim()
+  };
+}
+function ensureRankingPlayerNav(){
+  const profileBox=document.querySelector('#modal .profile');if(!profileBox)return null;
+  let nav=document.getElementById('rankingPlayerNav');
+  if(!nav){
+    nav=document.createElement('div');nav.id='rankingPlayerNav';nav.className='ranking-player-nav';
+    nav.innerHTML='<button type="button" data-ranking-nav="prev"></button><button type="button" data-ranking-nav="next"></button>';
+  }
+  const tabs=profileBox.querySelector('.unified-profile-tabs');
+  if(tabs&&nav.parentNode!==profileBox)profileBox.insertBefore(nav,tabs);
+  else if(tabs&&nav.nextSibling!==tabs)profileBox.insertBefore(nav,tabs);
+  else if(!nav.parentNode){
+    const pm=document.getElementById('pm');
+    if(pm?.parentNode===profileBox)pm.insertAdjacentElement('afterend',nav);else profileBox.appendChild(nav);
+  }
+  return nav;
+}
+function updateRankingPlayerNav(){
+  const modal=document.getElementById('modal');if(!modal?.classList.contains('open'))return;
+  const rows=rankingRows();
+  const id=String(selectedPlayerId||modal.dataset.id||'');
+  const idx=rows.findIndex(tr=>String(tr.dataset.id)===id);
+  const nav=ensureRankingPlayerNav();if(!nav)return;
+  if(idx<0||!rows.length){nav.hidden=true;return}
+  nav.hidden=false;
+  const prev=rankingRowInfo(rows[idx-1]),next=rankingRowInfo(rows[idx+1]);
+  const prevBtn=nav.querySelector('[data-ranking-nav="prev"]'),nextBtn=nav.querySelector('[data-ranking-nav="next"]');
+  const paint=(btn,item,dir)=>{
+    btn.disabled=!item;btn.dataset.targetId=item?.id||'';
+    btn.innerHTML=item?'<span class="ranking-nav-rank">'+(dir==='prev'?'← ':'')+item.rank+(dir==='next'?' →':'')+'</span><span class="ranking-nav-name">'+item.name+'</span>':'<span class="ranking-nav-rank">'+(dir==='prev'?'← Start':'End →')+'</span><span class="ranking-nav-name">No more players</span>';
+  };
+  paint(prevBtn,prev,'prev');paint(nextBtn,next,'next');
+  nav.querySelectorAll('button[data-target-id]').forEach(btn=>btn.onclick=()=>{
+    const target=btn.dataset.targetId;if(!target)return;
+    if(typeof window.profile==='function')window.profile(target);
+    requestAnimationFrame(()=>{const p=document.querySelector('#modal .profile');if(p)p.scrollTop=0;updateRankingPlayerNav()});
+  });
+}
+function installRankingSkeleton(){
+  const rows=document.getElementById('rows'),boardEl=document.getElementById('board');
+  if(rows&&!rows.children.length)rows.innerHTML=Array.from({length:9},()=>'<tr class="ranking-skeleton-row" aria-hidden="true"><td></td><td></td><td></td><td></td><td></td><td></td></tr>').join('');
+  if(boardEl&&!boardEl.children.length)boardEl.innerHTML=Array.from({length:20},()=>'<div class="ranking-skeleton-pick" aria-hidden="true"></div>').join('');
+}
 function installRankingPolish(){
   updateRankingStickyOffset();
   window.addEventListener('resize',()=>requestAnimationFrame(updateRankingStickyOffset),{passive:true});
@@ -342,9 +425,11 @@ function installRankingPolish(){
   const originalProfile=window.profile;
   if(typeof originalProfile==='function'&&!originalProfile.__shuaSelectedPlayerWrapped){
     const wrapped=function(id){
+      const modal=document.getElementById('modal');
+      if(!modal?.classList.contains('open'))rankingScrollY=window.scrollY||window.pageYOffset||0;
       selectedPlayerId=String(id||'');
       const result=originalProfile.apply(this,arguments);
-      requestAnimationFrame(applySelectedPlayerRow);
+      requestAnimationFrame(()=>{applySelectedPlayerRow();updateRankingPlayerNav()});
       return result;
     };
     wrapped.__shuaSelectedPlayerWrapped=true;
@@ -353,8 +438,13 @@ function installRankingPolish(){
   const modal=document.getElementById('modal');
   if(modal){
     const modalObserver=new MutationObserver(()=>{
-      if(modal.classList.contains('open'))applySelectedPlayerRow();
-      else clearSelectedPlayerRow();
+      if(modal.classList.contains('open')){applySelectedPlayerRow();requestAnimationFrame(updateRankingPlayerNav)}
+      else{
+        clearSelectedPlayerRow();
+        document.getElementById('rankingPlayerNav')?.remove();
+        const y=rankingScrollY;
+        requestAnimationFrame(()=>window.scrollTo({top:y,left:0,behavior:'auto'}));
+      }
     });
     modalObserver.observe(modal,{attributes:true,attributeFilter:['class']});
   }
@@ -378,14 +468,14 @@ async function loadData(){
 }
 
 function install(){
-  addStyles();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();
+  addStyles();installRankingSkeleton();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();
   document.addEventListener('click',e=>{
     const b=e.target.closest('.positions .pos');
     if(!b)return;
     if(!['HOME','MYGUYS','DND'].includes(b.dataset.pos)){leaveHome();hideTagged();closeMobileMenu();}
   },true);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileMenu()});
-  const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();upgradeFallbackFaces();applyColors();applySelectedPlayerRow()}));
+  const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();upgradeFallbackFaces();applyColors();applySelectedPlayerRow();updateRankingPlayerNav()}));
   obs.observe(document.body,{subtree:true,childList:true});
   loadData().catch(console.error);
   loadHistoricalHeadshots();

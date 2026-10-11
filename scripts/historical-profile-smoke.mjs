@@ -28,6 +28,10 @@ async function verifyHistoricalYear(page,year){
   const rowCount=await page.locator('#espnLiveRows .espn-live-row').count();
   const first=page.locator('#espnLiveRows .espn-live-row').first();
   const firstName=await first.locator('.espn-name-btn').innerText();
+  await page.waitForFunction(()=>{
+    const el=document.querySelector('#espnLiveRows .espn-live-row .espn-headshot');
+    return !!el && (el.tagName!=='IMG' || (el.complete&&el.naturalWidth>0));
+  },{timeout:15000});
   const rowFaceLoaded=await first.locator('.espn-headshot').evaluate(el=>el.tagName==='IMG'?el.complete&&el.naturalWidth>0:true);
 
   await first.locator('.espn-name-btn').click();
@@ -35,8 +39,12 @@ async function verifyHistoricalYear(page,year){
   const tabs=await page.locator('#unifiedProfileTabs .unified-profile-tab').allInnerTexts();
   if(!tabs.includes('History')||!tabs.includes('Game Log'))throw new Error('Missing History/Game Log tabs for '+firstName);
 
+  await page.waitForFunction(()=>{
+    const el=document.querySelector('#profileTop .person img.photo');
+    return !!el && el.complete && el.naturalWidth>0;
+  },{timeout:15000});
   const profileFace=page.locator('#profileTop .person img.photo');
-  const profileFaceLoaded=await profileFace.count()?await profileFace.evaluate(el=>el.complete&&el.naturalWidth>0):false;
+  const profileFaceLoaded=await profileFace.evaluate(el=>el.complete&&el.naturalWidth>0);
   if(!rowFaceLoaded||!profileFaceLoaded)throw new Error('Face did not load for '+firstName+' in '+year);
 
   await page.click('[data-profile-tab="history"]');

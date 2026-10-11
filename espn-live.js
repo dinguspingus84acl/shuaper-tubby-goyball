@@ -164,6 +164,24 @@ style.textContent=`
 .espn-error{color:#ff8b9d}
 .espn-live-source{font-size:.62rem;color:#73879e}
 @media(min-width:701px){
+  /* Desktop Stats-tab row hover */
+  .espn-live-row{
+    transition:background .14s ease,transform .14s ease,filter .14s ease,box-shadow .14s ease
+  }
+  .espn-player-block>.espn-live-row:hover,
+  #espnLiveRows>.espn-live-row:hover{
+    background:#102943!important;
+    transform:translateY(-1px);
+    filter:brightness(1.14);
+    box-shadow:inset 4px 0 0 #5f8fb8,0 5px 16px rgba(0,0,0,.24)
+  }
+  .espn-player-block>.espn-live-row:hover .espn-rank,
+  #espnLiveRows>.espn-live-row:hover .espn-rank{color:#fff!important}
+  .espn-player-block>.espn-live-row:hover .espn-headshot,
+  #espnLiveRows>.espn-live-row:hover .espn-headshot{
+    transform:scale(1.09);border-color:#ffffffcc
+  }
+  .espn-live-row .espn-headshot{transition:transform .14s ease,border-color .14s ease}
   .espn-game-log-title{
     padding:14px 14px 10px;font-size:.82rem;
     border:1px solid #ffffff12;border-bottom:0;border-radius:12px 12px 0 0;

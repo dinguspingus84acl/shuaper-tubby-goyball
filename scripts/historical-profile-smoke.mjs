@@ -202,6 +202,17 @@ try{
     throw new Error('Phone top controls should be hidden: '+JSON.stringify(phoneTopControls));
   if(phoneTopControls.phone&&phoneTopControls.toolsHeight>90)
     throw new Error('Phone header is still too tall: '+JSON.stringify(phoneTopControls));
+
+  await page.evaluate(()=>document.querySelector('.pos[data-pos="RB"]')?.click());
+  await page.waitForFunction(()=>!document.getElementById('tableCard')?.hidden&&document.querySelectorAll('#rows tr').length>5,{timeout:30000});
+  const phoneRankName=await page.locator('#rows .rank-player-copy>b').first().evaluate(el=>({
+    fontSize:parseFloat(getComputedStyle(el).fontSize),
+    fontWeight:getComputedStyle(el).fontWeight,
+    text:el.textContent.trim()
+  }));
+  if(phoneRankName.fontSize<14)
+    throw new Error('Phone ranking player name is still too small: '+JSON.stringify(phoneRankName));
+
   await openStats(page,2016);
 
   const checks=[];
@@ -215,7 +226,7 @@ try{
   await openStats(desktop,2016);
   checks.push(await verifyHistoricalYear(desktop,2016));
 
-  console.log('RESULT',JSON.stringify({checks,phoneTopControls,errors},null,2));
+  console.log('RESULT',JSON.stringify({checks,phoneTopControls,phoneRankName,errors},null,2));
   await browser.close();
 } finally {
   server.kill('SIGTERM');

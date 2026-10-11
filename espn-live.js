@@ -373,14 +373,17 @@ function mergeLegacyStats(espnRows,legacyRows){
   return out;
 }
 async function fetchStatsSeasonData(year){
-  if(year>2017)return fetchEspn(year);
+  if(year>2017){
+    const modern=await fetchEspn(year);
+    return modern.map(p=>({...p,seasonYear:year,source:p.source||'espn'}));
+  }
   const [espnResult,legacyResult]=await Promise.allSettled([
     fetchEspn(year),
     fetchLegacyNflverseStats(year)
   ]);
   const espnRows=espnResult.status==='fulfilled'?espnResult.value:[];
   const legacyRows=legacyResult.status==='fulfilled'?legacyResult.value:[];
-  const merged=mergeLegacyStats(espnRows,legacyRows);
+  const merged=mergeLegacyStats(espnRows,legacyRows).map(p=>({...p,seasonYear:year,source:p.source||'espn'}));
   if(merged.length)return merged;
   if(espnResult.status==='rejected')throw espnResult.reason;
   if(legacyResult.status==='rejected')throw legacyResult.reason;

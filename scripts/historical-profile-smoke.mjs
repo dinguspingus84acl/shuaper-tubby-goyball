@@ -122,6 +122,14 @@ async function verifyHistoricalYear(page,year){
   });
   if(phoneSheet.bodyPhone&&!(historyYearLogoGap!==null&&historyYearLogoGap>=2))
     throw new Error('History team logo crowds year: gap='+historyYearLogoGap);
+  const historyWidth=await page.locator('#unifiedHistoryPanel .player-history-row').first().evaluate(row=>{
+    const card=row.closest('.player-history-card');
+    const last=row.lastElementChild?.getBoundingClientRect();
+    const cardRect=card?.getBoundingClientRect();
+    return cardRect&&last?{cardWidth:cardRect.width,usedRight:last.right-cardRect.left,rightGap:cardRect.right-last.right}:null;
+  });
+  if(phoneSheet.bodyPhone&&(!historyWidth||historyWidth.rightGap>12))
+    throw new Error('History data leaves too much blank space: '+JSON.stringify(historyWidth));
   if(new Set(historyYears).size!==historyYears.length)throw new Error('Duplicate History years for '+firstName+': '+historyYears.join(','));
   if(!historyYears.includes(Number(year)))throw new Error('History missing selected year '+year+' for '+firstName);
 
@@ -148,6 +156,12 @@ async function verifyHistoricalYear(page,year){
   if(opponentLogoCount<1)throw new Error('Game Log opponent logos missing for '+firstName+' '+year);
   const scoredPtsCount=await detail.locator('.gl-pts-high,.gl-pts-mid,.gl-pts-low').count();
   if(scoredPtsCount<1)throw new Error('Game Log PTS color coding missing for '+firstName+' '+year);
+  const scoreColorStyle=await detail.locator('.gl-pts-high,.gl-pts-mid,.gl-pts-low').first().evaluate(el=>{
+    const s=getComputedStyle(el);
+    return {color:s.color,background:s.backgroundColor};
+  });
+  if(scoreColorStyle.background!=='rgba(0, 0, 0, 0)'&&scoreColorStyle.background!=='transparent')
+    throw new Error('Game Log score cell should only color the number: '+JSON.stringify(scoreColorStyle));
   const controlsPosition=await detail.locator('.espn-game-log-controls').first().evaluate(el=>getComputedStyle(el).position);
   if(controlsPosition!=='sticky')throw new Error('Game Log controls are not sticky: '+controlsPosition);
 
@@ -178,7 +192,7 @@ async function verifyHistoricalYear(page,year){
 
   if(phoneSheet.bodyPhone)await swipeDownToClose(page);
   else await page.click('#close');
-  return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350),phoneSheet,teamNameFit,historyYearLogoGap,gameLogLayout,summaryText,opponentLogoCount,scoredPtsCount,controlsPosition};
+  return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350),phoneSheet,teamNameFit,historyYearLogoGap,historyWidth,gameLogLayout,summaryText,opponentLogoCount,scoredPtsCount,scoreColorStyle,controlsPosition};
 }
 
 try{

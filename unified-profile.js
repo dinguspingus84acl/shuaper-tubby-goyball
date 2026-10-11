@@ -790,7 +790,8 @@ function updateCompareTray(){
     tray.querySelector('button').onclick=()=>{compareSelection=[];updateCompareTray();updateCompareAction(document.getElementById('modal')?.dataset.unifiedName||'')};
   }
   tray.hidden=false;
-  const n=document.getElementById('compareTrayName');if(n)n.textContent='Compare: '+compareSelection[0];
+  const n=document.getElementById('compareTrayName');if(n)n.textContent='Compare: '+compareSelection.join(' vs ');
+  const note=tray.querySelector('span');if(note)note.textContent=compareSelection.length<2?'Choose another player to compare':'Comparison ready';
 }
 function updateCompareAction(name){
   const btn=document.getElementById('playerCompareBtn');if(!btn)return;

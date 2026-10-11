@@ -263,7 +263,7 @@ function prepareUnified(name,seed=null){
 }
 async function openByName(name,seed=null){
   let p=playerByName(name);
-  if(p){
+  if(p&&!seedYear(seed)){
     activeSeed=null;
     baseProfile(p.id);
     fixKnownHeadshot(name);

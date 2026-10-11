@@ -327,96 +327,12 @@ function numField(row,name){
   return Number.isFinite(n)?n:0;
 }
 async function fetchLegacyNflverseStats(year){
-  const url='https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_'+year+'.csv';
-  const res=await fetch(url,{cache:'force-cache',mode:'cors'});
-  if(!res.ok)throw new Error('Legacy stats returned '+res.status);
-  const text=await res.text();
-  const lines=text.split(/\r?\n/).filter(Boolean);
-  if(lines.length<2)return[];
-  const headers=csvCells(lines[0]);
-  const idx=Object.fromEntries(headers.map((h,i)=>[h,i]));
-  const get=(cells,name)=>idx[name]===undefined?'':cells[idx[name]];
-  const agg=new Map();
-  for(const line of lines.slice(1)){
-    const cells=csvCells(line);
-    const seasonType=get(cells,'season_type');
-    if(seasonType&&seasonType!=='REG')continue;
-    const position=String(get(cells,'position')||'').toUpperCase();
-    if(!['QB','RB','WR','TE'].includes(position))continue;
-    const name=get(cells,'player_display_name')||get(cells,'player_name');
-    if(!name)continue;
-    const playerId=get(cells,'player_id')||norm(name)+':'+position;
-    const key=playerId+'|'+position;
-    let a=agg.get(key);
-    if(!a){
-      a={
-        id:String(playerId),
-        name,
-        position,
-        team:'—',
-        proTeamId:0,
-        experienceYears:0,
-        headshot:get(cells,'headshot_url')||'',
-        points:0,
-        average:null,
-        gamesPlayed:0,
-        passAtt:0,
-        completions:0,
-        passYds:0,
-        passTD:0,
-        interceptions:0,
-        rushAtt:0,
-        rushYds:0,
-        rushTD:0,
-        recYds:0,
-        recTD:0,
-        receptions:0,
-        targets:0,
-        fumblesLost:0,
-        source:'nflverse'
-      };
-      agg.set(key,a);
-    }
-    a.name=name||a.name;
-    a.team=legacyTeamCode(get(cells,'recent_team')||get(cells,'team')||a.team);
-    if(!a.headshot)a.headshot=get(cells,'headshot_url')||'';
-    a.gamesPlayed+=1;
-    const row={};
-    headers.forEach((h,i)=>row[h]=cells[i]);
-    const ppr=Number(get(cells,'fantasy_points_ppr'));
-    if(Number.isFinite(ppr))a.points+=ppr;
-    else{
-      a.points+=
-        numField(row,'passing_yards')*0.04+
-        numField(row,'passing_tds')*4-
-        numField(row,'interceptions')*2+
-        numField(row,'rushing_yards')*0.1+
-        numField(row,'rushing_tds')*6+
-        numField(row,'receiving_yards')*0.1+
-        numField(row,'receiving_tds')*6+
-        numField(row,'receptions')+
-        (numField(row,'passing_2pt_conversions')+numField(row,'rushing_2pt_conversions')+numField(row,'receiving_2pt_conversions'))*2-
-        (numField(row,'sack_fumbles_lost')+numField(row,'rushing_fumbles_lost')+numField(row,'receiving_fumbles_lost'))*2;
-    }
-    a.passAtt+=numField(row,'attempts')||numField(row,'passing_attempts');
-    a.completions+=numField(row,'completions');
-    a.passYds+=numField(row,'passing_yards');
-    a.passTD+=numField(row,'passing_tds');
-    a.interceptions+=numField(row,'interceptions');
-    a.rushAtt+=numField(row,'carries');
-    a.rushYds+=numField(row,'rushing_yards');
-    a.rushTD+=numField(row,'rushing_tds');
-    a.recYds+=numField(row,'receiving_yards');
-    a.recTD+=numField(row,'receiving_tds');
-    a.receptions+=numField(row,'receptions');
-    a.targets+=numField(row,'targets');
-    a.fumblesLost+=numField(row,'sack_fumbles_lost')+numField(row,'rushing_fumbles_lost')+numField(row,'receiving_fumbles_lost');
-  }
-  return [...agg.values()].map(p=>{
-    p.points=Number(p.points.toFixed(2));
-    p.average=p.gamesPlayed?p.points/p.gamesPlayed:null;
-    return p;
-  }).filter(p=>p.gamesPlayed>0&&(p.points!==0||p.position==='QB'||p.position==='RB'||p.position==='WR'||p.position==='TE'));
+  const res=await fetch('legacy-stats/'+year+'.json',{cache:'force-cache'});
+  if(!res.ok)throw new Error('Local legacy stats returned '+res.status);
+  const data=await res.json();
+  const rows=Array.isArray(data)?data:(data.rows||[]);
+  if(!rows.length)throw new Error('Local legacy stats are empty for '+year);
+  return rows;
 }
 function mergeLegacyStats(espnRows,legacyRows){
   const out=[...(espnRows||[])];
@@ -931,7 +847,7 @@ function setUpdatedLabel(message,error=false){
   el.classList.toggle('espn-error',!!error);
 }
 function currentCacheKey(){return 'shuaEspnLivePprStats'}
-function statsCacheKey(year){return 'shuaEspnStatsV2:'+year}
+function statsCacheKey(year){return 'shuaEspnStatsV3:'+year}
 function hydrateRowsFromCache(){
   if(rows.length)return true;
   try{
@@ -982,7 +898,7 @@ function updateStatsLabels(){
   const updated=document.getElementById('espnLastUpdated');
   const refreshBtn=document.getElementById('espnRefresh');
   if(sub)sub.textContent=statsSeason+' ESPN full-PPR scoring leaders — filter by position and rank by stat';
-  if(src)src.textContent=(statsSeason<=2017?'ESPN '+statsSeason+' full-PPR stats · nflverse fills missing legacy rows':'ESPN '+statsSeason+' full-PPR stats')+' · choose a position, then rank players by any relevant stat'+(statsSeason===SEASON?' · current season auto-refreshes every 60 seconds':'');
+  if(src)src.textContent=(statsSeason<=2017?'ESPN '+statsSeason+' full-PPR stats · local legacy data fills missing rows':'ESPN '+statsSeason+' full-PPR stats')+' · choose a position, then rank players by any relevant stat'+(statsSeason===SEASON?' · current season auto-refreshes every 60 seconds':'');
   if(updated){
     if(statsLastUpdated)updated.textContent=(statsSeason===SEASON?'Updated ':'Loaded ')+statsLastUpdated.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
     else updated.textContent='Not loaded yet';

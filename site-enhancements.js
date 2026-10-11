@@ -11,6 +11,22 @@ let rankPlayers=[];
 let currentKind=null;
 let currentPos='ALL';
 let historicalHeadshots={};
+window.ShuaAdvanceFace=window.ShuaAdvanceFace||function(img){
+  try{
+    const urls=String(img.dataset.faceUrls||'').split('|').map(decodeURIComponent).filter(Boolean);
+    let i=Number(img.dataset.faceIndex||0)+1;
+    if(i<urls.length){
+      img.dataset.faceIndex=String(i);
+      img.src=urls[i];
+      return;
+    }
+    const initials=img.dataset.faceInitials||'?';
+    const cls=img.dataset.faceFallbackClass||'photo fallback';
+    img.outerHTML='<span class="'+cls+'">'+initials+'</span>';
+  }catch(e){
+    img.style.display='none';
+  }
+};
 function headshotUrls(value){
   if(Array.isArray(value))return [...new Set(value.map(String).map(x=>x.trim()).filter(Boolean))];
   if(value&&typeof value==='object'){

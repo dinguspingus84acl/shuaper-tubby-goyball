@@ -129,17 +129,39 @@ for(const year of YEARS){
   const rows=await loadYear(year);
   const payload={year,source:'nflverse weekly player stats (CC BY 4.0)',generatedAt:new Date().toISOString(),rows};
   await fs.writeFile(path.join(OUT_DIR,`${year}.json`),JSON.stringify(payload));
+  const rankByPlayer=new Map();
+  for(const pos of ['QB','RB','WR','TE']){
+    rows.filter(p=>p.position===pos)
+      .sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name))
+      .forEach((p,i)=>rankByPlayer.set(p.id+'|'+p.position,i+1));
+  }
   for(const p of rows){
     const key=norm(p.name);
     if(!careerIndex[key]){
-      careerIndex[key]={name:p.name,position:p.position,headshot:p.headshot||'',years:[]};
+      careerIndex[key]={name:p.name,position:p.position,headshot:p.headshot||'',years:[],history:[]};
     }
     if(!careerIndex[key].headshot&&p.headshot)careerIndex[key].headshot=p.headshot;
     if(!careerIndex[key].years.includes(year))careerIndex[key].years.push(year);
+    careerIndex[key].history.push({
+      year,
+      id:p.id,
+      name:p.name,
+      position:p.position,
+      team:p.team,
+      teamAbbr:p.team,
+      headshot:p.headshot||'',
+      rank:rankByPlayer.get(p.id+'|'+p.position)||null,
+      points:p.points,
+      average:p.average,
+      ppg:p.average,
+      gamesPlayed:p.gamesPlayed,
+      games:p.gamesPlayed,
+      source:'nflverse'
+    });
   }
   console.log(`${year}: ${rows.length} fantasy players`);
 }
-for(const x of Object.values(careerIndex))x.years.sort((a,b)=>b-a);
+for(const x of Object.values(careerIndex)){x.years.sort((a,b)=>b-a);x.history.sort((a,b)=>b.year-a.year)}
 await fs.writeFile(path.join(OUT_DIR,'index.json'),JSON.stringify({
   generatedAt:new Date().toISOString(),
   minYear:YEARS[0],

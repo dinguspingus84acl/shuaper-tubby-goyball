@@ -68,6 +68,19 @@ function addStyles(){
     body:not(.phone-mode) #tableCard tbody tr[data-id]:not(.selected-player-row):hover .rank{color:#fff!important}
     body:not(.phone-mode) #tableCard tbody tr[data-id]:not(.selected-player-row):hover .photo{transform:scale(1.09);border-color:#ffffffcc}
     body:not(.phone-mode) #tableCard tbody tr[data-id] .photo{transition:transform .14s ease,border-color .14s ease}
+    body:not(.phone-mode) #tableCard tbody tr[data-id] td:last-child{position:relative;padding-right:38px}
+    body:not(.phone-mode) #tableCard tbody tr[data-id] td:last-child:after{content:"›";position:absolute;right:14px;top:50%;transform:translate(-5px,-50%);font-size:1.35rem;font-weight:1000;color:#9db1c5;opacity:0;transition:opacity .14s ease,transform .14s ease}
+    body:not(.phone-mode) #tableCard tbody tr[data-id]:hover td:last-child:after{opacity:1;transform:translate(0,-50%)}
+
+    /* Fast list transitions */
+    .shua-list-enter{animation:shuaListEnter .16s ease both}
+    @keyframes shuaListEnter{from{opacity:.35;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+    @media(prefers-reduced-motion:reduce){.shua-list-enter{animation:none}}
+
+    /* Back to top for long rankings/stats pages */
+    #shuaBackToTop{position:fixed;right:18px;bottom:72px;z-index:95;width:42px;height:42px;border:1px solid #ffffff32;border-radius:999px;background:#081a2df2;color:#fff;font-size:1.15rem;font-weight:1000;box-shadow:0 8px 24px #0008;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .16s ease,transform .16s ease}
+    #shuaBackToTop.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+    .phone-mode #shuaBackToTop{right:10px;bottom:max(64px,calc(54px + env(safe-area-inset-bottom)))}
 
     /* Previous / next ranking navigation inside player cards */
     .ranking-player-nav{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;margin:7px 0;padding:0}
@@ -411,6 +424,58 @@ function updateRankingPlayerNav(){
     requestAnimationFrame(()=>{const p=document.querySelector('#modal .profile');if(p)p.scrollTop=0;updateRankingPlayerNav()});
   });
 }
+const PAGE_STATE_KEY='shuaPageStateV2';
+function readPageState(){try{return JSON.parse(localStorage.getItem(PAGE_STATE_KEY)||'null')}catch(e){return null}}
+function savePageState(){
+  try{
+    const active=document.querySelector('.positions .pos.active');
+    const state={section:active?.dataset.pos||'HOME'};
+    try{state.positionView=positionView}catch(e){}
+    try{state.overallView=overallView}catch(e){}
+    try{state.teamCount=teamCount}catch(e){}
+    localStorage.setItem(PAGE_STATE_KEY,JSON.stringify(state));
+  }catch(e){}
+}
+function restoreSavedPageState(){
+  const state=readPageState();
+  if(!state?.section||state.section==='HOME'){showHome();return}
+  const navBtn=document.querySelector('.positions .pos[data-pos="'+state.section+'"]');
+  if(!navBtn){showHome();return}
+  leaveHome();navBtn.click();
+  setTimeout(()=>{
+    if(state.positionView){const b=document.querySelector('[data-posview="'+state.positionView+'"]');if(b)b.click()}
+    if(state.overallView){const b=document.querySelector('[data-view="'+state.overallView+'"]');if(b)b.click()}
+    if(state.teamCount){const b=document.querySelector('.team-btn[data-teams="'+state.teamCount+'"]');if(b)b.click()}
+  },0);
+}
+function animateListElement(el){
+  if(!el)return;
+  el.classList.remove('shua-list-enter');void el.offsetWidth;el.classList.add('shua-list-enter');
+  setTimeout(()=>el.classList.remove('shua-list-enter'),190);
+}
+function installListAnimations(){
+  [['rows','tableCard'],['board','board'],['espnLiveRows','espnLiveRows']].forEach(([watchId,targetId])=>{
+    const watch=document.getElementById(watchId),target=document.getElementById(targetId);
+    if(!watch||!target||watch.dataset.shuaAnimWatch==='1')return;
+    watch.dataset.shuaAnimWatch='1';
+    new MutationObserver(m=>{if(m.some(x=>x.type==='childList'))animateListElement(target)}).observe(watch,{childList:true});
+  });
+}
+function ensureBackToTop(){
+  if(document.getElementById('shuaBackToTop'))return;
+  const b=document.createElement('button');b.id='shuaBackToTop';b.type='button';b.setAttribute('aria-label','Back to top');b.textContent='↑';
+  document.body.appendChild(b);
+  const sync=()=>{
+    const modalOpen=document.getElementById('modal')?.classList.contains('open');
+    const useful=!document.body.classList.contains('fantasy-home-mode')&&!modalOpen&&window.scrollY>650;
+    b.classList.toggle('visible',useful);
+  };
+  b.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+  window.addEventListener('scroll',sync,{passive:true});
+  document.addEventListener('click',()=>requestAnimationFrame(sync),true);
+  sync();
+}
+
 function installRankingSkeleton(){
   const rows=document.getElementById('rows'),boardEl=document.getElementById('board');
   if(rows&&!rows.children.length)rows.innerHTML=Array.from({length:9},()=>'<tr class="ranking-skeleton-row" aria-hidden="true"><td></td><td></td><td></td><td></td><td></td><td></td></tr>').join('');
@@ -473,18 +538,23 @@ async function loadData(){
 }
 
 function install(){
-  addStyles();installRankingSkeleton();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();
+  addStyles();installRankingSkeleton();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();ensureBackToTop();installListAnimations();
   document.addEventListener('click',e=>{
     const b=e.target.closest('.positions .pos');
-    if(!b)return;
-    if(!['HOME','MYGUYS','DND'].includes(b.dataset.pos)){leaveHome();hideTagged();closeMobileMenu();}
+    if(b&&!['HOME','MYGUYS','DND'].includes(b.dataset.pos)){leaveHome();hideTagged();closeMobileMenu();}
+    if(b||e.target.closest('[data-posview],[data-view],.team-btn'))setTimeout(savePageState,0);
   },true);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileMenu()});
   const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();upgradeFallbackFaces();applyColors();applySelectedPlayerRow();updateRankingPlayerNav()}));
   obs.observe(document.body,{subtree:true,childList:true});
   loadData().catch(console.error);
   loadHistoricalHeadshots();
-  requestAnimationFrame(()=>{decorateTeamLogos();upgradeFallbackFaces();applyColors();showHome()});
+  requestAnimationFrame(()=>{
+    decorateTeamLogos();upgradeFallbackFaces();applyColors();
+    const saved=readPageState();
+    if(!saved?.section||saved.section==='HOME')showHome();else leaveHome();
+    setTimeout(()=>{installListAnimations();restoreSavedPageState()},90);
+  });
 }
 install();
 })();

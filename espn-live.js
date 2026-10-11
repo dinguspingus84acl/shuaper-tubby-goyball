@@ -375,7 +375,7 @@ function numField(row,name){
 async function loadHistoricalIndex(){
   if(historicalIndexPromise)return historicalIndexPromise;
   historicalIndexPromise=(async()=>{
-    const res=await fetch('legacy-stats/index.json',{cache:'force-cache'});
+    const res=await fetch('legacy-stats/index.json?v=20261010-career8',{cache:'force-cache'});
     if(!res.ok)throw new Error('Historical player index returned '+res.status);
     const data=await res.json();
     return data?.players||{};
@@ -385,7 +385,7 @@ async function loadHistoricalIndex(){
 async function loadHeadshotIndex(){
   if(headshotIndexPromise)return headshotIndexPromise;
   headshotIndexPromise=(async()=>{
-    const res=await fetch('legacy-stats/headshots.json',{cache:'force-cache'});
+    const res=await fetch('legacy-stats/headshots.json?v=20261010-headshots8',{cache:'force-cache'});
     if(!res.ok)throw new Error('Historical headshot index returned '+res.status);
     const data=await res.json();
     return data?.headshots||{};
@@ -406,7 +406,7 @@ async function fetchHistoricalSeason(year){
   year=Number(year);
   if(historicalSeasonCache.has(year))return historicalSeasonCache.get(year);
   const promise=(async()=>{
-    const res=await fetch('legacy-stats/'+year+'.json',{cache:'force-cache'});
+    const res=await fetch('legacy-stats/'+year+'.json?v=20261010-seasons8',{cache:'force-cache'});
     if(!res.ok)throw new Error('Local historical stats returned '+res.status);
     const data=await res.json();
     const rows=Array.isArray(data)?data:(data.rows||[]);

@@ -112,14 +112,11 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-filter,.espn-stat-btn,.espn-view-btn,.espn-refresh,.espn-year-select{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 11px;font-weight:900}
 .espn-filter.active,.espn-stat-btn.active,.espn-view-btn.active,.espn-refresh:active{background:#183d63!important;color:#fff!important}.espn-year-select{background:#081a2d;color:#fff;min-width:82px}
 .espn-stat-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 9px;border:1px solid #ffffff16;border-radius:10px;background:#07182a}
-.espn-stat-primary{display:flex;align-items:center;gap:7px;flex:1 1 auto;min-width:0}
-.espn-rank-control{display:flex;align-items:center;gap:6px;min-width:0}
-.espn-rank-control .espn-stat-label{margin:0}
+.espn-stat-primary{display:flex;align-items:center;gap:7px;flex:1 1 auto;min-width:0;flex-wrap:wrap}
+.espn-rank-by-head{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
+.espn-rank-by-head>span{flex:0 0 auto;color:#91a4ba;font-size:.56rem;font-weight:950;white-space:nowrap}
 .espn-stat-label{color:#7f93aa;font-size:.62rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
 .espn-stat-btn,.espn-view-btn{padding:6px 9px;font-size:.65rem}
-.espn-stat-select{min-width:170px;height:34px;border:1px solid #ffffff25;border-radius:8px;background:#0b2139;color:#fff;padding:0 32px 0 10px;font-size:.68rem;font-weight:950;outline:none}
-.espn-stat-select:focus{border-color:#6aaee5;box-shadow:0 0 0 2px #3d8cff22}
-.phone-mode .espn-stat-select{width:100%;height:38px;font-size:.72rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
 .espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 180px;gap:8px;align-items:center}
@@ -130,12 +127,14 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-column-stat-select{width:100%;min-width:0;height:32px;border:1px solid #ffffff1f;border-radius:6px;background:#081a2d;color:#dbeafe;padding:0 26px 0 8px;font-size:.64rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap}
 .espn-column-stat-select:focus{border-color:#6aaee5}
 .phone-mode .espn-column-stat-select{height:34px;font-size:.58rem;padding-left:5px;padding-right:20px}
+.phone-mode .espn-rank-by-head{gap:4px}
+.phone-mode .espn-rank-by-head>span{font-size:.5rem}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}.espn-headshot-fallback{display:flex;align-items:center;justify-content:center;color:#dbeafe;font-size:.68rem;font-weight:950}
-.espn-player-copy{min-width:0;display:grid;gap:3px}.espn-player-meta{display:flex;align-items:center;gap:4px;color:#8ca0b5;font-size:.58rem;font-weight:850;line-height:1}.espn-player-meta .espn-team-logo{width:16px;height:16px;flex-basis:16px}
-.espn-player-name{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.espn-name-btn{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:950;text-align:left;cursor:pointer;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.espn-player-copy{min-width:0;display:grid;gap:3px;overflow:visible}.espn-player-meta{display:flex;align-items:center;gap:4px;color:#8ca0b5;font-size:.58rem;font-weight:850;line-height:1}.espn-player-meta .espn-team-logo{width:16px;height:16px;flex-basis:16px}
+.espn-player-name{font-weight:950;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.12}
+.espn-name-btn{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:950;text-align:left;cursor:pointer;max-width:100%;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.12;word-break:normal;overflow-wrap:anywhere}
 .espn-name-btn:hover{text-decoration:underline}
 .espn-profile-gamelog{margin-top:12px;border:1px solid var(--l);border-radius:10px;background:#07182a;overflow:hidden}
 .espn-profile-gamelog-btn{width:100%;min-height:42px;border:0;background:#0b2139;color:#d7e6f5;padding:9px 12px;font-weight:950;text-align:left;display:flex;align-items:center;justify-content:space-between}
@@ -276,16 +275,14 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
   .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
-  .espn-live-row{padding:7px 6px;min-height:58px}
-  .espn-player-name{font-size:.72rem}.espn-player{gap:7px}.espn-player-meta{font-size:.54rem}.espn-player-meta .espn-team-logo{width:14px;height:14px;flex-basis:14px}
+  .espn-live-row{padding:7px 6px;min-height:58px;height:auto}
+  .espn-player-name{font-size:.72rem;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}.espn-player{gap:7px;align-items:flex-start}.espn-name-btn{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.12!important}.espn-player-meta{font-size:.54rem}.espn-player-meta .espn-team-logo{width:14px;height:14px;flex-basis:14px}
   .espn-headshot{width:34px;height:34px;flex-basis:34px}
   .espn-selected-stat{font-size:.72rem}
   .espn-live-toolbar{display:grid;grid-template-columns:1fr;gap:7px}.espn-live-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}.espn-filter{padding:7px 3px;font-size:.62rem;min-width:0}.espn-live-meta{display:flex;justify-content:flex-end;width:100%;align-items:center}.espn-year-select{min-height:38px;padding:6px 8px}.espn-stat-bar{display:flex!important;align-items:center!important;gap:6px!important;padding:6px 7px!important;flex-wrap:wrap!important}
-  .espn-stat-primary{display:flex!important;align-items:center!important;gap:6px!important;width:100%!important}
+  .espn-stat-primary{display:flex!important;align-items:center!important;gap:6px!important;width:100%!important;flex-wrap:nowrap!important}
   .espn-stat-primary>.espn-stat-label{width:auto!important;flex:0 0 auto}
-  .espn-rank-control{display:flex!important;align-items:center!important;gap:5px!important;flex:1 1 180px!important;min-width:0!important}
-  .espn-rank-control .espn-stat-label{width:auto!important;flex:0 0 auto}
-  .espn-rank-control .espn-stat-select{flex:1 1 auto!important;min-width:0!important;width:auto!important}
+  .espn-stat-primary .espn-year-select{flex:0 0 auto!important;min-width:72px!important;width:72px!important}
   .espn-stat-label{width:auto}
   .espn-stat-filters{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.espn-stat-filters::-webkit-scrollbar{display:none}
   .espn-stat-btn{flex:0 0 auto}
@@ -346,9 +343,6 @@ section.innerHTML=`
         <button type="button" class="espn-filter" data-espn-filter="WR">WR</button>
         <button type="button" class="espn-filter" data-espn-filter="TE">TE</button>
       </div>
-      <div class="espn-live-meta">
-        <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
-      </div>
     </div>
     <div class="espn-stat-bar">
       <div class="espn-stat-primary">
@@ -357,15 +351,12 @@ section.innerHTML=`
           <button type="button" class="espn-view-btn active" data-espn-view="TOTAL">Season</button>
           <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
         </div>
-        <label class="espn-rank-control">
-          <span class="espn-stat-label">Rank by</span>
-          <select id="espnStatSelect" class="espn-stat-select" aria-label="Rank players by stat"></select>
-        </label>
+        <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
       </div>
     </div>
     <div class="espn-live-card">
       <div class="espn-live-head">
-        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div><button type="button" id="espnPointsHead" class="espn-sort-head" data-sort-stat="points">PPR Pts <span class="sort-arrow"></span></button></div><div><select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Choose right column stat"></select></div>
+        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div>PPR Pts</div><div class="espn-rank-by-head"><span>Rank by</span><select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Rank players by stat"></select></div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open Stats to load rankings.</div></div>
     </div>
@@ -1355,14 +1346,11 @@ function openEspnPlayerProfile(player){
 }
 
 function renderStatFilters(){
-  const topSelect=document.getElementById('espnStatSelect');
-  const columnSelect=document.getElementById('espnColumnStatSelect');
+  const select=document.getElementById('espnColumnStatSelect');
   const cfg=configForFilter();
   if(!cfg.some(x=>x.key===activeStat))activeStat='points';
-  const options=cfg.map(x=>'<option value="'+x.key+'">'+fullStatLabel(x.key)+'</option>').join('');
-  const bind=select=>{
-    if(!select)return;
-    select.innerHTML=options;
+  if(select){
+    select.innerHTML=cfg.map(x=>'<option value="'+x.key+'">'+fullStatLabel(x.key)+'</option>').join('');
     select.value=activeStat;
     select.onchange=()=>{
       activeStat=select.value||'points';
@@ -1371,12 +1359,7 @@ function renderStatFilters(){
       renderStatFilters();
       render();
     };
-  };
-  bind(topSelect);
-  bind(columnSelect);
-  const pointsHead=document.getElementById('espnPointsHead');
-  if(pointsHead)pointsHead.childNodes[0].nodeValue=(statView==='PERGAME'?'PPR/G':'PPR Pts')+' ';
-  updateSortHeaders();
+  }
 }
 function localPlayerId(name){
   try{
@@ -1598,7 +1581,6 @@ if(statsYearSelect){
   };
 }
 syncStatsControls();
-document.getElementById('espnPointsHead')?.addEventListener('click',()=>sortFromHeader('points'));
 document.getElementById('close')?.addEventListener('click',hideProfileGameLog);
 document.getElementById('modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('modal'))hideProfileGameLog()});
 

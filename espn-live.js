@@ -73,6 +73,8 @@ const gameLogCache=new Map();
 const gameLogModes=new Map();
 const gameLogYears=new Map();
 const careerYearsCache=new Map();
+const historicalSeasonCache=new Map();
+let historicalIndexPromise=null;
 
 const style=document.createElement('style');
 style.id='espnLiveStyles';
@@ -326,13 +328,32 @@ function numField(row,name){
   const n=Number(row?.[name]);
   return Number.isFinite(n)?n:0;
 }
+async function loadHistoricalIndex(){
+  if(historicalIndexPromise)return historicalIndexPromise;
+  historicalIndexPromise=(async()=>{
+    const res=await fetch('legacy-stats/index.json',{cache:'force-cache'});
+    if(!res.ok)throw new Error('Historical player index returned '+res.status);
+    const data=await res.json();
+    return data?.players||{};
+  })();
+  try{return await historicalIndexPromise}catch(e){historicalIndexPromise=null;throw e}
+}
+async function fetchHistoricalSeason(year){
+  year=Number(year);
+  if(historicalSeasonCache.has(year))return historicalSeasonCache.get(year);
+  const promise=(async()=>{
+    const res=await fetch('legacy-stats/'+year+'.json',{cache:'force-cache'});
+    if(!res.ok)throw new Error('Local historical stats returned '+res.status);
+    const data=await res.json();
+    const rows=Array.isArray(data)?data:(data.rows||[]);
+    if(!rows.length)throw new Error('Local historical stats are empty for '+year);
+    return rows;
+  })();
+  historicalSeasonCache.set(year,promise);
+  try{return await promise}catch(e){historicalSeasonCache.delete(year);throw e}
+}
 async function fetchLegacyNflverseStats(year){
-  const res=await fetch('legacy-stats/'+year+'.json',{cache:'force-cache'});
-  if(!res.ok)throw new Error('Local legacy stats returned '+res.status);
-  const data=await res.json();
-  const rows=Array.isArray(data)?data:(data.rows||[]);
-  if(!rows.length)throw new Error('Local legacy stats are empty for '+year);
-  return rows;
+  return fetchHistoricalSeason(year);
 }
 function mergeLegacyStats(espnRows,legacyRows){
   const out=[...(espnRows||[])];
@@ -364,6 +385,96 @@ async function fetchStatsSeasonData(year){
   if(espnResult.status==='rejected')throw espnResult.reason;
   if(legacyResult.status==='rejected')throw legacyResult.reason;
   throw new Error('No historical stats available');
+}
+
+
+async function getHistoricalCareer(name){
+  const key=norm(name);
+  const index=await loadHistoricalIndex();
+  const meta=index[key];
+  if(!meta?.years?.length)return [];
+  const years=[...meta.years].sort((a,b)=>b-a);
+  const results=await Promise.all(years.map(async year=>{
+    try{
+      const seasonRows=await fetchHistoricalSeason(year);
+      const player=seasonRows.find(p=>norm(p.name)===key&&(!meta.position||p.position===meta.position))||
+        seasonRows.find(p=>norm(p.name)===key);
+      if(!player)return null;
+      const position=player.position||meta.position;
+      const posRows=seasonRows.filter(p=>p.position===position).sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name));
+      const i=posRows.findIndex(p=>norm(p.name)===key);
+      return {...player,year,rank:i>=0?i+1:null};
+    }catch(e){return null}
+  }));
+  return results.filter(Boolean).sort((a,b)=>b.year-a.year);
+}
+async function getAnyHistoricalPlayer(name,preferredYear){
+  const career=await getHistoricalCareer(name);
+  if(!career.length)return null;
+  if(preferredYear){
+    const exact=career.find(x=>Number(x.year)===Number(preferredYear));
+    if(exact)return exact;
+  }
+  return career[0];
+}
+function historicalGameLogHtml(player,career,year){
+  year=Number(year);
+  const seasonRow=career.find(x=>Number(x.year)===year)||career[0];
+  if(!seasonRow)return '<div class="espn-game-log-empty">No game stats found.</div>';
+  const years=career.map(x=>Number(x.year));
+  const modes=gameLogModesFor(seasonRow.position);
+  let mode=gameLogModes.get('hist:'+norm(player.name))||defaultGameLogMode(seasonRow.position);
+  if(!modes.some(x=>x.key===mode))mode=modes[0].key;
+  const yearSelect='<div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" data-hist-gl-year>'+
+    years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+
+    '</select></div>';
+  const tabs='<div class="espn-game-log-tabs">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" data-hist-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
+  const title='<div class="espn-game-log-title"><strong>'+seasonRow.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
+  const games=Array.isArray(seasonRow.games)?seasonRow.games:[];
+  if(!games.length)return title+yearSelect+tabs+'<div class="espn-game-log-empty">No game stats found for '+year+'.</div>';
+  const cols=gameLogColumns(mode,seasonRow.position);
+  return title+yearSelect+tabs+
+    '<div class="espn-game-log-table-wrap"><table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th>'+
+    cols.map(col=>'<th class="'+(col.key==='pts'?'gl-pts':'')+'">'+col.label+'</th>').join('')+
+    '</tr></thead><tbody>'+
+    games.map(g=>'<tr><td>'+g.week+'</td><td>'+g.opponent+'</td>'+
+      cols.map(col=>'<td class="'+(col.key==='pts'?'gl-pts':'gl-stat')+'">'+gameLogCell(g,col.key,mode,seasonRow.position)+'</td>').join('')+
+    '</tr>').join('')+
+    '</tbody></table></div>';
+}
+function bindHistoricalGameLog(panel,player,career,year){
+  panel.querySelectorAll('[data-hist-gl-mode]').forEach(btn=>{
+    btn.onclick=e=>{
+      e.preventDefault();e.stopPropagation();
+      gameLogModes.set('hist:'+norm(player.name),btn.dataset.histGlMode);
+      panel.innerHTML=historicalGameLogHtml(player,career,year);
+      bindHistoricalGameLog(panel,player,career,year);
+    };
+  });
+  const select=panel.querySelector('[data-hist-gl-year]');
+  if(select){
+    select.onchange=e=>{
+      const nextYear=Number(e.target.value);
+      panel.innerHTML=historicalGameLogHtml(player,career,nextYear);
+      bindHistoricalGameLog(panel,player,career,nextYear);
+    };
+  }
+}
+async function renderHistoricalGameLog(name,target,preferredYear){
+  const career=await getHistoricalCareer(name);
+  if(!career.length)return false;
+  const player=career.find(x=>Number(x.year)===Number(preferredYear))||career[0];
+  const year=Number(preferredYear)||Number(player.year);
+  target.innerHTML=historicalGameLogHtml(player,career,year);
+  bindHistoricalGameLog(target,player,career,year);
+  return true;
+}
+function historicalHeadshot(player){
+  return String(player?.headshot||'').trim();
+}
+function historicalTeamLogoUrl(team){
+  const slug=TEAM_SLUGS[team];
+  return slug?'https://a.espncdn.com/i/teamlogos/nfl/500/'+slug+'.png':'';
 }
 
 function configForFilter(){
@@ -767,7 +878,7 @@ function hideProfileGameLog(){
 }
 function openEspnPlayerProfile(player){
   if(window.openUnifiedPlayerProfileByName){
-    window.openUnifiedPlayerProfileByName(player.name);
+    window.openUnifiedPlayerProfileByName(player.name,player);
     return;
   }
   const localId=localPlayerId(player.name);
@@ -1041,6 +1152,12 @@ window.ShuaEspnLive={
   getPlayerByName(name){
     return rows.find(p=>norm(p.name)===norm(name))||null;
   },
+  async getAnyPlayerByName(name,preferredYear){
+    return rows.find(p=>norm(p.name)===norm(name))||statsRows.find(p=>norm(p.name)===norm(name))||await getAnyHistoricalPlayer(name,preferredYear);
+  },
+  getHistoricalCareer,
+  getPlayerHeadshotUrl(player){return historicalHeadshot(player)||(player?.id?/^\d+$/.test(String(player.id))?'https://a.espncdn.com/i/headshots/nfl/players/full/'+player.id+'.png':'':'')},
+  getTeamLogoUrl(team){return historicalTeamLogoUrl(team)},
   getPositionRank(name){
     const p=rows.find(x=>norm(x.name)===norm(name));
     if(!p)return null;
@@ -1074,21 +1191,30 @@ window.ShuaEspnLive={
     if(!target)return;
     target.innerHTML='<div class="espn-game-log-empty">Loading game log…</div>';
     try{
-      await this.ensureData();
       const p=rows.find(x=>norm(x.name)===norm(name));
-      if(!p){target.innerHTML='<div class="espn-game-log-empty">No ESPN game log found for this player.</div>';return}
-      if(!gameLogYears.has(String(p.id)))gameLogYears.set(String(p.id),SEASON);
-      const year=gameLogYears.get(String(p.id))||SEASON;
-      await fetchGameLog(p,year);
-      target.innerHTML=gameLogHtml(p);
-      bindGameLogModeButtons(target,p);
-      discoverGameLogYears(p).then(()=>{
-        if(gameLogYears.get(String(p.id))===year){
-          target.innerHTML=gameLogHtml(p);
-          bindGameLogModeButtons(target,p);
+      if(!p){
+        if(await renderHistoricalGameLog(name,target))return;
+        await this.ensureData();
+      }
+      const current=rows.find(x=>norm(x.name)===norm(name));
+      if(!current){
+        if(await renderHistoricalGameLog(name,target))return;
+        target.innerHTML='<div class="espn-game-log-empty">No game log found for this player.</div>';
+        return;
+      }
+      if(!gameLogYears.has(String(current.id)))gameLogYears.set(String(current.id),SEASON);
+      const year=gameLogYears.get(String(current.id))||SEASON;
+      await fetchGameLog(current,year);
+      target.innerHTML=gameLogHtml(current);
+      bindGameLogModeButtons(target,current);
+      discoverGameLogYears(current).then(()=>{
+        if(gameLogYears.get(String(current.id))===year){
+          target.innerHTML=gameLogHtml(current);
+          bindGameLogModeButtons(target,current);
         }
       }).catch(()=>{});
     }catch(e){
+      try{if(await renderHistoricalGameLog(name,target))return}catch(_){}
       target.innerHTML='<div class="espn-game-log-empty espn-error">Could not load this game log right now.</div>';
     }
   },
@@ -1096,9 +1222,19 @@ window.ShuaEspnLive={
     if(!target)return;
     target.innerHTML='<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
     try{
+      if(Number(year)>=2010&&Number(year)<=2025){
+        const hist=await getHistoricalCareer(name);
+        if(hist.some(x=>Number(x.year)===Number(year))){
+          const row=hist.find(x=>Number(x.year)===Number(year));
+          const one=[row];
+          target.innerHTML=historicalGameLogHtml(row,one,Number(year));
+          bindHistoricalGameLog(target,row,one,Number(year));
+          return;
+        }
+      }
       await this.ensureData();
       const p=rows.find(x=>norm(x.name)===norm(name));
-      if(!p){target.innerHTML='<div class="espn-game-log-empty">No ESPN game log found for this player.</div>';return}
+      if(!p){target.innerHTML='<div class="espn-game-log-empty">No game log found for this player.</div>';return}
       await fetchGameLog(p,Number(year));
       const opts={year:Number(year),showYearSelect:false};
       target.innerHTML=gameLogHtml(p,opts);

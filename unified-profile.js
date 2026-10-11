@@ -119,8 +119,12 @@ function seedTeamLogo(seed){
   return url?'<div class="team-logo"><img src="'+url+'" alt=""></div>':'';
 }
 function seedFace(seed){
-  const url=window.ShuaEspnLive?.getPlayerHeadshotUrl?.(seed);
-  return url?'<div class="person"><img class="photo lg" src="'+url+'" alt="'+String(seed?.name||'')+'" onerror="this.parentElement.innerHTML=\'<div class=&quot;photo lg fallback&quot;>?</div>\'"></div>':'<div class="person"><div class="photo lg fallback">?</div></div>';
+  const urls=window.ShuaEspnLive?.getPlayerHeadshotUrls?.(seed)||[];
+  const list=Array.isArray(urls)?urls.filter(Boolean):[];
+  const initials=String(seed?.name||'?').split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase()||'?';
+  if(!list.length)return '<div class="person"><div class="photo lg fallback">'+initials+'</div></div>';
+  const encoded=list.map(encodeURIComponent).join('|');
+  return '<div class="person"><img class="photo lg" src="'+list[0]+'" alt="'+String(seed?.name||'')+'" data-face-urls="'+encoded+'" data-face-index="0" data-face-initials="'+initials+'" data-face-fallback-class="photo lg fallback" onerror="window.ShuaAdvanceFace(this)"></div>';
 }
 function renderHistoricalOverview(seed){
   const stats=document.getElementById('stats');

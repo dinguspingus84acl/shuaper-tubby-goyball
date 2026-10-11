@@ -91,7 +91,7 @@ section.innerHTML=
       '<div class="trade-meter"><div id="tradeMeterLeft" class="trade-meter-left" style="width:50%"></div><div id="tradeMeterRight" class="trade-meter-right" style="width:50%"></div></div>'+
       '<div id="tradeWhy" class="trade-why"></div>'+
     '</div>'+
-    '<div class="trade-actions"><button type="button" id="tradeClear" class="trade-clear">Clear Trade</button></div>'+
+    '<div class="trade-actions"><button type="button" id="tradeSwap" class="trade-clear">Swap Sides</button><button type="button" id="tradeClear" class="trade-clear">Clear Trade</button></div>'+
   '</div>';
 const depth=document.getElementById('depthSection');
 if(depth&&depth.parentNode===main)main.insertBefore(section,depth.nextSibling);else main.appendChild(section);
@@ -284,7 +284,7 @@ function showMatches(side){
   results.innerHTML=matches.map(p=>
     '<button type="button" class="trade-result" data-add="'+side+'" data-name="'+encodeURIComponent(p.name)+'">'+
       '<span class="trade-result-player">'+teamLogo(p.team)+'<span class="trade-result-name">'+p.name+'</span></span>'+
-      '<span class="trade-result-meta">'+(tradeMode==='ROS'?p.position+' #'+p.positionRank:'Overall #'+p.rank)+' · '+p.value.toFixed(1)+'</span>'+
+      '<span class="trade-result-meta">'+p.position+' · '+(tradeMode==='ROS'?'ROS #'+p.positionRank:'Overall #'+p.rank)+' · Value '+p.value.toFixed(1)+'</span>'+
     '</button>'
   ).join('');
   results.style.display='block';
@@ -357,6 +357,12 @@ document.addEventListener('click',e=>{
   input.addEventListener('focus',()=>showMatches(side));
 });
 
+document.getElementById('tradeSwap').onclick=()=>{
+  const left=state.left;
+  state.left=state.right;
+  state.right=left;
+  renderSide('left');renderSide('right');
+};
 document.getElementById('tradeClear').onclick=()=>{
   state.left=[];state.right=[];
   renderSide('left');renderSide('right');

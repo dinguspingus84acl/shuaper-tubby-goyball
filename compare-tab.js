@@ -17,6 +17,7 @@ const TEAM_SLUGS={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CI
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let selected=[null,null];
 let renderToken=0;
+const COMPARE_STATE_KEY='shuaComparePlayersV1';
 
 const style=document.createElement('style');
 style.id='compareTabStyles';
@@ -142,6 +143,22 @@ function findPlayer(name){
   const k=norm(name);
   return allPlayers().find(p=>norm(p.name)===k)||null;
 }
+function saveCompareState(){
+  try{localStorage.setItem(COMPARE_STATE_KEY,JSON.stringify(selected.map(p=>p?.name||null)))}catch(e){}
+}
+function restoreCompareState(){
+  if(selected[0]||selected[1])return;
+  try{
+    const names=JSON.parse(localStorage.getItem(COMPARE_STATE_KEY)||'null');
+    if(!Array.isArray(names))return;
+    names.slice(0,2).forEach((name,i)=>{if(name)selected[i]=findPlayer(name)});
+    [0,1].forEach(i=>{
+      const input=document.getElementById('compareSearch'+i);
+      if(input&&selected[i])input.value=selected[i].name;
+      renderSelected(i);
+    });
+  }catch(e){}
+}
 function teamName(team){return TEAM_NAMES[String(team||'').toUpperCase()]||String(team||'—')}
 function teamLogo(team){
   const slug=TEAM_SLUGS[String(team||'').toUpperCase()];
@@ -180,10 +197,15 @@ function choose(slot,name){
   const other=selected[slot===0?1:0];
   if(other&&norm(other.name)===norm(p.name))return;
   selected[slot]=p;
+  saveCompareState();
   const input=document.getElementById('compareSearch'+slot);if(input)input.value=p.name;
   document.getElementById('compareSuggestions'+slot).hidden=true;
   renderSelected(slot);
-  renderCompare();
+  const otherSlot=slot===0?1:0;
+  if(!selected[otherSlot])setTimeout(()=>document.getElementById('compareSearch'+otherSlot)?.focus(),0);
+  renderCompare().then(()=>{
+    if(selected[0]&&selected[1])document.getElementById('compareResults')?.scrollIntoView({behavior:'smooth',block:'start'});
+  });
 }
 function renderSelected(slot){
   const box=document.getElementById('compareSelected'+slot),p=selected[slot];
@@ -232,6 +254,7 @@ async function renderCompare(){
   result.hidden=false;status.hidden=true;
 }
 function showCompare(){
+  restoreCompareState();
   try{position='COMPARE'}catch(e){}
   document.body.classList.remove('fantasy-home-mode','mobile-menu-open','stats-mode');
   document.querySelectorAll('.positions .pos').forEach(b=>b.classList.toggle('active',b.dataset.pos==='COMPARE'));
@@ -258,6 +281,7 @@ button.onclick=e=>{e.preventDefault();showCompare()};
   });
   document.querySelector('[data-clear-slot="'+slot+'"]').onclick=()=>{
     selected[slot]=null;
+    saveCompareState();
     input.value='';
     document.getElementById('compareSuggestions'+slot).hidden=true;
     renderSelected(slot);

@@ -75,7 +75,7 @@ style.textContent=`
 .featured-player-card{
   --featured-accent:#3d8cff;
   position:relative;overflow:hidden;isolation:isolate;
-  height:278px;border:1px solid #ffffff24;border-radius:18px;
+  height:258px;border:1px solid color-mix(in srgb,var(--featured-accent) 28%,#ffffff24);border-radius:16px 16px 0 0;
   background:
     radial-gradient(circle at 18% 32%,color-mix(in srgb,var(--featured-accent) 17%,transparent),transparent 34%),
     linear-gradient(135deg,#05090f 0%,#09111a 48%,#04080d 100%);
@@ -91,27 +91,33 @@ style.textContent=`
 }
 .featured-player-card .featured-left{position:relative;min-width:0;overflow:hidden}
 .featured-player-card .featured-portrait-box{
-  position:absolute;left:12px;right:12px;top:12px;bottom:76px;
-  border-radius:14px;overflow:hidden;border:1px solid #ffffff20;
+  position:absolute;left:11px;right:11px;top:11px;bottom:70px;
+  border-radius:13px;overflow:hidden;border:1px solid color-mix(in srgb,var(--featured-accent) 44%,#ffffff1d);
   background:linear-gradient(145deg,#080d14,#111822);
-  box-shadow:inset 0 1px 0 #ffffff12
+  box-shadow:inset 0 1px 0 #ffffff12,0 0 18px color-mix(in srgb,var(--featured-accent) 12%,transparent)
 }
 .featured-player-card .featured-bg-logo{
-  position:absolute;left:-11%;top:-4%;width:104%;height:104%;object-fit:contain;
-  opacity:.28;filter:drop-shadow(0 0 18px color-mix(in srgb,var(--featured-accent) 24%,transparent))
+  position:absolute;left:-15%;top:-8%;width:114%;height:114%;object-fit:contain;
+  opacity:.38;filter:drop-shadow(0 0 24px color-mix(in srgb,var(--featured-accent) 38%,transparent))
 }
 .featured-player-card .featured-photo{
-  position:absolute;z-index:2;left:50%;bottom:-1px;transform:translateX(-50%);
-  width:auto!important;height:98%!important;max-width:125%!important;border:0!important;border-radius:0!important;
+  position:absolute;z-index:2;left:50%;bottom:-8px;transform:translateX(-50%);
+  width:auto!important;height:111%!important;max-width:142%!important;border:0!important;border-radius:0!important;
   object-fit:contain!important;object-position:center bottom;background:transparent!important;
   filter:drop-shadow(0 11px 18px #0009)
 }
 .featured-player-card .featured-team-strip{
-  position:absolute;z-index:4;left:12px;right:12px;bottom:10px;height:56px;
+  position:absolute;z-index:4;left:11px;right:11px;bottom:8px;height:55px;
   display:grid;grid-template-columns:42px 1px minmax(0,1fr);gap:10px;align-items:center;
-  padding:0 4px;background:transparent
+  padding:0 9px;background:linear-gradient(90deg,#050b13f2,#09131fdc);
+  border:1px solid #ffffff12;border-radius:10px;
+  box-shadow:inset 0 1px 0 #ffffff08
 }
-.featured-player-card .featured-mini-logo{width:40px;height:40px;object-fit:contain}
+.featured-player-card .featured-team-strip:after{
+  content:"";position:absolute;left:9px;right:9px;bottom:-1px;height:2px;border-radius:999px;
+  background:linear-gradient(90deg,var(--featured-accent),transparent)
+}
+.featured-player-card .featured-mini-logo{width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 0 8px color-mix(in srgb,var(--featured-accent) 30%,transparent))}
 .featured-player-card .featured-divider{height:38px;background:#ffffff22}
 .featured-player-card .featured-team-name{
   font-size:1.04rem;font-weight:1000;letter-spacing:-.02em;color:#fff;line-height:1
@@ -123,56 +129,77 @@ style.textContent=`
 .featured-player-card .featured-team-meta strong{color:var(--featured-accent)}
 .featured-player-card .featured-right{
   position:relative;z-index:3;display:flex;flex-direction:column;justify-content:center;
-  padding:30px 26px 26px;min-width:0
+  padding:24px 23px 20px;min-width:0
 }
 .featured-player-card .featured-name{
-  margin:0 0 22px;color:#fff;text-transform:uppercase;line-height:.9;letter-spacing:-.05em;
-  overflow:hidden
+  margin:0 0 16px;color:#fff;text-transform:uppercase;line-height:.9;letter-spacing:-.05em;
+  overflow:visible;min-width:0
 }
 .featured-player-card .featured-first{display:block;font-size:1.65rem;font-weight:1000}
+.featured-player-card .featured-last-row{display:flex;align-items:flex-end;gap:9px;min-width:0;margin-top:6px}
 .featured-player-card .featured-last{
-  display:block;font-size:2.55rem;font-weight:1000;margin-top:6px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+  display:block;font-size:2.55rem;font-weight:1000;
+  white-space:nowrap;min-width:0
 }
+.featured-player-card .featured-jersey-number{
+  flex:0 0 auto;color:var(--featured-accent);font-size:1.05rem;font-weight:1000;
+  letter-spacing:-.02em;padding-bottom:3px
+}
+.featured-player-card.featured-name-long .featured-last{font-size:2.12rem;letter-spacing:-.04em}
+.featured-player-card.featured-name-xlong .featured-last{font-size:1.78rem;letter-spacing:-.035em}
 .featured-player-card .featured-bio{
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px
 }
 .featured-player-card .featured-bio-item{
-  min-width:0;border:1px solid #ffffff19;border-radius:11px;padding:11px 7px;
+  min-width:0;border:1px solid color-mix(in srgb,var(--featured-accent) 23%,#ffffff16);border-radius:10px;padding:8px 6px;
   background:linear-gradient(145deg,#0d141d,#080c12);text-align:center
 }
 .featured-player-card .featured-bio-label{
   display:block;color:#8f9cab;font-size:.54rem;font-weight:950;letter-spacing:.075em;white-space:nowrap
 }
 .featured-player-card .featured-bio-value{
-  display:block;color:#fff;font-size:1.12rem;font-weight:1000;letter-spacing:-.025em;
-  margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+  display:block;color:#fff;font-size:1.05rem;font-weight:1000;letter-spacing:-.025em;
+  margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
-.featured-player-profile .unified-profile-tabs{margin-top:8px}
+.featured-player-profile .unified-profile-tabs{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;
+  margin-top:0;padding:6px;border:1px solid #ffffff18;border-top:0;
+  border-radius:0 0 12px 12px;background:#07111de8
+}
+.featured-player-profile .unified-profile-tab{
+  width:100%;min-width:0;padding:6px 5px;border-radius:7px
+}
 @media(max-width:760px){
-  .featured-player-profile{width:100%!important;padding:7px!important}
-  .featured-player-profile .closem{right:11px!important;top:11px!important;width:27px;height:27px}
+  .featured-player-profile{width:100%!important;padding:6px!important}
+  .featured-player-profile .closem{right:9px!important;top:9px!important;width:25px;height:25px}
   .featured-player-card{
-    height:204px;grid-template-columns:39% 61%;border-radius:13px
+    height:186px;grid-template-columns:35% 65%;border-radius:11px 11px 0 0
   }
-  .featured-player-card .featured-portrait-box{left:7px;right:7px;top:7px;bottom:57px;border-radius:10px}
+  .featured-player-card .featured-portrait-box{left:6px;right:6px;top:6px;bottom:49px;border-radius:8px}
+  .featured-player-card .featured-photo{height:116%!important;max-width:150%!important;bottom:-10px}
+  .featured-player-card .featured-bg-logo{opacity:.4;width:118%;height:118%;left:-18%;top:-10%}
   .featured-player-card .featured-team-strip{
-    left:7px;right:7px;bottom:5px;height:46px;
-    grid-template-columns:31px 1px minmax(0,1fr);gap:7px
+    left:6px;right:6px;bottom:4px;height:40px;
+    grid-template-columns:27px 1px minmax(0,1fr);gap:6px;padding:0 6px;border-radius:7px
   }
-  .featured-player-card .featured-mini-logo{width:29px;height:29px}
-  .featured-player-card .featured-divider{height:31px}
-  .featured-player-card .featured-team-name{font-size:.76rem}
-  .featured-player-card .featured-team-meta{font-size:.49rem;margin-top:5px}
-  .featured-player-card .featured-right{padding:20px 11px 14px}
-  .featured-player-card .featured-name{margin-bottom:13px;padding-right:19px}
-  .featured-player-card .featured-first{font-size:1rem}
-  .featured-player-card .featured-last{font-size:1.42rem;margin-top:4px}
-  .featured-player-card .featured-bio{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
-  .featured-player-card .featured-bio-item{padding:7px 4px;border-radius:8px}
-  .featured-player-card .featured-bio-label{font-size:.43rem}
-  .featured-player-card .featured-bio-value{font-size:.76rem;margin-top:3px}
-  .featured-player-profile .unified-profile-tabs{margin-top:6px}
+  .featured-player-card .featured-mini-logo{width:26px;height:26px}
+  .featured-player-card .featured-divider{height:26px}
+  .featured-player-card .featured-team-name{font-size:.66rem}
+  .featured-player-card .featured-team-meta{font-size:.43rem;margin-top:4px}
+  .featured-player-card .featured-right{padding:16px 9px 10px}
+  .featured-player-card .featured-name{margin-bottom:10px;padding-right:17px}
+  .featured-player-card .featured-first{font-size:.9rem}
+  .featured-player-card .featured-last-row{gap:5px;margin-top:3px}
+  .featured-player-card .featured-last{font-size:1.28rem}
+  .featured-player-card .featured-jersey-number{font-size:.68rem;padding-bottom:1px}
+  .featured-player-card.featured-name-long .featured-last{font-size:1.08rem}
+  .featured-player-card.featured-name-xlong .featured-last{font-size:.93rem}
+  .featured-player-card .featured-bio{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+  .featured-player-card .featured-bio-item{padding:5px 3px;border-radius:7px}
+  .featured-player-card .featured-bio-label{font-size:.39rem}
+  .featured-player-card .featured-bio-value{font-size:.68rem;margin-top:2px}
+  .featured-player-profile .unified-profile-tabs{margin-top:0;padding:4px;gap:3px}
+  .featured-player-profile .unified-profile-tab{padding:5px 2px;font-size:.5rem}
 }
 @media(max-width:700px){
   .unified-profile-tabs{gap:4px;padding-bottom:6px}
@@ -395,11 +422,11 @@ function fillFeaturedBio(player,seed,bio){
     const el=card.querySelectorAll('.featured-bio-item')[i];
     if(el){el.querySelector('.featured-bio-label').textContent=label;el.querySelector('.featured-bio-value').textContent=value}
   });
+  const number=override.number??bio?.number??bio?.jersey_number;
   const meta=card.querySelector('.featured-team-meta');
-  if(meta){
-    const number=override.number??bio?.number??bio?.jersey_number;
-    meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong> · '+canonicalTeam(player?.team||bio?.team||'—')+(number!==null&&number!==undefined&&String(number)!==''?' · #'+number:'');
-  }
+  if(meta)meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong> · '+canonicalTeam(player?.team||bio?.team||'—');
+  const jersey=card.querySelector('.featured-jersey-number');
+  if(jersey)jersey.textContent=number!==null&&number!==undefined&&String(number)!==''?'#'+number:'';
 }
 function applyFeaturedProfile(name,seed=null){
   clearFeaturedProfile();
@@ -419,6 +446,9 @@ function applyFeaturedProfile(name,seed=null){
   const hero=document.createElement('section');
   hero.id='featuredPlayerCard';
   hero.className='featured-player-card';
+  const nameLength=String(player.name||name).replace(/\s+/g,'').length;
+  if(nameLength>=18)hero.classList.add('featured-name-xlong');
+  else if(nameLength>=14)hero.classList.add('featured-name-long');
   hero.style.setProperty('--featured-accent',TEAM_ACCENTS[canonicalTeam(team)]||'#3d8cff');
 
   const historical=!!seedYear(seed);
@@ -438,7 +468,7 @@ function applyFeaturedProfile(name,seed=null){
       '</div>'+
     '</div>'+
     '<div class="featured-right">'+
-      '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last">'+parts.last+'</span></h2>'+
+      '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span><span class="featured-jersey-number"></span></span></h2>'+
       '<div class="featured-bio">'+
         (historical
           ? stat('YEAR',String(seedYear(seed)))+stat('PPR PTS',Number.isFinite(Number(seed?.points))?Number(seed.points).toFixed(1):'—')+stat('PPG',Number.isFinite(Number(seed?.average))?Number(seed.average).toFixed(1):'—')+stat('GP',Number.isFinite(Number(seed?.gamesPlayed))?String(Number(seed.gamesPlayed)):'—')

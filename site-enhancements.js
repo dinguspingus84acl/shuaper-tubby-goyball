@@ -52,6 +52,15 @@ function addStyles(){
     .tag-group td{background:#0d2945!important;color:#fff!important;font-weight:950!important;letter-spacing:.08em;padding:9px 14px!important}.tag-group.qb td{border-left:5px solid var(--qb)}.tag-group.rb td{border-left:5px solid var(--rb)}.tag-group.wr td{border-left:5px solid var(--wr)}.tag-group.te td{border-left:5px solid var(--te)}
     .team-abbr{display:inline-flex;align-items:center;gap:7px;font-weight:800;white-space:nowrap}.team-mini-logo{width:22px;height:22px;object-fit:contain;vertical-align:middle;flex:0 0 22px}.team-mini-logo.sm{width:18px;height:18px;flex-basis:18px}
 
+    /* Rankings polish: pinned column labels + persistent selected-player state */
+    #tableCard{overflow:visible}
+    #tableCard thead th{position:sticky;top:var(--shua-ranking-sticky-top,68px);z-index:18;background:rgba(9,28,48,.98);box-shadow:0 1px 0 var(--l),0 8px 18px rgba(0,0,0,.22);backdrop-filter:blur(8px)}
+    #tableCard tbody tr[data-id]{transition:background .16s ease,box-shadow .16s ease,transform .16s ease}
+    #tableCard tbody tr[data-id].selected-player-row td{background:linear-gradient(90deg,rgba(53,208,127,.16),rgba(24,61,99,.12))!important}
+    #tableCard tbody tr[data-id].selected-player-row td:first-child{box-shadow:inset 4px 0 0 var(--g)}
+    #tableCard tbody tr[data-id].selected-player-row{box-shadow:0 0 0 1px rgba(53,208,127,.24),0 8px 24px rgba(0,0,0,.16)}
+    .phone-mode #tableCard tbody tr[data-id].selected-player-row{background:linear-gradient(90deg,rgba(53,208,127,.18),rgba(24,61,99,.12))!important;box-shadow:inset 4px 0 0 var(--g),0 0 0 1px rgba(53,208,127,.2)!important}
+
     #fantasyHome{display:none;position:fixed;inset:0;z-index:10;background:#010315;align-items:center;justify-content:center;overflow:hidden}
     #fantasyHome img{width:min(88vw,900px);height:min(88vh,900px);object-fit:contain;filter:drop-shadow(0 0 34px rgba(69,39,255,.18))}
     body.fantasy-home-mode #fantasyHome{display:flex}
@@ -308,6 +317,49 @@ function decorateTeamLogos(){
     if(m&&TEAM_SLUGS[m[2]])el.innerHTML=`${m[1]}· ${logoHtml(m[2],true)}`;
   });
 }
+let selectedPlayerId='';
+function updateRankingStickyOffset(){
+  const bar=document.querySelector('.sticky');
+  const h=bar?Math.max(0,Math.ceil(bar.getBoundingClientRect().height)):0;
+  document.documentElement.style.setProperty('--shua-ranking-sticky-top',h+'px');
+}
+function applySelectedPlayerRow(){
+  document.querySelectorAll('#rows tr.selected-player-row').forEach(tr=>tr.classList.remove('selected-player-row'));
+  if(!selectedPlayerId)return;
+  const row=[...document.querySelectorAll('#rows tr[data-id]')].find(tr=>tr.dataset.id===selectedPlayerId);
+  if(row)row.classList.add('selected-player-row');
+}
+function clearSelectedPlayerRow(){
+  selectedPlayerId='';
+  document.querySelectorAll('#rows tr.selected-player-row').forEach(tr=>tr.classList.remove('selected-player-row'));
+}
+function installRankingPolish(){
+  updateRankingStickyOffset();
+  window.addEventListener('resize',()=>requestAnimationFrame(updateRankingStickyOffset),{passive:true});
+  const bar=document.querySelector('.sticky');
+  if(bar&&window.ResizeObserver)new ResizeObserver(()=>updateRankingStickyOffset()).observe(bar);
+
+  const originalProfile=window.profile;
+  if(typeof originalProfile==='function'&&!originalProfile.__shuaSelectedPlayerWrapped){
+    const wrapped=function(id){
+      selectedPlayerId=String(id||'');
+      const result=originalProfile.apply(this,arguments);
+      requestAnimationFrame(applySelectedPlayerRow);
+      return result;
+    };
+    wrapped.__shuaSelectedPlayerWrapped=true;
+    window.profile=wrapped;
+  }
+  const modal=document.getElementById('modal');
+  if(modal){
+    const modalObserver=new MutationObserver(()=>{
+      if(modal.classList.contains('open'))applySelectedPlayerRow();
+      else clearSelectedPlayerRow();
+    });
+    modalObserver.observe(modal,{attributes:true,attributeFilter:['class']});
+  }
+}
+
 function applyColors(){
   const green=new Set(),red=new Set();
   Object.values(tags).forEach(g=>{(g.draft||[]).forEach(n=>green.add(canon(n)));(g['do-not-draft']||[]).forEach(n=>red.add(canon(n)))});
@@ -326,14 +378,14 @@ async function loadData(){
 }
 
 function install(){
-  addStyles();ensureHome();ensureControls();addNav();ensureMobileMenu();
+  addStyles();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();
   document.addEventListener('click',e=>{
     const b=e.target.closest('.positions .pos');
     if(!b)return;
     if(!['HOME','MYGUYS','DND'].includes(b.dataset.pos)){leaveHome();hideTagged();closeMobileMenu();}
   },true);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileMenu()});
-  const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();upgradeFallbackFaces();applyColors()}));
+  const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();upgradeFallbackFaces();applyColors();applySelectedPlayerRow()}));
   obs.observe(document.body,{subtree:true,childList:true});
   loadData().catch(console.error);
   loadHistoricalHeadshots();

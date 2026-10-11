@@ -71,11 +71,13 @@ async function verifyHistoricalYear(page,year){
   const phoneSheet=await page.locator('#modal .profile').evaluate(el=>{
     const r=el.getBoundingClientRect();
     const close=document.getElementById('close');
+    const hero=document.getElementById('featuredPlayerCard');
     return {
       bodyPhone:document.body.classList.contains('phone-mode'),
       width:r.width,height:r.height,top:r.top,left:r.left,
       innerWidth:window.innerWidth,innerHeight:window.innerHeight,
-      closeDisplay:close?getComputedStyle(close).display:'missing'
+      closeDisplay:close?getComputedStyle(close).display:'missing',
+      heroHeight:hero?hero.getBoundingClientRect().height:0
     };
   });
   if(phoneSheet.bodyPhone){
@@ -83,6 +85,8 @@ async function verifyHistoricalYear(page,year){
       throw new Error('Phone profile does not fill viewport: '+JSON.stringify(phoneSheet));
     if(phoneSheet.closeDisplay!=='none')
       throw new Error('Phone profile close button should be hidden: '+JSON.stringify(phoneSheet));
+    if(phoneSheet.heroHeight>260)
+      throw new Error('Phone featured card is not compact enough: '+JSON.stringify(phoneSheet));
   }
 
   const tabs=await page.locator('#unifiedProfileTabs .unified-profile-tab').allInnerTexts();
@@ -121,6 +125,16 @@ async function verifyHistoricalYear(page,year){
   const badOpponent=opponentLabels.find(x=>/^\s*(?:@|vs\.?\b)/i.test(x));
   if(badOpponent)throw new Error('Game Log opponent still includes @/vs prefix: '+badOpponent);
 
+  const summaryText=await detail.locator('.espn-game-log-summary').first().innerText();
+  if(!/Season/i.test(summaryText)||!/PPG/i.test(summaryText)||!/PPR/i.test(summaryText)||!/GP/i.test(summaryText))
+    throw new Error('Game Log season summary missing or incomplete: '+summaryText);
+  const opponentLogoCount=await detail.locator('.espn-game-log-opponent-logo').count();
+  if(opponentLogoCount<1)throw new Error('Game Log opponent logos missing for '+firstName+' '+year);
+  const scoredPtsCount=await detail.locator('.gl-pts-high,.gl-pts-mid,.gl-pts-low').count();
+  if(scoredPtsCount<1)throw new Error('Game Log PTS color coding missing for '+firstName+' '+year);
+  const controlsPosition=await detail.locator('.espn-game-log-controls').first().evaluate(el=>getComputedStyle(el).position);
+  if(controlsPosition!=='sticky')throw new Error('Game Log controls are not sticky: '+controlsPosition);
+
   const gameLogLayout=await detail.locator('.espn-game-log-table').evaluate(table=>{
     const wrap=table.closest('.espn-game-log-table-wrap');
     const td=table.querySelector('tbody td.gl-stat, tbody td.gl-pts, tbody td');
@@ -135,6 +149,11 @@ async function verifyHistoricalYear(page,year){
       throw new Error('Phone Game Log table overflows available width: '+JSON.stringify(gameLogLayout));
     if(gameLogLayout.tdFont<12.5)
       throw new Error('Phone Game Log numbers are still too small: '+JSON.stringify(gameLogLayout));
+  }else{
+    if(Math.abs(gameLogLayout.tableWidth-gameLogLayout.wrapWidth)>3)
+      throw new Error('Desktop Game Log table should fill its card: '+JSON.stringify(gameLogLayout));
+    if(gameLogLayout.tdFont<13)
+      throw new Error('Desktop Game Log numbers are too small: '+JSON.stringify(gameLogLayout));
   }
 
   const options=await detail.locator('select option').allTextContents();
@@ -143,7 +162,7 @@ async function verifyHistoricalYear(page,year){
 
   if(phoneSheet.bodyPhone)await swipeDownToClose(page);
   else await page.click('#close');
-  return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350),phoneSheet,gameLogLayout};
+  return {year,rowCount,firstName,historyYears:historyYears.slice(0,15),logYears:logYears.slice(0,15),rowFaceLoaded,profileFaceLoaded,detailText:detailText.slice(0,350),phoneSheet,gameLogLayout,summaryText,opponentLogoCount,scoredPtsCount,controlsPosition};
 }
 
 try{
@@ -159,17 +178,28 @@ try{
   const phoneTopControls=await page.evaluate(()=>({
     phone:document.body.classList.contains('phone-mode'),
     teamControls:document.getElementById('teamControls')?getComputedStyle(document.getElementById('teamControls')).display:'missing',
-    overallToggle:document.getElementById('overallToggle')?getComputedStyle(document.getElementById('overallToggle')).display:'missing'
+    overallToggle:document.getElementById('overallToggle')?getComputedStyle(document.getElementById('overallToggle')).display:'missing',
+    pageHead:document.querySelector('main .head')?getComputedStyle(document.querySelector('main .head')).display:'missing',
+    toolsHeight:document.querySelector('.tools')?.getBoundingClientRect().height||0
   }));
-  if(phoneTopControls.phone&&(phoneTopControls.teamControls!=='none'||phoneTopControls.overallToggle!=='none'))
+  if(phoneTopControls.phone&&(phoneTopControls.teamControls!=='none'||phoneTopControls.overallToggle!=='none'||phoneTopControls.pageHead!=='none'))
     throw new Error('Phone top controls should be hidden: '+JSON.stringify(phoneTopControls));
+  if(phoneTopControls.phone&&phoneTopControls.toolsHeight>90)
+    throw new Error('Phone header is still too tall: '+JSON.stringify(phoneTopControls));
   await openStats(page,2016);
 
   const checks=[];
   checks.push(await verifyHistoricalYear(page,2016));
   checks.push(await verifyHistoricalYear(page,2004));
 
-  console.log('RESULT',JSON.stringify({checks,errors},null,2));
+  const desktop=await browser.newPage({viewport:{width:1280,height:900}});
+  desktop.on('pageerror',e=>errors.push('DESKTOP PAGEERROR '+e.message));
+  desktop.on('console',m=>{if(m.type()==='error')errors.push('DESKTOP CONSOLE '+m.text())});
+  await desktop.goto('http://127.0.0.1:4173',{waitUntil:'domcontentloaded',timeout:60000});
+  await openStats(desktop,2016);
+  checks.push(await verifyHistoricalYear(desktop,2016));
+
+  console.log('RESULT',JSON.stringify({checks,phoneTopControls,errors},null,2));
   await browser.close();
 } finally {
   server.kill('SIGTERM');

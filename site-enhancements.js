@@ -10,6 +10,7 @@ let tags={QB:{draft:[],'do-not-draft':[]},RB:{draft:[],'do-not-draft':[]},WR:{dr
 let rankPlayers=[];
 let currentKind=null;
 let currentPos='ALL';
+let historicalHeadshots={};
 
 function addStyles(){
   if(document.getElementById('shuaEnhancementStyles'))return;
@@ -212,6 +213,55 @@ function refreshMobileMenu(){
   });
 }
 
+async function loadHistoricalHeadshots(){
+  try{
+    const r=await fetch('legacy-stats/headshots.json',{cache:'force-cache'});
+    if(!r.ok)return;
+    const d=await r.json();
+    historicalHeadshots=d?.headshots||{};
+    upgradeFallbackFaces();
+  }catch(e){}
+}
+function fallbackFaceName(el){
+  const photoCell=el.closest('.photo-cell');
+  if(photoCell){
+    const b=photoCell.querySelector('b');
+    if(b?.textContent)return b.textContent.trim();
+  }
+  const pool=el.closest('.pool-player');
+  if(pool){
+    const b=pool.querySelector('span[data-id] > b');
+    if(b?.textContent)return b.textContent.trim();
+  }
+  const roster=el.closest('.roster-card');
+  if(roster){
+    const b=roster.querySelector('.roster-name-line b')||roster.querySelector('b');
+    if(b?.textContent&&b.textContent.trim()!=='Empty')return b.textContent.trim();
+  }
+  const person=el.closest('.person');
+  if(person){
+    const n=document.getElementById('pn')?.textContent?.trim();
+    if(n)return n;
+  }
+  return '';
+}
+function upgradeFallbackFaces(){
+  if(!historicalHeadshots||!Object.keys(historicalHeadshots).length)return;
+  document.querySelectorAll('.photo.fallback').forEach(el=>{
+    const name=fallbackFaceName(el);
+    if(!name)return;
+    const src=historicalHeadshots[norm(name)];
+    if(!src)return;
+    const img=document.createElement('img');
+    img.className=[...el.classList].filter(x=>x!=='fallback').join(' ');
+    img.src=src;
+    img.alt=name;
+    img.loading='lazy';
+    img.onerror=()=>{if(img.isConnected)img.replaceWith(el)};
+    el.replaceWith(img);
+  });
+}
+
 function decorateTeamLogos(){
   document.querySelectorAll('#rows tr:not(.tag-group)').forEach(tr=>{
     const tds=tr.querySelectorAll('td');if(tds.length<4)return;
@@ -254,10 +304,11 @@ function install(){
     if(!['HOME','MYGUYS','DND'].includes(b.dataset.pos)){leaveHome();hideTagged();closeMobileMenu();}
   },true);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileMenu()});
-  const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();applyColors()}));
+  const obs=new MutationObserver(()=>requestAnimationFrame(()=>{decorateTeamLogos();upgradeFallbackFaces();applyColors()}));
   obs.observe(document.body,{subtree:true,childList:true});
   loadData().catch(console.error);
-  requestAnimationFrame(()=>{decorateTeamLogos();applyColors();showHome()});
+  loadHistoricalHeadshots();
+  requestAnimationFrame(()=>{decorateTeamLogos();upgradeFallbackFaces();applyColors();showHome()});
 }
 install();
 })();

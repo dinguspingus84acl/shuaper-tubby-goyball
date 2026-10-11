@@ -395,6 +395,10 @@ async function getHistoricalCareer(name){
   const key=norm(name);
   const index=await loadHistoricalIndex();
   const meta=index[key];
+  if(!meta)return [];
+  if(Array.isArray(meta.history)&&meta.history.length){
+    return meta.history.map(x=>({...x})).sort((a,b)=>b.year-a.year);
+  }
   if(!meta?.years?.length)return [];
   const years=[...meta.years].sort((a,b)=>b-a);
   const results=await Promise.all(years.map(async year=>{
@@ -410,6 +414,18 @@ async function getHistoricalCareer(name){
     }catch(e){return null}
   }));
   return results.filter(Boolean).sort((a,b)=>b.year-a.year);
+}
+async function loadHistoricalPlayerYear(name,year){
+  const key=norm(name);
+  const rows=await fetchHistoricalSeason(Number(year));
+  return rows.find(p=>norm(p.name)===key)||null;
+}
+async function hydrateHistoricalCareerYear(career,name,year){
+  const detailed=await loadHistoricalPlayerYear(name,year);
+  if(!detailed)return career;
+  const summary=career.find(x=>Number(x.year)===Number(year));
+  const merged={...summary,...detailed,year:Number(year),rank:summary?.rank??null,gamesPlayed:detailed.gamesPlayed,games:detailed.games,ppg:detailed.average,teamAbbr:detailed.team};
+  return career.map(x=>Number(x.year)===Number(year)?merged:x);
 }
 async function getAnyHistoricalPlayer(name,preferredYear){
   const career=await getHistoricalCareer(name);
@@ -456,18 +472,22 @@ function bindHistoricalGameLog(panel,player,career,year){
   });
   const select=panel.querySelector('[data-hist-gl-year]');
   if(select){
-    select.onchange=e=>{
+    select.onchange=async e=>{
       const nextYear=Number(e.target.value);
-      panel.innerHTML=historicalGameLogHtml(player,career,nextYear);
-      bindHistoricalGameLog(panel,player,career,nextYear);
+      panel.innerHTML='<div class="espn-game-log-empty">Loading '+nextYear+' game log…</div>';
+      const hydrated=await hydrateHistoricalCareerYear(career,player.name,nextYear);
+      const nextPlayer=hydrated.find(x=>Number(x.year)===nextYear)||player;
+      panel.innerHTML=historicalGameLogHtml(nextPlayer,hydrated,nextYear);
+      bindHistoricalGameLog(panel,nextPlayer,hydrated,nextYear);
     };
   }
 }
 async function renderHistoricalGameLog(name,target,preferredYear){
-  const career=await getHistoricalCareer(name);
+  let career=await getHistoricalCareer(name);
   if(!career.length)return false;
-  const player=career.find(x=>Number(x.year)===Number(preferredYear))||career[0];
-  const year=Number(preferredYear)||Number(player.year);
+  const year=Number(preferredYear)||Number(career[0].year);
+  career=await hydrateHistoricalCareerYear(career,name,year);
+  const player=career.find(x=>Number(x.year)===year)||career[0];
   target.innerHTML=historicalGameLogHtml(player,career,year);
   bindHistoricalGameLog(target,player,career,year);
   return true;
@@ -1226,8 +1246,9 @@ window.ShuaEspnLive={
     target.innerHTML='<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
     try{
       if(Number(year)>=2010&&Number(year)<=2025){
-        const hist=await getHistoricalCareer(name);
+        let hist=await getHistoricalCareer(name);
         if(hist.some(x=>Number(x.year)===Number(year))){
+          hist=await hydrateHistoricalCareerYear(hist,name,Number(year));
           const row=hist.find(x=>Number(x.year)===Number(year));
           const one=[row];
           target.innerHTML=historicalGameLogHtml(row,one,Number(year));

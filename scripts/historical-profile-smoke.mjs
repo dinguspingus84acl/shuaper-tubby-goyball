@@ -42,17 +42,10 @@ async function swipeDownToClose(page){
 async function selectProfileTab(page,key){
   const phone=await page.evaluate(()=>document.body.classList.contains('phone-mode'));
   if(phone){
-    const visibleBefore=await page.locator('#unifiedProfileTabs .unified-profile-tab:visible').count();
-    if(visibleBefore!==1)throw new Error('Phone profile should show exactly one tab heading, saw '+visibleBefore);
-    await page.locator('#unifiedProfileTabs .unified-profile-tab.active').click();
-    await page.waitForFunction(()=>document.getElementById('unifiedProfileTabs')?.classList.contains('phone-tab-menu-open'));
+    const visible=await page.locator('#unifiedProfileTabs .unified-profile-tab:visible').count();
+    if(visible!==4)throw new Error('Phone player profile should show four visible tabs, saw '+visible);
   }
   await page.locator('[data-profile-tab="'+key+'"]').click();
-  if(phone){
-    await page.waitForFunction(()=>!document.getElementById('unifiedProfileTabs')?.classList.contains('phone-tab-menu-open'));
-    const visibleAfter=await page.locator('#unifiedProfileTabs .unified-profile-tab:visible').count();
-    if(visibleAfter!==1)throw new Error('Phone profile tab heading did not collapse after selecting '+key);
-  }
 }
 
 async function verifyHistoricalYear(page,year){
@@ -163,6 +156,13 @@ try{
 
   await page.goto('http://127.0.0.1:4173',{waitUntil:'domcontentloaded',timeout:60000});
   await page.waitForSelector('#phoneMenuButton',{state:'visible',timeout:30000});
+  const phoneTopControls=await page.evaluate(()=>({
+    phone:document.body.classList.contains('phone-mode'),
+    teamControls:document.getElementById('teamControls')?getComputedStyle(document.getElementById('teamControls')).display:'missing',
+    overallToggle:document.getElementById('overallToggle')?getComputedStyle(document.getElementById('overallToggle')).display:'missing'
+  }));
+  if(phoneTopControls.phone&&(phoneTopControls.teamControls!=='none'||phoneTopControls.overallToggle!=='none'))
+    throw new Error('Phone top controls should be hidden: '+JSON.stringify(phoneTopControls));
   await openStats(page,2016);
 
   const checks=[];

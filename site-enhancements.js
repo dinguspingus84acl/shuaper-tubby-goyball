@@ -11,6 +11,14 @@ let rankPlayers=[];
 let currentKind=null;
 let currentPos='ALL';
 let historicalHeadshots={};
+function headshotUrls(value){
+  if(Array.isArray(value))return [...new Set(value.map(String).map(x=>x.trim()).filter(Boolean))];
+  if(value&&typeof value==='object'){
+    const arr=Array.isArray(value.urls)?value.urls:Array.isArray(value.headshots)?value.headshots:[value.url||value.headshot||''];
+    return [...new Set(arr.map(String).map(x=>x.trim()).filter(Boolean))];
+  }
+  const s=String(value||'').trim();return s?[s]:[];
+}
 
 function addStyles(){
   if(document.getElementById('shuaEnhancementStyles'))return;
@@ -252,28 +260,21 @@ function upgradeFallbackFaces(){
       name=el.closest('.espn-player')?.querySelector('.espn-name-btn')?.textContent?.trim()||'';
     }
     if(!name)return;
-    let src=historicalHeadshots?.[norm(name)]||'';
-    if(!src){
-      try{
-        if(typeof playerPhotoId==='function'){
-          const row=el.closest('.espn-player');
-          const team=row?.querySelector('.espn-player-meta span')?.textContent?.trim()||'';
-          const sid=playerPhotoId(name,team,'');
-          if(sid)src='https://sleepercdn.com/content/nfl/players/thumb/'+sid+'.jpg';
-        }
-      }catch(e){}
-    }
-    if(!src)return;
+    const candidates=headshotUrls(historicalHeadshots?.[norm(name)]);
+    if(!candidates.length)return;
     const img=document.createElement('img');
     img.className=el.classList.contains('espn-headshot-fallback')?'espn-headshot':[...el.classList].filter(x=>x!=='fallback').join(' ');
-    img.src=src;
+    img.src=candidates[0];
     img.alt=name;
     img.loading='lazy';
-    img.onerror=()=>{if(img.isConnected)img.replaceWith(el)};
+    img.dataset.faceUrls=candidates.map(encodeURIComponent).join('|');
+    img.dataset.faceIndex='0';
+    img.dataset.faceInitials=String(name).split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase()||'?';
+    img.dataset.faceFallbackClass=el.classList.contains('espn-headshot-fallback')?'espn-headshot espn-headshot-fallback':([...el.classList].join(' '));
+    img.onerror=()=>window.ShuaAdvanceFace?window.ShuaAdvanceFace(img):null;
     el.replaceWith(img);
   });
 }
-
 function decorateTeamLogos(){
   document.querySelectorAll('#rows tr:not(.tag-group)').forEach(tr=>{
     const tds=tr.querySelectorAll('td');if(tds.length<4)return;

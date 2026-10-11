@@ -122,14 +122,14 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .phone-mode .espn-stat-select{width:100%;height:38px;font-size:.72rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
-.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 150px;gap:8px;align-items:center}
+.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 180px;gap:8px;align-items:center}
 .espn-live-head{padding:8px 10px;color:var(--m);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#07182a}
 .espn-sort-head{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:900;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;width:100%;text-align:right}
 .espn-sort-head:hover{color:#fff}
 .espn-sort-head .sort-arrow{font-size:.68rem;color:#7fb6e5}
-.espn-column-stat-select{width:100%;min-width:0;height:30px;border:1px solid #ffffff1f;border-radius:6px;background:#081a2d;color:#dbeafe;padding:0 24px 0 7px;font-size:.6rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap}
+.espn-column-stat-select{width:100%;min-width:0;height:32px;border:1px solid #ffffff1f;border-radius:6px;background:#081a2d;color:#dbeafe;padding:0 26px 0 8px;font-size:.64rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap}
 .espn-column-stat-select:focus{border-color:#6aaee5}
-.phone-mode .espn-column-stat-select{height:32px;font-size:.58rem;padding-left:5px;padding-right:20px}
+.phone-mode .espn-column-stat-select{height:34px;font-size:.58rem;padding-left:5px;padding-right:20px}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}.espn-headshot-fallback{display:flex;align-items:center;justify-content:center;color:#dbeafe;font-size:.68rem;font-weight:950}
@@ -271,7 +271,7 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 
 @media(max-width:700px){
   .phone-mode.stats-mode .espn-live-toolbar{padding-right:58px!important}
-  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 126px;gap:5px}
+  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 148px;gap:5px}
   .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
@@ -362,7 +362,6 @@ section.innerHTML=`
         </label>
       </div>
     </div>
-    <div id="espnLiveSource" class="espn-live-source">ESPN 2026 full-PPR stats · choose a position, then rank players by any relevant stat</div>
     <div class="espn-live-card">
       <div class="espn-live-head">
         <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div><button type="button" id="espnPointsHead" class="espn-sort-head" data-sort-stat="points">PPR Pts <span class="sort-arrow"></span></button></div><div><select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Choose right column stat"></select></div>
@@ -1471,9 +1470,7 @@ function hydrateStatsCache(year){
 }
 function updateStatsLabels(){
   const sub=document.getElementById('sub');
-  const src=document.getElementById('espnLiveSource');
-  if(sub)sub.textContent=statsSeason+' ESPN full-PPR scoring leaders — filter by position and rank by stat';
-  if(src)src.textContent=(statsSeason<=2017?'ESPN '+statsSeason+' full-PPR stats · local historical data fills missing rows':'ESPN '+statsSeason+' full-PPR stats')+' · choose a position, then use the Rank by dropdown';
+  if(sub)sub.textContent=statsSeason+' full-PPR scoring leaders';
 }
 async function loadStatsSeason(year,{force=false}={}){
   year=Number(year)||SEASON;

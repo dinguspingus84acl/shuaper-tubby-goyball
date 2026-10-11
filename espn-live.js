@@ -118,11 +118,23 @@ style.textContent=`
 .espn-game-log-tab.active{background:#183d63;color:#fff;border-color:#ffffff35}
 .espn-game-log-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 8px}
 .espn-game-log-table-wrap{overflow-x:auto}
-.espn-game-log-table{width:100%;border-collapse:collapse;font-size:.62rem}
-.espn-game-log-table th,.espn-game-log-table td{padding:7px 8px;border-top:1px solid #ffffff10;text-align:left}
-.espn-game-log-table th{color:#7f93aa;font-size:.56rem;text-transform:uppercase;letter-spacing:.05em}
-.espn-game-log-table .gl-pts{text-align:right;font-weight:950}
-.espn-game-log-table .gl-stat{color:#b8c7d6}
+.espn-game-log-table{
+  width:auto;min-width:540px;max-width:100%;border-collapse:collapse;
+  font-size:.76rem;font-variant-numeric:tabular-nums
+}
+.espn-game-log-table th,.espn-game-log-table td{
+  padding:8px 5px;border-top:1px solid #ffffff10;text-align:center;line-height:1.15
+}
+.espn-game-log-table th{
+  color:#7f93aa;font-size:.59rem;text-transform:uppercase;letter-spacing:.035em;font-weight:900
+}
+.espn-game-log-table td{font-weight:850;color:#d4dfeb}
+.espn-game-log-table th:first-child,.espn-game-log-table td:first-child{width:38px;text-align:center}
+.espn-game-log-table th:nth-child(2),.espn-game-log-table td:nth-child(2){width:52px;text-align:left}
+.espn-game-log-table .gl-pts{text-align:center;font-weight:1000;color:#fff}
+.espn-game-log-table .gl-stat{text-align:center;color:#d2deea;font-weight:900}
+.espn-game-log-table .gl-col-turnovers{min-width:58px}
+.espn-game-log-table tbody tr{height:34px}
 .espn-game-log-empty{padding:12px 4px;color:#7f93aa;font-size:.62rem}
 .espn-team-logo{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
 .espn-pos{font-weight:900}
@@ -146,13 +158,28 @@ style.textContent=`
   .espn-stat-filters{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.espn-stat-filters::-webkit-scrollbar{display:none}
   .espn-stat-btn{flex:0 0 auto}
   .espn-game-log-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .espn-game-log-table{display:table!important;width:max-content!important;min-width:100%!important;border-collapse:collapse!important}
+  .espn-game-log-table{
+    display:table!important;width:100%!important;min-width:0!important;max-width:none!important;
+    table-layout:fixed!important;border-collapse:collapse!important;font-size:.82rem!important
+  }
   .espn-game-log-table thead{display:table-header-group!important}
   .espn-game-log-table tbody{display:table-row-group!important}
-  .espn-game-log-table tr{display:table-row!important;border:0!important}
-  .espn-game-log-table th,.espn-game-log-table td{display:table-cell!important;white-space:nowrap!important;padding:7px 8px!important;border-top:1px solid #ffffff10!important}
-  .espn-game-log-table th:first-child,.espn-game-log-table td:first-child{position:sticky;left:0;z-index:2;background:#061522}
-  .espn-game-log-table th:nth-child(2),.espn-game-log-table td:nth-child(2){min-width:58px}
+  .espn-game-log-table tr{display:table-row!important;border:0!important;height:36px!important}
+  .espn-game-log-table th,.espn-game-log-table td{
+    display:table-cell!important;white-space:nowrap!important;
+    padding:8px 3px!important;border-top:1px solid #ffffff10!important;
+    text-align:center!important
+  }
+  .espn-game-log-table th{font-size:.58rem!important;letter-spacing:.02em!important}
+  .espn-game-log-table td{font-size:.82rem!important;font-weight:900!important}
+  .espn-game-log-table .gl-pts{font-size:.88rem!important;font-weight:1000!important;color:#fff!important}
+  .espn-game-log-table th:first-child,.espn-game-log-table td:first-child{
+    width:34px!important;position:sticky;left:0;z-index:2;background:#061522
+  }
+  .espn-game-log-table th:nth-child(2),.espn-game-log-table td:nth-child(2){
+    width:48px!important;text-align:left!important
+  }
+  .espn-game-log-table .gl-col-turnovers{width:58px!important}
   .espn-game-log-tabs{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:6px}
   .espn-game-log-tab{flex:0 0 auto}
   .espn-game-log-year-row{justify-content:flex-start}
@@ -556,10 +583,10 @@ function historicalGameLogHtml(player,career,year){
   const cols=gameLogColumns(mode,seasonRow.position);
   return title+yearSelect+tabs+
     '<div class="espn-game-log-table-wrap"><table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th>'+
-    cols.map(col=>'<th class="'+(col.key==='pts'?'gl-pts':'')+'">'+col.label+'</th>').join('')+
+    cols.map(col=>'<th class="'+(col.key==='pts'?'gl-pts ':'')+'gl-col-'+col.key+'">'+col.label+'</th>').join('')+
     '</tr></thead><tbody>'+
     games.map(g=>'<tr><td>'+g.week+'</td><td>'+g.opponent+'</td>'+
-      cols.map(col=>'<td class="'+(col.key==='pts'?'gl-pts':'gl-stat')+'">'+gameLogCell(g,col.key,mode,seasonRow.position)+'</td>').join('')+
+      cols.map(col=>'<td class="'+(col.key==='pts'?'gl-pts ':'gl-stat ')+'gl-col-'+col.key+'">'+gameLogCell(g,col.key,mode,seasonRow.position)+'</td>').join('')+
     '</tr>').join('')+
     '</tbody></table></div>';
 }
@@ -915,10 +942,10 @@ function gameLogHtml(player,opts={}){
   const cols=gameLogColumns(mode,player.position);
   return title+yearSelect+tabs+
     '<div class="espn-game-log-table-wrap"><table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th>'+
-    cols.map(c=>'<th class="'+(c.key==='pts'?'gl-pts':'')+'">'+c.label+'</th>').join('')+
+    cols.map(c=>'<th class="'+(c.key==='pts'?'gl-pts ':'')+'gl-col-'+c.key+'">'+c.label+'</th>').join('')+
     '</tr></thead><tbody>'+
     cached.rows.map(g=>'<tr class="'+(!g.hasStats?'gl-unplayed':'')+'"><td>'+g.week+'</td><td>'+g.opponent+'</td>'+
-      cols.map(c=>'<td class="'+(c.key==='pts'?'gl-pts':'gl-stat')+'">'+gameLogCell(g,c.key,mode,player.position)+'</td>').join('')+
+      cols.map(c=>'<td class="'+(c.key==='pts'?'gl-pts ':'gl-stat ')+'gl-col-'+c.key+'">'+gameLogCell(g,c.key,mode,player.position)+'</td>').join('')+
     '</tr>').join('')+
     '</tbody></table></div>';
 }

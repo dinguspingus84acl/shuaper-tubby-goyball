@@ -201,6 +201,104 @@ style.textContent=`
   .featured-player-profile .unified-profile-tabs{margin-top:0;padding:4px;gap:3px}
   .featured-player-profile .unified-profile-tab{padding:5px 2px;font-size:.5rem}
 }
+/* Phone Mode: full-screen player sheet with swipe-down dismissal */
+.phone-mode #modal.modal.open{
+  display:block!important;
+  padding:0!important;
+  background:#02060d!important;
+  overflow:hidden!important
+}
+.phone-mode #modal .profile.featured-player-profile{
+  width:100vw!important;
+  max-width:none!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  max-height:100dvh!important;
+  margin:0!important;
+  padding:calc(env(safe-area-inset-top) + 10px) 0 env(safe-area-inset-bottom)!important;
+  border-radius:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  background:#06111f!important;
+  box-shadow:none!important;
+  touch-action:pan-y;
+  will-change:transform
+}
+.phone-mode #modal .profile.featured-player-profile::-webkit-scrollbar{display:none}
+.phone-mode .featured-player-profile .closem{display:none!important}
+.phone-mode .featured-player-profile:before{
+  content:"";display:block;position:absolute;z-index:30;
+  top:calc(env(safe-area-inset-top) + 5px);left:50%;transform:translateX(-50%);
+  width:42px;height:5px;border-radius:999px;background:#ffffff58;
+  pointer-events:none
+}
+.phone-mode .featured-player-profile #featuredPlayerCard{
+  width:calc(100% - 16px);height:278px;margin:10px 8px 0;
+  grid-template-columns:38% 62%;border-radius:15px 15px 0 0
+}
+.phone-mode .featured-player-card .featured-portrait-box{
+  left:8px;right:8px;top:8px;bottom:67px;border-radius:11px
+}
+.phone-mode .featured-player-card .featured-photo{
+  height:122%!important;max-width:158%!important;bottom:-14px
+}
+.phone-mode .featured-player-card .featured-bg-logo{
+  width:122%;height:122%;left:-20%;top:-12%;opacity:.42
+}
+.phone-mode .featured-player-card .featured-team-strip{
+  left:8px;right:8px;bottom:6px;height:54px;
+  grid-template-columns:38px 1px minmax(0,1fr);gap:9px;padding:0 8px;border-radius:9px
+}
+.phone-mode .featured-player-card .featured-mini-logo{width:36px;height:36px}
+.phone-mode .featured-player-card .featured-divider{height:35px}
+.phone-mode .featured-player-card .featured-team-name{font-size:.94rem}
+.phone-mode .featured-player-card .featured-team-meta{font-size:.6rem;margin-top:6px}
+.phone-mode .featured-player-card .featured-right{padding:28px 15px 20px}
+.phone-mode .featured-player-card .featured-name{margin-bottom:17px;padding-right:0}
+.phone-mode .featured-player-card .featured-first{font-size:1.25rem}
+.phone-mode .featured-player-card .featured-last-row{gap:7px;margin-top:5px}
+.phone-mode .featured-player-card .featured-last{font-size:1.92rem}
+.phone-mode .featured-player-card .featured-jersey-number{font-size:.92rem;padding-bottom:2px}
+.phone-mode .featured-player-card.featured-name-long .featured-last{font-size:1.58rem}
+.phone-mode .featured-player-card.featured-name-xlong .featured-last{font-size:1.32rem}
+.phone-mode .featured-player-card .featured-bio{
+  grid-template-columns:repeat(2,minmax(0,1fr));gap:7px
+}
+.phone-mode .featured-player-card .featured-bio-item{padding:9px 5px;border-radius:9px}
+.phone-mode .featured-player-card .featured-bio-label{font-size:.49rem}
+.phone-mode .featured-player-card .featured-bio-value{font-size:.9rem;margin-top:4px}
+.phone-mode .featured-player-profile .unified-profile-tabs{
+  position:sticky;top:0;z-index:20;
+  width:calc(100% - 16px);margin:0 8px!important;padding:5px!important;
+  border-radius:0 0 11px 11px!important;
+  box-shadow:0 8px 18px #0007
+}
+.phone-mode .featured-player-profile .unified-profile-tab{
+  min-height:36px!important;padding:7px 2px!important;font-size:.54rem!important
+}
+.phone-mode .featured-player-profile #unifiedProfilePanels{
+  min-height:calc(100dvh - 342px);
+  padding:10px 10px max(18px,env(safe-area-inset-bottom))
+}
+.phone-mode .featured-player-profile .unified-profile-panel{padding-top:6px}
+.phone-mode .featured-player-profile #unifiedOverviewPanel #stats{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important
+}
+.phone-mode .featured-player-profile #unifiedOverviewPanel #stats .stat{
+  min-height:82px!important;padding:11px!important
+}
+.phone-mode .featured-player-profile .unified-stat-grid{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;overflow:visible!important
+}
+.phone-mode .featured-player-profile .unified-stat-item{
+  min-height:64px!important;display:flex;flex-direction:column;justify-content:center
+}
+
 @media(max-width:700px){
   .unified-profile-tabs{gap:4px;padding-bottom:6px}
   .unified-profile-tab{padding:7px 8px;font-size:.58rem}
@@ -617,8 +715,101 @@ async function loadGameLog(name){
     panel.innerHTML='<div class="unified-profile-loading">Game log is unavailable right now.</div>';
   }
 }
+function isPhoneProfileSheet(){
+  const modal=document.getElementById('modal');
+  const profile=modal?.querySelector('.profile');
+  return !!(document.body.classList.contains('phone-mode')&&modal?.classList.contains('open')&&profile?.classList.contains('featured-player-profile'));
+}
+function resetPhoneProfileSheet(){
+  const modal=document.getElementById('modal');
+  const profile=modal?.querySelector('.profile');
+  if(profile){
+    profile.style.transition='';
+    profile.style.transform='';
+    profile.style.opacity='';
+  }
+  if(modal)modal.style.background='';
+}
+function dismissPhoneProfile(){
+  const modal=document.getElementById('modal');
+  if(!modal)return;
+  try{
+    if(typeof closeProfile==='function'){closeProfile();resetPhoneProfileSheet();return}
+  }catch(e){}
+  modal.classList.remove('open');
+  modal.removeAttribute('data-id');
+  document.body.style.overflow='';
+  resetPhoneProfileSheet();
+}
+function installPhoneSwipeDismiss(){
+  const profile=document.querySelector('#modal .profile');
+  if(!profile||profile.dataset.phoneSwipeDismiss==='1')return;
+  profile.dataset.phoneSwipeDismiss='1';
+
+  let tracking=false,dragging=false,startY=0,startX=0,lastY=0,startTime=0,suppressClickUntil=0;
+
+  const cancel=()=>{
+    tracking=false;dragging=false;
+    profile.style.transition='transform .18s ease-out, opacity .18s ease-out';
+    profile.style.transform='';
+    profile.style.opacity='';
+    const modal=document.getElementById('modal');
+    if(modal)modal.style.background='';
+    setTimeout(()=>{if(profile.isConnected)profile.style.transition=''},190);
+  };
+
+  profile.addEventListener('touchstart',e=>{
+    if(!isPhoneProfileSheet()||e.touches.length!==1||profile.scrollTop>1)return;
+    const t=e.touches[0];
+    tracking=true;dragging=false;startY=t.clientY;lastY=t.clientY;startX=t.clientX;startTime=performance.now();
+  },{passive:true});
+
+  profile.addEventListener('touchmove',e=>{
+    if(!tracking||e.touches.length!==1)return;
+    const t=e.touches[0],dy=t.clientY-startY,dx=t.clientX-startX;
+    lastY=t.clientY;
+    if(dy<=0){if(dragging)e.preventDefault();return}
+    if(!dragging){
+      if(dy<8)return;
+      if(dy<Math.abs(dx)*1.15){tracking=false;return}
+      dragging=true;
+    }
+    e.preventDefault();
+    const pull=Math.min(220,dy*.66);
+    const progress=Math.min(1,pull/220);
+    profile.style.transition='none';
+    profile.style.transform='translateY('+pull+'px)';
+    profile.style.opacity=String(1-progress*.18);
+    const modal=document.getElementById('modal');
+    if(modal)modal.style.background='rgba(2,6,13,'+(1-progress*.72)+')';
+  },{passive:false});
+
+  profile.addEventListener('touchend',()=>{
+    if(!tracking){cancel();return}
+    const dy=lastY-startY;
+    const elapsed=Math.max(1,performance.now()-startTime);
+    const velocity=dy/elapsed;
+    tracking=false;
+    if(dragging&&(dy>=105||(dy>=58&&velocity>=.48))){
+      suppressClickUntil=Date.now()+400;
+      profile.style.transition='transform .18s ease-in, opacity .18s ease-in';
+      profile.style.transform='translateY(105dvh)';
+      profile.style.opacity='.82';
+      setTimeout(dismissPhoneProfile,180);
+    }else cancel();
+    dragging=false;
+  },{passive:true});
+
+  profile.addEventListener('touchcancel',cancel,{passive:true});
+  profile.addEventListener('click',e=>{
+    if(Date.now()<suppressClickUntil){e.preventDefault();e.stopPropagation()}
+  },true);
+}
+
 function prepareUnified(name,seed=null){
   ensureUi();
+  resetPhoneProfileSheet();
+  installPhoneSwipeDismiss();
   activeSeed=seed?{...seed,__historical:!!(seed.source==='nflverse'||seed.seasonYear||seed.year)}:null;
   const modal=document.getElementById('modal');
   modal.dataset.unifiedName=name;

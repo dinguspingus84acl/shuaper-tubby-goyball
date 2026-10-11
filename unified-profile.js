@@ -22,6 +22,13 @@ const TEAM_NAMES={
   TEN:'TITANS',WAS:'COMMANDERS',WSH:'COMMANDERS'
 };
 const TEAM_CANON={GNB:'GB',KAN:'KC',LVR:'LV',NWE:'NE',NOR:'NO',SFO:'SF',TAM:'TB',WSH:'WAS',JAC:'JAX',OAK:'LV',STL:'LAR',SD:'LAC'};
+const TEAM_ACCENTS={
+  ARI:'#97233f',ATL:'#a71930',BAL:'#6a4c93',BUF:'#2f7ed8',CAR:'#0085ca',CHI:'#c83803',CIN:'#fb4f14',CLE:'#ff3c00',
+  DAL:'#3b82c4',DEN:'#fb4f14',DET:'#20a8e0',GB:'#2f6b4f',HOU:'#d71920',IND:'#3567a8',JAX:'#00a5b5',KC:'#e31837',
+  LAC:'#0080c6',LAR:'#3f65a8',LV:'#a5acaf',MIA:'#00a3a8',MIN:'#6b4c9a',NE:'#c60c30',NO:'#d3bc8d',
+  NYG:'#3568b8',NYJ:'#2b7a55',PHI:'#007078',PIT:'#ffb612',SEA:'#3f8ed8',SF:'#c9243f',TB:'#d50a0a',
+  TEN:'#4b92db',WAS:'#7b2638'
+};
 let sleeperBioPromise=null;
 let activeSeed=null;
 
@@ -412,6 +419,7 @@ function applyFeaturedProfile(name,seed=null){
   const hero=document.createElement('section');
   hero.id='featuredPlayerCard';
   hero.className='featured-player-card';
+  hero.style.setProperty('--featured-accent',TEAM_ACCENTS[canonicalTeam(team)]||'#3d8cff');
 
   const historical=!!seedYear(seed);
   const initialMeta='<strong>'+String(player.position||'—')+'</strong> · '+canonicalTeam(team)+(historical?' · '+seedYear(seed):'');

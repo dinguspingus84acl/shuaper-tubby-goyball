@@ -865,10 +865,11 @@ async function loadStatsSeason(year,{force=false}={}){
   const button=document.getElementById('espnRefresh');
   if(button){button.disabled=true;button.textContent='Loading…'}
   try{
-    const fresh=year===SEASON?await ensureCurrentRows():await fetchEspn(year);
+    const fresh=year===SEASON?(force?await fetchEspn(SEASON):await ensureCurrentRows()):await fetchEspn(year);
     if(statsSeason!==year)return statsRows;
     statsRows=[...fresh];
     statsLastUpdated=new Date();
+    if(year===SEASON){rows=[...fresh];lastUpdated=statsLastUpdated}
     try{
       localStorage.setItem(year===SEASON?currentCacheKey():statsCacheKey(year),JSON.stringify({ts:statsLastUpdated.getTime(),rows:statsRows}));
     }catch(e){}

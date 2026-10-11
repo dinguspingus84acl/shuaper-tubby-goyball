@@ -13,8 +13,11 @@ try{
   page.on('console',m=>{if(m.type()==='error')errors.push('CONSOLE '+m.text())});
 
   await page.goto('http://127.0.0.1:4173',{waitUntil:'domcontentloaded',timeout:60000});
-  await page.waitForSelector('.espn-live-btn',{timeout:30000});
-  await page.click('.espn-live-btn');
+  await page.waitForSelector('#phoneMenuButton',{state:'visible',timeout:30000});
+  await page.click('#phoneMenuButton');
+  await page.waitForSelector('#phoneMenuItems button',{timeout:30000});
+  const statsMenu=page.locator('#phoneMenuItems button').filter({hasText:'Stats'}).first();
+  await statsMenu.click();
   await page.waitForSelector('#espnStatsYear',{timeout:30000});
   await page.selectOption('#espnStatsYear','2016');
   await page.waitForFunction(()=>document.querySelectorAll('#espnLiveRows .espn-live-row').length>10,{timeout:120000});

@@ -445,7 +445,10 @@ async function discoverGameLogYears(player){
 async function fetchGameLog(player,year=SEASON){
   const cacheKey=gameLogCacheKey(player,year);
   const cached=gameLogCache.get(cacheKey);
-  if(cached&&Date.now()-cached.ts<REFRESH_MS)return cached.rows;
+  const ttl=year===SEASON?REFRESH_MS:86400000;
+  if(cached&&Date.now()-cached.ts<ttl)return cached.rows;
+
+  const schedulePromise=fetchProSchedule(year);
   const filter=JSON.stringify({players:{
     filterIds:{value:[Number(player.id)]},
     filterStatsForSourceIds:{value:[0]},
@@ -460,15 +463,18 @@ async function fetchGameLog(player,year=SEASON){
   let list=null,lastError=null;
   for(const url of candidates){
     try{
-      const r=await fetch(url,{cache:'no-store',mode:'cors',headers:{'Accept':'application/json','X-Fantasy-Filter':filter,'X-Fantasy-Source':'kona'}});
+      const r=await fetch(url,{cache:year===SEASON?'no-store':'force-cache',mode:'cors',headers:{'Accept':'application/json','X-Fantasy-Filter':filter,'X-Fantasy-Source':'kona'}});
       if(!r.ok)throw new Error('ESPN returned '+r.status);
       const d=await r.json();
       const arr=Array.isArray(d)?d:(d.players||[]);
-      if(arr.length){list=arr;break}
+      const exact=arr.find(x=>String((x?.playerPoolEntry?.player||x?.player||x)?.id||'')===String(player.id));
+      if(exact){list=[exact];break}
+      if(arr.length===1){list=arr;break}
     }catch(e){lastError=e}
   }
   if(!list)throw lastError||new Error('No game log data');
-  await fetchProSchedule(year);
+
+  await schedulePromise;
   const pool=list[0]?.playerPoolEntry||list[0];
   const histPlayer=pool?.player||list[0]?.player||pool;
   const historicalTeamId=Number(histPlayer?.proTeamId)||player.proTeamId;
@@ -484,24 +490,34 @@ async function fetchGameLog(player,year=SEASON){
     const prevSize=Object.keys(prev?.stats||{}).length;
     if(!prev||size>prevSize)byWeek.set(week,s);
   });
-  const log=[...byWeek.entries()].sort((a,b)=>a[0]-b[0]).map(([week,s])=>({
+
+  const makeRow=(week,s)=>({
     week,
     opponent:opponentLabel(historicalTeamId,week,year),
-    totalPoints:Number.isFinite(Number(s.appliedTotal))?Number(s.appliedTotal):0,
-    passAtt:rawStat(s,0),
-    completions:rawStat(s,1),
-    passYds:rawStat(s,3),
-    passTD:rawStat(s,4),
-    interceptions:rawStat(s,20),
-    rushAtt:rawStat(s,23),
-    rushYds:rawStat(s,24),
-    rushTD:rawStat(s,25),
-    recYds:rawStat(s,42),
-    recTD:rawStat(s,43),
-    receptions:rawStat(s,53),
-    targets:rawStat(s,58),
-    fumblesLost:rawStat(s,72)
-  }));
+    hasStats:!!s,
+    totalPoints:s&&Number.isFinite(Number(s.appliedTotal))?Number(s.appliedTotal):null,
+    passAtt:s?rawStat(s,0):null,
+    completions:s?rawStat(s,1):null,
+    passYds:s?rawStat(s,3):null,
+    passTD:s?rawStat(s,4):null,
+    interceptions:s?rawStat(s,20):null,
+    rushAtt:s?rawStat(s,23):null,
+    rushYds:s?rawStat(s,24):null,
+    rushTD:s?rawStat(s,25):null,
+    recYds:s?rawStat(s,42):null,
+    recTD:s?rawStat(s,43):null,
+    receptions:s?rawStat(s,53):null,
+    targets:s?rawStat(s,58):null,
+    fumblesLost:s?rawStat(s,72):null
+  });
+
+  let log;
+  if(year===SEASON){
+    log=[];
+    for(let week=1;week<=18;week++)log.push(makeRow(week,byWeek.get(week)||null));
+  }else{
+    log=[...byWeek.entries()].sort((a,b)=>a[0]-b[0]).map(([week,s])=>makeRow(week,s));
+  }
   gameLogCache.set(cacheKey,{ts:Date.now(),rows:log});
   return log;
 }
@@ -514,8 +530,7 @@ function defaultGameLogMode(position){
   return position==='QB'?'pass':position==='RB'?'rush':'rec';
 }
 function categoryPoints(g,mode,position){
-  // PTS is the player's total PPR score for that game on every category tab.
-  // The remaining columns are the rushing/receiving/passing breakout.
+  if(!g?.hasStats)return null;
   return Number(g.totalPoints)||0;
 }
 function gameLogColumns(mode,position){
@@ -540,23 +555,28 @@ function gameLogColumns(mode,position){
   ];
 }
 function gameLogCell(g,key,mode,position){
-  if(key==='pts')return categoryPoints(g,mode,position).toFixed(1);
-  if(key==='turnovers')return g.interceptions+'/'+g.fumblesLost;
+  if(!g?.hasStats)return '—';
+  if(key==='pts'){
+    const pts=categoryPoints(g,mode,position);
+    return pts===null?'—':Number(pts).toFixed(1);
+  }
+  if(key==='turnovers')return Number(g.interceptions||0)+'/'+Number(g.fumblesLost||0);
   const v=Number(g[key]||0);
   return Number.isInteger(v)?String(v):v.toFixed(1);
 }
-function gameLogHtml(player){
+function gameLogHtml(player,opts={}){
   const years=availableGameLogYears(player);
-  let year=gameLogYears.get(String(player.id))||SEASON;
-  if(!years.includes(year))year=years[0]||SEASON;
+  let year=Number(opts.year)||gameLogYears.get(String(player.id))||SEASON;
+  if(!opts.year&&!years.includes(year))year=years[0]||SEASON;
   const cacheKey=gameLogCacheKey(player,year);
   const cached=gameLogCache.get(cacheKey);
   const modes=gameLogModesFor(player.position);
   let mode=gameLogModes.get(String(player.id))||defaultGameLogMode(player.position);
   if(!modes.some(x=>x.key===mode))mode=modes[0].key;
-  const yearSelect='<div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" data-gl-year-select>'+
+  const showYearSelect=opts.showYearSelect!==false;
+  const yearSelect=showYearSelect?'<div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" data-gl-year-select>'+
     years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+
-    '</select></div>';
+    '</select></div>':'';
   const tabs='<div class="espn-game-log-tabs">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" data-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
   const title='<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
   if(!cached)return title+yearSelect+tabs+'<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
@@ -567,18 +587,18 @@ function gameLogHtml(player){
     '<div class="espn-game-log-table-wrap"><table class="espn-game-log-table"><thead><tr><th>WK</th><th>OPP</th>'+
     cols.map(c=>'<th class="'+(c.key==='pts'?'gl-pts':'')+'">'+c.label+'</th>').join('')+
     '</tr></thead><tbody>'+
-    cached.rows.map(g=>'<tr><td>'+g.week+'</td><td>'+g.opponent+'</td>'+
+    cached.rows.map(g=>'<tr class="'+(!g.hasStats?'gl-unplayed':'')+'"><td>'+g.week+'</td><td>'+g.opponent+'</td>'+
       cols.map(c=>'<td class="'+(c.key==='pts'?'gl-pts':'gl-stat')+'">'+gameLogCell(g,c.key,mode,player.position)+'</td>').join('')+
     '</tr>').join('')+
     '</tbody></table></div>';
 }
-function bindGameLogModeButtons(panel,player){
+function bindGameLogModeButtons(panel,player,opts={}){
   panel.querySelectorAll('[data-gl-mode]').forEach(btn=>{
     btn.onclick=e=>{
       e.preventDefault();e.stopPropagation();
       gameLogModes.set(String(player.id),btn.dataset.glMode);
-      panel.innerHTML=gameLogHtml(player);
-      bindGameLogModeButtons(panel,player);
+      panel.innerHTML=gameLogHtml(player,opts);
+      bindGameLogModeButtons(panel,player,opts);
     };
   });
   const select=panel.querySelector('[data-gl-year-select]');
@@ -586,16 +606,17 @@ function bindGameLogModeButtons(panel,player){
     select.onchange=async e=>{
       const year=Number(e.target.value);
       gameLogYears.set(String(player.id),year);
-      panel.innerHTML=gameLogHtml(player);
-      bindGameLogModeButtons(panel,player);
+      const nextOpts={...opts,year};
+      panel.innerHTML=gameLogHtml(player,nextOpts);
+      bindGameLogModeButtons(panel,player,nextOpts);
       try{
         await fetchGameLog(player,year);
       }catch(err){
         gameLogCache.set(gameLogCacheKey(player,year),{ts:Date.now(),rows:[],error:true});
       }
       if(gameLogYears.get(String(player.id))===year){
-        panel.innerHTML=gameLogHtml(player);
-        bindGameLogModeButtons(panel,player);
+        panel.innerHTML=gameLogHtml(player,nextOpts);
+        bindGameLogModeButtons(panel,player,nextOpts);
       }
     };
   }
@@ -750,6 +771,18 @@ function setUpdatedLabel(message,error=false){
   el.textContent=message;
   el.classList.toggle('espn-error',!!error);
 }
+function hydrateRowsFromCache(){
+  if(rows.length)return true;
+  try{
+    const cached=JSON.parse(localStorage.getItem('shuaEspnLivePprStats')||localStorage.getItem('shuaEspnLivePpr')||'null');
+    if(cached?.rows?.length){
+      rows=cached.rows;
+      lastUpdated=new Date(cached.ts||Date.now());
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
 async function refresh(){
   if(loading)return;
   loading=true;
@@ -849,6 +882,10 @@ document.addEventListener('click',e=>{
 
 window.ShuaEspnLive={
   async ensureData(){
+    if(!rows.length&&hydrateRowsFromCache()){
+      refresh().catch(()=>{});
+      return rows;
+    }
     if(!rows.length)await refresh();
     return rows;
   },
@@ -888,17 +925,37 @@ window.ShuaEspnLive={
     if(!target)return;
     target.innerHTML='<div class="espn-game-log-empty">Loading game log…</div>';
     try{
-      if(!rows.length)await refresh();
+      await this.ensureData();
       const p=rows.find(x=>norm(x.name)===norm(name));
       if(!p){target.innerHTML='<div class="espn-game-log-empty">No ESPN game log found for this player.</div>';return}
       if(!gameLogYears.has(String(p.id)))gameLogYears.set(String(p.id),SEASON);
-      await discoverGameLogYears(p);
-      const year=gameLogYears.get(String(p.id));
+      const year=gameLogYears.get(String(p.id))||SEASON;
       await fetchGameLog(p,year);
       target.innerHTML=gameLogHtml(p);
       bindGameLogModeButtons(target,p);
+      discoverGameLogYears(p).then(()=>{
+        if(gameLogYears.get(String(p.id))===year){
+          target.innerHTML=gameLogHtml(p);
+          bindGameLogModeButtons(target,p);
+        }
+      }).catch(()=>{});
     }catch(e){
       target.innerHTML='<div class="espn-game-log-empty espn-error">Could not load this game log right now.</div>';
+    }
+  },
+  async renderGameLogYear(name,year,target){
+    if(!target)return;
+    target.innerHTML='<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
+    try{
+      await this.ensureData();
+      const p=rows.find(x=>norm(x.name)===norm(name));
+      if(!p){target.innerHTML='<div class="espn-game-log-empty">No ESPN game log found for this player.</div>';return}
+      await fetchGameLog(p,Number(year));
+      const opts={year:Number(year),showYearSelect:false};
+      target.innerHTML=gameLogHtml(p,opts);
+      bindGameLogModeButtons(target,p,opts);
+    }catch(e){
+      target.innerHTML='<div class="espn-game-log-empty espn-error">Could not load '+year+' game log right now.</div>';
     }
   }
 };

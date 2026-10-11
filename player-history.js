@@ -633,9 +633,18 @@ async function render(name,target){
   if(!target)return;
   target.innerHTML='<div class="player-history-empty">Loading ESPN career finishes…</div>';
   try{
+    if(window.ShuaEspnLive?.getHistoricalCareer){
+      try{
+        const historical=await window.ShuaEspnLive.getHistoricalCareer(name);
+        if(historical?.length){
+          renderRows({name,id:historical[0].id,position:historical[0].position},historical,target);
+          return;
+        }
+      }catch(e){}
+    }
     const player=await resolvePlayer(name);
     if(!player){
-      target.innerHTML='<div class="player-history-empty player-history-error">Could not match this player to ESPN.</div>';
+      target.innerHTML='<div class="player-history-empty player-history-error">Could not match this player to historical or ESPN data.</div>';
       return;
     }
     const cached=readPlayerCache(player);

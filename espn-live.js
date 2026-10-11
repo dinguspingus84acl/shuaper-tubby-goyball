@@ -116,9 +116,18 @@ body.stats-mode .espn-sticky-controls{position:sticky;top:var(--shua-ranking-sti
 body.stats-mode #positionToggle{display:none!important}
 body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-live-filters,.espn-stat-filters{display:flex;gap:6px;flex-wrap:wrap}
-.espn-team-filter-wrap{display:flex;align-items:center;gap:6px;margin-left:auto}
+.espn-team-filter-wrap{position:relative;display:block;margin-left:auto;min-width:150px}
+.espn-team-filter-button{width:100%;height:36px;display:grid;grid-template-columns:24px minmax(0,1fr) 16px;align-items:center;gap:7px;border:1px solid #ffffff25;border-radius:8px;background:#0b2139;color:#fff;padding:0 8px;font-size:.66rem;font-weight:900;text-align:left}
 .espn-team-filter-logo{width:24px;height:24px;object-fit:contain;flex:0 0 24px}
-.espn-team-filter{height:36px;min-width:118px;border:1px solid #ffffff25;border-radius:8px;background:#0b2139;color:#fff;padding:0 28px 0 9px;font-size:.66rem;font-weight:900}
+.espn-team-filter-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.espn-team-filter-chevron{color:#91a4ba;text-align:center}
+.espn-team-filter-menu{position:absolute;right:0;top:calc(100% + 5px);z-index:90;width:190px;max-height:330px;overflow-y:auto;border:1px solid #ffffff25;border-radius:9px;background:#081a2d;box-shadow:0 14px 30px #000a}
+.espn-team-filter-menu[hidden]{display:none!important}
+.espn-team-filter-option{width:100%;min-height:40px;display:grid;grid-template-columns:26px minmax(0,1fr);gap:8px;align-items:center;border:0;border-top:1px solid #ffffff10;background:transparent;color:#fff;padding:7px 10px;text-align:left;font-size:.66rem;font-weight:900}
+.espn-team-filter-option:first-child{border-top:0}
+.espn-team-filter-option:hover,.espn-team-filter-option.active{background:#123554}
+.espn-team-filter-option img{width:24px;height:24px;object-fit:contain}
+.espn-team-filter-option .espn-team-logo-spacer{width:24px;height:24px}
 .espn-filter,.espn-stat-btn,.espn-view-btn,.espn-refresh,.espn-year-select{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 11px;font-weight:900}
 .espn-filter.active,.espn-stat-btn.active,.espn-view-btn.active,.espn-refresh:active{background:#183d63!important;color:#fff!important}.espn-year-select{background:#081a2d;color:#fff;min-width:82px}
 .espn-stat-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 9px;border:1px solid #ffffff16;border-radius:10px;background:#07182a}
@@ -291,7 +300,7 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
   .espn-player-name{font-size:.72rem;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}.espn-player{gap:7px;align-items:flex-start}.espn-name-btn{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.12!important}.espn-player-meta{font-size:.54rem}.espn-player-meta .espn-team-logo{width:14px;height:14px;flex-basis:14px}
   .espn-headshot{width:34px;height:34px;flex-basis:34px}
   .espn-selected-stat{font-size:.72rem}
-  .espn-live-toolbar{display:grid;grid-template-columns:1fr;gap:7px}.espn-live-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}.espn-filter{padding:7px 3px;font-size:.62rem;min-width:0}.espn-team-filter-wrap{width:100%;margin-left:0}.espn-team-filter{flex:1 1 auto;min-height:38px}.espn-live-meta{display:flex;justify-content:flex-end;width:100%;align-items:center}.espn-year-select{min-height:38px;padding:6px 8px}.espn-stat-bar{display:flex!important;align-items:center!important;gap:6px!important;padding:6px 7px!important;flex-wrap:wrap!important}
+  .espn-live-toolbar{display:grid;grid-template-columns:1fr;gap:7px}.espn-live-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}.espn-filter{padding:7px 3px;font-size:.62rem;min-width:0}.espn-team-filter-wrap{width:100%;margin-left:0}.espn-team-filter-button{min-height:38px}.espn-team-filter-menu{left:0;right:0;width:100%;max-height:48vh}.espn-live-meta{display:flex;justify-content:flex-end;width:100%;align-items:center}.espn-year-select{min-height:38px;padding:6px 8px}.espn-stat-bar{display:flex!important;align-items:center!important;gap:6px!important;padding:6px 7px!important;flex-wrap:wrap!important}
   .espn-stat-primary{display:flex!important;align-items:center!important;gap:6px!important;width:100%!important;flex-wrap:nowrap!important}
   .espn-stat-primary>.espn-stat-label{width:auto!important;flex:0 0 auto}
   .espn-stat-primary .espn-year-select{flex:0 0 auto!important;min-width:72px!important;width:72px!important}
@@ -356,7 +365,15 @@ section.innerHTML=`
           <button type="button" class="espn-filter" data-espn-filter="WR">WR</button>
           <button type="button" class="espn-filter" data-espn-filter="TE">TE</button>
         </div>
-        <label class="espn-team-filter-wrap"><img id="espnTeamFilterLogo" class="espn-team-filter-logo" alt="" hidden><select id="espnTeamFilter" class="espn-team-filter" aria-label="Filter Stats by team"><option value="ALL">All Teams</option></select></label>
+        <div class="espn-team-filter-wrap">
+          <button id="espnTeamFilterButton" class="espn-team-filter-button" type="button" aria-haspopup="listbox" aria-expanded="false">
+            <img id="espnTeamFilterLogo" class="espn-team-filter-logo" alt="" hidden>
+            <span id="espnTeamFilterLabel" class="espn-team-filter-label">All Teams</span>
+            <span class="espn-team-filter-chevron">⌄</span>
+          </button>
+          <div id="espnTeamFilterMenu" class="espn-team-filter-menu" role="listbox" hidden></div>
+          <select id="espnTeamFilter" hidden aria-hidden="true" tabindex="-1"><option value="ALL">All Teams</option></select>
+        </div>
       </div>
       <div class="espn-stat-bar">
         <div class="espn-stat-primary">
@@ -1361,22 +1378,39 @@ function openEspnPlayerProfile(player){
 
 function renderTeamFilter(){
   const select=document.getElementById('espnTeamFilter');
+  const button=document.getElementById('espnTeamFilterButton');
+  const menu=document.getElementById('espnTeamFilterMenu');
   const logo=document.getElementById('espnTeamFilterLogo');
-  if(!select)return;
+  const label=document.getElementById('espnTeamFilterLabel');
+  if(!select||!button||!menu)return;
   const teams=[...new Set(statsRows.map(p=>String(p.team||'').toUpperCase()).filter(Boolean).filter(x=>x!=='FA'&&x!=='—'))].sort();
   if(activeTeam!=='ALL'&&!teams.includes(activeTeam))activeTeam='ALL';
   select.innerHTML='<option value="ALL">All Teams</option>'+teams.map(t=>'<option value="'+t+'">'+t+'</option>').join('');
   select.value=activeTeam;
+  label.textContent=activeTeam==='ALL'?'All Teams':activeTeam;
   const slug=TEAM_SLUGS[activeTeam];
   if(logo){
     if(activeTeam!=='ALL'&&slug){logo.src='https://a.espncdn.com/i/teamlogos/nfl/500/'+slug+'.png';logo.alt=activeTeam+' logo';logo.hidden=false}
     else{logo.hidden=true;logo.removeAttribute('src');logo.alt=''}
   }
-  select.onchange=()=>{
-    activeTeam=select.value||'ALL';
+  menu.innerHTML='<button type="button" class="espn-team-filter-option'+(activeTeam==='ALL'?' active':'')+'" data-espn-team="ALL" role="option" aria-selected="'+(activeTeam==='ALL'?'true':'false')+'"><span class="espn-team-logo-spacer"></span><span>All Teams</span></button>'+
+    teams.map(t=>{
+      const s=TEAM_SLUGS[t];
+      return '<button type="button" class="espn-team-filter-option'+(activeTeam===t?' active':'')+'" data-espn-team="'+t+'" role="option" aria-selected="'+(activeTeam===t?'true':'false')+'">'+
+        (s?'<img src="https://a.espncdn.com/i/teamlogos/nfl/500/'+s+'.png" alt="">':'<span class="espn-team-logo-spacer"></span>')+
+        '<span>'+t+'</span></button>';
+    }).join('');
+  menu.querySelectorAll('[data-espn-team]').forEach(opt=>opt.onclick=e=>{
+    e.preventDefault();e.stopPropagation();
+    activeTeam=opt.dataset.espnTeam||'ALL';
     saveStatsUiState();
-    renderTeamFilter();
-    render();
+    menu.hidden=true;button.setAttribute('aria-expanded','false');
+    renderTeamFilter();render();
+  });
+  button.onclick=e=>{
+    e.preventDefault();e.stopPropagation();
+    menu.hidden=!menu.hidden;
+    button.setAttribute('aria-expanded',menu.hidden?'false':'true');
   };
 }
 function renderStatFilters(){
@@ -1622,6 +1656,20 @@ document.getElementById('modal')?.addEventListener('click',e=>{if(e.target===doc
 document.addEventListener('click',e=>{
   const navBtn=e.target.closest('.positions .pos');
   if(navBtn&&navBtn.dataset.pos!=='ESPN')hideEspn();
+  const teamMenu=document.getElementById('espnTeamFilterMenu');
+  const teamButton=document.getElementById('espnTeamFilterButton');
+  if(teamMenu&&!e.target.closest('.espn-team-filter-wrap')){
+    teamMenu.hidden=true;
+    if(teamButton)teamButton.setAttribute('aria-expanded','false');
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    const teamMenu=document.getElementById('espnTeamFilterMenu');
+    const teamButton=document.getElementById('espnTeamFilterButton');
+    if(teamMenu)teamMenu.hidden=true;
+    if(teamButton)teamButton.setAttribute('aria-expanded','false');
+  }
 });
 
 window.ShuaEspnLive={

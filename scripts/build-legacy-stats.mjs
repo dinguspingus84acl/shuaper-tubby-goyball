@@ -78,7 +78,7 @@ async function loadYear(year){
     const name=r.player_display_name||r.player_name;
     if(!name) continue;
     const id=String(r.player_id||`${name}:${position}`);
-    const key=`${id}|${position}`;
+    const key=`${norm(name)}|${position}`;
     let p=byPlayer.get(key);
     if(!p){
       p={
@@ -88,16 +88,28 @@ async function loadYear(year){
         rushAtt:0,rushYds:0,rushTD:0,recYds:0,recTD:0,receptions:0,targets:0,fumblesLost:0,
         source:'nflverse',games:[]
       };
+      p._gameMap=new Map();
       byPlayer.set(key,p);
     }
     p.name=name||p.name;
+    if((!p.id||p.id.includes(':'))&&r.player_id)p.id=String(r.player_id);
     p.team=teamCode(r.team||p.team);
     if(!p.headshot && r.headshot_url) p.headshot=r.headshot_url;
     if(!p.headshot&&HEADSHOT_FALLBACKS[norm(name)])p.headshot=HEADSHOT_FALLBACKS[norm(name)];
     const g=gameRow(r);
     if(g.week>0 && g.week<=18){
-      p.games.push(g);
-      p.points += g.totalPoints;
+      const gameKey=String(r.game_id||g.week);
+      const existing=p._gameMap.get(gameKey);
+      if(!existing){
+        p._gameMap.set(gameKey,g);
+      }else{
+        const merged={...existing};
+        for(const field of ['totalPoints','passAtt','completions','passYds','passTD','interceptions','rushAtt','rushYds','rushTD','recYds','recTD','receptions','targets','fumblesLost']){
+          merged[field]=Number(existing[field]||0)+Number(g[field]||0);
+        }
+        if((!merged.opponent||merged.opponent==='—')&&g.opponent)merged.opponent=g.opponent;
+        p._gameMap.set(gameKey,merged);
+      }
     }
     p.passAtt += n(r.attempts);
     p.completions += n(r.completions);
@@ -114,9 +126,10 @@ async function loadYear(year){
     p.fumblesLost += n(r.sack_fumbles_lost)+n(r.rushing_fumbles_lost)+n(r.receiving_fumbles_lost);
   }
   const rows=[...byPlayer.values()].map(p=>{
-    p.games.sort((a,b)=>a.week-b.week);
+    p.games=[...p._gameMap.values()].sort((a,b)=>a.week-b.week);
+    delete p._gameMap;
     p.gamesPlayed=p.games.length;
-    p.points=Number(p.points.toFixed(2));
+    p.points=Number(p.games.reduce((sum,g)=>sum+Number(g.totalPoints||0),0).toFixed(2));
     p.average=p.gamesPlayed?Number((p.points/p.gamesPlayed).toFixed(3)):null;
     return p;
   }).filter(p=>p.gamesPlayed>0).sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name));
@@ -144,7 +157,7 @@ for(const year of YEARS){
     if(!careerIndex[key].headshot&&p.headshot)careerIndex[key].headshot=p.headshot;
     if(p.headshot)headshotIndex[key]=p.headshot;
     if(!careerIndex[key].years.includes(year))careerIndex[key].years.push(year);
-    careerIndex[key].history.push({
+    const summary={
       year,
       id:p.id,
       name:p.name,
@@ -159,7 +172,11 @@ for(const year of YEARS){
       gamesPlayed:p.gamesPlayed,
       games:p.gamesPlayed,
       source:'nflverse'
-    });
+    };
+    const existingHistory=careerIndex[key].history.findIndex(x=>x.year===year);
+    if(existingHistory>=0){
+      if((careerIndex[key].history[existingHistory].gamesPlayed||0)<p.gamesPlayed)careerIndex[key].history[existingHistory]=summary;
+    }else careerIndex[key].history.push(summary);
   }
   console.log(`${year}: ${rows.length} fantasy players`);
 }

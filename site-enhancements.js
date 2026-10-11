@@ -402,7 +402,8 @@ function updateRankingPlayerNav(){
   const prevBtn=nav.querySelector('[data-ranking-nav="prev"]'),nextBtn=nav.querySelector('[data-ranking-nav="next"]');
   const paint=(btn,item,dir)=>{
     btn.disabled=!item;btn.dataset.targetId=item?.id||'';
-    btn.innerHTML=item?'<span class="ranking-nav-rank">'+(dir==='prev'?'← ':'')+item.rank+(dir==='next'?' →':'')+'</span><span class="ranking-nav-name">'+item.name+'</span>':'<span class="ranking-nav-rank">'+(dir==='prev'?'← Start':'End →')+'</span><span class="ranking-nav-name">No more players</span>';
+    const html=item?'<span class="ranking-nav-rank">'+(dir==='prev'?'← ':'')+item.rank+(dir==='next'?' →':'')+'</span><span class="ranking-nav-name">'+item.name+'</span>':'<span class="ranking-nav-rank">'+(dir==='prev'?'← Start':'End →')+'</span><span class="ranking-nav-name">No more players</span>';
+    if(btn.innerHTML!==html)btn.innerHTML=html;
   };
   paint(prevBtn,prev,'prev');paint(nextBtn,next,'next');
   nav.querySelectorAll('button[data-target-id]').forEach(btn=>btn.onclick=()=>{
@@ -414,7 +415,7 @@ function updateRankingPlayerNav(){
 function installRankingSkeleton(){
   const rows=document.getElementById('rows'),boardEl=document.getElementById('board');
   if(rows&&!rows.children.length)rows.innerHTML=Array.from({length:9},()=>'<tr class="ranking-skeleton-row" aria-hidden="true"><td></td><td></td><td></td><td></td><td></td><td></td></tr>').join('');
-  if(boardEl&&!boardEl.children.length)boardEl.innerHTML=Array.from({length:20},()=>'<div class="ranking-skeleton-pick" aria-hidden="true"></div>').join('');
+  if(boardEl&&!boardEl.children.length){boardEl.style.gridTemplateColumns='repeat(10,minmax(125px,1fr))';boardEl.innerHTML=Array.from({length:20},()=>'<div class="ranking-skeleton-pick" aria-hidden="true"></div>').join('')}
 }
 function installRankingPolish(){
   updateRankingStickyOffset();

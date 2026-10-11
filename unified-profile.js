@@ -241,7 +241,9 @@ async function loadGameLog(name){
   panel.dataset.ready='0';
   panel.innerHTML='<div class="unified-profile-loading">Loading game log…</div>';
   if(window.ShuaEspnLive?.renderGameLog){
-    await window.ShuaEspnLive.renderGameLog(name,panel);
+    const yr=seedYear(activeSeed);
+    if(yr&&window.ShuaEspnLive?.renderGameLogYear)await window.ShuaEspnLive.renderGameLogYear(name,yr,panel);
+    else await window.ShuaEspnLive.renderGameLog(name,panel);
     panel.dataset.ready='1';
   }else{
     panel.innerHTML='<div class="unified-profile-loading">Game log is unavailable right now.</div>';

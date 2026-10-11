@@ -879,7 +879,7 @@ function installPhoneSwipeDismiss(){
     if(!isPhoneProfileSheet()||e.touches.length!==1)return;
     const t=e.touches[0];
     tracking=true;mode='';startY=lastY=t.clientY;startX=lastX=t.clientX;startTime=performance.now();
-    horizontalAllowed=!!e.target.closest('#featuredPlayerCard');
+    horizontalAllowed=!e.target.closest('button,input,select,textarea,a,.unified-profile-tabs,.espn-stat-filters,.espn-game-log-tabs,.espn-game-log-table-wrap,.espn-live-filters,.espn-live-meta');
   },{passive:true});
 
   profile.addEventListener('touchmove',e=>{

@@ -66,7 +66,8 @@ let statsLastUpdated=null;
 let activeFilter='ALL';
 let activeStat='points';
 let statView='TOTAL';
-const STATS_UI_STATE_KEY='shuaEspnStatsUiStateV2';
+let sortDirection='DESC';
+const STATS_UI_STATE_KEY='shuaEspnStatsUiStateV3';
 try{
   const saved=JSON.parse(localStorage.getItem(STATS_UI_STATE_KEY)||'null');
   if(saved){
@@ -74,10 +75,11 @@ try{
     if(['ALL','QB','RB','WR','TE'].includes(saved.activeFilter))activeFilter=saved.activeFilter;
     if(typeof saved.activeStat==='string'&&saved.activeStat)activeStat=saved.activeStat;
     if(['TOTAL','PERGAME'].includes(saved.statView))statView=saved.statView;
+    if(['ASC','DESC'].includes(saved.sortDirection))sortDirection=saved.sortDirection;
   }
 }catch(e){}
 function saveStatsUiState(){
-  try{localStorage.setItem(STATS_UI_STATE_KEY,JSON.stringify({statsSeason,activeFilter,activeStat,statView}))}catch(e){}
+  try{localStorage.setItem(STATS_UI_STATE_KEY,JSON.stringify({statsSeason,activeFilter,activeStat,statView,sortDirection}))}catch(e){}
 }
 function syncStatsControls(){
   document.querySelectorAll('[data-espn-filter]').forEach(x=>x.classList.toggle('active',x.dataset.espnFilter===activeFilter));
@@ -114,6 +116,11 @@ style.textContent=`
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
 .espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 92px;gap:8px;align-items:center}
 .espn-live-head{padding:8px 10px;color:var(--m);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#07182a}
+.espn-sort-head{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:900;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;width:100%;text-align:right}
+.espn-sort-head:hover{color:#fff}
+.espn-sort-head .sort-arrow{font-size:.68rem;color:#7fb6e5}
+.espn-sort-head.active{color:#fff}
+.phone-mode .espn-sort-head{pointer-events:none}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}.espn-headshot-fallback{display:flex;align-items:center;justify-content:center;color:#dbeafe;font-size:.68rem;font-weight:950}
@@ -341,7 +348,7 @@ section.innerHTML=`
     <div id="espnLiveSource" class="espn-live-source">ESPN 2026 full-PPR stats · choose a position, then rank players by any relevant stat</div>
     <div class="espn-live-card">
       <div class="espn-live-head">
-        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div id="espnPointsHead" style="text-align:right">PPR Pts</div><div id="espnSelectedStatHead" style="text-align:right">PPR Pts</div>
+        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div><button type="button" id="espnPointsHead" class="espn-sort-head" data-sort-stat="points">PPR Pts <span class="sort-arrow"></span></button></div><div><button type="button" id="espnSelectedStatHead" class="espn-sort-head active" data-sort-stat="selected">PPR Pts <span class="sort-arrow">▼</span></button></div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open Stats to load rankings.</div></div>
     </div>
@@ -790,7 +797,28 @@ function formatStat(p,key){
 }
 function rankRows(list,filter){
   const filtered=filter==='ALL'?list:list.filter(p=>p.position===filter);
-  return [...filtered].sort((a,b)=>statValue(b,activeStat)-statValue(a,activeStat)||b.points-a.points||a.name.localeCompare(b.name));
+  const dir=sortDirection==='ASC'?1:-1;
+  return [...filtered].sort((a,b)=>{
+    const delta=statValue(a,activeStat)-statValue(b,activeStat);
+    if(delta!==0)return delta*dir;
+    const pts=(Number(a.points)||0)-(Number(b.points)||0);
+    if(pts!==0)return pts*dir;
+    return a.name.localeCompare(b.name);
+  });
+}
+function updateSortHeaders(){
+  const points=document.getElementById('espnPointsHead');
+  const selected=document.getElementById('espnSelectedStatHead');
+  [points,selected].forEach(x=>{if(!x)return;x.classList.remove('active');const a=x.querySelector('.sort-arrow');if(a)a.textContent=''});
+  const target=activeStat==='points'?points:selected;
+  if(target){target.classList.add('active');const a=target.querySelector('.sort-arrow');if(a)a.textContent=sortDirection==='ASC'?'▲':'▼'}
+}
+function sortFromHeader(key){
+  if(document.body.classList.contains('phone-mode'))return;
+  const next=key==='points'?'points':activeStat;
+  if(activeStat===next)sortDirection=sortDirection==='DESC'?'ASC':'DESC';
+  else{activeStat=next;sortDirection='DESC'}
+  saveStatsUiState();renderStatFilters();render();updateSortHeaders();
 }
 function statsSummary(p){
   if(p.position==='QB'){
@@ -1293,15 +1321,17 @@ function renderStatFilters(){
   box.querySelectorAll('[data-espn-stat]').forEach(b=>{
     b.onclick=()=>{
       activeStat=b.dataset.espnStat;
+      sortDirection='DESC';
       saveStatsUiState();
       renderStatFilters();
       render();
     };
   });
   const head=document.getElementById('espnSelectedStatHead');
-  if(head)head.textContent=displayStatLabel(activeStat);
+  if(head){const label=displayStatLabel(activeStat);head.childNodes[0].nodeValue=label+' '}
   const pointsHead=document.getElementById('espnPointsHead');
-  if(pointsHead)pointsHead.textContent=statView==='PERGAME'?'PPR/G':'PPR Pts';
+  if(pointsHead)pointsHead.childNodes[0].nodeValue=(statView==='PERGAME'?'PPR/G':'PPR Pts')+' ';
+  updateSortHeaders();
 }
 function localPlayerId(name){
   try{
@@ -1502,6 +1532,7 @@ document.querySelectorAll('[data-espn-filter]').forEach(b=>{
     activeFilter=b.dataset.espnFilter;
     const cfg=STAT_CONFIG[activeFilter]||STAT_CONFIG.ALL;
     if(!cfg.some(x=>x.key===activeStat))activeStat='points';
+    sortDirection='DESC';
     document.querySelectorAll('[data-espn-filter]').forEach(x=>x.classList.toggle('active',x===b));
     saveStatsUiState();
     renderStatFilters();
@@ -1534,6 +1565,8 @@ if(statsYearSelect){
   };
 }
 syncStatsControls();
+document.getElementById('espnPointsHead')?.addEventListener('click',()=>sortFromHeader('points'));
+document.getElementById('espnSelectedStatHead')?.addEventListener('click',()=>sortFromHeader('selected'));
 document.getElementById('espnRefresh').onclick=refresh;
 document.getElementById('close')?.addEventListener('click',hideProfileGameLog);
 document.getElementById('modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('modal'))hideProfileGameLog()});
@@ -1586,6 +1619,34 @@ window.ShuaEspnLive={
       .sort((a,b)=>b.points-a.points||((b.average??-Infinity)-(a.average??-Infinity))||a.name.localeCompare(b.name));
     const i=ranked.findIndex(x=>String(x.id)===String(p.id));
     return i>=0?i+1:null;
+  },
+  async getComparisonSnapshot(name){
+    await ensureCurrentRows().catch(()=>{});
+    const p=rows.find(x=>nameKey(x.name)===nameKey(name))||statsRows.find(x=>nameKey(x.name)===nameKey(name))||null;
+    if(!p)return {name,position:'—',team:'—',espnRank:null,points:null,ppg:null,recent:[],latestFinish:null,headshot:'',teamLogo:''};
+    const ranked=rows.filter(x=>x.position===p.position)
+      .sort((a,b)=>b.points-a.points||((b.average??-Infinity)-(a.average??-Infinity))||a.name.localeCompare(b.name));
+    const espnRank=ranked.findIndex(x=>String(x.id)===String(p.id))+1||null;
+    let recent=[];
+    try{
+      await fetchGameLog(p,SEASON);
+      const gl=gameLogCache.get(gameLogCacheKey(p,SEASON))?.rows||[];
+      recent=gl.filter(g=>g?.hasStats&&Number.isFinite(Number(g.totalPoints))).slice(-5).map(g=>({week:g.week,points:Number(g.totalPoints),opponent:cleanGameLogOpponent(g.opponent)}));
+    }catch(e){}
+    let latestFinish=null;
+    try{
+      const career=await getCompleteCareer(name);
+      const hist=career.find(x=>Number(x.year)<SEASON&&Number.isFinite(Number(x.rank)));
+      if(hist)latestFinish={year:Number(hist.year),rank:Number(hist.rank),position:hist.position||p.position,ppg:Number.isFinite(Number(hist.ppg??hist.average))?Number(hist.ppg??hist.average):null};
+    }catch(e){}
+    return {
+      id:String(p.id||''),name:p.name,position:p.position,team:p.team,
+      espnRank,points:Number.isFinite(Number(p.points))?Number(p.points):null,
+      ppg:Number.isFinite(Number(p.average))?Number(p.average):null,
+      recent,latestFinish,
+      headshot:playerFaceCandidates(p)[0]||'',
+      teamLogo:historicalTeamLogoUrl(p.team)
+    };
   },
   async renderPlayerStats(name,target){
     if(!target)return;

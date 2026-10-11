@@ -62,14 +62,12 @@ function addStyles(){
     .phone-mode #tableCard tbody tr[data-id].selected-player-row{background:linear-gradient(90deg,rgba(53,208,127,.18),rgba(24,61,99,.12))!important;box-shadow:inset 4px 0 0 var(--g),0 0 0 1px rgba(53,208,127,.2)!important}
 
     /* Desktop row hover */
-    @media(hover:hover) and (pointer:fine){
-      #tableCard tbody tr[data-id]:not(.selected-player-row){cursor:pointer;transition:transform .14s ease,filter .14s ease,box-shadow .14s ease}
-      #tableCard tbody tr[data-id]:not(.selected-player-row):hover{transform:translateY(-1px);filter:brightness(1.16);box-shadow:inset 4px 0 0 #5f8fb8,0 5px 16px rgba(0,0,0,.28)}
-      #tableCard tbody tr[data-id]:not(.selected-player-row):hover td{background:#102943!important}
-      #tableCard tbody tr[data-id]:not(.selected-player-row):hover .rank{color:#fff!important}
-      #tableCard tbody tr[data-id]:not(.selected-player-row):hover .photo{transform:scale(1.09);border-color:#ffffffcc}
-      #tableCard tbody tr[data-id] .photo{transition:transform .14s ease,border-color .14s ease}
-    }
+    body:not(.phone-mode) #tableCard tbody tr[data-id]:not(.selected-player-row){cursor:pointer;transition:transform .14s ease,filter .14s ease,box-shadow .14s ease}
+    body:not(.phone-mode) #tableCard tbody tr[data-id]:not(.selected-player-row):hover{transform:translateY(-1px);filter:brightness(1.16);box-shadow:inset 4px 0 0 #5f8fb8,0 5px 16px rgba(0,0,0,.28)}
+    body:not(.phone-mode) #tableCard tbody tr[data-id]:not(.selected-player-row):hover td{background:#102943!important}
+    body:not(.phone-mode) #tableCard tbody tr[data-id]:not(.selected-player-row):hover .rank{color:#fff!important}
+    body:not(.phone-mode) #tableCard tbody tr[data-id]:not(.selected-player-row):hover .photo{transform:scale(1.09);border-color:#ffffffcc}
+    body:not(.phone-mode) #tableCard tbody tr[data-id] .photo{transition:transform .14s ease,border-color .14s ease}
 
     /* Previous / next ranking navigation inside player cards */
     .ranking-player-nav{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;margin:7px 0;padding:0}
@@ -420,6 +418,11 @@ function installRankingSkeleton(){
 }
 function installRankingPolish(){
   updateRankingStickyOffset();
+  document.addEventListener('pointerdown',e=>{
+    const target=e.target.closest('#rows tr[data-id],#board [data-id]');
+    const modal=document.getElementById('modal');
+    if(target&&!modal?.classList.contains('open'))rankingScrollY=window.scrollY||window.pageYOffset||0;
+  },true);
   window.addEventListener('resize',()=>requestAnimationFrame(updateRankingStickyOffset),{passive:true});
   const bar=document.querySelector('.sticky');
   if(bar&&window.ResizeObserver)new ResizeObserver(()=>updateRankingStickyOffset()).observe(bar);

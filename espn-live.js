@@ -126,9 +126,9 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-sort-head .sort-arrow{font-size:.68rem;color:#7fb6e5}
 .espn-column-stat-select{width:100%;min-width:0;height:32px;border:1px solid #ffffff1f;border-radius:6px;background:#081a2d;color:#dbeafe;padding:0 26px 0 8px;font-size:.64rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap}
 .espn-column-stat-select:focus{border-color:#6aaee5}
-.phone-mode .espn-column-stat-select{height:34px;font-size:.58rem;padding-left:5px;padding-right:20px}
-.phone-mode .espn-rank-by-head{gap:4px}
-.phone-mode .espn-rank-by-head>span{font-size:.5rem}
+.phone-mode .espn-column-stat-select{height:36px;font-size:.54rem;padding-left:5px;padding-right:20px;min-width:0!important;width:100%!important}
+.phone-mode .espn-rank-by-head{gap:4px;min-width:0;width:100%}
+.phone-mode .espn-rank-by-head>span{font-size:.5rem;flex:0 0 auto}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}.espn-headshot-fallback{display:flex;align-items:center;justify-content:center;color:#dbeafe;font-size:.68rem;font-weight:950}
@@ -270,8 +270,8 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 
 @media(max-width:700px){
   .phone-mode.stats-mode .espn-live-toolbar{padding-right:58px!important}
-  .phone-mode.stats-mode .espn-live-head,.phone-mode.stats-mode .espn-live-row{grid-template-columns:34px minmax(0,1fr) 148px!important;gap:5px!important}
-  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 148px;gap:5px}
+  .phone-mode.stats-mode .espn-live-head,.phone-mode.stats-mode .espn-live-row{grid-template-columns:34px minmax(0,1fr) minmax(154px,42vw)!important;gap:5px!important}
+  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) minmax(154px,42vw);gap:5px}
   .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
@@ -813,12 +813,8 @@ function fullStatLabel(key){
     recYds:'Receiving Yards',
     recTD:'Receiving Touchdowns'
   };
-  let label=labels[key]||statLabel(key);
-  if(statView==='PERGAME'&&key!=='average'){
-    if(key==='points')return 'PPR Points Per Game';
-    return label+' Per Game';
-  }
-  return label;
+  if(key==='points'&&statView==='PERGAME')return 'PPR Points Per Game';
+  return labels[key]||statLabel(key);
 }
 function formatStat(p,key){
   const v=statValue(p,key);

@@ -31,6 +31,8 @@ const TEAM_ACCENTS={
 };
 let sleeperBioPromise=null;
 let activeSeed=null;
+let preferredProfileTab=(()=>{try{return sessionStorage.getItem('shuaProfileTab')||'overview'}catch(e){return'overview'}})();
+let swipeHintShownThisSession=false;
 
 const style=document.createElement('style');
 style.id='unifiedProfileStyles';
@@ -67,6 +69,13 @@ style.textContent=`
 .unified-stat-item b{display:block;margin-top:2px;font-size:.76rem}
 .unified-profile-loading{padding:14px 4px;color:#7f93aa;font-size:.66rem}
 #unifiedNotesPanel .note-box{margin-top:0}
+.player-sticky-identity{display:none;position:sticky;top:0;z-index:32;min-height:38px;align-items:center;justify-content:space-between;gap:10px;padding:7px 12px;border:1px solid #ffffff18;border-radius:9px;background:#061522f5;box-shadow:0 8px 20px #0007;backdrop-filter:blur(10px)}
+.player-sticky-identity.visible{display:flex}
+.player-sticky-identity strong{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.78rem}
+.player-sticky-identity span{color:#91a4ba;font-size:.62rem;font-weight:900;white-space:nowrap}
+.player-swipe-hint{display:none;position:fixed;left:50%;bottom:max(18px,calc(10px + env(safe-area-inset-bottom)));z-index:140;transform:translateX(-50%);padding:8px 12px;border:1px solid #ffffff2c;border-radius:999px;background:#061522ef;color:#e6eef7;font-size:.65rem;font-weight:950;box-shadow:0 8px 26px #0009;pointer-events:none;animation:swipeHintIn .18s ease both}
+.phone-mode .player-swipe-hint{display:block}
+@keyframes swipeHintIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 #espnProfileGameLogWrap{display:none!important}
 
 /* Final player-sequence controls: owned here so later profile wrapping cannot replace them. */
@@ -297,7 +306,7 @@ style.textContent=`
 .phone-mode .featured-player-card .featured-bio-label{font-size:.49rem}
 .phone-mode .featured-player-card .featured-bio-value{font-size:.9rem;margin-top:4px}
 .phone-mode .featured-player-profile .unified-profile-tabs{
-  position:sticky;top:0;z-index:20;
+  position:sticky;top:var(--sticky-player-name-height,0px);z-index:20;
   display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;
   width:calc(100% - 16px);margin:0 8px!important;padding:5px!important;
   border-radius:0 0 11px 11px!important;
@@ -720,6 +729,57 @@ function renderHistoricalOverview(seed){
     '<div class="stat"><span>Position</span><b>'+String(seed?.position||'—')+'</b></div>';
 }
 
+function ensureStickyIdentity(name){
+  const box=document.querySelector('#modal .profile');if(!box)return;
+  let bar=document.getElementById('playerStickyIdentity');
+  if(!bar){
+    bar=document.createElement('div');bar.id='playerStickyIdentity';bar.className='player-sticky-identity';
+    const close=document.getElementById('close');
+    if(close?.parentNode===box)close.insertAdjacentElement('afterend',bar);else box.prepend(bar);
+  }
+  const p=playerByName(name)||basePositionPlayer(name);
+  bar.innerHTML='<strong>'+String(name||'Player')+'</strong><span>'+String(p?.position||'—')+' · '+String(p?.team||'—')+'</span>';
+  if(box.dataset.stickyIdentityInstalled!=='1'){
+    box.dataset.stickyIdentityInstalled='1';
+    box.addEventListener('scroll',()=>{
+      const visible=box.scrollTop>150;
+      bar.classList.toggle('visible',visible);
+      box.style.setProperty('--sticky-player-name-height',visible?'38px':'0px');
+    },{passive:true});
+  }
+  const visible=box.scrollTop>150;
+  bar.classList.toggle('visible',visible);
+  box.style.setProperty('--sticky-player-name-height',visible?'38px':'0px');
+}
+function ensureSwipeHint(){
+  if(!document.body.classList.contains('phone-mode')||swipeHintShownThisSession)return;
+  try{if(localStorage.getItem('shuaPlayerSwipeHintSeen')==='1')return}catch(e){}
+  swipeHintShownThisSession=true;
+  let hint=document.getElementById('playerSwipeHint');
+  if(!hint){hint=document.createElement('div');hint.id='playerSwipeHint';hint.className='player-swipe-hint';hint.textContent='↔ Swipe left / right for players';document.body.appendChild(hint)}
+  hint.hidden=false;
+  setTimeout(()=>{if(hint?.isConnected)hint.remove()},4800);
+}
+function markSwipeHintLearned(){
+  try{localStorage.setItem('shuaPlayerSwipeHintSeen','1')}catch(e){}
+  document.getElementById('playerSwipeHint')?.remove();
+}
+function installKeyboardPlayerNav(){
+  if(document.documentElement.dataset.playerKeyboardNav==='1')return;
+  document.documentElement.dataset.playerKeyboardNav='1';
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
+    const modal=document.getElementById('modal');
+    if(!modal?.classList.contains('open')||historicalSeed())return;
+    if(e.target?.matches?.('input,textarea,select,[contenteditable="true"]'))return;
+    const id=modal.dataset.id||'';
+    const dir=e.key==='ArrowRight'?'next':'prev';
+    const target=adjacentPlayerId(id,dir);
+    if(!target)return;
+    e.preventDefault();openAdjacentPlayer(target,dir,false);
+  });
+}
+
 function ensureUi(){
   const box=document.querySelector('#modal .profile');
   if(!box)return null;
@@ -765,6 +825,9 @@ function ensureUi(){
   return box;
 }
 function activateTab(key){
+  if(!['overview','gamelog','history','notes'].includes(key))key='overview';
+  preferredProfileTab=key;
+  try{sessionStorage.setItem('shuaProfileTab',key)}catch(e){}
   const tabs=document.querySelectorAll('[data-profile-tab]');
   tabs.forEach(b=>b.classList.toggle('active',b.dataset.profileTab===key));
   document.querySelectorAll('[data-profile-panel]').forEach(p=>p.hidden=p.dataset.profilePanel!==key);
@@ -923,6 +986,7 @@ function installPhoneSwipeDismiss(){
       const target=adjacentPlayerId(currentId,dir);
       if(target&&(Math.abs(dx)>=72||(Math.abs(dx)>=42&&velocity>=.42))){
         suppressClickUntil=Date.now()+450;
+        markSwipeHintLearned();
         openAdjacentPlayer(target,dir,true);
       }else reset();
       mode='';return;
@@ -953,13 +1017,15 @@ function prepareUnified(name,seed=null){
   modal.dataset.unifiedName=name;
   applyFeaturedProfile(name,seed);
   renderOverviewRanks(name);
+  ensureStickyIdentity(name);
+  ensureSwipeHint();
   const currentId=document.getElementById('modal')?.dataset.id||playerByName(name)?.id||'';
   if(currentId){markSelectedRankingRow(currentId);paintPlayerNav(currentId)}else document.getElementById('rankingPlayerNav')?.setAttribute('hidden','');
   const gp=document.getElementById('unifiedGameLogPanel');
   if(gp){gp.dataset.loadedFor='';gp.dataset.ready='0';gp.innerHTML=''}
   const hp=document.getElementById('unifiedHistoryPanel');
   if(hp){hp.dataset.loadedFor='';hp.dataset.ready='0';hp.innerHTML=''}
-  activateTab('overview');
+  activateTab(preferredProfileTab||'overview');
 }
 async function openByName(name,seed=null){
   let p=playerByName(name);
@@ -1002,4 +1068,5 @@ window.profile=function(id){
 };
 
 ensureUi();
+installKeyboardPlayerNav();
 })();

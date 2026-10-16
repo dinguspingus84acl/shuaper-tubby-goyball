@@ -52,6 +52,9 @@ function addStyles(){
     .tagged-controls{display:none;gap:7px;flex-wrap:wrap;margin:12px 0}.tagged-controls.open{display:flex}.tagged-controls button{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 12px;font-weight:900}.tagged-controls button.active{background:#183d63;color:#fff}.tagged-count{margin-left:auto;color:var(--m);align-self:center;font-weight:800}
     .tag-group td{background:#0d2945!important;color:#fff!important;font-weight:950!important;letter-spacing:.08em;padding:9px 14px!important}.tag-group.qb td{border-left:5px solid var(--qb)}.tag-group.rb td{border-left:5px solid var(--rb)}.tag-group.wr td{border-left:5px solid var(--wr)}.tag-group.te td{border-left:5px solid var(--te)}
     .team-abbr{display:inline-flex;align-items:center;gap:7px;font-weight:800;white-space:nowrap}.team-mini-logo{width:22px;height:22px;object-fit:contain;vertical-align:middle;flex:0 0 22px}.team-mini-logo.sm{width:18px;height:18px;flex-basis:18px}
+    .tagged-player-name-line{display:inline-flex;align-items:center;gap:7px;min-width:0;white-space:nowrap}
+    .tagged-player-team-logo{width:19px;height:19px;object-fit:contain;flex:0 0 19px}
+    .phone-mode .tagged-player-team-logo{width:17px;height:17px;flex-basis:17px}
 
     /* Rankings polish: pinned column labels + persistent selected-player state */
     #tableCard{overflow:visible}
@@ -150,6 +153,10 @@ function addStyles(){
 function logoHtml(team,small=false){
   const slug=TEAM_SLUGS[team];
   return slug?`<span class="team-abbr"><img class="team-mini-logo${small?' sm':''}" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt=""><span>${team}</span></span>`:`<span class="team-abbr">${team||'—'}</span>`;
+}
+function taggedTeamLogo(team){
+  const slug=TEAM_SLUGS[team];
+  return slug?`<img class="tagged-player-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt="${team} logo">`:'';
 }
 function tagSet(pos,key){return new Set((tags[pos]?.[key]||[]).map(canon))}
 function isTagged(p,key){
@@ -258,7 +265,7 @@ function renderTagged(){
   arr.forEach(p=>{
     if(grouped&&p.position!==last){last=p.position;html+=`<tr class="tag-group ${p.position.toLowerCase()}"><td colspan="6">${p.position}</td></tr>`}
     const a=p.additionalStats||{};
-    html+=`<tr data-id="${idFor(p)}"><td class="rank">#${p.positionRank}</td><td><div class="photo-cell">${typeof pic==='function'?pic(p.name,'',p.team,p.position):''}<b class="${my?'draft-name':'do-not-draft-name'}">${p.name}</b></div></td><td><span class="badge">${p.position}</span></td><td>${p.team}</td><td>${a.espnAdp||'—'}</td><td class="notes">${a.notes||'—'}</td></tr>`;
+    html+=`<tr data-id="${idFor(p)}"><td class="rank">#${p.positionRank}</td><td><div class="photo-cell">${typeof pic==='function'?pic(p.name,'',p.team,p.position):''}<span class="tagged-player-name-line"><b class="${my?'draft-name':'do-not-draft-name'}">${p.name}</b>${taggedTeamLogo(p.team)}</span></div></td><td><span class="badge">${p.position}</span></td><td>${p.team}</td><td>${a.espnAdp||'—'}</td><td class="notes">${a.notes||'—'}</td></tr>`;
   });
   document.getElementById('rows').innerHTML=html;
   document.querySelectorAll('#rows tr[data-id]').forEach(tr=>tr.onclick=()=>{if(typeof profile==='function')profile(tr.dataset.id)});

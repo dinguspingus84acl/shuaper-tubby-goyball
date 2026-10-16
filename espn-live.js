@@ -138,14 +138,14 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-stat-btn,.espn-view-btn{padding:6px 9px;font-size:.65rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
-.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 180px;gap:8px;align-items:center}
+.espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 215px;gap:8px;align-items:center}
 .espn-live-head{padding:8px 10px;color:var(--m);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#07182a}
 .espn-sort-head{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:900;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;width:100%;text-align:right}
 .espn-sort-head:hover{color:#fff}
 .espn-sort-head .sort-arrow{font-size:.68rem;color:#7fb6e5}
-.espn-column-stat-select{width:100%;min-width:0;height:32px;border:1px solid #ffffff1f;border-radius:6px;background:#081a2d;color:#dbeafe;padding:0 26px 0 8px;font-size:.64rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap}
+.espn-column-stat-select{width:100%;min-width:0;height:32px;border:1px solid #ffffff1f;border-radius:6px;background:#081a2d;color:#dbeafe;padding:0 28px 0 9px;font-size:.62rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap}
 .espn-column-stat-select:focus{border-color:#6aaee5}
-.phone-mode .espn-column-stat-select{height:36px;font-size:.54rem;padding-left:5px;padding-right:20px;min-width:0!important;width:100%!important}
+.phone-mode .espn-column-stat-select{height:36px;font-size:.52rem;padding-left:6px;padding-right:20px;min-width:0!important;width:100%!important}
 .phone-mode .espn-rank-by-head{gap:4px;min-width:0;width:100%}
 .phone-mode .espn-rank-by-head>span{font-size:.5rem;flex:0 0 auto}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
@@ -291,8 +291,8 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 
 @media(max-width:700px){
   .phone-mode.stats-mode .espn-live-toolbar{padding-right:58px!important}
-  .phone-mode.stats-mode .espn-live-head,.phone-mode.stats-mode .espn-live-row{grid-template-columns:34px minmax(0,1fr) minmax(154px,42vw)!important;gap:5px!important}
-  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) minmax(154px,42vw);gap:5px}
+  .phone-mode.stats-mode .espn-live-head,.phone-mode.stats-mode .espn-live-row{grid-template-columns:34px minmax(0,1fr) minmax(184px,48vw)!important;gap:5px!important}
+  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) minmax(184px,48vw);gap:5px}
   .espn-live-head>*:nth-child(3),.espn-live-row>*:nth-child(3){display:none}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
@@ -368,11 +368,11 @@ section.innerHTML=`
         <div class="espn-team-filter-wrap">
           <button id="espnTeamFilterButton" class="espn-team-filter-button" type="button" aria-haspopup="listbox" aria-expanded="false">
             <img id="espnTeamFilterLogo" class="espn-team-filter-logo" alt="" hidden>
-            <span id="espnTeamFilterLabel" class="espn-team-filter-label">All Teams</span>
+            <span id="espnTeamFilterLabel" class="espn-team-filter-label">Teams</span>
             <span class="espn-team-filter-chevron">⌄</span>
           </button>
           <div id="espnTeamFilterMenu" class="espn-team-filter-menu" role="listbox" hidden></div>
-          <select id="espnTeamFilter" hidden aria-hidden="true" tabindex="-1"><option value="ALL">All Teams</option></select>
+          <select id="espnTeamFilter" hidden aria-hidden="true" tabindex="-1"><option value="ALL">Teams</option></select>
         </div>
       </div>
       <div class="espn-stat-bar">
@@ -845,7 +845,7 @@ function fullStatLabel(key){
     recYds:'Receiving Yards',
     recTD:'Receiving Touchdowns'
   };
-  if(key==='points'&&statView==='PERGAME')return 'PPR Points Per Game';
+  if(key==='points'&&statView==='PERGAME')return 'Points';
   return labels[key]||statLabel(key);
 }
 function formatStat(p,key){
@@ -1385,15 +1385,15 @@ function renderTeamFilter(){
   if(!select||!button||!menu)return;
   const teams=[...new Set(statsRows.map(p=>String(p.team||'').toUpperCase()).filter(Boolean).filter(x=>x!=='FA'&&x!=='—'))].sort();
   if(activeTeam!=='ALL'&&!teams.includes(activeTeam))activeTeam='ALL';
-  select.innerHTML='<option value="ALL">All Teams</option>'+teams.map(t=>'<option value="'+t+'">'+t+'</option>').join('');
+  select.innerHTML='<option value="ALL">Teams</option>'+teams.map(t=>'<option value="'+t+'">'+t+'</option>').join('');
   select.value=activeTeam;
-  label.textContent=activeTeam==='ALL'?'All Teams':activeTeam;
+  label.textContent=activeTeam==='ALL'?'Teams':activeTeam;
   const slug=TEAM_SLUGS[activeTeam];
   if(logo){
     if(activeTeam!=='ALL'&&slug){logo.src='https://a.espncdn.com/i/teamlogos/nfl/500/'+slug+'.png';logo.alt=activeTeam+' logo';logo.hidden=false}
     else{logo.hidden=true;logo.removeAttribute('src');logo.alt=''}
   }
-  menu.innerHTML='<button type="button" class="espn-team-filter-option'+(activeTeam==='ALL'?' active':'')+'" data-espn-team="ALL" role="option" aria-selected="'+(activeTeam==='ALL'?'true':'false')+'"><span class="espn-team-logo-spacer"></span><span>All Teams</span></button>'+
+  menu.innerHTML='<button type="button" class="espn-team-filter-option'+(activeTeam==='ALL'?' active':'')+'" data-espn-team="ALL" role="option" aria-selected="'+(activeTeam==='ALL'?'true':'false')+'"><span class="espn-team-logo-spacer"></span><span>Teams</span></button>'+
     teams.map(t=>{
       const s=TEAM_SLUGS[t];
       return '<button type="button" class="espn-team-filter-option'+(activeTeam===t?' active':'')+'" data-espn-team="'+t+'" role="option" aria-selected="'+(activeTeam===t?'true':'false')+'">'+
@@ -1415,7 +1415,7 @@ function renderTeamFilter(){
 }
 function renderStatFilters(){
   const select=document.getElementById('espnColumnStatSelect');
-  const cfg=configForFilter();
+  const cfg=configForFilter().filter(x=>statView!=='PERGAME'||x.key!=='average');
   if(!cfg.some(x=>x.key===activeStat))activeStat='points';
   if(select){
     select.innerHTML=cfg.map(x=>'<option value="'+x.key+'">'+fullStatLabel(x.key)+'</option>').join('');

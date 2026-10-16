@@ -42,11 +42,6 @@ function addStyles(){
   st.id='shuaEnhancementStyles';
   st.textContent=`
     .tools>.search{display:none!important}
-    #globalFantasyLogo{display:flex;align-items:center;justify-content:center;min-height:54px;padding:6px 18px 2px}
-    #globalFantasyLogo button{border:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer}
-    #globalFantasyLogo img{display:block;height:46px;width:auto;max-width:min(64vw,240px);object-fit:contain;filter:drop-shadow(0 0 14px rgba(69,39,255,.16))}
-    .phone-mode #globalFantasyLogo{min-height:48px;padding:4px 64px 0 10px}
-    .phone-mode #globalFantasyLogo img{height:40px;max-width:58vw}
     .phone-mode .positions{display:none!important}
     body.utility-tab-mode #positionToggle{display:none!important}
     .phone-mode #phoneMenuButton{display:flex!important}
@@ -190,14 +185,6 @@ function ensureControls(){
 }
 function hideTagged(){currentKind=null;const c=document.getElementById('taggedControls');if(c)c.classList.remove('open')}
 
-function ensureGlobalLogo(){
-  if(document.getElementById('globalFantasyLogo'))return;
-  const sticky=document.querySelector('.sticky');if(!sticky)return;
-  const wrap=document.createElement('div');wrap.id='globalFantasyLogo';
-  wrap.innerHTML='<button type="button" aria-label="Go to Home"><img src="fantasy-home.svg" alt="Fantasy"></button>';
-  sticky.insertBefore(wrap,sticky.firstChild);
-  wrap.querySelector('button').onclick=e=>{e.preventDefault();showHome()};
-}
 function ensureHome(){
   if(document.getElementById('fantasyHome'))return;
   const home=document.createElement('section');
@@ -568,7 +555,7 @@ async function loadData(){
 }
 
 function install(){
-  addStyles();installRankingSkeleton();ensureHome();ensureGlobalLogo();ensureControls();addNav();ensureMobileMenu();installRankingPolish();ensureBackToTop();installListAnimations();
+  addStyles();installRankingSkeleton();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();ensureBackToTop();installListAnimations();
   document.addEventListener('click',e=>{
     const b=e.target.closest('.positions .pos');
     if(b){

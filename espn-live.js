@@ -116,14 +116,15 @@ body.stats-mode .espn-sticky-controls{position:sticky;top:var(--shua-ranking-sti
 body.stats-mode #positionToggle{display:none!important}
 body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-live-filters,.espn-stat-filters{display:flex;gap:6px;flex-wrap:wrap}
-.espn-team-filter-wrap{position:relative;display:block;margin-left:auto;min-width:150px}
-.espn-team-filter-button{width:100%;height:36px;display:grid;grid-template-columns:24px minmax(0,1fr) 16px;align-items:center;gap:7px;border:1px solid #ffffff25;border-radius:8px;background:#0b2139;color:#fff;padding:0 8px;font-size:.66rem;font-weight:900;text-align:left}
+.espn-team-filter-wrap{position:relative;display:flex;align-items:center;gap:7px;margin-left:auto;min-width:210px}
+.espn-team-filter-title{flex:0 0 auto;color:#dbeafe;font-size:.74rem;font-weight:1000;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.espn-team-filter-button{flex:1 1 auto;min-width:118px;height:38px;display:grid;grid-template-columns:24px minmax(0,1fr) 16px;align-items:center;gap:7px;border:1px solid #ffffff25;border-radius:8px;background:#0b2139;color:#fff;padding:0 9px;font-size:.74rem;font-weight:950;text-align:left}
 .espn-team-filter-logo{width:24px;height:24px;object-fit:contain;flex:0 0 24px}
 .espn-team-filter-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .espn-team-filter-chevron{color:#91a4ba;text-align:center}
 .espn-team-filter-menu{position:absolute;right:0;top:calc(100% + 5px);z-index:90;width:190px;max-height:330px;overflow-y:auto;border:1px solid #ffffff25;border-radius:9px;background:#081a2d;box-shadow:0 14px 30px #000a}
 .espn-team-filter-menu[hidden]{display:none!important}
-.espn-team-filter-option{width:100%;min-height:40px;display:grid;grid-template-columns:26px minmax(0,1fr);gap:8px;align-items:center;border:0;border-top:1px solid #ffffff10;background:transparent;color:#fff;padding:7px 10px;text-align:left;font-size:.66rem;font-weight:900}
+.espn-team-filter-option{width:100%;min-height:42px;display:grid;grid-template-columns:26px minmax(0,1fr);gap:8px;align-items:center;border:0;border-top:1px solid #ffffff10;background:transparent;color:#fff;padding:8px 10px;text-align:left;font-size:.74rem;font-weight:950}
 .espn-team-filter-option:first-child{border-top:0}
 .espn-team-filter-option:hover,.espn-team-filter-option.active{background:#123554}
 .espn-team-filter-option img{width:24px;height:24px;object-fit:contain}
@@ -133,7 +134,7 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-stat-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 9px;border:1px solid #ffffff16;border-radius:10px;background:#07182a}
 .espn-stat-primary{display:flex;align-items:center;gap:7px;flex:1 1 auto;min-width:0;flex-wrap:wrap}
 .espn-rank-by-head{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
-.espn-rank-by-head>span{flex:0 0 auto;color:#91a4ba;font-size:.56rem;font-weight:950;white-space:nowrap}
+.espn-rank-by-head>span{flex:0 0 auto;color:#dbeafe;font-size:.72rem;font-weight:1000;white-space:nowrap;text-transform:uppercase;letter-spacing:.03em}
 .espn-stat-label{color:#7f93aa;font-size:.62rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
 .espn-stat-btn,.espn-view-btn{padding:6px 9px;font-size:.65rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
@@ -143,17 +144,17 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-sort-head{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:900;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;width:100%;text-align:right}
 .espn-sort-head:hover{color:#fff}
 .espn-sort-head .sort-arrow{font-size:.68rem;color:#7fb6e5}
-.espn-column-stat-select{width:100%;min-width:0;height:32px;border:1px solid #ffffff1f;border-radius:6px;background:#081a2d;color:#dbeafe;padding:0 28px 0 9px;font-size:.62rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap}
+.espn-column-stat-select{width:100%;min-width:0;height:36px;border:1px solid #ffffff1f;border-radius:7px;background:#081a2d;color:#fff;padding:0 30px 0 10px;font-size:.72rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap}
 .espn-column-stat-select:focus{border-color:#6aaee5}
-.phone-mode .espn-column-stat-select{height:36px;font-size:.52rem;padding-left:6px;padding-right:20px;min-width:0!important;width:100%!important}
-.phone-mode .espn-rank-by-head{gap:4px;min-width:0;width:100%}
-.phone-mode .espn-rank-by-head>span{font-size:.5rem;flex:0 0 auto}
+.phone-mode .espn-column-stat-select{height:38px;font-size:.66rem;padding-left:7px;padding-right:21px;min-width:0!important;width:100%!important}
+.phone-mode .espn-rank-by-head{gap:5px;min-width:0;width:100%}
+.phone-mode .espn-rank-by-head>span{font-size:.64rem;flex:0 0 auto}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}.espn-headshot-fallback{display:flex;align-items:center;justify-content:center;color:#dbeafe;font-size:.68rem;font-weight:950}
 .espn-player-copy{min-width:0;display:grid;gap:3px;overflow:visible}.espn-player-meta{display:flex;align-items:center;gap:4px;color:#8ca0b5;font-size:.58rem;font-weight:850;line-height:1}.espn-player-meta .espn-team-logo{width:16px;height:16px;flex-basis:16px}
-.espn-player-name{font-weight:950;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.12}
-.espn-name-btn{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:950;text-align:left;cursor:pointer;max-width:100%;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.12;word-break:normal;overflow-wrap:anywhere}
+.espn-player-name{font-weight:950;white-space:nowrap;overflow:visible;text-overflow:clip;line-height:1.1}
+.espn-name-btn{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:950;text-align:left;cursor:pointer;max-width:none;white-space:nowrap;overflow:visible;text-overflow:clip;line-height:1.1;word-break:normal;overflow-wrap:normal}
 .espn-name-btn:hover{text-decoration:underline}
 .espn-profile-gamelog{margin-top:12px;border:1px solid var(--l);border-radius:10px;background:#07182a;overflow:hidden}
 .espn-profile-gamelog-btn{width:100%;min-height:42px;border:0;background:#0b2139;color:#d7e6f5;padding:9px 12px;font-weight:950;text-align:left;display:flex;align-items:center;justify-content:space-between}
@@ -297,10 +298,10 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
   .espn-live-row{padding:7px 6px;min-height:58px;height:auto}
-  .espn-player-name{font-size:.72rem;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}.espn-player{gap:7px;align-items:flex-start}.espn-name-btn{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.12!important}.espn-player-meta{font-size:.54rem}.espn-player-meta .espn-team-logo{width:14px;height:14px;flex-basis:14px}
+  .espn-player-name{font-size:.69rem;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}.espn-player{gap:7px;align-items:center}.espn-name-btn{font-size:.69rem!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;line-height:1.1!important;letter-spacing:-.01em}.espn-player-meta{font-size:.54rem}.espn-player-meta .espn-team-logo{width:14px;height:14px;flex-basis:14px}
   .espn-headshot{width:34px;height:34px;flex-basis:34px}
   .espn-selected-stat{font-size:.72rem}
-  .espn-live-toolbar{display:grid;grid-template-columns:1fr;gap:7px}.espn-live-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}.espn-filter{padding:7px 3px;font-size:.62rem;min-width:0}.espn-team-filter-wrap{width:100%;margin-left:0}.espn-team-filter-button{min-height:38px}.espn-team-filter-menu{left:0;right:0;width:100%;max-height:48vh}.espn-live-meta{display:flex;justify-content:flex-end;width:100%;align-items:center}.espn-year-select{min-height:38px;padding:6px 8px}.espn-stat-bar{display:flex!important;align-items:center!important;gap:6px!important;padding:6px 7px!important;flex-wrap:wrap!important}
+  .espn-live-toolbar{display:grid;grid-template-columns:1fr;gap:7px}.espn-live-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}.espn-filter{padding:7px 3px;font-size:.62rem;min-width:0}.espn-team-filter-wrap{width:100%;margin-left:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px}.espn-team-filter-title{font-size:.68rem}.espn-team-filter-button{min-height:40px;font-size:.7rem}.espn-team-filter-menu{left:0;right:0;width:100%;max-height:48vh}.espn-live-meta{display:flex;justify-content:flex-end;width:100%;align-items:center}.espn-year-select{min-height:38px;padding:6px 8px}.espn-stat-bar{display:flex!important;align-items:center!important;gap:6px!important;padding:6px 7px!important;flex-wrap:wrap!important}
   .espn-stat-primary{display:flex!important;align-items:center!important;gap:6px!important;width:100%!important;flex-wrap:nowrap!important}
   .espn-stat-primary>.espn-stat-label{width:auto!important;flex:0 0 auto}
   .espn-stat-primary .espn-year-select{flex:0 0 auto!important;min-width:72px!important;width:72px!important}
@@ -366,13 +367,14 @@ section.innerHTML=`
           <button type="button" class="espn-filter" data-espn-filter="TE">TE</button>
         </div>
         <div class="espn-team-filter-wrap">
+          <span class="espn-team-filter-title">Teams</span>
           <button id="espnTeamFilterButton" class="espn-team-filter-button" type="button" aria-haspopup="listbox" aria-expanded="false">
             <img id="espnTeamFilterLogo" class="espn-team-filter-logo" alt="" hidden>
-            <span id="espnTeamFilterLabel" class="espn-team-filter-label">Teams</span>
+            <span id="espnTeamFilterLabel" class="espn-team-filter-label">All</span>
             <span class="espn-team-filter-chevron">⌄</span>
           </button>
           <div id="espnTeamFilterMenu" class="espn-team-filter-menu" role="listbox" hidden></div>
-          <select id="espnTeamFilter" hidden aria-hidden="true" tabindex="-1"><option value="ALL">Teams</option></select>
+          <select id="espnTeamFilter" hidden aria-hidden="true" tabindex="-1"><option value="ALL">All</option></select>
         </div>
       </div>
       <div class="espn-stat-bar">
@@ -1385,15 +1387,15 @@ function renderTeamFilter(){
   if(!select||!button||!menu)return;
   const teams=[...new Set(statsRows.map(p=>String(p.team||'').toUpperCase()).filter(Boolean).filter(x=>x!=='FA'&&x!=='—'))].sort();
   if(activeTeam!=='ALL'&&!teams.includes(activeTeam))activeTeam='ALL';
-  select.innerHTML='<option value="ALL">Teams</option>'+teams.map(t=>'<option value="'+t+'">'+t+'</option>').join('');
+  select.innerHTML='<option value="ALL">All</option>'+teams.map(t=>'<option value="'+t+'">'+t+'</option>').join('');
   select.value=activeTeam;
-  label.textContent=activeTeam==='ALL'?'Teams':activeTeam;
+  label.textContent=activeTeam==='ALL'?'All':activeTeam;
   const slug=TEAM_SLUGS[activeTeam];
   if(logo){
     if(activeTeam!=='ALL'&&slug){logo.src='https://a.espncdn.com/i/teamlogos/nfl/500/'+slug+'.png';logo.alt=activeTeam+' logo';logo.hidden=false}
     else{logo.hidden=true;logo.removeAttribute('src');logo.alt=''}
   }
-  menu.innerHTML='<button type="button" class="espn-team-filter-option'+(activeTeam==='ALL'?' active':'')+'" data-espn-team="ALL" role="option" aria-selected="'+(activeTeam==='ALL'?'true':'false')+'"><span class="espn-team-logo-spacer"></span><span>Teams</span></button>'+
+  menu.innerHTML='<button type="button" class="espn-team-filter-option'+(activeTeam==='ALL'?' active':'')+'" data-espn-team="ALL" role="option" aria-selected="'+(activeTeam==='ALL'?'true':'false')+'"><span class="espn-team-logo-spacer"></span><span>All</span></button>'+
     teams.map(t=>{
       const s=TEAM_SLUGS[t];
       return '<button type="button" class="espn-team-filter-option'+(activeTeam===t?' active':'')+'" data-espn-team="'+t+'" role="option" aria-selected="'+(activeTeam===t?'true':'false')+'">'+

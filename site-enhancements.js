@@ -574,8 +574,29 @@ async function loadData(){
   applyColors();if(currentKind)renderTagged();
 }
 
+function installLiveMobileViewport(){
+  let raf=0;
+  const sync=()=>{
+    raf=0;
+    if(!document.body.classList.contains('phone-mode'))return;
+    const vv=window.visualViewport;
+    const h=Math.max(vv?.height||0,window.innerHeight||0);
+    const top=Math.max(0,vv?.offsetTop||0);
+    document.documentElement.style.setProperty('--shua-live-vh',Math.ceil(h)+'px');
+    document.documentElement.style.setProperty('--shua-live-top',Math.ceil(top)+'px');
+  };
+  const queue=()=>{if(!raf)raf=requestAnimationFrame(sync)};
+  sync();
+  window.addEventListener('resize',queue,{passive:true});
+  window.addEventListener('scroll',queue,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(sync,40),{passive:true});
+  if(window.visualViewport){
+    visualViewport.addEventListener('resize',queue,{passive:true});
+    visualViewport.addEventListener('scroll',queue,{passive:true});
+  }
+}
 function install(){
-  addStyles();installRankingSkeleton();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();ensureBackToTop();installListAnimations();
+  addStyles();installLiveMobileViewport();installRankingSkeleton();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();ensureBackToTop();installListAnimations();
   document.addEventListener('click',e=>{
     const b=e.target.closest('.positions .pos');
     if(b){

@@ -161,12 +161,13 @@ function logoHtml(team,small=false){
   const slug=TEAM_SLUGS[team];
   return slug?`<span class="team-abbr"><img class="team-mini-logo${small?' sm':''}" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt=""><span>${team}</span></span>`:`<span class="team-abbr">${team||'—'}</span>`;
 }
-function taggedTeamIdentity(team){
+function taggedTeamIdentity(team,position){
   const slug=TEAM_SLUGS[team];
-  const full=TEAM_FULL_NAMES[team]||team||'—';
+  const abbr=team||'—';
+  const pos=position||'—';
   return '<span class="tagged-player-team-line">'+
-    (slug?`<img class="tagged-player-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt="${full} logo">`:'')+
-    '<span class="tagged-player-team-name">'+full+'</span></span>';
+    (slug?`<img class="tagged-player-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt="${abbr} logo">`:'')+
+    '<span class="tagged-player-team-name">'+abbr+' · '+pos+'</span></span>';
 }
 function tagSet(pos,key){return new Set((tags[pos]?.[key]||[]).map(canon))}
 function isTagged(p,key){
@@ -275,7 +276,7 @@ function renderTagged(){
   arr.forEach(p=>{
     if(grouped&&p.position!==last){last=p.position;html+=`<tr class="tag-group ${p.position.toLowerCase()}"><td colspan="6">${p.position}</td></tr>`}
     const a=p.additionalStats||{};
-    html+=`<tr class="tagged-player-row" data-id="${idFor(p)}"><td class="rank">#${p.positionRank}</td><td><div class="photo-cell">${typeof pic==='function'?pic(p.name,'',p.team,p.position):''}<span class="tagged-player-copy"><b class="${my?'draft-name':'do-not-draft-name'}">${p.name}</b>${taggedTeamIdentity(p.team)}</span></div></td><td><span class="badge">${p.position}</span></td><td>${p.team}</td><td>${a.espnAdp||'—'}</td><td class="notes">${a.notes||'—'}</td></tr>`;
+    html+=`<tr class="tagged-player-row" data-id="${idFor(p)}"><td class="rank">#${p.positionRank}</td><td><div class="photo-cell">${typeof pic==='function'?pic(p.name,'',p.team,p.position):''}<span class="tagged-player-copy"><b class="${my?'draft-name':'do-not-draft-name'}">${p.name}</b>${taggedTeamIdentity(p.team,p.position)}</span></div></td><td><span class="badge">${p.position}</span></td><td>${p.team}</td><td>${a.espnAdp||'—'}</td><td class="notes">${a.notes||'—'}</td></tr>`;
   });
   document.getElementById('rows').innerHTML=html;
   document.querySelectorAll('#rows tr[data-id]').forEach(tr=>tr.onclick=()=>{if(typeof profile==='function')profile(tr.dataset.id)});

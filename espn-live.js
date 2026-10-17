@@ -1769,6 +1769,10 @@ window.ShuaEspnLive={
     }
     return statsRows.find(p=>nameKey(p.name)===nameKey(name))||rows.find(p=>nameKey(p.name)===nameKey(name))||await getAnyHistoricalPlayer(name,preferredYear);
   },
+  async getAnalyticsSchedule(){
+    const teams=await fetchProSchedule(SEASON);
+    return teams.map(t=>({id:Number(t.id),team:TEAM_BY_ID[Number(t.id)]||t.abbrev||'',weeks:Object.fromEntries(Array.from({length:18},(_,i)=>{const week=i+1;return [week,opponentLabel(t.id,week,SEASON)]}))}));
+  },
   async getAnalyticsDataset(){
     await ensureCurrentRows().catch(()=>{});
     return rows.map(p=>({id:String(p.id||''),name:p.name,team:p.team,position:p.position,points:Number(p.points)||0,ppg:Number(p.average)||0,gamesPlayed:Number(p.gamesPlayed)||0,targets:Number(p.targets)||0,receptions:Number(p.receptions)||0,rushAtt:Number(p.rushAtt)||0,passAtt:Number(p.passAtt)||0,rushYds:Number(p.rushYds)||0,recYds:Number(p.recYds)||0}));

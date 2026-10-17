@@ -580,24 +580,10 @@ function installLiveMobileViewport(){
     raf=0;
     if(!document.body.classList.contains('phone-mode'))return;
     const vv=window.visualViewport;
-    const h=Math.max(1,vv?.height||window.innerHeight||0);
-    const screenH=Math.max(h,window.screen?.height||0);
-    const reportedTop=Math.max(0,vv?.offsetTop||0);
-    const totalGap=Math.max(0,screenH-h);
-
-    // Safari 26 can report safe-area env() values incorrectly while its chrome
-    // is changing. visualViewport is much more useful here. If offsetTop is
-    // unexpectedly zero, infer the split from the total physical-screen gap.
-    let topGap=reportedTop;
-    if(topGap<20&&totalGap>70){
-      topGap=Math.min(62,Math.max(47,Math.round(totalGap*.51)));
-    }
-    topGap=Math.min(topGap,totalGap);
-    const bottomGap=Math.max(0,totalGap-topGap);
-
+    const h=Math.max(vv?.height||0,window.innerHeight||0);
+    const top=Math.max(0,vv?.offsetTop||0);
     document.documentElement.style.setProperty('--shua-live-vh',Math.ceil(h)+'px');
-    document.documentElement.style.setProperty('--shua-physical-top',Math.ceil(topGap)+'px');
-    document.documentElement.style.setProperty('--shua-physical-bottom',Math.ceil(bottomGap)+'px');
+    document.documentElement.style.setProperty('--shua-live-top',Math.ceil(top)+'px');
   };
   const queue=()=>{if(!raf)raf=requestAnimationFrame(sync)};
   sync();

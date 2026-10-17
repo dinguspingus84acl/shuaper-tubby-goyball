@@ -1,0 +1,22 @@
+name: Premium analytics preview
+on:
+  push:
+    branches: [build/premium-analytics]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Package source for isolated browser tests
+        run: git archive --format=zip HEAD -o /tmp/shua-source.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shua-source
+          path: /tmp/shua-source.zip
+          retention-days: 3

@@ -165,6 +165,8 @@ body.phone-mode .modal{inset:0!important;width:100vw!important;height:100lvh!imp
   html{
     margin:0!important;padding:0!important;border:0!important;
     min-height:100%!important;
+    overflow-x:clip!important;
+    overflow-y:auto!important;
     background:#061322!important;
     overscroll-behavior-y:auto!important;
   }
@@ -172,12 +174,12 @@ body.phone-mode .modal{inset:0!important;width:100vw!important;height:100lvh!imp
   body.phone-mode{
     position:relative!important;
     margin:0!important;padding:0!important;border:0!important;outline:0!important;
-    min-height:0!important;
+    min-height:100%!important;
     background:transparent!important;
     overflow-x:clip!important;
     overflow-y:visible!important;
     overscroll-behavior-y:auto!important;
-    -webkit-overflow-scrolling:touch;
+    -webkit-overflow-scrolling:auto;
   }
 
   /* Let the document and real player rows paint the viewport, not a fixed fake layer. */
@@ -206,12 +208,12 @@ body.phone-mode .modal{inset:0!important;width:100vw!important;height:100lvh!imp
     top:auto!important;
     left:auto!important;right:auto!important;
     width:100%!important;max-width:none!important;
-    min-height:0!important;
+    min-height:100svh!important;
     margin:0!important;
     padding:0 6px 0!important;
     border:0!important;outline:0!important;
     background:transparent!important;
-    overflow-x:clip!important;
+    overflow-x:visible!important;
     overflow-y:visible!important;
   }
 

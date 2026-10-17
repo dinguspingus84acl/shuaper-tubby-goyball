@@ -312,8 +312,8 @@ function showTrade(){
   section.hidden=false;
   document.getElementById('title').textContent='Trade Calculator';
   document.getElementById('sub').textContent='Powered by your Big Board';
-  window.ShuaApplyFullBleed?.();
-  window.ShuaFinishTabTransition?.();
+  
+  
 }
 function hideTrade(){
   section.hidden=true;

@@ -216,7 +216,7 @@ function showHome(){
   document.body.classList.add('fantasy-home-mode');
   document.querySelectorAll('.positions .pos').forEach(x=>x.classList.toggle('active',x.dataset.pos==='HOME'));
   closeMobileMenu();
-  window.ShuaFinishTabTransition?.();
+  
 }
 function leaveHome(){document.body.classList.remove('fantasy-home-mode')}
 const UTILITY_TABS=new Set(['MYGUYS','DND','MOCK','DEPTH','COMPARE','TRADE']);
@@ -258,7 +258,7 @@ function openTagged(kind,button){
   c.querySelectorAll('[data-tagpos]').forEach(x=>x.classList.toggle('active',x.dataset.tagpos==='ALL'));
   renderTagged();
   closeMobileMenu();
-  window.ShuaFinishTabTransition?.();
+  
 }
 function renderTagged(){
   if(!currentKind)return;
@@ -498,156 +498,6 @@ function installListAnimations(){
     new MutationObserver(m=>{if(m.some(x=>x.type==='childList'))animateListElement(target)}).observe(watch,{childList:true});
   });
 }
-function installRuntimeFullBleed(){
-  const STYLE_ID='shuaRuntimeFullBleed';
-  const css=`
-    html{margin:0!important;padding:0!important;border:0!important;background:#061322!important}
-    body.phone-mode{
-      margin:0!important;padding:0!important;border:0!important;outline:0!important;
-      min-height:100lvh!important;background:#061322!important;
-      overflow-x:hidden!important;overflow-y:auto!important
-    }
-    body.phone-mode .sticky{
-      position:absolute!important;top:0!important;left:0!important;right:0!important;
-      width:100%!important;height:0!important;min-height:0!important;
-      margin:0!important;padding:0!important;border:0!important;outline:0!important;
-      overflow:visible!important;background:transparent!important;box-shadow:none!important;
-      -webkit-backdrop-filter:none!important;backdrop-filter:none!important
-    }
-    body.phone-mode .sticky>.tools{
-      height:0!important;min-height:0!important;margin:0!important;padding:0!important;
-      border:0!important;overflow:visible!important;background:transparent!important
-    }
-    body.phone-mode main{
-      margin:0!important;padding-top:0!important;padding-bottom:0!important;
-      min-height:100lvh!important;border:0!important;outline:0!important;
-      overflow-x:hidden!important;overflow-y:visible!important;background:transparent!important
-    }
-    body.phone-mode #tableCard,
-    body.phone-mode #mockSection,
-    body.phone-mode #depthSection,
-    body.phone-mode #compareSection,
-    body.phone-mode #tradeSection,
-    body.phone-mode #espnLiveSection{
-      margin-top:0!important;padding-top:0!important;
-      border-top-color:transparent!important;border-bottom-color:transparent!important
-    }
-    body.phone-mode #espnLiveSection,
-    body.phone-mode .espn-live-shell,
-    body.phone-mode .tagged-controls,
-    body.phone-mode .depth-toolbar{margin-top:0!important;padding-top:0!important}
-  `;
-  let applying=false;
-  const apply=()=>{
-    if(applying)return;
-    applying=true;
-    let st=document.getElementById(STYLE_ID);
-    if(!st){
-      st=document.createElement('style');
-      st.id=STYLE_ID;
-      st.textContent=css;
-    }
-    if(st.parentNode)st.parentNode.removeChild(st);
-    document.head.appendChild(st);
-    if(document.body.classList.contains('phone-mode')){
-      document.body.style.setProperty('padding-top','0','important');
-      document.body.style.setProperty('padding-bottom','0','important');
-      const sticky=document.querySelector('.sticky');
-      if(sticky){
-        sticky.style.setProperty('height','0','important');
-        sticky.style.setProperty('min-height','0','important');
-        sticky.style.setProperty('padding','0','important');
-        sticky.style.setProperty('border','0','important');
-      }
-      const main=document.querySelector('main');
-      if(main){
-        main.style.setProperty('padding-top','0','important');
-        main.style.setProperty('padding-bottom','0','important');
-      }
-      void document.documentElement.offsetHeight;
-    }
-    applying=false;
-  };
-  window.ShuaApplyFullBleed=apply;
-  let tabTransitionY=0;
-  let tabTransitionActive=false;
-  let tabTransitionTimer=0;
-
-  const beginTabTransition=()=>{
-    if(!document.body.classList.contains('phone-mode'))return;
-    if(document.getElementById('modal')?.classList.contains('open'))return;
-    tabTransitionY=window.scrollY||window.pageYOffset||0;
-    tabTransitionActive=true;
-    clearTimeout(tabTransitionTimer);
-    const viewportH=window.visualViewport?.height||window.innerHeight||0;
-    const keepHeight=Math.ceil(tabTransitionY+viewportH+240);
-    document.body.style.setProperty('min-height',keepHeight+'px','important');
-    const main=document.querySelector('main');
-    if(main)main.style.setProperty('min-height',keepHeight+'px','important');
-    apply();
-  };
-
-  const finishTabTransition=()=>{
-    if(!document.body.classList.contains('phone-mode'))return;
-    if(!tabTransitionActive){apply();return}
-    const y=tabTransitionY;
-    const restore=()=>{
-      apply();
-      if(Math.abs((window.scrollY||0)-y)>1)window.scrollTo({top:y,left:0,behavior:'auto'});
-    };
-    requestAnimationFrame(()=>requestAnimationFrame(restore));
-    setTimeout(restore,80);
-    tabTransitionTimer=setTimeout(()=>{
-      tabTransitionActive=false;
-      document.body.style.removeProperty('min-height');
-      const main=document.querySelector('main');
-      if(main)main.style.removeProperty('min-height');
-      apply();
-    },420);
-  };
-
-  window.ShuaBeginTabTransition=beginTabTransition;
-  window.ShuaFinishTabTransition=finishTabTransition;
-  apply();
-
-  // Dynamic tabs append their own <style> blocks after this script. Keep this rule last.
-  if(window.MutationObserver){
-    let queued=false;
-    const headObserver=new MutationObserver(muts=>{
-      if(applying)return;
-      if(!muts.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&n.tagName==='STYLE'&&n.id!==STYLE_ID)))return;
-      if(queued)return;
-      queued=true;
-      setTimeout(()=>{queued=false;apply()},0);
-    });
-    headObserver.observe(document.head,{childList:true});
-  }
-
-  // Preserve the current Safari viewport while each tab swaps its content.
-  document.addEventListener('pointerdown',e=>{
-    if(!e.target.closest('.positions .pos,#phoneMenuItems button'))return;
-    beginTabTransition();
-  },true);
-  document.addEventListener('click',e=>{
-    if(!e.target.closest('.positions .pos,#phoneMenuItems button'))return;
-    if(!tabTransitionActive)beginTabTransition();
-    setTimeout(finishTabTransition,0);
-  },false);
-
-  // Also catch show/hide changes made programmatically by custom tabs.
-  const main=document.querySelector('main');
-  if(main&&window.MutationObserver){
-    let queued=false;
-    const viewObserver=new MutationObserver(()=>{
-      if(queued)return;
-      queued=true;
-      requestAnimationFrame(()=>{queued=false;apply()});
-    });
-    viewObserver.observe(main,{subtree:true,attributes:true,attributeFilter:['hidden','class']});
-  }
-  window.addEventListener('pageshow',apply,{passive:true});
-  window.addEventListener('orientationchange',()=>setTimeout(apply,50),{passive:true});
-}
 function ensureBackToTop(){
   if(document.getElementById('shuaBackToTop'))return;
   const b=document.createElement('button');b.id='shuaBackToTop';b.type='button';b.setAttribute('aria-label','Back to top');b.textContent='↑';
@@ -725,7 +575,7 @@ async function loadData(){
 }
 
 function install(){
-  addStyles();installRuntimeFullBleed();installRankingSkeleton();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();ensureBackToTop();installListAnimations();
+  addStyles();installRankingSkeleton();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();ensureBackToTop();installListAnimations();
   document.addEventListener('click',e=>{
     const b=e.target.closest('.positions .pos');
     if(b){
@@ -751,7 +601,7 @@ function install(){
     decorateTeamLogos();upgradeFallbackFaces();applyColors();
     const saved=readPageState();
     if(!saved?.section||saved.section==='HOME')showHome();else leaveHome();
-    setTimeout(()=>{installListAnimations();restoreSavedPageState();setTimeout(()=>window.ShuaApplyFullBleed?.(),100)},90);
+    setTimeout(()=>{installListAnimations();restoreSavedPageState();},90);
   });
 }
 install();

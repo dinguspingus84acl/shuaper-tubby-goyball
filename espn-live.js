@@ -1615,8 +1615,8 @@ function showEspn(){
   else render();
   if(timer)clearInterval(timer);
   timer=setInterval(()=>{if(!section.hidden&&statsSeason===SEASON)loadStatsSeason(SEASON,{force:true})},REFRESH_MS);
-  window.ShuaApplyFullBleed?.();
-  window.ShuaFinishTabTransition?.();
+  
+  
 }
 function hideEspn(){
   section.hidden=true;

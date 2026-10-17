@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict');
+const S=require('../analytics/core.js');
+assert.equal(S.num(null),null);assert.equal(S.num(''),null);assert.equal(S.num(0),0);assert.equal(S.num(-3),-3);
+assert.deepEqual(S.rolling([2,4,6,8,10],3),[null,null,4,6,8]);
+assert.deepEqual(S.rolling([2,null,6,8,10],3),[null,null,null,null,8]);
+assert.equal(S.quantile([0,10,20],.5),10);assert.equal(S.quantile([0,10],.1),1);
+const p={name:'Test',key:'test',position:'QB',games:[{week:1,points:0},{week:2,points:-2},{week:4,points:20},{week:5,points:null}]};
+const c=S.consistency(p);assert.equal(c.n,3);assert.equal(c.rates[0].count,1);assert.ok(Math.abs(c.rates[0].percent-100/3)<1e-10);assert.deepEqual(c.rates.map(x=>x.threshold),[15,20,25,30]);
+const ds={players:[{position:'RB',games:[{week:1,points:10,opponent:'DAL'},{week:2,points:30,opponent:'BUF'}]},{position:'RB',games:[{week:1,points:5,opponent:'DAL'},{week:2,points:0,opponent:'BUF'}]},{position:'QB',games:[{week:1,points:25,opponent:'DAL'},{week:2,points:20,opponent:'BUF'}]}]};
+let d=S.defense(ds,'RB',2);assert.equal(d.byTeam.DAL.allowed,15);assert.equal(d.byTeam.DAL.games,1);assert.equal(d.byTeam.BUF.rank,1);assert.equal(d.byTeam.BUF.allowed,30);assert.equal(S.defense(ds,'RB',1).byTeam.BUF,undefined);
+const src={players:[{name:'A',key:'a',position:'RB',games:[{week:1,points:10,team:'DET',rushAtt:10,targets:5}]},{name:'B',key:'b',position:'WR',games:[{week:1,points:15,team:'DET',rushAtt:0,targets:15}]}]};assert.equal(S.teamShares(src,'DET')[0].targetShare,25);assert.equal(S.teamShares(src,'DET')[0].carryShare,100);assert.equal(S.teamShares(src,'DET')[0].redZone,null);
+const inj={players:[{key:'a',games:[{week:1,team:'DET',points:10,targets:10,rushAtt:0}]},{key:'b',games:[{week:1,team:'DET',points:5,targets:5,rushAtt:0},{week:2,team:'DET',points:10,targets:10,rushAtt:0}]}]};assert.equal(S.splits(inj,inj.players[0],'DET',18,[2]).rows[0].delta,5);assert.equal(S.splits(inj,inj.players[0],'DET',18,[]).rows[0].delta,null);
+console.log('PASS: nulls, zero/negative games, rolling averages, quantiles, QB thresholds, defensive game denominators, no future leakage, shares and absence splits.');

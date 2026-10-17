@@ -1,0 +1,29 @@
+name: Verify Analytics Studio
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['analytics/*.js', 'analytics/*.css', 'analytics-dashboard.js', 'player-insights.js', 'site-enhancements.js', 'tests/studio-real-site.py', '.github/workflows/analytics-studio-verify.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax and calculation tests
+        run: |
+          node tests/analytics-core.cjs
+          for f in analytics/*.js analytics-dashboard.js player-insights.js site-enhancements.js; do node --check "$f"; done
+      - name: Install verification browsers
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium webkit
+      - name: Test dashboards and existing navigation in both browsers
+        run: python tests/studio-real-site.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: analytics-studio-verification
+          path: tests/studio-verification/

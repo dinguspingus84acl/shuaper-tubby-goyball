@@ -440,6 +440,8 @@ function ensureRankingPlayerNav(){
   return nav;
 }
 function updateRankingPlayerNav(){
+  const currentNav=document.getElementById('rankingPlayerNav');
+  if(currentNav&&!currentNav.querySelector('[data-ranking-nav]'))return;
   const modal=document.getElementById('modal');if(!modal?.classList.contains('open'))return;
   const rows=rankingRows();
   const id=String(selectedPlayerId||modal.dataset.id||'');

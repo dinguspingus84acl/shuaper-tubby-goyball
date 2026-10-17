@@ -274,7 +274,7 @@ function renderTagged(){
   document.getElementById('taggedCount').textContent=`${arr.length} player${arr.length===1?'':'s'}`;
   const grouped=currentPos==='ALL';let last='',html='';
   arr.forEach(p=>{
-    if(grouped&&p.position!==last){last=p.position;html+=`<tr class="tag-group ${p.position.toLowerCase()}"><td colspan="6">${p.position}</td></tr>`}
+    if(grouped&&p.position!==last){last=p.position;html+=`<tr class="tag-group"><td colspan="6">${p.position}</td></tr>`}
     const a=p.additionalStats||{};
     html+=`<tr class="tagged-player-row" data-id="${idFor(p)}"><td class="rank">#${p.positionRank}</td><td><div class="photo-cell">${typeof pic==='function'?pic(p.name,'',p.team,p.position):''}<span class="tagged-player-copy"><b class="${my?'draft-name':'do-not-draft-name'}">${p.name}</b>${taggedTeamIdentity(p.team,p.position)}</span></div></td><td><span class="badge">${p.position}</span></td><td>${p.team}</td><td>${a.espnAdp||'—'}</td><td class="notes">${a.notes||'—'}</td></tr>`;
   });

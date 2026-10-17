@@ -43,8 +43,6 @@ function addStyles(){
   st.id='shuaEnhancementStyles';
   st.textContent=`
     .tools>.search{display:none!important}
-    #iosChromePrimer{display:none}
-    .phone-mode #iosChromePrimer{display:block;height:88px;min-height:88px;pointer-events:none;visibility:hidden}
     .phone-mode .positions{display:none!important}
     body.utility-tab-mode #positionToggle{display:none!important}
     .phone-mode #phoneMenuButton{display:flex!important}
@@ -205,29 +203,6 @@ function ensureControls(){
 }
 function hideTagged(){currentKind=null;const c=document.getElementById('taggedControls');if(c)c.classList.remove('open')}
 
-function ensureMobileChromePrimer(){
-  let primer=document.getElementById('iosChromePrimer');
-  if(primer)return primer;
-  const main=document.querySelector('main');
-  if(!main)return null;
-  primer=document.createElement('div');
-  primer.id='iosChromePrimer';
-  primer.setAttribute('aria-hidden','true');
-  main.insertBefore(primer,main.firstChild);
-  return primer;
-}
-function normalizeMobileBrowserChrome(){
-  if(!document.body.classList.contains('phone-mode'))return;
-  if(document.getElementById('modal')?.classList.contains('open'))return;
-  ensureMobileChromePrimer();
-  const run=()=>{
-    const max=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
-    const target=Math.min(88,max);
-    if(target<24)return;
-    window.scrollTo({top:target,left:0,behavior:'auto'});
-  };
-  requestAnimationFrame(()=>requestAnimationFrame(run));
-}
 function ensureHome(){
   if(document.getElementById('fantasyHome'))return;
   const home=document.createElement('section');
@@ -282,7 +257,7 @@ function openTagged(kind,button){
   c.querySelectorAll('[data-tagpos]').forEach(x=>x.classList.toggle('active',x.dataset.tagpos==='ALL'));
   renderTagged();
   closeMobileMenu();
-  setTimeout(normalizeMobileBrowserChrome,0);
+  
 }
 function renderTagged(){
   if(!currentKind)return;
@@ -599,13 +574,13 @@ async function loadData(){
 }
 
 function install(){
-  addStyles();installRankingSkeleton();ensureMobileChromePrimer();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();ensureBackToTop();installListAnimations();
+  addStyles();installRankingSkeleton();ensureHome();ensureControls();addNav();ensureMobileMenu();installRankingPolish();ensureBackToTop();installListAnimations();
   document.addEventListener('click',e=>{
     const b=e.target.closest('.positions .pos');
     if(b){
       syncUtilityTabMode(b.dataset.pos);
       if(!['HOME','MYGUYS','DND'].includes(b.dataset.pos)){leaveHome();hideTagged();closeMobileMenu();}
-      setTimeout(normalizeMobileBrowserChrome,0);
+      
     }
     if(b||e.target.closest('[data-posview],[data-view],.team-btn'))setTimeout(savePageState,0);
   },true);
@@ -625,7 +600,7 @@ function install(){
     decorateTeamLogos();upgradeFallbackFaces();applyColors();
     const saved=readPageState();
     if(!saved?.section||saved.section==='HOME')showHome();else leaveHome();
-    setTimeout(()=>{installListAnimations();restoreSavedPageState();setTimeout(normalizeMobileBrowserChrome,60)},90);
+    setTimeout(()=>{installListAnimations();restoreSavedPageState()},90);
   });
 }
 install();

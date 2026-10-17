@@ -10,7 +10,7 @@ const canon=s=>aliases[norm(s)]||norm(s);
 let tags={QB:{draft:[],'do-not-draft':[]},RB:{draft:[],'do-not-draft':[]},WR:{draft:[],'do-not-draft':[]},TE:{draft:[],'do-not-draft':[]}};
 let rankPlayers=[];
 let currentKind=null;
-let currentPos='QB';
+let currentPos='ALL';
 let historicalHeadshots={};
 window.ShuaAdvanceFace=window.ShuaAdvanceFace||function(img){
   try{
@@ -142,7 +142,7 @@ function addStyles(){
     body.mobile-menu-open #phoneMenuDrawer{transform:translateX(0)}
 
     @media(max-width:650px){
-      .tagged-controls.open{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.tagged-controls button{padding:8px 4px}.tagged-count{grid-column:1/-1;margin-left:0}.tag-group{display:block!important}.tag-group td{display:block!important}
+      .tagged-controls.open{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.tagged-controls button{padding:8px 4px}.tagged-count{grid-column:1/-1;margin-left:0}.tag-group{display:block!important}.tag-group td{display:block!important}
       .phone-mode .positions{display:none!important}
       .phone-mode #phoneMenuButton{display:flex}
       .phone-mode #fantasyHome img{width:96vw;height:88vh}
@@ -191,7 +191,7 @@ function ensureControls(){
   if(c)return c;
   c=document.createElement('div');
   c.id='taggedControls';c.className='tagged-controls';
-  c.innerHTML=`<button data-tagpos="QB" class="active">QB</button><button data-tagpos="RB">RB</button><button data-tagpos="WR">WR</button><button data-tagpos="TE">TE</button><span id="taggedCount" class="tagged-count"></span>`;
+  c.innerHTML=`<button data-tagpos="ALL" class="active">All</button><button data-tagpos="QB">QB</button><button data-tagpos="RB">RB</button><button data-tagpos="WR">WR</button><button data-tagpos="TE">TE</button><span id="taggedCount" class="tagged-count"></span>`;
   const anchor=document.getElementById('overallToggle');
   (anchor?.parentNode||document.querySelector('main'))?.insertBefore(c,anchor?anchor.nextSibling:null);
   c.querySelectorAll('[data-tagpos]').forEach(b=>b.onclick=()=>{
@@ -250,11 +250,11 @@ function addNav(){
 function openTagged(kind,button){
   leaveHome();
   syncUtilityTabMode(kind);
-  currentKind=kind;currentPos='QB';
+  currentKind=kind;currentPos='ALL';
   try{position=kind}catch(e){}
   document.querySelectorAll('.positions .pos').forEach(x=>x.classList.toggle('active',x===button));
   const c=ensureControls();
-  c.querySelectorAll('[data-tagpos]').forEach(x=>x.classList.toggle('active',x.dataset.tagpos==='QB'));
+  c.querySelectorAll('[data-tagpos]').forEach(x=>x.classList.toggle('active',x.dataset.tagpos==='ALL'));
   renderTagged();
   closeMobileMenu();
 }
@@ -263,7 +263,7 @@ function renderTagged(){
   const my=currentKind==='MYGUYS',arr=buildRows(currentKind),c=ensureControls();
   c.classList.add('open');
   document.getElementById('title').textContent=my?'My Guys':'Do Not Draft';
-  document.getElementById('sub').textContent=`Showing ${currentPos} only`;
+  document.getElementById('sub').textContent=currentPos==='ALL'?'Grouped by position — QB, RB, WR, TE':`Showing ${currentPos} only`;
   document.getElementById('teamControls').hidden=true;
   document.getElementById('overallToggle').hidden=true;
   const positionToggle=document.getElementById('positionToggle');if(positionToggle)positionToggle.hidden=true;
@@ -272,8 +272,9 @@ function renderTagged(){
   document.getElementById('board').hidden=true;
   document.getElementById('tableCard').hidden=false;
   document.getElementById('taggedCount').textContent=`${arr.length} player${arr.length===1?'':'s'}`;
-  let html='';
+  const grouped=currentPos==='ALL';let last='',html='';
   arr.forEach(p=>{
+    if(grouped&&p.position!==last){last=p.position;html+=`<tr class="tag-group ${p.position.toLowerCase()}"><td colspan="6">${p.position}</td></tr>`}
     const a=p.additionalStats||{};
     html+=`<tr class="tagged-player-row" data-id="${idFor(p)}"><td class="rank">#${p.positionRank}</td><td><div class="photo-cell">${typeof pic==='function'?pic(p.name,'',p.team,p.position):''}<span class="tagged-player-copy"><b class="${my?'draft-name':'do-not-draft-name'}">${p.name}</b>${taggedTeamIdentity(p.team,p.position)}</span></div></td><td><span class="badge">${p.position}</span></td><td>${p.team}</td><td>${a.espnAdp||'—'}</td><td class="notes">${a.notes||'—'}</td></tr>`;
   });

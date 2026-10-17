@@ -290,7 +290,7 @@ style.textContent=`
   min-height:100dvh!important;
   max-height:100dvh!important;
   margin:0!important;
-  padding:calc(env(safe-area-inset-top) + 10px) 0 env(safe-area-inset-bottom)!important;
+  padding:0!important;
   border-radius:0!important;
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -306,7 +306,7 @@ style.textContent=`
 .phone-mode .featured-player-profile .closem{display:none!important}
 .phone-mode .featured-player-profile:before{
   content:"";display:block;position:absolute;z-index:30;
-  top:calc(env(safe-area-inset-top) + 5px);left:50%;transform:translateX(-50%);
+  top:5px;left:50%;transform:translateX(-50%);
   width:42px;height:5px;border-radius:999px;background:#ffffff58;
   pointer-events:none
 }
@@ -359,7 +359,7 @@ style.textContent=`
 }
 .phone-mode .featured-player-profile #unifiedProfilePanels{
   min-height:calc(100dvh - 316px);
-  padding:10px 10px max(18px,env(safe-area-inset-bottom))
+  padding:10px
 }
 .phone-mode .featured-player-profile .unified-profile-panel{padding-top:6px}
 .phone-mode .featured-player-profile #unifiedOverviewPanel #stats{

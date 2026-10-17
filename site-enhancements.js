@@ -216,6 +216,7 @@ function showHome(){
   document.body.classList.add('fantasy-home-mode');
   document.querySelectorAll('.positions .pos').forEach(x=>x.classList.toggle('active',x.dataset.pos==='HOME'));
   closeMobileMenu();
+  window.ShuaSettleMobileViewport?.();
 }
 function leaveHome(){document.body.classList.remove('fantasy-home-mode')}
 const UTILITY_TABS=new Set(['MYGUYS','DND','MOCK','DEPTH','COMPARE','TRADE']);
@@ -257,7 +258,7 @@ function openTagged(kind,button){
   c.querySelectorAll('[data-tagpos]').forEach(x=>x.classList.toggle('active',x.dataset.tagpos==='ALL'));
   renderTagged();
   closeMobileMenu();
-  
+  window.ShuaSettleMobileViewport?.();
 }
 function renderTagged(){
   if(!currentKind)return;
@@ -568,6 +569,24 @@ function installRuntimeFullBleed(){
     applying=false;
   };
   window.ShuaApplyFullBleed=apply;
+  const settleViewport=()=>{
+    if(!document.body.classList.contains('phone-mode'))return;
+    if(document.getElementById('modal')?.classList.contains('open'))return;
+    apply();
+    const nudge=()=>{
+      const doc=document.documentElement;
+      const max=Math.max(0,doc.scrollHeight-window.innerHeight);
+      if(max>1)window.scrollTo({top:1,left:0,behavior:'auto'});
+      void doc.offsetHeight;
+      apply();
+    };
+    // First nudge stays inside the user-initiated tab click.
+    nudge();
+    requestAnimationFrame(nudge);
+    setTimeout(nudge,40);
+    setTimeout(nudge,120);
+  };
+  window.ShuaSettleMobileViewport=settleViewport;
   apply();
 
   // Dynamic tabs append their own <style> blocks after this script. Keep this rule last.
@@ -586,8 +605,8 @@ function installRuntimeFullBleed(){
   // Recalculate immediately after any primary tab switch.
   document.addEventListener('click',e=>{
     if(!e.target.closest('.positions .pos,#phoneMenuItems button'))return;
-    setTimeout(apply,0);
-    setTimeout(apply,60);
+    settleViewport();
+    setTimeout(settleViewport,60);
   },false);
 
   // Also catch show/hide changes made programmatically by custom tabs.

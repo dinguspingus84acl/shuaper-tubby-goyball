@@ -264,6 +264,8 @@ function showCompare(){
   const title=document.getElementById('title');if(title)title.textContent='Compare Players';
   const sub=document.getElementById('sub');if(sub)sub.textContent='Search for two players and compare them side by side.';
   renderCompare();
+  window.ShuaApplyFullBleed?.();
+  window.ShuaSettleMobileViewport?.();
 }
 function hideCompare(){section.hidden=true}
 

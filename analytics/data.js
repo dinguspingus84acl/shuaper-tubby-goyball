@@ -28,8 +28,8 @@ async function load(year){return memo('season:'+year,async()=>{
  else
  if(year<YEAR){const local=await json('legacy-stats/'+year+'.json',{cache:'force-cache'});players=(Array.isArray(local)?local:local.rows||[]).map(p=>normalise(p,sched));source='nflverse · site historical archive';}
  else{
- const filter=JSON.stringify({players:{limit:2000,filterSlotIds:{value:[0,2,4,6]},filterStatsForSourceIds:{value:[0]},filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+year,'10'+year]}}});let error;
- for(const host of ['https://lm-api-reads.fantasy.espn.com','https://fantasy.espn.com']){try{const d=await json(host+'/apis/v3/games/ffl/seasons/'+year+'/segments/0/leaguedefaults/3?view=kona_player_info',{headers:{'Accept':'application/json','X-Fantasy-Filter':filter,'X-Fantasy-Source':'kona'},cache:'no-store'});players=parseEspn(Array.isArray(d)?d:d.players||[],year,sched);if(players.some(p=>p.games.length))break;}catch(e){error=e;}}
+ const filter=JSON.stringify({players:{limit:700,filterSlotIds:{value:[0,2,4,6]},filterStatsForSourceIds:{value:[0]},filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+year]}}});let error;
+ for(const host of ['https://lm-api-reads.fantasy.espn.com','https://fantasy.espn.com']){try{const d=await json(host+'/apis/v3/games/ffl/seasons/'+year+'/segments/0/leaguedefaults/3?scoringPeriodId=0&view=kona_player_info',{headers:{'Accept':'application/json','X-Fantasy-Filter':filter,'X-Fantasy-Source':'kona'},cache:'no-store'});players=parseEspn(Array.isArray(d)?d:d.players||[],year,sched);if(players.some(p=>p.games.length))break;}catch(e){error=e;}}
  if(!players.some(p=>p.games.length)){throw error||new Error('The '+year+' feed has not returned completed weekly statistics. Choose an archived season to inspect the dashboards.');}
  }
  players=players.filter(p=>S.positions.includes(p.position)&&p.name);

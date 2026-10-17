@@ -37,7 +37,12 @@ with sync_playwright() as pw:
    page.locator('[data-st-open]').first.click()
    if page.locator('#modal.open').count():
     page.locator('#shuaPlayerInsights summary').click();page.wait_for_selector('#shuaPlayerInsights .st-svg',timeout=25000)
-    page.locator('#close').click()
+    
+    closers=page.locator('#modal button:visible').evaluate_all("els=>els.map(e=>({id:e.id,text:e.textContent,aria:e.getAttribute('aria-label'),cls:e.className}))");print('VISIBLE PROFILE CONTROLS',json.dumps(closers),flush=True)
+    close=page.locator('#modal button:visible').filter(has_text='×')
+    if close.count():close.first.click()
+    else:page.keyboard.press('Escape')
+    assert not page.locator('#modal.open').count(),'Profile did not close'
    for tab in ['QB','RB','WR','TE','DEPTH','ESPNLIVE','COMPARE','TRADE']:
     selector='.positions [data-pos="'+tab+'"]'
     if page.locator(selector).count():

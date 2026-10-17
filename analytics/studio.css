@@ -41,4 +41,9 @@
 
 body.shua-studio-open main>:not(#shuaAnalyticsSection){display:none!important}
 
-@media(max-width:700px){.st-studio .st-controls>.st-player-control{grid-column:1/-1}}
+@media(max-width:700px){.st-studio .st-controls>.st-player-control{flex:1 1 100%;min-width:0}}
+
+/* Neutralize the old global <header> rule only inside the new dashboards. */
+#shuaAnalyticsSection header,.st-profile-insights header{border:0!important;max-width:none;margin:0;background:transparent}
+#shuaAnalyticsSection .st-heading{padding:0 0 17px!important}
+#shuaAnalyticsSection .st-panel-head,.st-profile-insights .st-panel-head{padding:0!important;margin-bottom:17px}

@@ -47,3 +47,6 @@ body.shua-studio-open main>:not(#shuaAnalyticsSection){display:none!important}
 #shuaAnalyticsSection header,.st-profile-insights header{border:0!important;max-width:none;margin:0;background:transparent}
 #shuaAnalyticsSection .st-heading{padding:0 0 17px!important}
 #shuaAnalyticsSection .st-panel-head,.st-profile-insights .st-panel-head{padding:0!important;margin-bottom:17px}
+
+#shuaAnalyticsSection .st-score.negative{color:#ff6779;border-color:#fa60764d;background:linear-gradient(130deg,#391827,#211827)}
+#stReturnToAnalytics{display:block!important;position:sticky;top:0;z-index:45;min-height:42px;margin:6px 8px;padding:8px 14px;background:#082237;border:1px solid #36bce866;color:#e9f8ff;border-radius:10px;font-weight:800;cursor:pointer}

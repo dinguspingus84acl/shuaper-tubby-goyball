@@ -31,6 +31,14 @@ with sync_playwright() as pw:
     if view in ['trends','opportunity','injury','schedule','weekly']:
      page.screenshot(path=str(OUT/f'{engine}-{width}-{view}.png'),full_page=True)
    page.locator('[data-st-view="trends"]').click()
+   page.locator('[data-st-pos="WR"]').click()
+   options=page.locator('#stPlayer option').evaluate_all('(es)=>es.map(e=>e.value)')
+   if len(options)>1:page.select_option('#stPlayer',options[1])
+   assert page.locator('#stContent .st-chart').count()>=1
+   page.select_option('#stWeek','8');assert 'Week 8' in page.locator('#stWeek').inner_text()
+   page.locator('[data-st-view="schedule"]').click();page.select_option('#stPlayoffs','playoffs')
+   assert page.locator('#stContent').inner_text().find('15')>=0
+   page.locator('[data-st-view="trends"]').click()
    page.locator('.st-chart-hit').first.focus();assert page.locator('.st-tooltip:not([hidden])').count()
    page.locator('.st-legend-btn').first.click();assert page.locator('.st-legend-btn').first.get_attribute('aria-pressed')=='false'
    page.locator('[data-st-view="weekly"]').click()
@@ -38,10 +46,7 @@ with sync_playwright() as pw:
    if page.locator('#modal.open').count():
     page.locator('#shuaPlayerInsights summary').click();page.wait_for_selector('#shuaPlayerInsights .st-svg',timeout=25000)
     
-    closers=page.locator('#modal button:visible').evaluate_all("els=>els.map(e=>({id:e.id,text:e.textContent,aria:e.getAttribute('aria-label'),cls:e.className}))");print('VISIBLE PROFILE CONTROLS',json.dumps(closers),flush=True)
-    close=page.locator('#modal button:visible').filter(has_text='×')
-    if close.count():close.first.click()
-    else:page.keyboard.press('Escape')
+    page.locator('#stReturnToAnalytics').click()
     assert not page.locator('#modal.open').count(),'Profile did not close'
    for tab in ['QB','RB','WR','TE','DEPTH','ESPNLIVE','COMPARE','TRADE']:
     selector='.positions [data-pos="'+tab+'"]'
@@ -54,7 +59,7 @@ with sync_playwright() as pw:
     assert page.locator('#shuaAnalyticsSection').is_visible()
    result['pageErrors']=errors
    # Fail on studio runtime errors, and retain unrelated legacy errors for inspection.
-   assert not [e for e in errors if 'ShuaStudio' in e or 'stContent' in e],errors
+   assert not errors,errors
    report['browsers'].append(result);context.close()
   browser.close()
 server.shutdown()

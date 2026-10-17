@@ -52,7 +52,7 @@ for year in [2024,2025,2026]:
   if year<2026:
    raw=json.loads((ROOT/f'legacy-stats/{year}.json').read_text());players=raw if isinstance(raw,list) else raw.get('rows',[]);sources.append('nflverse · existing site archive')
   else:
-   filtr={'players':{'limit':700,'filterSlotIds':{'value':[0,2,4,6]},'filterStatsForSourceIds':{'value':[0]},'filterStatsForTopScoringPeriodIds':{'value':20,'additionalValue':['00'+str(year)]}}}
+   filtr={'players':{'filterSlotIds':{'value':[0,2,4,6]},'filterStatsForSourceIds':{'value':[0]},'filterStatsForTopScoringPeriodIds':{'value':20,'additionalValue':['00'+str(year)]}}}
    raw=jget(f'https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{year}/segments/0/leaguedefaults/3?scoringPeriodId=0&view=kona_player_info',{'X-Fantasy-Filter':json.dumps(filtr),'X-Fantasy-Source':'kona'})
    entries=raw if isinstance(raw,list) else raw.get('players',[])
    for e in entries:

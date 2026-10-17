@@ -1,12 +1,12 @@
-"""Browser smoke tests of the actual checked-out website and source-attributed data."""
-import functools, http.server, json, pathlib, threading, time
+"""Regression tests of the actual website and source-attributed datasets, not mockups."""
+import functools, http.server, json, pathlib, threading
 from playwright.sync_api import sync_playwright
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 OUT=ROOT/'tests/studio-verification';OUT.mkdir(parents=True,exist_ok=True)
 server=http.server.ThreadingHTTPServer(('127.0.0.1',8765),functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(ROOT)))
 threading.Thread(target=server.serve_forever,daemon=True).start()
 manifest=json.loads((ROOT/'analytics/manifest.json').read_text())
-year=2026 if '2026' in manifest['datasets'] else 2025
+year=max(map(int,manifest['datasets']))
 report={'year':year,'source':'actual repository + prepared source-attributed datasets','browsers':[]}
 with sync_playwright() as pw:
  for engine in ['chromium','webkit']:
@@ -33,10 +33,12 @@ with sync_playwright() as pw:
    page.locator('[data-st-view="trends"]').click()
    page.locator('[data-st-pos="WR"]').click()
    options=page.locator('#stPlayer option').evaluate_all('(es)=>es.map(e=>e.value)')
-   if len(options)>1:page.select_option('#stPlayer',options[1])
+   if len(options)>1:
+    page.select_option('#stPlayer',options[1]);assert page.locator('#stPlayer').input_value()==options[1]
    assert page.locator('#stContent .st-chart').count()>=1
-   page.select_option('#stWeek','8');assert 'Week 8' in page.locator('#stWeek').inner_text()
+   page.select_option('#stWeek','8');assert page.locator('#stWeek').input_value()=='8'
    page.locator('[data-st-view="schedule"]').click();page.select_option('#stPlayoffs','playoffs')
+   assert page.locator('#stPlayoffs').input_value()=='playoffs'
    assert page.locator('#stContent').inner_text().find('15')>=0
    page.locator('[data-st-view="trends"]').click()
    page.locator('.st-chart-hit').first.focus();assert page.locator('.st-tooltip:not([hidden])').count()
@@ -45,7 +47,6 @@ with sync_playwright() as pw:
    page.locator('[data-st-open]').first.click()
    if page.locator('#modal.open').count():
     page.locator('#shuaPlayerInsights summary').click();page.wait_for_selector('#shuaPlayerInsights .st-svg',timeout=25000)
-    
     page.locator('#stReturnToAnalytics').click()
     assert not page.locator('#modal.open').count(),'Profile did not close'
    for tab in ['QB','RB','WR','TE','DEPTH','ESPNLIVE','COMPARE','TRADE']:
@@ -58,11 +59,11 @@ with sync_playwright() as pw:
     page.locator('#phoneMenuButton').click();page.wait_for_selector('#phoneMenuItems button[data-target="ANALYTICS"]');page.locator('#phoneMenuItems button[data-target="ANALYTICS"]').click()
     assert page.locator('#shuaAnalyticsSection').is_visible()
    result['pageErrors']=errors
-   # Fail on studio runtime errors, and retain unrelated legacy errors for inspection.
    assert not errors,errors
-   report['browsers'].append(result);context.close()
+   report['browsers'].append(result)
+   (OUT/'report.json').write_text(json.dumps(report,indent=2))
+   context.close()
   browser.close()
 server.shutdown()
-(OUT/'report.json').write_text(json.dumps(report,indent=2))
 print(json.dumps(report,indent=2))
-print('PASS: actual-site Chromium and WebKit renders at phone + desktop sizes. WebKit is not physical iPhone Safari chrome.')
+print('PASS: actual-site Chromium and WebKit at phone + desktop sizes. WebKit does not reproduce physical iPhone Safari browser chrome.')

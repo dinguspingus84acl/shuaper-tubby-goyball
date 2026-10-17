@@ -2,7 +2,7 @@ name: Verify analytics studio staging
 on:
   push:
     branches: ['analytics-studio/20261017']
-    paths: ['analytics-studio-bundle.*']
+    paths: ['staging-followup.py', '.github/workflows/analytics-studio-staging.yml', 'tests/studio-real-site.py']
 permissions:
   contents: write
 jobs:
@@ -13,25 +13,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Unpack reviewed implementation
-        run: |
-          python - <<'PY'
-          import hashlib, json, lzma, pathlib
-          root=pathlib.Path('.').resolve()
-          raw=b''.join(p.read_bytes() for p in sorted(root.glob('analytics-studio-bundle.*')))
-          assert hashlib.sha256(raw).hexdigest()=='12634f8204ffe7cc7b4e428b4b5d26f1da165f2d1e8ff8f77648edc630d74a60'
-          files=json.loads(lzma.decompress(raw))
-          for name, text in files.items():
-            dest=(root/name).resolve()
-            if not dest.is_relative_to(root): raise RuntimeError('Unsafe archive path')
-            dest.parent.mkdir(parents=True,exist_ok=True)
-            dest.write_text(text,encoding='utf-8')
-          PY
+      - name: Apply isolated followup and diagnose source
+        run: python -u staging-followup.py
       - name: Syntax and calculation tests
         run: |
           node tests/analytics-core.cjs
           for f in analytics/*.js analytics-dashboard.js player-insights.js; do node --check "$f"; done
-          python -m py_compile scripts/prepare-analytics-studio.py
+          python -m py_compile tests/studio-real-site.py scripts/prepare-analytics-studio.py
       - name: Prepare verified data and custom ranking revisions
         run: python -u scripts/prepare-analytics-studio.py
       - name: Record prepared tree on staging only
@@ -40,7 +28,7 @@ jobs:
           git config user.name 'SHUA Analytics Build'
           git config user.email 'actions@users.noreply.github.com'
           git add analytics analytics-dashboard.js player-insights.js index.html scripts/prepare-analytics-studio.py tests
-          git commit -m 'Prepare source-attributed analytics studio assets [skip ci]'
+          git diff --cached --quiet || git commit -m 'Verify integrated analytics studio assets [skip ci]'
           git push origin HEAD:analytics-studio/20261017
       - name: Install test browsers
         run: |
@@ -53,3 +41,14 @@ jobs:
         with:
           name: analytics-studio-verification
           path: tests/studio-verification/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: analytics-studio-source
+          path: |
+            analytics/
+            analytics-dashboard.js
+            player-insights.js
+            index.html
+            scripts/prepare-analytics-studio.py
+            tests/studio-real-site.py

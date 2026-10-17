@@ -11,7 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Prepare scoped dashboard release
-        run: python scripts/prepare-studio-release.py
+        run: |
+          python scripts/prepare-studio-release.py
+          python scripts/refine-studio-release.py
       - name: Syntax and calculation tests
         run: |
           node tests/analytics-core.cjs

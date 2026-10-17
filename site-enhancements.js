@@ -536,6 +536,8 @@ function installRuntimeFullBleed(){
     body.phone-mode .espn-live-shell,
     body.phone-mode .tagged-controls,
     body.phone-mode .depth-toolbar{margin-top:0!important;padding-top:0!important}
+    #iosChromeRunway{display:none!important}
+    body.phone-mode #iosChromeRunway{display:block!important;background:transparent!important}
   `;
   let applying=false;
   const apply=()=>{
@@ -569,24 +571,38 @@ function installRuntimeFullBleed(){
     applying=false;
   };
   window.ShuaApplyFullBleed=apply;
+  const RUNWAY=112;
+  const ensureRunway=()=>{
+    let r=document.getElementById('iosChromeRunway');
+    if(r)return r;
+    const main=document.querySelector('main');
+    if(!main)return null;
+    r=document.createElement('div');
+    r.id='iosChromeRunway';
+    r.setAttribute('aria-hidden','true');
+    r.style.cssText='height:'+RUNWAY+'px;min-height:'+RUNWAY+'px;margin:0;padding:0;border:0;pointer-events:none;visibility:hidden;';
+    main.parentNode.insertBefore(r,main);
+    return r;
+  };
   const settleViewport=()=>{
     if(!document.body.classList.contains('phone-mode'))return;
     if(document.getElementById('modal')?.classList.contains('open'))return;
+    ensureRunway();
     apply();
-    const nudge=()=>{
-      const doc=document.documentElement;
-      const max=Math.max(0,doc.scrollHeight-window.innerHeight);
-      if(max>1)window.scrollTo({top:1,left:0,behavior:'auto'});
-      void doc.offsetHeight;
+    const settle=()=>{
+      const max=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
+      const target=Math.min(RUNWAY,max);
+      if(target>0)window.scrollTo({top:target,left:0,behavior:'auto'});
+      void document.documentElement.offsetHeight;
       apply();
     };
-    // First nudge stays inside the user-initiated tab click.
-    nudge();
-    requestAnimationFrame(nudge);
-    setTimeout(nudge,40);
-    setTimeout(nudge,120);
+    settle();
+    requestAnimationFrame(settle);
+    setTimeout(settle,80);
+    setTimeout(settle,180);
   };
   window.ShuaSettleMobileViewport=settleViewport;
+  ensureRunway();
   apply();
 
   // Dynamic tabs append their own <style> blocks after this script. Keep this rule last.
@@ -632,7 +648,7 @@ function ensureBackToTop(){
     const useful=!document.body.classList.contains('fantasy-home-mode')&&!modalOpen&&window.scrollY>650;
     b.classList.toggle('visible',useful);
   };
-  b.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+  b.onclick=()=>window.scrollTo({top:document.body.classList.contains('phone-mode')?112:0,behavior:'smooth'});
   window.addEventListener('scroll',sync,{passive:true});
   document.addEventListener('click',()=>requestAnimationFrame(sync),true);
   sync();
@@ -674,7 +690,7 @@ function installRankingPolish(){
       else{
         clearSelectedPlayerRow();
         document.getElementById('rankingPlayerNav')?.remove();
-        const y=rankingScrollY;
+        const y=document.body.classList.contains('phone-mode')?Math.max(112,rankingScrollY):rankingScrollY;
         requestAnimationFrame(()=>window.scrollTo({top:y,left:0,behavior:'auto'}));
       }
     });
@@ -726,7 +742,7 @@ function install(){
     decorateTeamLogos();upgradeFallbackFaces();applyColors();
     const saved=readPageState();
     if(!saved?.section||saved.section==='HOME')showHome();else leaveHome();
-    setTimeout(()=>{installListAnimations();restoreSavedPageState();setTimeout(()=>window.ShuaApplyFullBleed?.(),80)},90);
+    setTimeout(()=>{installListAnimations();restoreSavedPageState();setTimeout(()=>window.ShuaSettleMobileViewport?.(),100)},90);
   });
 }
 install();

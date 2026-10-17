@@ -1769,6 +1769,16 @@ window.ShuaEspnLive={
     }
     return statsRows.find(p=>nameKey(p.name)===nameKey(name))||rows.find(p=>nameKey(p.name)===nameKey(name))||await getAnyHistoricalPlayer(name,preferredYear);
   },
+  async getAnalyticsDataset(){
+    await ensureCurrentRows().catch(()=>{});
+    return rows.map(p=>({id:String(p.id||''),name:p.name,team:p.team,position:p.position,points:Number(p.points)||0,ppg:Number(p.average)||0,gamesPlayed:Number(p.gamesPlayed)||0,targets:Number(p.targets)||0,receptions:Number(p.receptions)||0,rushAtt:Number(p.rushAtt)||0,passAtt:Number(p.passAtt)||0,rushYds:Number(p.rushYds)||0,recYds:Number(p.recYds)||0}));
+  },
+  async getAnalyticsGameLog(name){
+    await ensureCurrentRows().catch(()=>{});
+    const p=rows.find(x=>nameKey(x.name)===nameKey(name));
+    if(!p)return [];
+    try{const games=await fetchGameLog(p,SEASON);return games.filter(g=>g?.hasStats&&Number.isFinite(Number(g.totalPoints))).map(g=>({week:Number(g.week)||0,points:Number(g.totalPoints),opponent:cleanGameLogOpponent(g.opponent)}));}catch(e){return []}
+  },
   getHistoricalCareer,
   getCompleteCareer,
   getPlayerHeadshotUrl(player){return playerFaceCandidates(player)[0]||''},

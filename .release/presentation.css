@@ -1,0 +1,23 @@
+
+/* Navigation, opening states and enlarged chart presentation. Scoped to Studio. */
+.st-dashboard-picker{display:none}
+.st-boot{border:1px solid #285d79;background:#0b2236;border-radius:14px;padding:18px;color:#def5ff;margin:10px 0}
+.st-boot[hidden]{display:none!important}
+.st-chart-tools{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.st-chart-tools .st-legend{flex:1;margin-right:0}
+.st-expand{flex-shrink:0;border:1px solid #2a526e;border-radius:7px;background:#0e293e;color:#b8e9f8;font:inherit;font-size:10px;font-weight:750;padding:6px 9px;cursor:pointer;min-height:30px}
+.st-expand:focus-visible{outline:2px solid #24efa0;outline-offset:3px}
+.st-chart-note{color:#77a6c4;font-size:10px;margin:6px 0}
+.st-point-label{font-size:10px;font-weight:850;fill:#efffff;font-variant-numeric:tabular-nums}
+.st-chart-dialog{box-sizing:border-box;width:calc(100% - 24px);max-width:1160px;max-height:calc(100dvh - 32px);overflow:auto;background:#071c2e;color:#eefaff;border:1px solid #287895;border-radius:18px;padding:20px;box-shadow:0 24px 100px #000a}
+.st-chart-dialog::backdrop{background:#020c18dc;backdrop-filter:blur(5px)}
+.st-chart-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:16px}
+.st-chart-dialog-head h2{font-size:21px;line-height:1.2;margin:0}
+.st-chart-dialog-head button{border:1px solid #347086;border-radius:8px;background:#102f43;color:#fff;padding:9px 15px;font:inherit;cursor:pointer}
+.st-chart-dialog .st-expand{display:none}
+.st-chart-dialog .st-svg{width:100%;height:auto;max-height:none}
+.st-chart-dialog .st-chart-scroll{max-height:none}
+.st-chart-dialog .st-chart{position:relative}
+body.shua-studio-open>.view-mode-toggle{position:relative!important;inset:auto!important;width:max-content;margin:0 12px 14px auto!important;z-index:auto}
+@media(max-width:1000px){.st-dashboard-picker{display:block;margin:0 0 10px;max-width:100%}.st-dashboard-picker select{min-height:46px;font-size:14px!important}.st-topline{margin-bottom:14px}.st-chart-dialog{padding:13px}.st-chart-dialog-head h2{font-size:17px}}
+@media(max-width:700px){.st-dashboard-picker select{font-size:16px!important}.st-expand{min-height:34px}.st-podium .st-feature-top{height:103px}.st-podium .st-feature .st-face{height:114px;width:134px}.st-chart-dialog{width:calc(100% - 12px);max-height:calc(100dvh - 16px)}}

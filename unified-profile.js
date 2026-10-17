@@ -68,7 +68,7 @@ style.textContent=`
 .unified-stat-item{border:1px solid #ffffff12;background:#07182a;border-radius:8px;padding:7px}
 .unified-stat-item b{display:block;margin-top:2px;font-size:.76rem}
 .unified-profile-loading{padding:14px 4px;color:#7f93aa;font-size:.66rem}
-#unifiedNotesPanel .note-box{margin-top:0}
+#unifiedOverviewPanel .note-box{margin-top:10px}
 .player-sticky-identity{display:none;position:sticky;top:0;z-index:32;min-height:46px;align-items:center;gap:10px;padding:7px 10px;border:1px solid #ffffff20;border-radius:9px;background:#061522f7;box-shadow:0 8px 20px #0008;backdrop-filter:blur(10px)}
 .player-sticky-identity.visible{display:flex}
 .player-sticky-main{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
@@ -1009,8 +1009,7 @@ function ensureUi(){
   tabs.innerHTML=[
     ['overview','Overview'],
     ['gamelog','Game Log'],
-    ['history','History'],
-    ['notes','Notes']
+    ['history','History']
   ].map(([k,l])=>'<button type="button" class="unified-profile-tab" data-profile-tab="'+k+'">'+l+'</button>').join('');
 
   const panels=document.createElement('div');
@@ -1018,8 +1017,7 @@ function ensureUi(){
   panels.innerHTML=
     '<div id="unifiedOverviewPanel" class="unified-profile-panel" data-profile-panel="overview"></div>'+
     '<div id="unifiedGameLogPanel" class="unified-profile-panel" data-profile-panel="gamelog" hidden></div>'+ 
-    '<div id="unifiedHistoryPanel" class="unified-profile-panel" data-profile-panel="history" hidden></div>'+
-    '<div id="unifiedNotesPanel" class="unified-profile-panel" data-profile-panel="notes" hidden></div>';
+    '<div id="unifiedHistoryPanel" class="unified-profile-panel" data-profile-panel="history" hidden></div>';
 
   const profileTop=document.getElementById('profileTop');
   profileTop.insertAdjacentElement('afterend',tabs);
@@ -1028,7 +1026,7 @@ function ensureUi(){
   const overview=document.getElementById('unifiedOverviewPanel');
   if(injury)overview.appendChild(injury);
   if(stats)overview.appendChild(stats);
-  if(notes)document.getElementById('unifiedNotesPanel').appendChild(notes);
+  if(notes)overview.appendChild(notes);
 
   tabs.addEventListener('click',e=>{
     const btn=e.target.closest('[data-profile-tab]');
@@ -1038,7 +1036,8 @@ function ensureUi(){
   return box;
 }
 function activateTab(key){
-  if(!['overview','gamelog','history','notes'].includes(key))key='overview';
+  if(key==='notes')key='overview';
+  if(!['overview','gamelog','history'].includes(key))key='overview';
   preferredProfileTab=key;
   try{sessionStorage.setItem('shuaProfileTab',key)}catch(e){}
   const tabs=document.querySelectorAll('[data-profile-tab]');

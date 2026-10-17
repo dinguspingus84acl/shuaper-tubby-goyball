@@ -5,10 +5,13 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: premium-analytics-preview
+  cancel-in-progress: false
 jobs:
   preview:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -17,29 +20,42 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Apply checksum-verified source bundle
+        run: python scripts/apply-analytics-bundle.py
       - name: Build verified weekly datasets
         env:
           ANALYTICS_SEASON: '2026'
         run: python scripts/build-analytics-data.py
-      - name: Check source syntax
+      - name: Validate JavaScript and calculations
         run: |
-          node --check analytics-dashboard.js
-          if [ -f analytics-core.js ]; then node --check analytics-core.js; fi
-          if [ -f analytics-ui.js ]; then node --check analytics-ui.js; fi
-          if [ -f tests/analytics.test.cjs ]; then node --test tests/analytics.test.cjs; fi
-      - name: Save generated data on preview branch only
+          for f in analytics-dashboard.js analytics-core.js analytics-charts.js analytics-ui.js player-insights.js; do node --check "$f"; done
+          node --test tests/analytics.test.cjs
+      - name: Install browser testing tools
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium webkit
+      - name: Test actual HTTP rendering and navigation in Chromium and WebKit
+        run: python tests/browser_analytics.py
+      - name: Save verified sources on preview branch only
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add analytics-data
+          git add -A .analytics-staging || true
+          git add analytics-data analytics-core.js analytics-charts.js analytics-ui.js analytics-dashboard.js analytics-premium.css player-insights.js index.html scripts/build-analytics-data.py tests/analytics.test.cjs
           if ! git diff --cached --quiet; then
-            git commit -m 'Build verified analytics data for preview'
+            git commit -m 'Implement and verify all ten premium analytics dashboards'
             git push origin HEAD:build/premium-analytics
           fi
-      - name: Package source for isolated browser tests
-        run: git archive --format=zip HEAD -o /tmp/shua-source.zip
+      - name: Package source for review
+        if: always()
+        run: |
+          mkdir -p /tmp/shua-review
+          tar --exclude=.git --exclude=test-results -czf /tmp/shua-review/source.tar.gz .
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: shua-source
-          path: /tmp/shua-source.zip
-          retention-days: 3
+          name: premium-analytics-review
+          path: |
+            /tmp/shua-review/source.tar.gz
+            test-results
+          retention-days: 5

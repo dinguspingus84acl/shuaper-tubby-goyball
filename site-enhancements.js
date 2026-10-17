@@ -2,6 +2,7 @@
 'use strict';
 
 const TEAM_SLUGS={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',DAL:'dal',DEN:'den',DET:'det',GNB:'gb',GB:'gb',HOU:'hou',IND:'ind',JAX:'jax',KAN:'kc',KC:'kc',LAC:'lac',LAR:'lar',LVR:'lv',LV:'lv',MIA:'mia',MIN:'min',NWE:'ne',NE:'ne',NOR:'no',NO:'no',NYG:'nyg',NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SFO:'sf',SF:'sf',TAM:'tb',TB:'tb',TEN:'ten',WAS:'wsh',WSH:'wsh'};
+const TEAM_FULL_NAMES={ARI:'Arizona Cardinals',ATL:'Atlanta Falcons',BAL:'Baltimore Ravens',BUF:'Buffalo Bills',CAR:'Carolina Panthers',CHI:'Chicago Bears',CIN:'Cincinnati Bengals',CLE:'Cleveland Browns',DAL:'Dallas Cowboys',DEN:'Denver Broncos',DET:'Detroit Lions',GB:'Green Bay Packers',GNB:'Green Bay Packers',HOU:'Houston Texans',IND:'Indianapolis Colts',JAX:'Jacksonville Jaguars',KC:'Kansas City Chiefs',KAN:'Kansas City Chiefs',LAC:'Los Angeles Chargers',LAR:'Los Angeles Rams',LV:'Las Vegas Raiders',LVR:'Las Vegas Raiders',MIA:'Miami Dolphins',MIN:'Minnesota Vikings',NE:'New England Patriots',NWE:'New England Patriots',NO:'New Orleans Saints',NOR:'New Orleans Saints',NYG:'New York Giants',NYJ:'New York Jets',PHI:'Philadelphia Eagles',PIT:'Pittsburgh Steelers',SEA:'Seattle Seahawks',SF:'San Francisco 49ers',SFO:'San Francisco 49ers',TB:'Tampa Bay Buccaneers',TAM:'Tampa Bay Buccaneers',TEN:'Tennessee Titans',WAS:'Washington Commanders',WSH:'Washington Commanders'};
 const POSITIONS=['QB','RB','WR','TE'];
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
 const aliases={kennethwalkeriii:'kennethwalker',travisetiennejr:'travisetienne',marvinharrisonjr:'marvinharrison',michaelpittmanjr:'michaelpittman',brianthomasjr:'brianthomas',tyronetracyjr:'tyronetracy',brianrobinsonjr:'brianrobinson',jeramayahlove:'jeremiyahlove',kennethgainwell:'kennygainwell',jaydenblue:'jaydonblue',kcconception:'kcconcepcion',patbyrnat:'patbryant'};
@@ -52,8 +53,14 @@ function addStyles(){
     .tagged-controls{display:none;gap:7px;flex-wrap:wrap;margin:12px 0}.tagged-controls.open{display:flex}.tagged-controls button{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 12px;font-weight:900}.tagged-controls button.active{background:#183d63;color:#fff}.tagged-count{margin-left:auto;color:var(--m);align-self:center;font-weight:800}
     .tag-group td{background:#0d2945!important;color:#fff!important;font-weight:950!important;letter-spacing:.08em;padding:9px 14px!important}.tag-group.qb td{border-left:5px solid var(--qb)}.tag-group.rb td{border-left:5px solid var(--rb)}.tag-group.wr td{border-left:5px solid var(--wr)}.tag-group.te td{border-left:5px solid var(--te)}
     .team-abbr{display:inline-flex;align-items:center;gap:7px;font-weight:800;white-space:nowrap}.team-mini-logo{width:22px;height:22px;object-fit:contain;vertical-align:middle;flex:0 0 22px}.team-mini-logo.sm{width:18px;height:18px;flex-basis:18px}
-    .tagged-player-name-line{display:inline-flex;align-items:center;gap:7px;min-width:0;white-space:nowrap}
+    .tagged-player-copy{display:grid;gap:4px;min-width:0}
+    .tagged-player-copy>b{display:block;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.15}
+    .tagged-player-team-line{display:flex;align-items:center;gap:6px;min-width:0;color:var(--m);font-size:.62rem;font-weight:850;white-space:normal}
     .tagged-player-team-logo{width:19px;height:19px;object-fit:contain;flex:0 0 19px}
+    .tagged-player-team-name{white-space:normal;overflow:visible;text-overflow:clip}
+    .phone-mode #tableCard .tagged-player-row td:nth-child(2){overflow:visible!important;text-overflow:clip!important;white-space:normal!important}
+    .phone-mode #tableCard .tagged-player-row .tagged-player-copy>b{white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+    .phone-mode #tableCard .tagged-player-row .tagged-player-team-line{font-size:.56rem;white-space:normal!important}
     .phone-mode .tagged-player-team-logo{width:17px;height:17px;flex-basis:17px}
 
     /* Rankings polish: pinned column labels + persistent selected-player state */
@@ -154,9 +161,12 @@ function logoHtml(team,small=false){
   const slug=TEAM_SLUGS[team];
   return slug?`<span class="team-abbr"><img class="team-mini-logo${small?' sm':''}" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt=""><span>${team}</span></span>`:`<span class="team-abbr">${team||'—'}</span>`;
 }
-function taggedTeamLogo(team){
+function taggedTeamIdentity(team){
   const slug=TEAM_SLUGS[team];
-  return slug?`<img class="tagged-player-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt="${team} logo">`:'';
+  const full=TEAM_FULL_NAMES[team]||team||'—';
+  return '<span class="tagged-player-team-line">'+
+    (slug?`<img class="tagged-player-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${slug}.png" alt="${full} logo">`:'')+
+    '<span class="tagged-player-team-name">'+full+'</span></span>';
 }
 function tagSet(pos,key){return new Set((tags[pos]?.[key]||[]).map(canon))}
 function isTagged(p,key){
@@ -265,7 +275,7 @@ function renderTagged(){
   arr.forEach(p=>{
     if(grouped&&p.position!==last){last=p.position;html+=`<tr class="tag-group ${p.position.toLowerCase()}"><td colspan="6">${p.position}</td></tr>`}
     const a=p.additionalStats||{};
-    html+=`<tr data-id="${idFor(p)}"><td class="rank">#${p.positionRank}</td><td><div class="photo-cell">${typeof pic==='function'?pic(p.name,'',p.team,p.position):''}<span class="tagged-player-name-line"><b class="${my?'draft-name':'do-not-draft-name'}">${p.name}</b>${taggedTeamLogo(p.team)}</span></div></td><td><span class="badge">${p.position}</span></td><td>${p.team}</td><td>${a.espnAdp||'—'}</td><td class="notes">${a.notes||'—'}</td></tr>`;
+    html+=`<tr class="tagged-player-row" data-id="${idFor(p)}"><td class="rank">#${p.positionRank}</td><td><div class="photo-cell">${typeof pic==='function'?pic(p.name,'',p.team,p.position):''}<span class="tagged-player-copy"><b class="${my?'draft-name':'do-not-draft-name'}">${p.name}</b>${taggedTeamIdentity(p.team)}</span></div></td><td><span class="badge">${p.position}</span></td><td>${p.team}</td><td>${a.espnAdp||'—'}</td><td class="notes">${a.notes||'—'}</td></tr>`;
   });
   document.getElementById('rows').innerHTML=html;
   document.querySelectorAll('#rows tr[data-id]').forEach(tr=>tr.onclick=()=>{if(typeof profile==='function')profile(tr.dataset.id)});

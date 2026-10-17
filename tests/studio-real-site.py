@@ -22,6 +22,7 @@ with sync_playwright() as pw:
    for view in ['matchup','trends','opportunity','rankings','consistency','teams','injury','schedule','startsit','weekly']:
     page.locator('[data-st-view="'+view+'"]').click()
     if view=='rankings':page.wait_for_selector('#stRankBody .st-chart',timeout=20000)
+    if view=='injury':assert page.locator('#stContent .st-chart').count()>=2,'Injury Impact did not choose a comparable source-confirmed absence'
     page.wait_for_timeout(300)
     assert page.locator('#stContent .st-panel').count()>0,(engine,width,view,'missing panels')
     assert not page.locator('#stContent').inner_text().startswith('This dashboard could not render'),(view,page.locator('#stContent').inner_text())

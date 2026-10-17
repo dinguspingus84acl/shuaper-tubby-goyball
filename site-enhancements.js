@@ -582,8 +582,10 @@ function installLiveMobileViewport(){
     const vv=window.visualViewport;
     const h=Math.max(vv?.height||0,window.innerHeight||0);
     const top=Math.max(0,vv?.offsetTop||0);
+    const pageTop=Math.max(0,vv?.pageTop||window.scrollY||0);
     document.documentElement.style.setProperty('--shua-live-vh',Math.ceil(h)+'px');
     document.documentElement.style.setProperty('--shua-live-top',Math.ceil(top)+'px');
+    document.documentElement.style.setProperty('--shua-live-page-top',Math.ceil(pageTop)+'px');
   };
   const queue=()=>{if(!raf)raf=requestAnimationFrame(sync)};
   sync();

@@ -173,9 +173,9 @@ body.phone-mode .modal{inset:0!important;width:100vw!important;height:100lvh!imp
     position:relative!important;
     margin:0!important;padding:0!important;border:0!important;outline:0!important;
     min-height:0!important;
-    background:#061322!important;
-    overflow-x:hidden!important;
-    overflow-y:auto!important;
+    background:transparent!important;
+    overflow-x:clip!important;
+    overflow-y:visible!important;
     overscroll-behavior-y:auto!important;
     -webkit-overflow-scrolling:touch;
   }
@@ -207,11 +207,11 @@ body.phone-mode .modal{inset:0!important;width:100vw!important;height:100lvh!imp
     left:auto!important;right:auto!important;
     width:100%!important;max-width:none!important;
     min-height:0!important;
-    margin:calc(-1 * env(safe-area-inset-top)) 0 0!important;
+    margin:0!important;
     padding:0 6px 0!important;
     border:0!important;outline:0!important;
     background:transparent!important;
-    overflow-x:hidden!important;
+    overflow-x:clip!important;
     overflow-y:visible!important;
   }
 

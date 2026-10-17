@@ -133,7 +133,7 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-filter.active,.espn-stat-btn.active,.espn-view-btn.active,.espn-refresh:active{background:#183d63!important;color:#fff!important}.espn-year-select{background:#081a2d;color:#fff;min-width:82px}
 .espn-stat-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 9px;border:1px solid #ffffff16;border-radius:10px;background:#07182a}
 .espn-stat-primary{display:flex;align-items:center;gap:7px;flex:1 1 auto;min-width:0;flex-wrap:wrap}
-.espn-rank-by-head{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
+.espn-rank-by-head{display:flex;align-items:center;justify-content:flex-end;justify-self:end;gap:6px;min-width:0;width:100%}
 .espn-stat-label{color:#7f93aa;font-size:.62rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
 .espn-stat-btn,.espn-view-btn{padding:6px 9px;font-size:.65rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
@@ -143,10 +143,11 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-sort-head{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:900;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;width:100%;text-align:right}
 .espn-sort-head:hover{color:#fff}
 .espn-sort-head .sort-arrow{font-size:.68rem;color:#7fb6e5}
-.espn-column-stat-select{width:100%;min-width:0;height:36px;border:1px solid #ffffff1f;border-radius:7px;background:#081a2d;color:#fff;padding:0 30px 0 10px;font-size:.72rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap}
+.espn-column-stat-select{width:100%;min-width:0;height:36px;border:1px solid #ffffff1f;border-radius:7px;background:#081a2d;color:#fff;padding:0 30px 0 10px;font-size:.72rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap;text-align:right;text-align-last:right}
+.espn-column-stat-select option{text-align:right}
 .espn-column-stat-select:focus{border-color:#6aaee5}
 .phone-mode .espn-column-stat-select{height:38px;font-size:.66rem;padding-left:7px;padding-right:21px;min-width:0!important;width:100%!important}
-.phone-mode .espn-rank-by-head{display:block;min-width:0;width:100%}
+.phone-mode .espn-rank-by-head{display:block;min-width:0;width:100%;justify-self:end;text-align:right}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
 .espn-player{display:flex;align-items:center;gap:9px;min-width:0}.espn-headshot{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 15%;background:#17314a;border:1px solid #ffffff30;flex:0 0 38px}.espn-headshot-fallback{display:flex;align-items:center;justify-content:center;color:#dbeafe;font-size:.68rem;font-weight:950}
@@ -208,7 +209,7 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-game-log-empty{padding:12px 4px;color:#7f93aa;font-size:.62rem}
 .espn-team-logo{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
 .espn-pos{font-weight:900}
-.espn-points,.espn-selected-stat{text-align:right;font-weight:900}
+.espn-points,.espn-selected-stat{text-align:right;font-weight:900;justify-self:end;width:100%;padding-right:2px}
 .espn-selected-stat{color:#dbeafe;background:transparent;box-shadow:none}
 #espnLiveRows>.espn-live-row.stats-selected{background:#0d2a42!important;box-shadow:inset 4px 0 0 #35d07f}
 #espnSelectedStatHead{background:transparent;box-shadow:none;border-radius:0;padding:0}
@@ -298,7 +299,9 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
   .espn-player-name{font-size:.69rem;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}.espn-player{gap:7px;align-items:center}.espn-name-btn{font-size:.69rem!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;line-height:1.1!important;letter-spacing:-.01em}.espn-player-meta{font-size:.54rem}.espn-player-meta .espn-team-logo{width:14px;height:14px;flex-basis:14px}
   .espn-headshot{width:34px;height:34px;flex-basis:34px}
   .espn-pos{display:block!important;text-align:center;font-size:.64rem;font-weight:950}
-  .espn-selected-stat{font-size:.72rem}
+  .espn-rank-by-head{justify-self:end!important}
+  .espn-column-stat-select{text-align:right!important;text-align-last:right!important}
+  .espn-selected-stat{font-size:.72rem;text-align:right!important;justify-self:end!important;width:100%!important;padding-right:2px!important}
   .espn-live-toolbar{display:grid;grid-template-columns:1fr;gap:7px}.espn-live-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}.espn-filter{padding:7px 3px;font-size:.62rem;min-width:0}.espn-team-filter-wrap{width:auto;margin-left:0;justify-self:start;display:flex;gap:6px}.espn-team-filter-title{font-size:.64rem}.espn-team-filter-button{flex-basis:188px;width:188px;min-height:36px;font-size:.66rem}.espn-team-filter-menu{left:auto;right:0;width:225px;max-height:48vh}.espn-live-meta{display:flex;justify-content:flex-end;width:100%;align-items:center}.espn-year-select{min-height:38px;padding:6px 8px}.espn-stat-bar{display:flex!important;align-items:center!important;gap:6px!important;padding:6px 7px!important;flex-wrap:wrap!important}
   .espn-stat-primary{display:flex!important;align-items:center!important;gap:6px!important;width:100%!important;flex-wrap:nowrap!important}
   .espn-stat-primary>.espn-stat-label{width:auto!important;flex:0 0 auto}

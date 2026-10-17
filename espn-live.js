@@ -143,10 +143,15 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-sort-head{border:0;background:transparent;color:inherit;padding:0;font:inherit;font-weight:900;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;width:100%;text-align:right}
 .espn-sort-head:hover{color:#fff}
 .espn-sort-head .sort-arrow{font-size:.68rem;color:#7fb6e5}
-.espn-column-stat-select{width:100%;min-width:0;height:36px;border:1px solid #ffffff1f;border-radius:7px;background:#081a2d;color:#fff;padding:0 30px 0 10px;font-size:.72rem;font-weight:950;outline:none;text-transform:none;white-space:nowrap;text-align:right;text-align-last:right}
-.espn-column-stat-select option{text-align:right}
-.espn-column-stat-select:focus{border-color:#6aaee5}
-.phone-mode .espn-column-stat-select{height:38px;font-size:.66rem;padding-left:7px;padding-right:21px;min-width:0!important;width:100%!important}
+.espn-stat-picker{position:relative;width:100%;min-width:0}
+.espn-stat-picker-button{width:100%;height:36px;border:1px solid #ffffff1f;border-radius:7px;background:#081a2d;color:#fff;padding:0 9px;font-size:.7rem;font-weight:950;outline:none;white-space:nowrap;text-align:right;overflow:visible}
+.espn-stat-picker-menu{position:absolute;right:0;top:calc(100% + 5px);z-index:95;width:max(190px,100%);max-height:330px;overflow-y:auto;border:1px solid #ffffff25;border-radius:9px;background:#081a2d;box-shadow:0 14px 30px #000a}
+.espn-stat-picker-menu[hidden]{display:none!important}
+.espn-stat-picker-option{width:100%;min-height:40px;border:0;border-top:1px solid #ffffff10;background:transparent;color:#fff;padding:8px 10px;text-align:right;font-size:.7rem;font-weight:950;white-space:nowrap}
+.espn-stat-picker-option:first-child{border-top:0}
+.espn-stat-picker-option:hover,.espn-stat-picker-option.active{background:#123554}
+.phone-mode .espn-stat-picker-button{height:38px;font-size:.66rem;padding:0 7px}
+.phone-mode .espn-stat-picker-menu{width:205px}
 .phone-mode .espn-rank-by-head{display:block;min-width:0;width:100%;justify-self:end;text-align:right}
 .espn-live-row{padding:8px 10px;border-top:1px solid #ffffff12;min-height:58px}
 .espn-rank{color:var(--r);font-weight:950}
@@ -291,8 +296,8 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 
 @media(max-width:700px){
   .phone-mode.stats-mode .espn-live-toolbar{padding-right:58px!important}
-  .phone-mode.stats-mode .espn-live-head,.phone-mode.stats-mode .espn-live-row{grid-template-columns:34px minmax(0,1fr) 38px minmax(188px,49vw)!important;gap:5px!important}
-  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 38px minmax(188px,49vw);gap:5px}
+  .phone-mode.stats-mode .espn-live-head,.phone-mode.stats-mode .espn-live-row{grid-template-columns:34px minmax(0,1fr) 38px 148px!important;gap:5px!important}
+  .espn-live-head,.espn-live-row{grid-template-columns:34px minmax(0,1fr) 38px 148px;gap:5px}
   .espn-live-head>*:nth-child(4),.espn-live-row>*:nth-child(4){display:none}
   .espn-live-head>*:nth-child(5),.espn-live-row>*:nth-child(5){display:none}
   .espn-live-row{padding:7px 6px;min-height:58px;height:auto}
@@ -300,7 +305,6 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
   .espn-headshot{width:34px;height:34px;flex-basis:34px}
   .espn-pos{display:block!important;text-align:center;font-size:.64rem;font-weight:950}
   .espn-rank-by-head{justify-self:end!important}
-  .espn-column-stat-select{text-align:right!important;text-align-last:right!important}
   .espn-selected-stat{font-size:.72rem;text-align:right!important;justify-self:end!important;width:100%!important;padding-right:2px!important}
   .espn-live-toolbar{display:grid;grid-template-columns:1fr;gap:7px}.espn-live-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}.espn-filter{padding:7px 3px;font-size:.62rem;min-width:0}.espn-team-filter-wrap{width:auto;margin-left:0;justify-self:start;display:flex;gap:6px}.espn-team-filter-title{font-size:.64rem}.espn-team-filter-button{flex-basis:188px;width:188px;min-height:36px;font-size:.66rem}.espn-team-filter-menu{left:auto;right:0;width:225px;max-height:48vh}.espn-live-meta{display:flex;justify-content:flex-end;width:100%;align-items:center}.espn-year-select{min-height:38px;padding:6px 8px}.espn-stat-bar{display:flex!important;align-items:center!important;gap:6px!important;padding:6px 7px!important;flex-wrap:wrap!important}
   .espn-stat-primary{display:flex!important;align-items:center!important;gap:6px!important;width:100%!important;flex-wrap:nowrap!important}
@@ -390,7 +394,7 @@ section.innerHTML=`
     </div>
     <div class="espn-live-card">
       <div class="espn-live-head">
-        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div>PPR Pts</div><div class="espn-rank-by-head"><select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Rank players by stat"></select></div>
+        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div>PPR Pts</div><div class="espn-rank-by-head"><div class="espn-stat-picker"><button id="espnStatPickerButton" class="espn-stat-picker-button" type="button" aria-haspopup="listbox" aria-expanded="false"><span id="espnStatPickerLabel">Points</span></button><div id="espnStatPickerMenu" class="espn-stat-picker-menu" role="listbox" hidden></div><select id="espnColumnStatSelect" hidden aria-hidden="true" tabindex="-1"></select></div></div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open Stats to load rankings.</div></div>
     </div>
@@ -1417,17 +1421,35 @@ function renderTeamFilter(){
 }
 function renderStatFilters(){
   const select=document.getElementById('espnColumnStatSelect');
+  const button=document.getElementById('espnStatPickerButton');
+  const label=document.getElementById('espnStatPickerLabel');
+  const menu=document.getElementById('espnStatPickerMenu');
   const cfg=configForFilter().filter(x=>statView!=='PERGAME'||x.key!=='average');
   if(!cfg.some(x=>x.key===activeStat))activeStat='points';
+  const currentLabel=fullStatLabel(activeStat);
   if(select){
     select.innerHTML=cfg.map(x=>'<option value="'+x.key+'">'+fullStatLabel(x.key)+'</option>').join('');
     select.value=activeStat;
-    select.onchange=()=>{
-      activeStat=select.value||'points';
+  }
+  if(label)label.textContent=currentLabel;
+  if(menu){
+    menu.innerHTML=cfg.map(x=>'<button type="button" class="espn-stat-picker-option'+(x.key===activeStat?' active':'')+'" data-espn-stat="'+x.key+'" role="option" aria-selected="'+(x.key===activeStat?'true':'false')+'">'+fullStatLabel(x.key)+'</button>').join('');
+    menu.querySelectorAll('[data-espn-stat]').forEach(opt=>opt.onclick=e=>{
+      e.preventDefault();e.stopPropagation();
+      activeStat=opt.dataset.espnStat||'points';
       sortDirection='DESC';
       saveStatsUiState();
+      menu.hidden=true;
+      if(button)button.setAttribute('aria-expanded','false');
       renderStatFilters();
       render();
+    });
+  }
+  if(button&&menu){
+    button.onclick=e=>{
+      e.preventDefault();e.stopPropagation();
+      menu.hidden=!menu.hidden;
+      button.setAttribute('aria-expanded',menu.hidden?'false':'true');
     };
   }
 }
@@ -1664,6 +1686,12 @@ document.addEventListener('click',e=>{
     teamMenu.hidden=true;
     if(teamButton)teamButton.setAttribute('aria-expanded','false');
   }
+  const statMenu=document.getElementById('espnStatPickerMenu');
+  const statButton=document.getElementById('espnStatPickerButton');
+  if(statMenu&&!e.target.closest('.espn-stat-picker')){
+    statMenu.hidden=true;
+    if(statButton)statButton.setAttribute('aria-expanded','false');
+  }
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
@@ -1671,6 +1699,10 @@ document.addEventListener('keydown',e=>{
     const teamButton=document.getElementById('espnTeamFilterButton');
     if(teamMenu)teamMenu.hidden=true;
     if(teamButton)teamButton.setAttribute('aria-expanded','false');
+    const statMenu=document.getElementById('espnStatPickerMenu');
+    const statButton=document.getElementById('espnStatPickerButton');
+    if(statMenu)statMenu.hidden=true;
+    if(statButton)statButton.setAttribute('aria-expanded','false');
   }
 });
 

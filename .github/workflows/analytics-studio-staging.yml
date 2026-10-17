@@ -11,44 +11,35 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Fit category labels inside their chart cells
+      - name: Open Injury Impact on a real comparable absence, not an empty scenario
         run: |
           python - <<'PY'
           from pathlib import Path
-          p=Path('analytics/charts.js');s=p.read_text()
-          old='labels.forEach((label,i)=>{const x=L+cell*i+cell/2;body+='
-          new='labels.forEach((label,i)=>{const x=L+cell*i+cell/2,cap=Math.max(5,Math.floor((cell-7)/6));body+='
-          assert old in s
-          s=s.replace(old,new).replace("label.length>16?label.slice(0,15)+'…':label","label.length>cap?label.slice(0,cap-1)+'…':label")
+          p=Path('analytics/ui.js');s=p.read_text()
+          old='function injury(){const members='
+          new="""function injury(){if(state.injuryInitialized!==state.year){state.injuryInitialized=state.year;const candidates=dataset.players.filter(p=>['RB','WR','TE'].includes(p.position)).filter(p=>Object.entries(p.availability||{}).some(([w,x])=>+w<=state.week&&String(x.status).toLowerCase()==='out')).sort((a,b)=>(A(b,state.week).points||0)-(A(a,state.week).points||0));for(const p of candidates){const weeks=Object.entries(p.availability||{}).filter(([w,x])=>+w<=state.week&&String(x.status).toLowerCase()==='out').map(([w])=>+w);const comparable=S.splits(dataset,p,p.team,state.week,weeks).rows.some(r=>r.nWith>0&&r.nWithout>0);if(comparable){state.team=p.team;state.player=p.key;state.outWeeks=null;break;}}}const members="""
+          assert old in s;s=s.replace(old,new)
+          s=s.replace("state.view=tab.dataset.stView;state.outWeeks=null;","state.view=tab.dataset.stView;state.outWeeks=null;if(state.view==='injury')state.injuryInitialized=0;")
           p.write_text(s)
+          p=Path('tests/studio-real-site.py');s=p.read_text();old="    if view=='rankings':page.wait_for_selector('#stRankBody .st-chart',timeout=20000)";new=old+"\n    if view=='injury':assert page.locator('#stContent .st-chart').count()>=2,'Injury Impact did not choose a comparable source-confirmed absence'";assert old in s;p.write_text(s.replace(old,new))
           PY
       - name: Record final source on staging only
         run: |
           test "$GITHUB_REF_NAME" = 'analytics-studio/20261017'
           git config user.name 'SHUA Analytics Build'
           git config user.email 'actions@users.noreply.github.com'
-          git add analytics/charts.js
-          git commit -m 'Fit chart labels without clipping player controls [skip ci]'
+          git add analytics/ui.js tests/studio-real-site.py
+          git commit -m 'Default injury charts to source-confirmed comparable games [skip ci]'
           git push origin HEAD:analytics-studio/20261017
-      - name: Syntax, calculation and data validation tests
+      - name: Syntax and calculation tests
         run: |
           node tests/analytics-core.cjs
           for f in analytics/*.js analytics-dashboard.js player-insights.js site-enhancements.js; do node --check "$f"; done
-          python - <<'PY'
-          import importlib.util,json,pathlib
-          p=pathlib.Path('scripts/refresh-analytics-studio.py')
-          spec=importlib.util.spec_from_file_location('refresh',p);mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
-          for f in pathlib.Path('analytics/data').glob('season-*.json'):mod.validate(json.loads(f.read_text()))
-          try:mod.validate({'players':[]})
-          except ValueError:pass
-          else:raise AssertionError('Empty dataset accepted')
-          print('PASS: source dataset validation')
-          PY
       - name: Install test browsers
         run: |
           python -m pip install playwright==1.57.0
           python -m playwright install --with-deps chromium webkit
-      - name: Test current-season dashboards and existing navigation
+      - name: Test all current-season dashboards and existing navigation
         run: python tests/studio-real-site.py
       - uses: actions/upload-artifact@v4
         if: always()

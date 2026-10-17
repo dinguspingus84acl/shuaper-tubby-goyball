@@ -2,7 +2,7 @@ name: Verify analytics studio staging
 on:
   push:
     branches: ['analytics-studio/20261017']
-    paths: ['staging-followup.py', '.github/workflows/analytics-studio-staging.yml', 'tests/studio-real-site.py']
+    paths: ['staging-finalize.py', '.github/workflows/analytics-studio-staging.yml']
 permissions:
   contents: write
 jobs:
@@ -13,13 +13,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply isolated followup and diagnose source
-        run: python -u staging-followup.py
+      - name: Apply final integration corrections
+        run: python -u staging-finalize.py
       - name: Syntax and calculation tests
         run: |
           node tests/analytics-core.cjs
-          for f in analytics/*.js analytics-dashboard.js player-insights.js; do node --check "$f"; done
-          python -m py_compile tests/studio-real-site.py scripts/prepare-analytics-studio.py
+          for f in analytics/*.js analytics-dashboard.js player-insights.js site-enhancements.js; do node --check "$f"; done
+          python -c "from pathlib import Path; [compile(Path(p).read_text(),p,'exec') for p in ['tests/studio-real-site.py','scripts/prepare-analytics-studio.py']]"
       - name: Prepare verified data and custom ranking revisions
         run: python -u scripts/prepare-analytics-studio.py
       - name: Record prepared tree on staging only
@@ -27,8 +27,8 @@ jobs:
           test "$GITHUB_REF_NAME" = 'analytics-studio/20261017'
           git config user.name 'SHUA Analytics Build'
           git config user.email 'actions@users.noreply.github.com'
-          git add analytics analytics-dashboard.js player-insights.js index.html scripts/prepare-analytics-studio.py tests
-          git diff --cached --quiet || git commit -m 'Verify integrated analytics studio assets [skip ci]'
+          git add analytics analytics-dashboard.js player-insights.js site-enhancements.js index.html scripts/prepare-analytics-studio.py tests
+          git diff --cached --quiet || git commit -m 'Finalize verified analytics studio assets [skip ci]'
           git push origin HEAD:analytics-studio/20261017
       - name: Install test browsers
         run: |
@@ -49,6 +49,7 @@ jobs:
             analytics/
             analytics-dashboard.js
             player-insights.js
+            site-enhancements.js
             index.html
             scripts/prepare-analytics-studio.py
             tests/studio-real-site.py

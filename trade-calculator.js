@@ -313,7 +313,7 @@ function showTrade(){
   document.getElementById('title').textContent='Trade Calculator';
   document.getElementById('sub').textContent='Powered by your Big Board';
   window.ShuaApplyFullBleed?.();
-  window.ShuaSettleMobileViewport?.();
+  window.ShuaFinishTabTransition?.();
 }
 function hideTrade(){
   section.hidden=true;

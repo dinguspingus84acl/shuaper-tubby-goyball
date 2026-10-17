@@ -1616,7 +1616,7 @@ function showEspn(){
   if(timer)clearInterval(timer);
   timer=setInterval(()=>{if(!section.hidden&&statsSeason===SEASON)loadStatsSeason(SEASON,{force:true})},REFRESH_MS);
   window.ShuaApplyFullBleed?.();
-  window.ShuaSettleMobileViewport?.();
+  window.ShuaFinishTabTransition?.();
 }
 function hideEspn(){
   section.hidden=true;

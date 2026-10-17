@@ -51,7 +51,7 @@ function addStyles(){
     .myguys-btn{border-color:#35d07f66!important}.myguys-btn.active{background:#145c3d!important;color:#fff!important;border-color:#35d07f!important}
     .dnd-btn{border-color:#ff174466!important}.dnd-btn.active{background:#681b2a!important;color:#fff!important;border-color:#ff1744!important}
     .tagged-controls{display:none;gap:7px;flex-wrap:wrap;margin:12px 0}.tagged-controls.open{display:flex}.tagged-controls button{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 12px;font-weight:900}.tagged-controls button.active{background:#183d63;color:#fff}.tagged-count{margin-left:auto;color:var(--m);align-self:center;font-weight:800}
-    .tag-group td{background:#0d2945!important;color:#fff!important;font-weight:950!important;letter-spacing:.08em;padding:9px 14px!important;border-left:5px solid #ffffff24}
+    .tag-group td{background:transparent!important;color:var(--m)!important;font-weight:950!important;letter-spacing:.08em;padding:9px 14px!important;border-left:0!important}
     .team-abbr{display:inline-flex;align-items:center;gap:7px;font-weight:800;white-space:nowrap}.team-mini-logo{width:22px;height:22px;object-fit:contain;vertical-align:middle;flex:0 0 22px}.team-mini-logo.sm{width:18px;height:18px;flex-basis:18px}
     .tagged-player-copy{display:grid;gap:4px;min-width:0}
     .tagged-player-copy>b{display:block;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.15}

@@ -138,6 +138,12 @@ with sync_playwright() as pw:
    # Click the face, not just the name: the entire player box must open the card.
    page.locator('#stScheduleRows [data-st-open="joshallen"] .st-schedule-face').first.click()
    page.wait_for_selector('#modal.open #sosStat[role="button"]',timeout=20000)
+   sos_rank=page.evaluate("""async () => {
+     const feed=await window.ShuaStudio.Data.espnMatchups(2026);
+     const card=document.querySelector('#sosStat b')?.textContent||'';
+     return {expected:feed.positions.QB.BUF.rank,actual:Number(card.match(/#(\\d+)/)?.[1])};
+   }""")
+   assert sos_rank['expected']==sos_rank['actual'],('Card SOS should use ESPN OPRK',sos_rank)
    # Opponent colors in the actual player Game Log must use Schedule's positional grades.
    page.locator('#unifiedProfileTabs [data-profile-tab="gamelog"]').click()
    page.wait_for_selector('#unifiedGameLogPanel .espn-game-log-opponent[data-gl-opponent]',timeout=35000)

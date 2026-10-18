@@ -26,7 +26,7 @@ try:
     page.goto(BASE+'#analytics/trends',wait_until='domcontentloaded')
     page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=60000)
     def select_chart(view):
-     if width<=1000:page.select_option('#stDashboard',view)
+     if width<=1000 or page.locator('#stDashboard').is_visible():page.select_option('#stDashboard',view)
      else:page.locator('.st-navigation [data-st-view="'+view+'"]').click()
     assert page.locator('#stDashboard').count()==1
     assert page.locator('#stDashboard').is_visible()==(width<=1000)

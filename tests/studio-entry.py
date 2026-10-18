@@ -47,6 +47,10 @@ try:
       assert page.locator('#stScheduleRows .st-schedule-rank').count()==0
       assert page.locator('#stScheduleRows .st-schedule-person-button').count()==36
       assert page.locator('#stRange').count()==0
+      assert page.locator('.st-topline').count()==0
+      assert page.locator('#stWorkspace > .st-heading').count()==0
+      assert page.locator('.st-schedule-heatmap-panel .st-panel-head').count()==0
+      assert page.locator('[data-st-sort-week]').count()>=2
      assert page.url.endswith('#analytics/'+view),page.url
      assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2'),view
      if view in ['trends','opportunity','injury','schedule','weekly']:page.screenshot(path=str(OUT/f'release-{engine}-{width}-{view}.png'),full_page=True)
@@ -57,7 +61,7 @@ try:
     select_chart('schedule')
     page.wait_for_function("window.ShuaStudio?.UI?.dataset?.year===2026",timeout=30000)
     assert page.locator('#stSeason').count()==0,'Schedule should not offer prior seasons'
-    assert '2026' in page.locator('#stWorkspace .st-heading').inner_text()
+    assert page.locator('#stWorkspace > .st-heading').count()==0
     page.wait_for_selector('#stScheduleRows tr',timeout=45000)
     assert page.locator('#stContent .st-heat-table').count()==1
     select_chart('trends')

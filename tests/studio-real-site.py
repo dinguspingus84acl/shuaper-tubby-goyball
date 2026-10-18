@@ -42,6 +42,18 @@ with sync_playwright() as pw:
      assert page.locator('#stSeason').count()==0,'Schedule should remain 2026 only'
      assert page.locator('[data-st-schedule-pos="ALL"]').count()==0,'All filter must be removed'
      assert page.locator('#stScheduleRows tr').count()==36,'QB tab should include all ROS QBs'
+     assert page.locator('#stPlayoffs').count()==0,'Schedule window filter should be gone'
+     assert page.locator('#stDashboard option[value="schedule"]').text_content().strip()=='Schedule'
+     assert page.locator('#stScheduleRows .st-schedule-team-logo').count()>0,'Team logos should precede the team text'
+     assert page.locator('#stScheduleRows .st-week-opponent-logo').count()>0,'Matchup opponent logos should appear'
+     position_tops=page.locator('.st-schedule-positions button').evaluate_all('(buttons)=>buttons.map(b=>Math.round(b.getBoundingClientRect().top))')
+     assert len(position_tops)==5 and max(position_tops)-min(position_tops)<=2,'All positions must fit in one row'
+     week_buttons=page.locator('.st-week-sort')
+     assert week_buttons.count()>=2
+     assert page.locator('.st-week-sort-icon').count()==0,'Inactive week arrows should be absent'
+     assert week_buttons.evaluate_all('(buttons)=>buttons.every(b=>b.getBoundingClientRect().width>=75 && b.scrollWidth<=b.clientWidth+2)'),'Week labels must not be cut off'
+     assert page.locator('#stScheduleRows .st-heat-cell small').first.text_content().find('easiest')==-1,'Remove easiest from scores'
+
      assert page.locator('.st-topline').count()==0,'Old Studio branding should not appear'
      assert page.locator('#stWorkspace > .st-heading').count()==0,'Remove the schedule title and 2026 schedule eyebrow'
      assert page.locator('.st-schedule-heatmap-panel .st-panel-head').count()==0,'Remove duplicate heatmap heading'
@@ -56,6 +68,8 @@ with sync_playwright() as pw:
      first_week.click()
      assert page.locator('.st-week-sort.active').count()==1
      assert page.locator('.st-week-sort.active').first.get_attribute('aria-label').endswith('Easiest first')
+     assert page.locator('.st-week-sort-icon').count()==1,'Only the active week should show a sort arrow'
+     assert page.locator('.st-week-sort.active .st-week-sort-icon').evaluate('(x)=>getComputedStyle(x).color')=='rgb(54, 240, 174)','Selected arrow should be green'
      ranks=week_ranks()
      assert len(ranks)>=2 and ranks==sorted(ranks),'Easiest matchups must sort first'
      first_week=page.locator('[data-st-sort-week]').first
@@ -110,9 +124,9 @@ with sync_playwright() as pw:
     page.select_option('#stPlayer',options[1]);assert page.locator('#stPlayer').input_value()==options[1]
    assert page.locator('#stContent .st-chart').count()>=1
    page.select_option('#stWeek','8');assert page.locator('#stWeek').input_value()=='8'
-   select_chart('schedule');page.select_option('#stPlayoffs','playoffs')
-   assert page.locator('#stPlayoffs').input_value()=='playoffs'
-   assert page.locator('#stContent').inner_text().find('15')>=0
+   select_chart('schedule')
+   assert page.locator('#stPlayoffs').count()==0
+   assert page.locator('.st-week-sort').count()>=2
    select_chart('trends')
    page.locator('.st-chart-hit').first.focus();assert page.locator('.st-tooltip:not([hidden])').count()
    page.locator('.st-legend-btn').first.click();assert page.locator('.st-legend-btn').first.get_attribute('aria-pressed')=='false'

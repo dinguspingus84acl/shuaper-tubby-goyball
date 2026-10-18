@@ -47,6 +47,11 @@ try:
       assert page.locator('#stScheduleRows .st-schedule-rank').count()==0
       assert page.locator('#stScheduleRows .st-schedule-person-button').count()==36
       assert page.locator('#stRange').count()==0
+      assert page.locator('#stPlayoffs').count()==0
+      assert page.locator('#stDashboard option[value="schedule"]').text_content().strip()=='Schedule'
+      assert page.locator('.st-week-sort-icon').count()==0
+      assert page.locator('.st-schedule-positions button').count()==5
+      assert page.locator('#stScheduleRows .st-schedule-team-logo').count()>0
       assert page.locator('.st-topline').count()==0
       assert page.locator('#stWorkspace > .st-heading').count()==0
       assert page.locator('.st-schedule-heatmap-panel .st-panel-head').count()==0

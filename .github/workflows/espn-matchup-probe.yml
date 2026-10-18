@@ -36,7 +36,7 @@ jobs:
              raw=r.read();print("STATUS",r.status,"BYTES",len(raw),"CONTENTTYPE",r.headers.get("Content-Type"))
             s=raw.decode('utf-8','replace')
             if s.lstrip().startswith('{'):
-             obj=json.loads(s);print("JSON KEYS",list(obj)[:30]);pos=obj.get('positionAgainstOpponent',{}).get('positionalRatings',{});print('RATINGS',list(pos)[:12],str(pos)[:2500]);print('SETTINGS',str(obj.get('settings',{}).get('scoringSettings',{}))[:2000])
+             obj=json.loads(s);print("JSON KEYS",list(obj)[:30]);pos=obj.get('positionAgainstOpponent',{}).get('positionalRatings',{});print('RATINGS',list(pos)[:12],str(pos)[:2500]);print('SCORING SAMPLE',[(item.get('statId'),item.get('points')) for item in obj.get('settings',{}).get('scoringSettings',{}).get('scoringItems',[]) if item.get('statId') in (3,4,20,23,24,25,42,43,53,72)],'RANKTYPE',obj.get('settings',{}).get('scoringSettings',{}).get('playerRankType'))
             else:
              for term in ['Detroit Lions','TEAM AVG','positionalRatings','pointsAgainst','positionId','application/ld+json','__NEXT_DATA__','data-page']:
               i=s.find(term)

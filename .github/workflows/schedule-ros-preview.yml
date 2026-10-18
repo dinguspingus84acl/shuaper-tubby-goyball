@@ -1,0 +1,37 @@
+name: Schedule ROS and D-ST preview
+on:
+  push:
+    branches:
+      - feature/schedule-ros-defense-20261018
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JavaScript and data
+        run: |
+          node tests/analytics-core.cjs
+          for f in analytics/*.js analytics-dashboard.js unified-profile.js; do node --check "$f"; done
+          python - <<'PY'
+          import json
+          ranks=json.load(open('ros-rankings.json'))
+          assert sum(len(ranks[k]) for k in ('QB','RB','WR','TE'))==329
+          print('PASS: all 329 ROS entries available')
+          PY
+      - name: Install browser tests
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium webkit
+      - name: Test all analytics screens and schedule shortcut
+        run: python tests/studio-real-site.py
+      - name: Test schedule deep links and year locking
+        run: python tests/studio-entry.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: schedule-ros-preview-screenshots
+          path: tests/studio-verification/
+          retention-days: 3

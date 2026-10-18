@@ -28,6 +28,17 @@ with sync_playwright() as pw:
      page.select_option('#stInjuryPos','WR')
      assert page.locator('#stInjuryList [data-st-injury]').count()>0
      page.select_option('#stInjuryPos','ALL')
+    if view=='schedule':
+     page.wait_for_selector('#stScheduleRows tr',timeout=45000)
+     assert page.locator('#stSeason').count()==0,'Schedule contains unwanted season selector'
+     assert page.locator('#stScheduleRows tr').count()==361,'Expected all ROS players and 32 defenses'
+     assert page.locator('#stScheduleRows img.st-schedule-face').count()>120,'Player faces missing'
+     page.locator('[data-st-schedule-pos="DST"]').click()
+     assert page.locator('#stScheduleRows tr').count()==32,'Expected 32 NFL defenses'
+     assert page.locator('#stScheduleRows .st-schedule-team-photo').count()==32,'Defense logos missing'
+     page.locator('[data-st-schedule-pos="RB"]').click()
+     assert page.locator('#stScheduleRows tr').count()==110,'Expected all 110 ROS RBs'
+     page.locator('[data-st-schedule-pos="ALL"]').click()
     page.wait_for_timeout(300)
     assert page.locator('#stContent .st-panel').count()>0,(engine,width,view,'missing panels')
     assert not page.locator('#stContent').inner_text().startswith('This dashboard could not render'),(view,page.locator('#stContent').inner_text())
@@ -36,6 +47,17 @@ with sync_playwright() as pw:
     result['views'].append({'view':view,'panels':page.locator('#stContent .st-panel').count(),'documentWidth':sizes['document']})
     if view in ['trends','opportunity','injury','schedule','weekly']:
      page.screenshot(path=str(OUT/f'{engine}-{width}-{view}.png'),full_page=True)
+   # Clicking Schedule from a player card focuses that player in the heatmap.
+   page.locator('[data-st-view="schedule"]').click()
+   page.wait_for_selector('#stScheduleRows [data-st-open="joshallen"]',timeout=45000)
+   page.locator('[data-st-schedule-pos="QB"]').click()
+   page.locator('#stScheduleRows [data-st-open="joshallen"]').first.click()
+   page.wait_for_selector('#modal.open #unifiedScheduleLink',timeout=20000)
+   page.locator('#unifiedScheduleLink').click()
+   page.wait_for_selector('#stScheduleRows tr.st-schedule-highlight',timeout=45000)
+   assert page.locator('#stScheduleRows tr.st-schedule-highlight').first.get_attribute('data-st-schedule-key')=='joshallen'
+   assert page.locator('#modal.open').count()==0
+   assert page.locator('[data-st-schedule-pos="QB"]').get_attribute('aria-pressed')=='true'
    page.locator('[data-st-view="trends"]').click()
    page.locator('[data-st-pos="WR"]').click()
    options=page.locator('#stPlayer option').evaluate_all('(es)=>es.map(e=>e.value)')

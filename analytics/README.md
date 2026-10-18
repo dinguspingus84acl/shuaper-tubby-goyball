@@ -4,7 +4,7 @@ Nine interactive dashboards based on the approved dark-neon visual concepts. The
 
 ## Entry points
 
-Open **Analytics** in the desktop navigation or phone hamburger. The Studio has matchup difficulty, player trends, advanced opportunity, consistency, team opportunity, injury impact, schedule heatmap, start/sit, and weekly performance screens. Player cards open the existing profile; **Back to Analytics** closes only that profile. Overview includes expandable performance analytics. Depth Charts links to the selected team's opportunity breakdown.
+Open **Analytics** in the desktop navigation or phone hamburger. **Schedule** is fixed to the 2026 season and includes all 329 players in the published ROS rankings plus 32 NFL D/ST units; choose All or any position, and search player names. Player headshots are sourced from current ESPN or the site's existing headshot index; unknown teams remain unrated. The player-card Overview shortcut **2026 Schedule →** opens the heatmap focused on that player. The Studio has matchup difficulty, player trends, advanced opportunity, consistency, team opportunity, injury impact, schedule heatmap, start/sit, and weekly performance screens. Player cards open the existing profile; **Back to Analytics** closes only that profile. Overview includes expandable performance analytics. Depth Charts links to the selected team's opportunity breakdown.
 
 ## Data and definitions
 
@@ -31,3 +31,7 @@ For a full local rebuild: `python scripts/refresh-analytics-studio.py` in a full
 ## Scope
 
 Studio styling is scoped to the analytics section and its profile components. Existing iPhone viewport/safe-area/full-bleed rules are unchanged. The only existing enhancement function touched is a guard that prevents the legacy profile-nav decorator from dereferencing buttons owned by the unified profile navigation.
+
+### Defensive schedule ratings
+
+For DST entries, opponent difficulty is a *turnover-opportunity proxy* based on the opposing offense's recorded interceptions thrown and fumbles lost per game. It is **not** total fantasy D/ST points allowed; sacks, points allowed and return scores are not included. Offensive positions continue to use position-specific PPR conceded.

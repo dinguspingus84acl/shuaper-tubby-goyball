@@ -25,20 +25,22 @@ try:
     page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
     page.goto(BASE+'#analytics/trends',wait_until='domcontentloaded')
     page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=60000)
-    assert page.locator('#stDashboard option').count()==9
+    assert page.locator('#stDashboard').count()==0
+    assert page.locator('.st-navigation [data-st-view]').count()==9
     assert page.locator('#stContent .st-chart').count()>=2
     for view in VIEWS:
-     if width<700:page.select_option('#stDashboard',view)
-     else:page.locator('[data-st-view="'+view+'"]').click()
+     page.locator('.st-navigation [data-st-view="'+view+'"]').click()
      assert page.locator('#stContent .st-panel').count()>0,view
      assert not page.locator('#stContent').inner_text().startswith('This dashboard could not render'),view
-     assert page.locator('#stDashboard').input_value()==view
+     assert page.locator('.st-navigation [data-st-view="'+view+'"]').get_attribute('aria-selected')=='true'
      if view=='schedule':
       page.wait_for_selector('#stScheduleRows tr',timeout=45000)
       assert page.locator('#stScheduleRows tr').count()==36
       assert page.locator('#stSeason').count()==0
       assert page.locator('[data-st-schedule-pos="ALL"]').count()==0
-      assert page.locator('#stScheduleRows .st-schedule-rank').count()==36
+      assert page.locator('#stScheduleRows .st-schedule-rank').count()==0
+      assert page.locator('#stScheduleRows .st-schedule-person-button').count()==36
+      assert page.locator('#stRange').count()==0
      assert page.url.endswith('#analytics/'+view),page.url
      assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2'),view
      if view in ['trends','opportunity','injury','schedule','weekly']:page.screenshot(path=str(OUT/f'release-{engine}-{width}-{view}.png'),full_page=True)
@@ -67,12 +69,12 @@ try:
     assert page.locator('#stContent .st-chart').count()==count
     assert page.locator('#stChartDialog[open]').count()==0
     page.reload(wait_until='domcontentloaded');page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=60000)
-    assert page.locator('#stDashboard').input_value()=='trends'
+    assert page.locator('.st-navigation [data-st-view="trends"]').get_attribute('aria-selected')=='true'
     page.locator('.positions [data-pos="QB"]').evaluate('(b)=>b.click()')
     assert not page.locator('#shuaAnalyticsSection').is_visible()
     assert '#analytics/' not in page.url
     page.evaluate("location.hash='analytics/consistency'");page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]')
-    assert page.locator('#stDashboard').input_value()=='consistency'
+    assert page.locator('.st-navigation [data-st-view="consistency"]').get_attribute('aria-selected')=='true'
     assert not errors,errors
     report['checks'].append({'browser':engine,'width':width,'dashboards':9,'deepLinks':True,'expandedCharts':True,'pageErrors':errors});ctx.close()
    ctx=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True);failures={'count':0}

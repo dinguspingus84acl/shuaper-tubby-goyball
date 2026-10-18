@@ -53,17 +53,16 @@ function consistency(){const p=selected();if(!p)return C.empty();const c=S.consi
 function teams(){const members=S.teamShares(dataset,state.team,state.week,state.range).sort((a,b)=>(b.targets||0)+(b.rushAtt||0)-(a.targets||0)-(a.rushAtt||0));const carr=members.filter(p=>p.position==='RB').map(p=>({...p,value:p.rushAtt})).filter(p=>p.value>0),tgt=members.filter(p=>p.position==='WR').map(p=>({...p,value:p.targets})).filter(p=>p.value>0);return controls({team:true,week:true,range:true})+`<div class="st-hero" style="min-height:110px"><div class="st-hero-art">${logo(state.team,'st-face')}</div><div class="st-hero-copy"><span class="st-eyebrow">TEAM OPPORTUNITY</span><h3>${E(S.teams[state.team])}</h3><p class="st-footnote">${dataset.year} · ${state.range?'Last '+state.range+' weeks':'Season to date'} · through Week ${state.week}</p></div></div><div class="st-grid2">${panel('Running back carry share','Distribution within team RB carries.',C.donut(carr,{label:'RB carries'}))}${panel('Wide receiver target share','Distribution within team WR targets.',C.donut(tgt,{label:'WR targets'}))}${panel('Red-zone usage','Shares of all recorded red-zone opportunities.',C.donut(members.map(p=>({...p,value:p.redZone})),{label:'RZ opportunities'}))}${panel('Offensive snap rate','Individual snap rate. Rates overlap and are not a pie.',C.bars({title:'Individual offensive snap rates',labels:members.filter(p=>N(p.snapRate)!==null).slice(0,6).map(p=>chartName(p)),series:[{name:'Snap rate',values:members.filter(p=>N(p.snapRate)!==null).slice(0,6).map(p=>p.snapRate),unit:'%',color:C.colors[1]}],percent:true}))}</div>`+panel('Opportunity leaders','Shares use team totals, not just the players displayed below.',`<div class="st-table-wrap"><table><thead><tr><th>Player</th><th>Carries</th><th>Carry share</th><th>Targets</th><th>Target share</th><th>Red zone</th><th>Snap rate</th></tr></thead><tbody>${members.slice(0,15).map(p=>`<tr><td>${person(p)}</td><td>${F(p.rushAtt,0)}</td><td>${F(p.carryShare,1,'%')}</td><td>${F(p.targets,0)}</td><td>${F(p.targetShare,1,'%')}</td><td>${F(p.redZone,0)}</td><td>${F(p.snapRate,1,'%')}</td></tr>`).join('')}</tbody></table></div>`)+method('Donut segments sum to their named group: RB carries or WR targets. The leaders table uses the full offense as its denominator. Multiple players share the field on each snap, so individual snap rates are intentionally shown as separate bars, not a donut.');}
 async function rankings(id){const base=positions()+controls({player:true,ranking:true});const host=document.getElementById('stContent');host.innerHTML=base+`<div id="stRankBody" class="st-loading">Reading your published ranking revisions…</div>`;let result;try{result=await S.Data.rankHistory(state.rankSource);}catch(e){if(id===renderId)document.getElementById('stRankBody').innerHTML=note('Ranking revisions could not be retrieved. '+E(e.message),true);return;}if(id!==renderId)return;historyData=result;const p=selected();if(!p)return;const snaps=result.snapshots.filter(x=>x.ranks?.[p.key]),labels=snaps.map(x=>new Date(x.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})),values=snaps.map(x=>x.ranks[p.key].rank),latest=values.at(-1),delta=values.length>1?values[0]-latest:null;const current=result.snapshots.at(-1)?.ranks||{},near=Object.entries(current).filter(([k,v])=>state.rankSource==='big-board.json'||v.position===state.pos).sort((a,b)=>a[1].rank-b[1].rank),idx=near.findIndex(([k])=>k===p.key);const first3=snaps.slice(-3);document.getElementById('stRankBody').outerHTML=`<div id="stRankBody">${hero(p,[['Latest custom rank',latest?'#'+latest:'Unranked'],['Published revisions',snaps.length]],delta===null?null:[(delta>0?'+':'')+delta+' places','change over shown revisions'])}${snaps.length===1?note('One published snapshot is available for this player. A line is not invented between nonexistent revisions.'):''}${panel('Ranking position over time','Lower numbers are better. Dates come from the actual Git commits.',C.line({title:'Custom ranking movement',labels,series:[{name:state.rankSource==='big-board.json'?'Your overall rank':'Your '+state.pos+' ROS rank',values}],invert:true,area:false}),'trend')}${panel('Revision timeline','Recorded commit messages—not inferred injury or performance events.',`<div class="st-timeline">${first3.map(s=>`<div><small>${E(new Date(s.date).toLocaleDateString())}</small><b>#${s.ranks[p.key].rank}</b><p>${E(s.message)}</p></div>`).join('')}</div>`)}${panel('Nearby in your rankings','Current neighboring players, in your exact order.',`<div class="st-grid4">${near.slice(Math.max(0,idx-2),idx+3).filter(([k])=>k!==p.key).map(([k,r])=>{const x=dataset.players.find(p=>p.key===k)||{key:k,name:r.name,position:r.position||'',team:''};return `<div class="st-feature">${person(x)}<span class="st-big-value">#${r.rank}<small>Custom rank</small></span></div>`;}).join('')}</div>`)}${method('Source: '+E(state.rankSource)+'. These charts read real Git revisions and never substitute ESPN finishing ranks. Missing players are omitted from a revision rather than assigned a fabricated rank. The underlying ranking files are not modified by Analytics.')}</div>`;}
 function schedulePositions(roster){
- const total=Object.values(roster).reduce((n,rows)=>n+rows.length,0);
- const options=[['ALL','All',total],...['QB','RB','WR','TE','DST'].map(pos=>[pos,pos==='DST'?'D/ST':pos,(roster[pos]||[]).length])];
- const current=state.schedulePos||'ALL';
+ const options=['QB','RB','WR','TE','DST'].map(pos=>[pos,pos==='DST'?'D/ST':pos,(roster[pos]||[]).length]);
+ const current=options.some(([pos])=>pos===state.schedulePos)?state.schedulePos:'QB';
  return '<div class="st-position st-schedule-positions" role="group" aria-label="Schedule positions">'+options.map(([pos,label,count])=>'<button type="button" data-st-schedule-pos="'+pos+'" aria-pressed="'+(current===pos)+'">'+label+' <small>'+count+'</small></button>').join('')+'</div>';
 }
 function schedulePlayer(p){
  const name='<strong>'+E(p.name)+'</strong>';
  const portrait=p.position==='DST'?logo(p.team,'st-schedule-face st-schedule-team-photo'):face(p,'st-schedule-face');
  const title=p.position==='DST'?name:'<button type="button" data-st-open="'+E(p.key)+'" title="Open '+E(p.name)+' player card">'+name+'</button>';
- const rank=p.rosRank?'#'+p.rosRank+' ROS · ':'';
- return '<div class="st-schedule-person">'+portrait+'<span class="st-schedule-person-info">'+title+'<small>'+rank+E(p.team||'Team unavailable')+' · '+E(p.position==='DST'?'D/ST':p.position)+'</small></span></div>';
+ const rank=p.rosRank?'<span class="st-schedule-rank" aria-label="ROS rank '+E(p.rosRank)+'">'+E(p.rosRank)+'</span>':'';
+ return '<div class="st-schedule-person"><span class="st-schedule-avatar">'+portrait+rank+'</span><span class="st-schedule-person-info">'+title+'<small>'+E(p.team||'Team unavailable')+' · '+E(p.position==='DST'?'D/ST':p.position)+'</small></span></div>';
 }
 function dstDifficulty(ds,through,last){
  const start=last?Math.max(1,through-last+1):1,byWeek=new Map();
@@ -98,8 +97,9 @@ function schedule(){
  }
  if(dataset.scheduleRosterError)return toolbar+note('Unable to load schedule rosters: '+E(dataset.scheduleRosterError),true);
  const roster=dataset.scheduleRoster;
- const pos=state.schedulePos||'ALL',all=['QB','RB','WR','TE','DST'].flatMap(k=>roster[k]||[]);
- const players=pos==='ALL'?all:(roster[pos]||[]);
+ const pos=['QB','RB','WR','TE','DST'].includes(state.schedulePos)?state.schedulePos:'QB';
+ const total=['QB','RB','WR','TE','DST'].reduce((n,k)=>n+(roster[k]?.length||0),0);
+ const players=roster[pos]||[];
  const through=Math.min(state.week-1,dataset.latestWeek);
  const ratings={};
  for(const p of new Set(players.map(p=>p.position))){
@@ -112,7 +112,7 @@ function schedule(){
  });
  const metricLabel=p=>p.position==='DST'?'opponent offensive turnovers / game':'PPR allowed per game';
  let body=schedulePositions(roster)+toolbar;
- body+='<div class="st-schedule-tools"><label><span class="st-label">Find a player or defense</span><input id="stScheduleSearch" type="search" placeholder="Search 2026 ROS players and defenses" autocomplete="off" value="'+E(state.scheduleQuery||'')+'"></label><span id="stScheduleCount">'+rows.length+' of '+all.length+' shown</span></div>';
+ body+='<div class="st-schedule-tools"><label><span class="st-label">Search</span><input id="stScheduleSearch" type="search" placeholder="Search" autocomplete="off" value="'+E(state.scheduleQuery||'')+'"></label><span id="stScheduleCount">'+rows.length+' players</span></div>';
  const cells=rows.map(p=>{
   const highlighted=state.scheduleFocusKey===p.key;
   const playerRow='<tr data-st-schedule-key="'+E(p.key)+'" data-st-schedule-name="'+E(p.name.toLowerCase())+'" class="'+(highlighted?'st-schedule-highlight':'')+'"><th scope="row" class="st-heat-player">'+schedulePlayer(p)+'</th>';
@@ -127,14 +127,14 @@ function schedule(){
    return '<td><div class="st-heat-cell '+difficulty+'" tabindex="0" title="'+E(tip)+'"><b>'+E(label)+'</b><small>'+(!opponent?.bye&&matchup?matchup.rank+' easiest':'—')+'</small></div></td>';
   }).join('')+'</tr>';
  }).join('');
- body+=panel('Rest-of-season schedule heatmap','All '+all.length+' players and defenses. Opponent difficulty is measured separately by position.',
+ body+=panel('Rest-of-season schedule heatmap','Showing '+rows.length+' of '+total+' ranked players and defenses. Matchups are graded by position.',
   '<div class="st-heat-legend"><span><i style="background:#24efa0"></i>Ranks 1–10 · easier</span><span><i style="background:#ffd15e"></i>11–20 · middle</span><span><i style="background:#ff617f"></i>21+ · harder</span><span>— unrated / bye</span></div>'+
-  '<div class="st-heat-scroll"><table class="st-heat-table"><thead><tr><th class="st-heat-player" scope="col">Player · ROS rank</th>'+weeks.map(w=>'<th scope="col">W'+w+'</th>').join('')+'</tr></thead><tbody id="stScheduleRows">'+cells+'</tbody></table></div>',
+  '<div class="st-heat-scroll"><table class="st-heat-table"><thead><tr><th class="st-heat-player" scope="col">Player</th>'+weeks.map(w=>'<th scope="col">W'+w+'</th>').join('')+'</tr></thead><tbody id="stScheduleRows">'+cells+'</tbody></table></div>',
   'calendar',state.playoffs?'Playoffs W15–17':'From W'+state.week);
  const top=rows.filter(p=>p.rankAverage!==null).sort((a,b)=>a.rankAverage-b.rankAverage||(a.rosRank||999)-(b.rosRank||999)).slice(0,12);
  body+=panel('Best remaining schedules','Average matchup difficulty rank across reported opponents. Lower rank = easier within each position.',
   '<div class="st-schedule-best">'+top.map((p,i)=>'<div class="st-schedule-best-row"><span class="st-rank-num">'+(i+1)+'</span>'+schedulePlayer(p)+'<b>#'+F(p.rankAverage,1)+'</b></div>').join('')+'</div>','cup');
- body+=method('2026 only. Player rows use the full published QB/RB/WR/TE rest-of-season rankings in their existing order; all 32 NFL D/ST units are also included. Position difficulty for offensive players uses historical full-PPR points conceded. D/ST difficulty uses an expressly limited proxy: interceptions plus lost fumbles committed by the upcoming opponent per completed game. D/ST ratings are NOT complete fantasy defense projections (sacks, points conceded, scores and return TDs are not covered). In the All view, compare difficulty ranks rather than raw PPR or turnover totals. No opponent or headshot is fabricated when unavailable. Missing team mappings show as unrated.');
+ body+=method('2026 only. Player rows use the full published QB/RB/WR/TE rest-of-season rankings in their existing order; all 32 NFL D/ST units are also included. Position difficulty for offensive players uses historical full-PPR points conceded. D/ST difficulty uses an expressly limited proxy: interceptions plus lost fumbles committed by the upcoming opponent per completed game. D/ST ratings are NOT complete fantasy defense projections (sacks, points conceded, scores and return TDs are not covered). Across different positions, compare difficulty ranks rather than raw PPR or turnover totals. No opponent or headshot is fabricated when unavailable. Missing team mappings show as unrated.');
  if(state.scheduleScrollPending&&state.scheduleFocusKey){
   const focus=state.scheduleFocusKey;
   state.scheduleScrollPending=false;
@@ -241,7 +241,7 @@ C.install();
 function openSchedule(name='',position=''){
  const supplied=String(position||'').toUpperCase().replace(/[^A-Z]/g,'');
  if(['QB','RB','WR','TE','DST'].includes(supplied))state.schedulePos=supplied;
- else if(name)state.schedulePos='ALL';
+ else state.schedulePos='QB';
  state.scheduleFocusKey=name?S.key(name):'';
  state.scheduleQuery='';
  state.scheduleScrollPending=!!name;

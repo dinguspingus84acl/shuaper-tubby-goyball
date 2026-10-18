@@ -30,15 +30,21 @@ with sync_playwright() as pw:
      page.select_option('#stInjuryPos','ALL')
     if view=='schedule':
      page.wait_for_selector('#stScheduleRows tr',timeout=45000)
-     assert page.locator('#stSeason').count()==0,'Schedule contains unwanted season selector'
-     assert page.locator('#stScheduleRows tr').count()==361,'Expected all ROS players and 32 defenses'
-     assert page.locator('#stScheduleRows img.st-schedule-face').count()>120,'Player faces missing'
-     page.locator('[data-st-schedule-pos="DST"]').click()
-     assert page.locator('#stScheduleRows tr').count()==32,'Expected 32 NFL defenses'
-     assert page.locator('#stScheduleRows .st-schedule-team-photo').count()==32,'Defense logos missing'
-     page.locator('[data-st-schedule-pos="RB"]').click()
-     assert page.locator('#stScheduleRows tr').count()==110,'Expected all 110 ROS RBs'
-     page.locator('[data-st-schedule-pos="ALL"]').click()
+     assert page.locator('#stSeason').count()==0,'Schedule should remain 2026 only'
+     assert page.locator('[data-st-schedule-pos="ALL"]').count()==0,'All filter must be removed'
+     assert page.locator('#stScheduleRows tr').count()==36,'QB tab should include all ROS QBs'
+     assert page.locator('#stScheduleSearch').get_attribute('placeholder')=='Search'
+     assert page.locator('.st-schedule-tools .st-label').text_content().strip()=='Search'
+     assert page.locator('#stScheduleRows .st-schedule-rank').count()==36,'Number circles should replace text ROS ranks'
+     assert page.locator('#stScheduleRows .st-schedule-avatar').count()==36,'Circular faces should be present'
+     assert page.locator('#stScheduleRows .st-schedule-person-info').first.inner_text().find('ROS')==-1
+     page.locator('#stScheduleSearch').fill('Josh Allen')
+     assert page.locator('#stScheduleRows tr:visible').count()==1
+     page.locator('#stScheduleSearch').fill('')
+     for pos,total in [('WR',130),('TE',53),('RB',110),('DST',32),('QB',36)]:
+      page.locator('[data-st-schedule-pos="'+pos+'"]').click()
+      assert page.locator('#stScheduleRows tr').count()==total,(pos,'missing ROS or defense entries')
+     assert page.locator('#stScheduleRows .st-schedule-face').count()>0,'Player portraits missing'
     page.wait_for_timeout(300)
     assert page.locator('#stContent .st-panel').count()>0,(engine,width,view,'missing panels')
     assert not page.locator('#stContent').inner_text().startswith('This dashboard could not render'),(view,page.locator('#stContent').inner_text())
@@ -52,8 +58,9 @@ with sync_playwright() as pw:
    page.wait_for_selector('#stScheduleRows [data-st-open="joshallen"]',timeout=45000)
    page.locator('[data-st-schedule-pos="QB"]').click()
    page.locator('#stScheduleRows [data-st-open="joshallen"]').first.click()
-   page.wait_for_selector('#modal.open #unifiedScheduleLink',timeout=20000)
-   page.locator('#unifiedScheduleLink').click()
+   page.wait_for_selector('#modal.open #sosStat[role="button"]',timeout=20000)
+   assert page.locator('#unifiedScheduleLink').count()==0,'Old Schedule shortcut should be removed'
+   page.locator('#sosStat').click()
    page.wait_for_selector('#stScheduleRows tr.st-schedule-highlight',timeout=45000)
    assert page.locator('#stScheduleRows tr.st-schedule-highlight').first.get_attribute('data-st-schedule-key')=='joshallen'
    assert page.locator('#modal.open').count()==0

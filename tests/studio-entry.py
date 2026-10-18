@@ -35,8 +35,10 @@ try:
      assert page.locator('#stDashboard').input_value()==view
      if view=='schedule':
       page.wait_for_selector('#stScheduleRows tr',timeout=45000)
-      assert page.locator('#stScheduleRows tr').count()==361
+      assert page.locator('#stScheduleRows tr').count()==36
       assert page.locator('#stSeason').count()==0
+      assert page.locator('[data-st-schedule-pos="ALL"]').count()==0
+      assert page.locator('#stScheduleRows .st-schedule-rank').count()==36
      assert page.url.endswith('#analytics/'+view),page.url
      assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2'),view
      if view in ['trends','opportunity','injury','schedule','weekly']:page.screenshot(path=str(OUT/f'release-{engine}-{width}-{view}.png'),full_page=True)

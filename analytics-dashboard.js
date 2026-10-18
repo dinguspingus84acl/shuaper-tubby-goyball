@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   if (window.ShuaStudioLoader) return;
-  const version = '20261018-matchup-logo-only1';
+  const version = '20261018-espn-ppr-schedule7';
   const base = new URL('.', document.currentScript.src);
   const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js', 'analytics/ui.js'];
   const tests = [() => window.ShuaStudio?.aggregate, () => window.ShuaStudio?.Data,

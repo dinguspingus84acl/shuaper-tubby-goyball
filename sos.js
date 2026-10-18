@@ -15,8 +15,8 @@
     if(!modal||!stats||!meta||!modal.classList.contains('open'))return;
 
     const parts=meta.textContent.split('·').map(x=>x.trim());
-    const team=normalizeTeam(parts[0]||'');
-    const position=parts[1]||'';
+    const team=normalizeTeam(parts[parts.length-2]||'');
+    const position=parts[parts.length-1]||'';
     const rank=sos[team]&&sos[team][position];
 
     let box=document.getElementById('sosStat');
@@ -27,9 +27,47 @@
       box.className='stat';
       stats.appendChild(box);
     }
-    box.innerHTML='<span>Strength of schedule</span><b>#'+rank+' of 32</b>';
-    box.title='1 is easiest and 32 is hardest';
+    box.innerHTML='<span>Strength of Schedule ↗</span><b>#'+rank+' of 32</b>';
+    box.title='Open 2026 Schedule heatmap · #1 easiest, #32 hardest';
+    box.setAttribute('role','button');
+    box.setAttribute('tabindex','0');
+    box.setAttribute('aria-label','Open '+position+' Strength of Schedule heatmap for '+(modal.dataset.unifiedName||document.getElementById('pn')?.textContent||'this player'));
   }
+
+  async function openFromStrengthOfSchedule(){
+    const modal=document.getElementById('modal');
+    if(!modal?.classList.contains('open'))return;
+    const name=(modal.dataset.unifiedName||document.getElementById('pn')?.textContent||'').trim();
+    const parts=(document.getElementById('pm')?.textContent||'').split('·').map(t=>t.trim());
+    const position=parts[parts.length-1]||'';
+    if(!name)return;
+    document.getElementById('close')?.click();
+    try{
+      if(window.ShuaStudioLoader?.load)await window.ShuaStudioLoader.load();
+      if(window.ShuaStudio?.UI?.openSchedule){
+        window.ShuaStudio.UI.openSchedule(name,position);
+        return;
+      }
+    }catch(e){}
+    window.location.hash='analytics/schedule';
+    if(window.ShuaStudioLoader?.open)window.ShuaStudioLoader.open();
+    else document.getElementById('studioNav')?.click();
+  }
+  document.addEventListener('click',e=>{
+    const target=e.target.closest?.('#sosStat');
+    if(!target)return;
+    e.preventDefault();e.stopPropagation();
+    void openFromStrengthOfSchedule();
+  });
+  document.addEventListener('keydown',e=>{
+    if((e.key==='Enter'||e.key===' ')&&e.target.closest?.('#sosStat')){
+      e.preventDefault();void openFromStrengthOfSchedule();
+    }
+  });
+  const sosStyle=document.createElement('style');
+  sosStyle.id='sosScheduleLinkStyles';
+  sosStyle.textContent='#sosStat[role=button]{cursor:pointer;border-color:#207e78!important;transition:background .15s,border-color .15s}#sosStat[role=button]:hover,#sosStat[role=button]:focus-visible{background:#10443c!important;border-color:#24efa0!important}#sosStat[role=button]:focus-visible{outline:2px solid #24efa0;outline-offset:3px}#sosStat[role=button] span{color:#cafcef!important}';
+  document.head.append(sosStyle);
 
   const observer=new MutationObserver(refresh);
   document.addEventListener('DOMContentLoaded',()=>{

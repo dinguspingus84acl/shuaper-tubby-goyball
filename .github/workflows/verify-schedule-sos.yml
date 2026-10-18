@@ -1,0 +1,31 @@
+name: Verify schedule SOS navigation and portrait badges
+on:
+  push:
+    branches:
+      - feature/schedule-sos-click-20261018
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax and analytics checks
+        run: |
+          node tests/analytics-core.cjs
+          for f in analytics/*.js analytics-dashboard.js sos.js unified-profile.js; do node --check "$f"; done
+      - name: Browser dependencies
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium webkit
+      - name: All views and SOS player-card navigation
+        run: python tests/studio-real-site.py
+      - name: Deep links and mobile recovery
+        run: python tests/studio-entry.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: schedule-sos-browser-results
+          path: tests/studio-verification/
+          retention-days: 3

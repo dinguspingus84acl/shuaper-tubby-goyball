@@ -101,9 +101,10 @@ function schedule(){
  const total=['QB','RB','WR','TE','DST'].reduce((n,k)=>n+(roster[k]?.length||0),0);
  const players=roster[pos]||[];
  const through=Math.min(state.week-1,dataset.latestWeek);
+ if(!dataset.espnRatings)return schedulePositions(roster)+toolbar+note('ESPN full-PPR matchup rankings are temporarily unavailable. '+E(dataset.espnRatingsError||'Retry later.')+' No local rankings are substituted.',true);
  const ratings={};
  for(const p of new Set(players.map(p=>p.position))){
-  ratings[p]=p==='DST'?dstDifficulty(dataset,through,0):S.defense(dataset,p,through,0);
+  ratings[p]=S.Data.espnDefense(dataset.espnRatings,p);
  }
  const weeks=Array.from({length:Math.max(0,19-state.week)},(_,i)=>i+state.week);
  const rows=players.map((player,index)=>{
@@ -126,7 +127,7 @@ function schedule(){
  });
  const metricLabel=p=>p.position==='DST'?'opponent offensive turnovers / game':'PPR allowed per game';
  let body=schedulePositions(roster)+toolbar;
- body+='<div class="st-schedule-tools"><label><span class="st-label">Search</span><input id="stScheduleSearch" type="search" placeholder="Search" autocomplete="off" value="'+E(state.scheduleQuery||'')+'"></label><span id="stScheduleCount">'+rows.length+' players</span></div>';
+ body+='<div class="st-schedule-tools"><div class="st-schedule-search-wrap"><label for="stScheduleSearch"><span class="st-label">Search</span></label><input id="stScheduleSearch" type="search" placeholder="Search players" role="combobox" aria-autocomplete="list" aria-controls="stScheduleSuggestions" aria-expanded="false" autocomplete="off" value="'+E(state.scheduleQuery||'')+'"><div id="stScheduleSuggestions" role="listbox" aria-label="Matching players" hidden></div></div><span id="stScheduleCount">'+rows.length+' players</span></div>';
  const cells=rows.map(p=>{
   const highlighted=state.scheduleFocusKey===p.key;
   const playerRow='<tr data-st-schedule-key="'+E(p.key)+'" data-st-schedule-name="'+E(p.name.toLowerCase())+'" class="'+(highlighted?'st-schedule-highlight':'')+'"><th scope="row" class="st-heat-player">'+schedulePlayer(p)+'</th>';
@@ -138,8 +139,8 @@ function schedule(){
    const label=opponent?.bye?'BYE':hasOpponent?(opponent.home?'vs ':'@ ')+opponent.opponent:'—';
    const matchupHtml=hasOpponent?'<span class="st-week-opponent">'+logo(opponent.opponent,'st-week-opponent-logo').replace('alt=""','alt="'+E(opponent.opponent)+'"')+'</span>':E(label);
    const difficulty=opponent?.bye?'bye':unavailable?'':color(matchup?.rank);
-   const tip=p.name+' · Week '+w+' · '+label+(matchup?' · '+F(matchup.allowed,1)+' '+metricLabel(p)+' · '+matchup.games+' recorded games':' · opponent rating unavailable');
-   return '<td><div class="st-heat-cell '+difficulty+'" tabindex="0" title="'+E(tip)+'"><b>'+matchupHtml+'</b><small>'+(!opponent?.bye&&matchup?String(matchup.rank):'—')+'</small></div></td>';
+   const tip=p.name+' · Week '+w+' · '+label+(matchup?' · ESPN OPRK '+matchup.espnRank+'/32 · '+F(matchup.allowed,1)+' '+metricLabel(p):' · opponent rating unavailable');
+   return '<td><div class="st-heat-cell '+difficulty+'" tabindex="0" title="'+E(tip)+'"><b>'+matchupHtml+'</b><small>'+(!opponent?.bye&&matchup?String(matchup.espnRank):'—')+'</small></div></td>';
   }).join('')+'</tr>';
  }).join('');
  const weekHead=weeks.map(w=>{
@@ -148,13 +149,13 @@ function schedule(){
   return '<th scope="col" aria-sort="'+(selected?(sortDirection==='easy'?'ascending':'descending'):'none')+'"><button type="button" class="st-week-sort'+(selected?' active':'')+'" data-st-sort-week="'+w+'" aria-label="Week '+w+': '+description+'" title="Week '+w+' · '+description+'">W'+w+(indicator?' <span class="st-week-sort-icon" aria-hidden="true">'+indicator+'</span>':'')+'</button></th>';
  }).join('');
  body+='<section class="st-panel st-schedule-heatmap-panel">'+
-  '<div class="st-heat-legend"><span><i style="background:#24efa0"></i>Ranks 1–10 · easier</span><span><i style="background:#ffd15e"></i>11–20 · middle</span><span><i style="background:#ff617f"></i>21+ · harder</span><span>— unrated / bye</span></div>'+
+  '<div class="st-heat-legend"><span><i style="background:#24efa0"></i>ESPN 23–32 · easier</span><span><i style="background:#ffd15e"></i>13–22 · middle</span><span><i style="background:#ff617f"></i>1–12 · harder</span><span>— unrated / bye</span></div>'+
   '<p class="st-week-sort-hint">Tap a week to rank matchups from easiest to hardest. Tap again to reverse; a third tap restores your ROS order.</p>'+
   '<div class="st-heat-scroll"><table class="st-heat-table"><thead><tr><th class="st-heat-player" scope="col">Player</th>'+weekHead+'</tr></thead><tbody id="stScheduleRows">'+cells+'</tbody></table></div></section>';
  const top=rows.filter(p=>p.rankAverage!==null).sort((a,b)=>a.rankAverage-b.rankAverage||(a.rosRank||999)-(b.rosRank||999)).slice(0,12);
  body+=panel('Best remaining schedules','Average matchup difficulty rank across reported opponents. Lower rank = easier within each position.',
   '<div class="st-schedule-best">'+top.map((p,i)=>'<div class="st-schedule-best-row"><span class="st-rank-num">'+(i+1)+'</span>'+schedulePlayer(p)+'<b>#'+F(p.rankAverage,1)+'</b></div>').join('')+'</div>','cup');
- body+=method('2026 only. Player rows use the full published QB/RB/WR/TE rest-of-season rankings in their existing order; all 32 NFL D/ST units are also included. Position difficulty for offensive players uses historical full-PPR points conceded. D/ST difficulty uses an expressly limited proxy: interceptions plus lost fumbles committed by the upcoming opponent per completed game. D/ST ratings are NOT complete fantasy defense projections (sacks, points conceded, scores and return TDs are not covered). Across different positions, compare difficulty ranks rather than raw PPR or turnover totals. No opponent or headshot is fabricated when unavailable. Missing team mappings show as unrated.');
+ body+=method('2026 ESPN full-PPR opponent ratings with 4-point passing TDs (QB/RB/WR/TE/D/ST), scoring period '+dataset.espnRatings.scoringPeriodId+'. ESPN OPRK 1 is the hardest matchup; 32 is the easiest. Rankings are reported by ESPN and are not inferred from locally observed points. Updated '+new Date(dataset.espnRatings.fetchedAt).toLocaleString()+'. Player order defaults to your full published ROS position ranks. Unrated teams remain neutral; a bye is not a ranked opponent. Source: '+dataset.espnRatings.referenceUrl);
  if(state.scheduleScrollPending&&state.scheduleFocusKey){
   const focus=state.scheduleFocusKey;
   state.scheduleScrollPending=false;
@@ -233,7 +234,13 @@ function shell(){section.innerHTML=`<label class="st-dashboard-picker" for="stDa
 function persist(){updateLink();try{localStorage.setItem('shuaStudioStateV1',JSON.stringify({...state,outWeeks:null}));}catch(e){}}
 function render(){if(!visible||!dataset)return;const id=++renderId;C.reset();shell();const host=document.getElementById('stContent');try{if(state.view==='rankings')rankings(id);else host.innerHTML=renderers[state.view]();}catch(e){host.innerHTML=note('This dashboard could not render. '+E(e.message),true);console.error('SHUA Studio render',e);}document.getElementById('stSource').textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');persist();section.dataset.ready='true';}
 let firstLoad=true;
-async function load(){const id=++epoch;if(firstLoad){firstLoad=false;let saved=null;try{saved=JSON.parse(localStorage.getItem('shuaStudioStateV1')||'null');}catch(e){}if(!saved?.year&&state.view!=='schedule'){state.year=await S.Data.preferredYear();if(id!==epoch)return;}}if(state.view==='schedule')state.year=2026;shell();const host=document.getElementById('stContent');section.dataset.ready='false';host.innerHTML='<div class="st-loading">Loading verified season data…<div class="st-skeleton" aria-hidden="true"></div></div>';try{const data=await S.Data.load(+state.year);if(id!==epoch)return;dataset=data;state.week=Math.max(1,Math.min(18,state.week||(['matchup','schedule','startsit'].includes(state.view)?dataset.latestWeek+1:dataset.latestWeek)));render();}catch(e){if(id!==epoch)return;host.innerHTML=note(E(e.message),true)+`<button type="button" class="st-button" data-st-archive="2025">Open the 2025 historical dashboards</button> <button type="button" class="st-button" data-st-retry>Retry current season</button>`;section.dataset.ready='error';}}
+async function load(){const id=++epoch;if(firstLoad){firstLoad=false;let saved=null;try{saved=JSON.parse(localStorage.getItem('shuaStudioStateV1')||'null');}catch(e){}if(!saved?.year&&state.view!=='schedule'){state.year=await S.Data.preferredYear();if(id!==epoch)return;}}if(state.view==='schedule')state.year=2026;shell();const host=document.getElementById('stContent');section.dataset.ready='false';host.innerHTML='<div class="st-loading">Loading verified season data…<div class="st-skeleton" aria-hidden="true"></div></div>';try{const data=await S.Data.load(+state.year);if(id!==epoch)return;
+if(data.year===2026){
+ try{data.espnRatings=await S.Data.espnMatchups(2026);data.espnRatingsError=null;}
+ catch(err){data.espnRatingsError=err.message||String(err);data.espnRatings=null;}
+ if(id!==epoch)return;
+}
+dataset=data;state.week=Math.max(1,Math.min(18,state.week||(['matchup','schedule','startsit'].includes(state.view)?dataset.latestWeek+1:dataset.latestWeek)));render();}catch(e){if(id!==epoch)return;host.innerHTML=note(E(e.message),true)+`<button type="button" class="st-button" data-st-archive="2025">Open the 2025 historical dashboards</button> <button type="button" class="st-button" data-st-retry>Retry current season</button>`;section.dataset.ready='error';}}
 function open(){if(state.view==='schedule'&&+state.year!==2026){state.scheduleReturnYear=+state.year;state.year=2026;}visible=true;document.body.classList.add('shua-studio-open');document.body.classList.remove('fantasy-home-mode','stats-mode','compare-mode','trade-mode','mobile-menu-open');for(const child of main.children){if(child===section)continue;if(!hiddenBefore.has(child))hiddenBefore.set(child,child.hidden);child.hidden=true;}section.hidden=false;navigation.querySelectorAll('.pos').forEach(b=>b.classList.toggle('active',b===button));try{localStorage.setItem('shuaPageStateV2',JSON.stringify({section:'ANALYTICS'}));}catch(e){}if(dataset&&dataset.year===+state.year)render();else load();}
 function close(){visible=false;try{if(linkedView()){const u=new URL(location.href);u.hash='';history.replaceState(history.state,'',u);}}catch(e){}document.body.classList.remove('shua-studio-open');epoch++;renderId++;section.hidden=true;for(const [el,hidden] of hiddenBefore){if(el.isConnected)el.hidden=hidden;}hiddenBefore.clear();}
 function showPlayer(k){const p=dataset?.players.find(x=>x.key===k)||Object.values(dataset?.scheduleRoster||{}).flat().find(x=>x.key===k);if(!p)return;let found=null;try{const candidates=[...(typeof board!=='undefined'?board:[]),...(typeof players!=='undefined'?players:[])];found=candidates.find(x=>key(x.name)===p.key);}catch(e){}if(found&&typeof window.profile==='function'){window.profile(found.id);document.getElementById('modal').dataset.studioProfile='1';return;}if(window.ShuaEspnLive?.openStatsPlayerByName?.(p.name)){document.getElementById('modal').dataset.studioProfile='1';return;}if(window.openUnifiedPlayerProfileByName){window.openUnifiedPlayerProfileByName(p.name);return;}state.view='trends';state.pos=p.position;state.player=p.key;state.week=dataset.latestWeek;render();}

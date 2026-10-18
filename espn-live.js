@@ -199,8 +199,12 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 }
 .espn-game-log-opponent{display:flex;align-items:center;gap:6px;min-width:0}
 .espn-game-log-opponent-logo{width:18px;height:18px;object-fit:contain;flex:0 0 18px}
-.espn-game-log-opponent{gap:3px;border-radius:7px;padding:3px 3px;border:1px solid transparent;min-height:26px;box-sizing:border-box;font-size:11px;white-space:nowrap}
-.espn-game-log-opponent .espn-game-log-opponent-logo{width:15px;height:15px;flex:0 0 15px}
+.espn-game-log-opponent{gap:5px;width:100%;min-width:94px;max-width:none;min-height:31px;padding:5px 8px;border:1px solid transparent;border-radius:8px;box-sizing:border-box;font-size:12px;white-space:nowrap;justify-content:flex-start}
+.espn-game-log-opponent .espn-game-log-opponent-logo{width:18px;height:18px;flex:0 0 18px}
+.espn-game-log-opponent>span{display:block;white-space:nowrap;flex:1;text-align:left}
+.espn-game-log-table th:nth-child(2),.espn-game-log-table td:nth-child(2){width:106px!important;min-width:106px!important;max-width:none!important;white-space:nowrap!important;text-align:left!important}
+body.phone-mode .espn-game-log-table th:nth-child(2),body.phone-mode .espn-game-log-table td:nth-child(2){width:106px!important;min-width:106px!important;max-width:none!important}
+.espn-game-log-table-wrap{max-width:100%;overflow-x:auto!important}
 .espn-game-log-opponent.gl-sos-easy{background:linear-gradient(145deg,#087c53,#0c573f);border-color:#22d99666;color:#d3ffed}
 .espn-game-log-opponent.gl-sos-neutral{background:linear-gradient(145deg,#9a7524,#715524);border-color:#e0b94e88;color:#fff0c4}
 .espn-game-log-opponent.gl-sos-tough{background:linear-gradient(145deg,#a22d47,#712136);border-color:#ff657a55;color:#ffe4ea}
@@ -1175,19 +1179,18 @@ function canonicalGameLogTeam(opp){
 }
 function gameLogDifficulty(year,position){
   const season=Number(year),pos=String(position||'').toUpperCase();
-  if(season<2024||season>2026||!['QB','RB','WR','TE'].includes(pos))return Promise.resolve(null);
+  // No ESPN historical OPRK feed is currently archived: do not relabel local
+  // estimates as ESPN grades for older seasons.
+  if(season!==SEASON||!['QB','RB','WR','TE'].includes(pos))return Promise.resolve(null);
   const key=season+'|'+pos;
   if(gameLogDifficultyCache.has(key))return gameLogDifficultyCache.get(key);
   const promise=(async()=>{
-    // The Schedule tab and Game Log use the SAME positional PPR-allowed calculator,
-    // source dataset and rank thresholds. Old, unsupported seasons remain unrated.
-    if(!window.ShuaStudio?.Data?.load||!window.ShuaStudio?.defense){
-      await window.ShuaStudioLoader?.load?.();
-    }
-    const analytics=window.ShuaStudio;
-    if(!analytics?.Data?.load||!analytics?.defense)return null;
-    const ds=await analytics.Data.load(season);
-    return {grades:analytics.defense(ds,pos,ds.latestWeek,0).byTeam,through:ds.latestWeek};
+    if(!window.ShuaStudio?.Data?.espnMatchups)await window.ShuaStudioLoader?.load?.();
+    const data=window.ShuaStudio?.Data;
+    if(!data?.espnMatchups||!data?.espnDefense)return null;
+    const snapshot=await data.espnMatchups(SEASON);
+    const def=data.espnDefense(snapshot,pos);
+    return def?{grades:def.byTeam,through:snapshot.scoringPeriodId,fetchedAt:snapshot.fetchedAt}:null;
   })().catch(()=>null);
   gameLogDifficultyCache.set(key,promise);
   return promise;
@@ -1205,7 +1208,7 @@ function colorGameLogMatchups(panel,year,position){
       const rank=Number(data.grades?.[team]?.rank);
       if(!Number.isFinite(rank)||rank<=0)continue;
       item.classList.add(rank<=10?'gl-sos-easy':rank<=20?'gl-sos-neutral':'gl-sos-tough');
-      item.title='Matchup difficulty: '+rank+' of 32 for '+position+' (PPR allowed through Week '+data.through+')';
+      item.title='ESPN '+position+' opponent rank '+data.grades[team].espnRank+' of 32 (32 easiest; 1 hardest), ESPN full-PPR matchup snapshot, period '+data.through;
     }
   });
 }

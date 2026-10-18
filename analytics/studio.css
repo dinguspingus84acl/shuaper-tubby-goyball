@@ -190,3 +190,36 @@ body.shua-studio-open>.view-mode-toggle{position:relative!important;inset:auto!i
   #shuaAnalyticsSection .st-layout{display:block!important}
 }
 @media (min-width:1001px){#shuaAnalyticsSection .st-dashboard-picker{display:none!important}}
+
+
+/* Simplified Analytics header and compact 2026 schedule controls. */
+#shuaAnalyticsSection .st-schedule-filters{margin:0 0 8px}
+#shuaAnalyticsSection .st-schedule-filters .st-controls{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin:0}
+#shuaAnalyticsSection .st-schedule-filters .st-controls label{flex:0 1 auto;width:unset;min-width:0;max-width:185px}
+#shuaAnalyticsSection .st-schedule-filters .st-controls label:first-child{flex:0 0 118px;width:118px;max-width:118px;min-width:0}
+#shuaAnalyticsSection .st-schedule-filters .st-controls select{height:37px;min-height:37px;padding:4px 27px 4px 8px;font-size:13px!important;border-radius:8px}
+#shuaAnalyticsSection .st-schedule-filters .st-label,.st-schedule-tools .st-label{font-size:10px;line-height:1.25;letter-spacing:.04em}
+#shuaAnalyticsSection .st-schedule-tools{gap:10px;margin:8px 0 11px;align-items:center}
+#shuaAnalyticsSection .st-schedule-tools label{flex:0 1 236px;max-width:236px;min-width:130px}
+#shuaAnalyticsSection #stScheduleSearch{height:37px;min-height:37px;padding:6px 10px;font-size:14px;border-radius:8px}
+#shuaAnalyticsSection #stScheduleCount{padding:15px 0 0;font-size:10px}
+#shuaAnalyticsSection .st-schedule-heatmap-panel{margin-top:4px;padding-top:13px}
+#shuaAnalyticsSection .st-schedule-heatmap-panel .st-heat-legend{margin:0 0 9px}
+#shuaAnalyticsSection .st-week-sort-hint{margin:0 0 11px;color:#8eb1c5;font-size:11px;line-height:1.45}
+#shuaAnalyticsSection .st-heat-table thead th{vertical-align:middle!important}
+#shuaAnalyticsSection .st-week-sort{width:100%;display:flex;align-items:center;justify-content:center;gap:4px;min-height:37px;padding:5px 3px;margin:0;border:1px solid transparent;border-radius:7px;background:transparent;color:#d2e9f6;font:inherit;font-size:11px;font-weight:850;white-space:nowrap;cursor:pointer;touch-action:manipulation}
+#shuaAnalyticsSection .st-week-sort:hover{background:#154b5b;border-color:#2a827c}
+#shuaAnalyticsSection .st-week-sort.active{background:#0d4d45;color:#36f0ae;border-color:#24c899a3}
+#shuaAnalyticsSection .st-week-sort:focus-visible{outline:2px solid #24efa0;outline-offset:2px}
+#shuaAnalyticsSection .st-week-sort-icon{color:#78c4dc;font-size:12px;font-weight:950;min-width:11px}
+#shuaAnalyticsSection .st-week-sort.active .st-week-sort-icon{color:#36f0ae}
+@media(max-width:700px){
+ #shuaAnalyticsSection .st-schedule-filters .st-controls{gap:6px}
+ #shuaAnalyticsSection .st-schedule-filters .st-controls label:first-child{flex-basis:105px;width:105px;max-width:105px}
+ #shuaAnalyticsSection .st-schedule-filters .st-controls label{max-width:170px}
+ #shuaAnalyticsSection .st-schedule-filters .st-controls select{height:39px;min-height:39px;font-size:16px!important}
+ #shuaAnalyticsSection .st-schedule-tools label{flex-basis:175px;max-width:175px;min-width:120px}
+ #shuaAnalyticsSection #stScheduleSearch{height:39px;min-height:39px;font-size:16px}
+ #shuaAnalyticsSection .st-week-sort{min-height:40px;font-size:11px}
+ #shuaAnalyticsSection .st-schedule-heatmap-panel{padding:10px}
+}

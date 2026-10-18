@@ -42,6 +42,29 @@ with sync_playwright() as pw:
      assert page.locator('#stSeason').count()==0,'Schedule should remain 2026 only'
      assert page.locator('[data-st-schedule-pos="ALL"]').count()==0,'All filter must be removed'
      assert page.locator('#stScheduleRows tr').count()==36,'QB tab should include all ROS QBs'
+     assert page.locator('.st-topline').count()==0,'Old Studio branding should not appear'
+     assert page.locator('#stWorkspace > .st-heading').count()==0,'Remove the schedule title and 2026 schedule eyebrow'
+     assert page.locator('.st-schedule-heatmap-panel .st-panel-head').count()==0,'Remove duplicate heatmap heading'
+     assert page.locator('#stDashboard option[value="schedule"]').text_content().strip().endswith('Schedule')
+     assert page.locator('#stWeek').evaluate('(x)=>x.getBoundingClientRect().width')<=125,'Week selector must be compact'
+     assert page.locator('#stScheduleSearch').evaluate('(x)=>x.getBoundingClientRect().width')<=242,'Search input must be compact'
+     assert page.locator('[data-st-sort-week]').count()>=2,'Each schedule week needs a sort button'
+     first_week=page.locator('[data-st-sort-week]').first
+     baseline=page.locator('#stScheduleRows tr').first.get_attribute('data-st-schedule-key')
+     def week_ranks():
+      return page.locator('#stScheduleRows tr').evaluate_all("(rows)=>rows.map(row=>parseInt(row.querySelector('td .st-heat-cell small')?.textContent||'',10)).filter(Number.isFinite)")
+     first_week.click()
+     assert page.locator('.st-week-sort.active').count()==1
+     assert page.locator('.st-week-sort.active').first.get_attribute('aria-label').endswith('Easiest first')
+     ranks=week_ranks()
+     assert len(ranks)>=2 and ranks==sorted(ranks),'Easiest matchups must sort first'
+     first_week=page.locator('[data-st-sort-week]').first
+     first_week.click()
+     ranks=week_ranks()
+     assert ranks==sorted(ranks,reverse=True),'Second tap ranks hardest first'
+     page.locator('[data-st-sort-week]').first.click()
+     assert page.locator('.st-week-sort.active').count()==0,'Third tap restores published ROS ordering'
+     assert page.locator('#stScheduleRows tr').first.get_attribute('data-st-schedule-key')==baseline
      assert page.locator('#stScheduleSearch').get_attribute('placeholder')=='Search'
      assert page.locator('.st-schedule-tools .st-label').text_content().strip()=='Search'
      assert page.locator('#stScheduleRows .st-schedule-rank').count()==0,'Green rank badges must be removed'

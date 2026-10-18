@@ -46,6 +46,10 @@ with sync_playwright() as pw:
      assert page.locator('#stDashboard option[value="schedule"]').text_content().strip()=='Schedule'
      assert page.locator('#stScheduleRows .st-schedule-team-logo').count()>0,'Team logos should precede the team text'
      assert page.locator('#stScheduleRows .st-week-opponent-logo').count()>0,'Matchup opponent logos should appear'
+     assert page.locator('#stScheduleRows .st-week-opponent > span').count()==0,'Opponent abbreviations should not appear beside matchup logos'
+     assert page.locator('#stScheduleRows .st-week-opponent-logo').first.get_attribute('alt'),'Logo-only matchup must retain accessible team name'
+     search_width=page.locator('#stScheduleSearch').evaluate('(x)=>x.getBoundingClientRect().width')
+     assert search_width>=(195 if width<700 else 250),('Search should be wider',search_width)
      position_tops=page.locator('.st-schedule-positions button').evaluate_all('(buttons)=>buttons.map(b=>Math.round(b.getBoundingClientRect().top))')
      assert len(position_tops)==5 and max(position_tops)-min(position_tops)<=2,'All positions must fit in one row'
      week_buttons=page.locator('.st-week-sort')
@@ -59,7 +63,7 @@ with sync_playwright() as pw:
      assert page.locator('.st-schedule-heatmap-panel .st-panel-head').count()==0,'Remove duplicate heatmap heading'
      assert page.locator('#stDashboard option[value="schedule"]').text_content().strip().endswith('Schedule')
      assert page.locator('#stWeek').evaluate('(x)=>x.getBoundingClientRect().width')<=125,'Week selector must be compact'
-     assert page.locator('#stScheduleSearch').evaluate('(x)=>x.getBoundingClientRect().width')<=242,'Search input must be compact'
+     assert page.locator('#stScheduleSearch').evaluate('(x)=>x.getBoundingClientRect().width')<=305,'Search input should stay reasonably compact'
      assert page.locator('[data-st-sort-week]').count()>=2,'Each schedule week needs a sort button'
      first_week=page.locator('[data-st-sort-week]').first
      baseline=page.locator('#stScheduleRows tr').first.get_attribute('data-st-schedule-key')
@@ -111,6 +115,23 @@ with sync_playwright() as pw:
    # Click the face, not just the name: the entire player box must open the card.
    page.locator('#stScheduleRows [data-st-open="joshallen"] .st-schedule-face').first.click()
    page.wait_for_selector('#modal.open #sosStat[role="button"]',timeout=20000)
+   # Opponent colors in the actual player Game Log must use Schedule's positional grades.
+   page.locator('#unifiedProfileTabs [data-profile-tab="gamelog"]').click()
+   page.wait_for_selector('#unifiedGameLogPanel .espn-game-log-opponent[data-gl-opponent]',timeout=35000)
+   page.wait_for_function("""() => [...document.querySelectorAll('#unifiedGameLogPanel .espn-game-log-opponent')]
+      .some(el => ['gl-sos-easy','gl-sos-neutral','gl-sos-tough'].some(cls => el.classList.contains(cls)))""",timeout=35000)
+   matchup_result=page.evaluate("""async () => {
+     const ds=await window.ShuaStudio.Data.load(2026);
+     const grades=window.ShuaStudio.defense(ds,'QB',ds.latestWeek,0).byTeam;
+     const colored=[...document.querySelectorAll('#unifiedGameLogPanel .espn-game-log-opponent')]
+       .find(el => el.matches('.gl-sos-easy,.gl-sos-neutral,.gl-sos-tough'));
+     const team=window.ShuaStudio.canonicalTeam(colored.dataset.glOpponent);
+     const rank=grades[team]?.rank;
+     const expected=rank<=10?'gl-sos-easy':rank<=20?'gl-sos-neutral':'gl-sos-tough';
+     return {team,rank,expected,actual:colored.className};
+   }""")
+   assert matchup_result['rank'] is not None and matchup_result['expected'] in matchup_result['actual'],matchup_result
+   page.locator('#unifiedProfileTabs [data-profile-tab="overview"]').click()
    assert page.locator('#unifiedScheduleLink').count()==0,'Old Schedule shortcut should be removed'
    page.locator('#sosStat').click()
    page.wait_for_selector('#stScheduleRows tr.st-schedule-highlight',timeout=45000)

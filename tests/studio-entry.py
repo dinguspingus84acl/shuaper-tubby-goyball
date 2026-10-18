@@ -52,6 +52,8 @@ try:
       assert page.locator('.st-week-sort-icon').count()==0
       assert page.locator('.st-schedule-positions button').count()==5
       assert page.locator('#stScheduleRows .st-schedule-team-logo').count()>0
+      assert page.locator('#stScheduleRows .st-week-opponent > span').count()==0
+      assert page.locator('#stScheduleRows .st-week-opponent-logo').first.get_attribute('alt')
       assert page.locator('.st-topline').count()==0
       assert page.locator('#stWorkspace > .st-heading').count()==0
       assert page.locator('.st-schedule-heatmap-panel .st-panel-head').count()==0

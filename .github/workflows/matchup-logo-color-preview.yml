@@ -1,0 +1,31 @@
+name: Matchup logos and game log colors preview
+on:
+  push:
+    branches: [feature/logo-only-game-log-colors-20261018]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax and analytics calculations
+        run: |
+          node tests/analytics-core.cjs
+          for f in analytics/*.js analytics-dashboard.js espn-live.js; do node --check "$f"; done
+          python -m py_compile tests/studio-real-site.py tests/studio-entry.py
+      - name: Install Chromium and WebKit
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium webkit
+      - name: Verify player matchup colors and navigation
+        run: python tests/studio-real-site.py
+      - name: Verify deep links and mobile performance
+        run: python tests/studio-entry.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: matchup-color-browser-preview
+          path: tests/studio-verification/
+          retention-days: 3

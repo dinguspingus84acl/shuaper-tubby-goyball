@@ -40,6 +40,40 @@ async function load(year){return memo('season:'+year,async()=>{
  return {year,players,schedule:sched,weeks,latestWeek:Math.max(...weeks),source,warnings,fetchedAt:new Date().toISOString(),snapshotAt:stored?.generatedAt||null,rankData,enrichment:!!enrichment||!!stored};
  });}
 async function currentRanks(){return memo('currentRanks',async()=>{const [b,r]=await Promise.all([json('big-board.json',{cache:'no-store'}),json('ros-rankings.json',{cache:'no-store'})]);return {overall:(b.players||[]).map(x=>typeof x==='string'?x:x.name),position:r};});}
+async function scheduleRoster(ds){
+ return memo('schedule-roster:'+ds.year,async()=>{
+  const [site,depth,photos]=await Promise.all([
+   json('players.json',{cache:'force-cache'}).catch(()=>[]),
+   json('depth-chart.json',{cache:'force-cache'}).catch(()=>({teams:[]})),
+   json('legacy-stats/headshots.json',{cache:'force-cache'}).catch(()=>({headshots:{}}))
+  ]);
+  const siteMap=new Map((Array.isArray(site)?site:site.players||[]).map(p=>[key(p.name),p]));
+  const depthMap=new Map();
+  for(const t of depth.teams||[])for(const pos of S.positions)for(const name of t[pos]||[])depthMap.set(key(name),T(t.team));
+  const playerMap=new Map(ds.players.map(p=>[p.key,p]));
+  const ranks=ds.rankData?.position||{};
+  const result={};
+  for(const pos of S.positions){
+   result[pos]=(ranks[pos]||[]).map((row,i)=>{
+    const k=key(row.name),current=playerMap.get(k),sitePlayer=siteMap.get(k);
+    const team=T(current?.team||sitePlayer?.team||depthMap.get(k)||'');
+    const photo=photos.headshots?.[k];
+    const fallbackPhoto=Array.isArray(photo)?(photo.find(url=>/espncdn\.com/.test(url))||photo[0]):'';
+    return {
+     ...current,key:k,name:row.name,position:pos,team:S.teams[team]?team:'',
+     headshot:current?.headshot||sitePlayer?.headshot||fallbackPhoto||'',
+     customPositionRank:Number(row.rank)||i+1,rosRank:Number(row.rank)||i+1,
+     hasRecordedGames:!!current?.games?.length
+    };
+   });
+  }
+  result.DST=Object.keys(S.teams).sort((a,b)=>S.teams[a].localeCompare(S.teams[b])).map(team=>({
+    key:'dst-'+team.toLowerCase(),name:S.teams[team]+' D/ST',team,position:'DST',headshot:'',rosRank:null,customPositionRank:null,
+    hasRecordedGames:false
+  }));
+  return result;
+ });
+}
 function rankMap(data,path){const result={};if(path==='big-board.json'){(data.players||[]).forEach((v,i)=>{const name=typeof v==='string'?v:v.name;if(!result[key(name)])result[key(name)]={name,rank:i+1};});}else{for(const pos of S.positions){for(const p of data[pos]||[])result[key(p.name)]={name:p.name,rank:+p.rank,position:pos};}}return result;}
 async function rankHistory(path='big-board.json'){
  return memo('history:'+path,async()=>{try{const staticHistory=await json('analytics/rank-history.json',{cache:'no-store'});if(staticHistory[path]?.snapshots?.length)return staticHistory[path];}catch(e){}const old=readSaved('history:'+path);if(old&&Date.now()-old.ts<3600000)return old.value;let snapshots=[],failure='';
@@ -50,5 +84,5 @@ async function rankHistory(path='big-board.json'){
  });
 }
 async function preferredYear(){try{const m=await json('analytics/manifest.json',{cache:'no-store'});const ys=Object.keys(m.datasets||{}).map(Number).filter(y=>y<=YEAR);return ys.length?Math.max(...ys):YEAR;}catch(e){return YEAR;}}
-S.Data={load,schedule,rankHistory,currentRanks,json,normalise,parseEspn,preferredYear,clear(){cache.clear();},YEAR};
+S.Data={load,schedule,scheduleRoster,rankHistory,currentRanks,json,normalise,parseEspn,preferredYear,clear(){cache.clear();},YEAR};
 })();

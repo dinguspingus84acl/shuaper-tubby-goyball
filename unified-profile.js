@@ -386,6 +386,12 @@ style.textContent=`
   .unified-stat-item{flex:0 0 92px}
 }
 `;
+style.textContent += `
+.unified-schedule-shortcut{display:block;width:100%;min-height:45px;text-align:center;margin:5px 0 12px;padding:11px 15px;border-radius:12px;background:linear-gradient(105deg,#0a635a,#0c4467);border:1px solid #23beaa85;color:#f0fffd;font-size:14px;font-weight:900;letter-spacing:.01em;cursor:pointer;box-shadow:inset 0 1px 0 #ffffff24,0 6px 16px #0003}
+.unified-schedule-shortcut:hover{background:linear-gradient(105deg,#0b7660,#0f537a)}
+.unified-schedule-shortcut:focus-visible{outline:2px solid #24efa0;outline-offset:3px}
+.phone-mode .unified-schedule-shortcut{margin:3px 0 10px;min-height:49px}
+`;
 document.head.appendChild(style);
 
 function playerByName(name){
@@ -1027,6 +1033,36 @@ function ensureUi(){
   if(injury)overview.appendChild(injury);
   if(stats)overview.appendChild(stats);
   if(notes)overview.appendChild(notes);
+  let scheduleShortcut=document.getElementById('unifiedScheduleLink');
+  if(!scheduleShortcut){
+    scheduleShortcut=document.createElement('button');
+    scheduleShortcut.type='button';
+    scheduleShortcut.id='unifiedScheduleLink';
+    scheduleShortcut.className='unified-schedule-shortcut';
+    scheduleShortcut.textContent='2026 Schedule  →';
+    scheduleShortcut.setAttribute('aria-label','View this player in the 2026 rest-of-season schedule heatmap');
+    scheduleShortcut.onclick=async()=>{
+      const modal=document.getElementById('modal');
+      const name=modal?.dataset.unifiedName;
+      if(!name)return;
+      const player=playerByName(name)||basePositionPlayer(name)||activeSeed;
+      const position=String(player?.position||'');
+      document.getElementById('close')?.click();
+      try{
+        if(window.ShuaStudioLoader?.load)await window.ShuaStudioLoader.load();
+        if(window.ShuaStudio?.UI?.openSchedule){
+          window.ShuaStudio.UI.openSchedule(name,position);
+        }else{
+          window.location.hash='analytics/schedule';
+          document.getElementById('studioNav')?.click();
+        }
+      }catch(e){
+        window.location.hash='analytics/schedule';
+        document.getElementById('studioNav')?.click();
+      }
+    };
+  }
+  overview.prepend(scheduleShortcut);
 
   tabs.addEventListener('click',e=>{
     const btn=e.target.closest('[data-profile-tab]');

@@ -36,7 +36,20 @@ try:
      assert page.url.endswith('#analytics/'+view),page.url
      assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2'),view
      if view in ['trends','opportunity','injury','schedule','weekly']:page.screenshot(path=str(OUT/f'release-{engine}-{width}-{view}.png'),full_page=True)
+    # The Schedule tab is permanently 2026, even when another analytics tab uses an archive.
     page.locator('[data-st-view="trends"]').click()
+    page.select_option('#stSeason','2025')
+    page.wait_for_function("window.ShuaStudio?.UI?.dataset?.year===2025",timeout=30000)
+    page.locator('[data-st-view="schedule"]').click()
+    page.wait_for_function("window.ShuaStudio?.UI?.dataset?.year===2026",timeout=30000)
+    assert page.locator('#stSeason').count()==0,'Schedule should not offer prior seasons'
+    assert '2026' in page.locator('#stWorkspace .st-heading').inner_text()
+    assert page.locator('#stContent .st-heat-table').count()==1
+    page.locator('[data-st-view="trends"]').click()
+    page.wait_for_function("window.ShuaStudio?.UI?.dataset?.year===2025",timeout=30000)
+    assert page.locator('#stSeason').input_value()=='2025','Other tabs must retain their season'
+    page.select_option('#stSeason','2026')
+    page.wait_for_function("window.ShuaStudio?.UI?.dataset?.year===2026",timeout=30000)
     count=page.locator('#stContent .st-chart').count()
     page.locator('#stContent [data-st-expand]').first.click();page.wait_for_selector('#stChartDialog[open]')
     assert page.locator('#stChartDialog svg.st-svg').count()>0

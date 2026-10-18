@@ -68,6 +68,36 @@ function schedulePlayer(p){
    ?'<div class="st-schedule-person st-schedule-defense">'+content+'</div>'
    :'<button type="button" class="st-schedule-person st-schedule-person-button" data-st-open="'+E(p.key)+'" aria-label="Open '+E(p.name)+' player profile">'+content+'</button>';
 }
+function showScheduleSuggestions(inputText){
+ const root=section.querySelector('#stScheduleSuggestions'),input=section.querySelector('#stScheduleSearch');
+ if(!root||!input)return;
+ const query=String(inputText||'').trim().toLowerCase();
+ const positions=['QB','RB','WR','TE','DST'];
+ const players=positions.flatMap(pos=>dataset?.scheduleRoster?.[pos]||[]);
+ if(query.length<2){
+  root.hidden=true;root.replaceChildren();input.setAttribute('aria-expanded','false');
+  return;
+ }
+ const results=players.filter(p=>p.name.toLowerCase().includes(query)).sort((a,b)=>{
+  const sameA=a.position===state.schedulePos?0:1,sameB=b.position===state.schedulePos?0:1;
+  const startA=a.name.toLowerCase().startsWith(query)?0:1,startB=b.name.toLowerCase().startsWith(query)?0:1;
+  return startA-startB||sameA-sameB||(a.rosRank||999)-(b.rosRank||999)||a.name.localeCompare(b.name);
+ }).slice(0,9);
+ root.innerHTML=results.map(p=>'<button type="button" role="option" class="st-schedule-suggestion" data-st-suggest="'+E(p.key)+'" data-st-suggest-pos="'+E(p.position)+'" aria-label="Show '+E(p.name)+' in Schedule">'+
+ (p.position==='DST'?logo(p.team,'st-schedule-suggestion-face'):face(p,'st-schedule-suggestion-face'))+
+ '<span class="st-schedule-suggest-copy"><strong>'+E(p.name)+'</strong><small>'+logo(p.team,'st-schedule-suggestion-logo')+E(p.team)+' · '+E(p.position==='DST'?'D/ST':p.position)+'</small></span></button>').join('')
+ ||'<div class="st-schedule-no-match">No matching players or defenses</div>';
+ root.hidden=false;input.setAttribute('aria-expanded','true');
+}
+function openScheduleSuggestion(btn){
+ const pos=btn.dataset.stSuggestPos,k=btn.dataset.stSuggest;
+ if(!['QB','RB','WR','TE','DST'].includes(pos)||!k)return;
+ state.schedulePos=pos;
+ state.scheduleFocusKey=k;
+ state.scheduleQuery='';
+ state.scheduleScrollPending=true;
+ render();
+}
 function dstDifficulty(ds,through,last){
  const start=last?Math.max(1,through-last+1):1,byWeek=new Map();
  for(const player of ds.players)for(const game of G(player,through)){
@@ -252,6 +282,10 @@ button.onclick=()=>open();
 window.addEventListener('hashchange',()=>{const v=linkedView();if(v)navigate(v);else if(visible)close();});
 document.addEventListener('click',e=>{const b=e.target.closest?.('.positions .pos');if(b&&b!==button&&visible)close();},true);
 section.addEventListener('click',e=>{
+ const suggestion=e.target.closest('[data-st-suggest]');
+ if(suggestion&&state.view==='schedule'){openScheduleSuggestion(suggestion);return;}
+ const currentSuggestions=section.querySelector('#stScheduleSuggestions');
+ if(currentSuggestions&&!e.target.closest('.st-schedule-search-wrap'))currentSuggestions.hidden=true;
  const weekSort=e.target.closest('[data-st-sort-week]');
  if(weekSort&&state.view==='schedule'){
   const week=+weekSort.dataset.stSortWeek;
@@ -277,8 +311,64 @@ section.addEventListener('input',e=>{
  });
  const label=document.getElementById('stScheduleCount');
  if(label)label.textContent=count+' matching rows';
+ showScheduleSuggestions(search);
 });
 section.addEventListener('input',e=>{if(e.target.id!=='stInjurySearch')return;const q=e.target.value.toLowerCase().trim();state.injurySearch=q;let count=0;section.querySelectorAll('#stInjuryList [data-st-injury]').forEach(el=>{el.hidden=!!q&&!el.dataset.name.includes(q);if(!el.hidden)count++;});const counter=document.getElementById('stInjuryCount');if(counter)counter.textContent=count+' players';});
+section.addEventListener('keydown',e=>{
+ if(e.target.id==='stScheduleSearch'){
+  const popup=section.querySelector('#stScheduleSuggestions');
+  if(e.key==='Escape'){if(popup)popup.hidden=true;e.target.setAttribute('aria-expanded','false');return;}
+  if(e.key==='ArrowDown'&&popup&&!popup.hidden){
+   const first=popup.querySelector('[data-st-suggest]');
+   if(first){e.preventDefault();first.focus();}
+  }
+ }else if(e.target.matches('[data-st-suggest]')){
+  if(e.key==='Escape'){e.preventDefault();section.querySelector('#stScheduleSearch')?.focus();section.querySelector('#stScheduleSuggestions').hidden=true;}
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+   const options=[...section.querySelectorAll('[data-st-suggest]')],idx=options.indexOf(e.target);
+   const next=options[idx+(e.key==='ArrowDown'?1:-1)];if(next){e.preventDefault();next.focus();}
+  }
+ }
+});
+let schedulePositionDrag=null;
+function schedulePositionAt(x,y,bar){
+ const rect=bar.getBoundingClientRect();
+ if(y<rect.top-35||y>rect.bottom+35)return null;
+ const buttons=[...bar.querySelectorAll('[data-st-schedule-pos]')];
+ return buttons.reduce((best,b)=>{
+  const r=b.getBoundingClientRect(),distance=Math.abs(x-(r.left+r.right)/2);
+  return !best||distance<best.distance?{pos:b.dataset.stSchedulePos,distance}:best;
+ },null)?.pos||null;
+}
+section.addEventListener('pointerdown',e=>{
+ if(state.view!=='schedule'||e.pointerType==='mouse')return;
+ const btn=e.target.closest('[data-st-schedule-pos]'),bar=btn?.closest('.st-schedule-positions');
+ if(!bar)return;
+ schedulePositionDrag={id:e.pointerId,bar,last:btn.dataset.stSchedulePos,moved:false};
+ try{bar.setPointerCapture(e.pointerId);}catch(_){}
+});
+section.addEventListener('pointermove',e=>{
+ const drag=schedulePositionDrag;
+ if(!drag||e.pointerId!==drag.id)return;
+ const pos=schedulePositionAt(e.clientX,e.clientY,drag.bar);
+ if(pos&&pos!==drag.last){
+  drag.last=pos;drag.moved=true;
+  drag.bar.querySelectorAll('[data-st-schedule-pos]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.stSchedulePos===pos)));
+  e.preventDefault();
+ }
+});
+section.addEventListener('pointerup',e=>{
+ const drag=schedulePositionDrag;
+ if(!drag||e.pointerId!==drag.id)return;
+ schedulePositionDrag=null;
+ try{drag.bar.releasePointerCapture(e.pointerId);}catch(_){}
+ if(drag.moved){
+  state.schedulePos=drag.last;state.scheduleFocusKey='';state.scheduleQuery='';
+  render();e.preventDefault();
+ }
+});
+section.addEventListener('pointercancel',e=>{if(schedulePositionDrag?.id===e.pointerId)schedulePositionDrag=null;});
+section.addEventListener('contextmenu',e=>{if(e.target.closest('.st-schedule-positions'))e.preventDefault();});
 section.addEventListener('keydown',e=>{const tab=e.target.closest('[role=tab]');if(!tab||!['ArrowLeft','ArrowRight','ArrowDown','ArrowUp','Home','End'].includes(e.key))return;e.preventDefault();const tabs=[...section.querySelectorAll('[role=tab]')],i=tabs.indexOf(tab),next=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(['ArrowRight','ArrowDown'].includes(e.key)?1:-1)+tabs.length)%tabs.length;tabs[next].click();section.querySelectorAll('[role=tab]')[next]?.focus();});
 document.addEventListener('error',e=>{if(e.target?.tagName==='IMG'&&e.target.closest?.('#shuaAnalyticsSection,.st-profile-insights')){const img=e.target;if(img.dataset.stInitials){const fallback=document.createElement('span');fallback.className=img.className+' st-avatar-fallback';fallback.textContent=img.dataset.stInitials;fallback.setAttribute('aria-hidden','true');img.replaceWith(fallback);}else{img.style.visibility='hidden';img.setAttribute('aria-hidden','true');}}},true);
 let resize=0,layoutWidth=window.innerWidth;window.addEventListener('resize',()=>{if(window.innerWidth===layoutWidth)return;layoutWidth=window.innerWidth;clearTimeout(resize);resize=setTimeout(()=>{if(visible&&dataset)render();},220);},{passive:true});

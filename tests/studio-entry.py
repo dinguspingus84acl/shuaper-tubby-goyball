@@ -42,6 +42,9 @@ try:
      if view=='schedule':
       page.wait_for_selector('#stScheduleRows tr',timeout=45000)
       assert page.locator('#stScheduleRows tr').count()==36
+      assert page.evaluate('window.ShuaStudio.UI.dataset.espnRatings?.source')=='ESPN Fantasy Football mPositionalRatings'
+      assert page.evaluate('window.ShuaStudio.UI.dataset.espnRatings?.positions?.QB?.DET?.rank')==32
+      assert page.locator('#stScheduleSuggestions').count()==1
       assert page.locator('#stSeason').count()==0
       assert page.locator('[data-st-schedule-pos="ALL"]').count()==0
       assert page.locator('#stScheduleRows .st-schedule-rank').count()==0

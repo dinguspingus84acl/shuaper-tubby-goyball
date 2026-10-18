@@ -25,11 +25,17 @@ try:
     page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
     page.goto(BASE+'#analytics/trends',wait_until='domcontentloaded')
     page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=60000)
-    assert page.locator('#stDashboard').count()==0
+    def select_chart(view):
+     if width<=1000:page.select_option('#stDashboard',view)
+     else:page.locator('.st-navigation [data-st-view="'+view+'"]').click()
+    assert page.locator('#stDashboard').count()==1
+    assert page.locator('#stDashboard').is_visible()==(width<=1000)
+    assert page.locator('.st-navigation').is_visible()==(width>1000)
+    assert page.locator('#stDashboard option').count()==9
     assert page.locator('.st-navigation [data-st-view]').count()==9
     assert page.locator('#stContent .st-chart').count()>=2
     for view in VIEWS:
-     page.locator('.st-navigation [data-st-view="'+view+'"]').click()
+     select_chart(view)
      assert page.locator('#stContent .st-panel').count()>0,view
      assert not page.locator('#stContent').inner_text().startswith('This dashboard could not render'),view
      assert page.locator('.st-navigation [data-st-view="'+view+'"]').get_attribute('aria-selected')=='true'
@@ -45,16 +51,16 @@ try:
      assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2'),view
      if view in ['trends','opportunity','injury','schedule','weekly']:page.screenshot(path=str(OUT/f'release-{engine}-{width}-{view}.png'),full_page=True)
     # The Schedule tab is permanently 2026, even when another analytics tab uses an archive.
-    page.locator('[data-st-view="trends"]').click()
+    select_chart('trends')
     page.select_option('#stSeason','2025')
     page.wait_for_function("window.ShuaStudio?.UI?.dataset?.year===2025",timeout=30000)
-    page.locator('[data-st-view="schedule"]').click()
+    select_chart('schedule')
     page.wait_for_function("window.ShuaStudio?.UI?.dataset?.year===2026",timeout=30000)
     assert page.locator('#stSeason').count()==0,'Schedule should not offer prior seasons'
     assert '2026' in page.locator('#stWorkspace .st-heading').inner_text()
     page.wait_for_selector('#stScheduleRows tr',timeout=45000)
     assert page.locator('#stContent .st-heat-table').count()==1
-    page.locator('[data-st-view="trends"]').click()
+    select_chart('trends')
     page.wait_for_function("window.ShuaStudio?.UI?.dataset?.year===2025",timeout=30000)
     assert page.locator('#stSeason').input_value()=='2025','Other tabs must retain their season'
     page.select_option('#stSeason','2026')
@@ -69,12 +75,12 @@ try:
     assert page.locator('#stContent .st-chart').count()==count
     assert page.locator('#stChartDialog[open]').count()==0
     page.reload(wait_until='domcontentloaded');page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=60000)
-    assert page.locator('.st-navigation [data-st-view="trends"]').get_attribute('aria-selected')=='true'
+    assert page.locator('#stDashboard').input_value()=='trends'
     page.locator('.positions [data-pos="QB"]').evaluate('(b)=>b.click()')
     assert not page.locator('#shuaAnalyticsSection').is_visible()
     assert '#analytics/' not in page.url
     page.evaluate("location.hash='analytics/consistency'");page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]')
-    assert page.locator('.st-navigation [data-st-view="consistency"]').get_attribute('aria-selected')=='true'
+    assert page.locator('#stDashboard').input_value()=='consistency'
     assert not errors,errors
     report['checks'].append({'browser':engine,'width':width,'dashboards':9,'deepLinks':True,'expandedCharts':True,'pageErrors':errors});ctx.close()
    ctx=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True);failures={'count':0}

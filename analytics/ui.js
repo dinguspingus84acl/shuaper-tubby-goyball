@@ -136,7 +136,7 @@ function schedule(){
    const hasOpponent=opponent?.known&&!opponent.bye&&!!S.teams[opponent.opponent];
    const unavailable=!S.teams[p.team]||!opponent?.known;
    const label=opponent?.bye?'BYE':hasOpponent?(opponent.home?'vs ':'@ ')+opponent.opponent:'—';
-   const matchupHtml=hasOpponent?'<span class="st-week-opponent">'+logo(opponent.opponent,'st-week-opponent-logo')+'<span>'+E(label)+'</span></span>':E(label);
+   const matchupHtml=hasOpponent?'<span class="st-week-opponent">'+logo(opponent.opponent,'st-week-opponent-logo').replace('alt=""','alt="'+E(opponent.opponent)+'"')+'</span>':E(label);
    const difficulty=opponent?.bye?'bye':unavailable?'':color(matchup?.rank);
    const tip=p.name+' · Week '+w+' · '+label+(matchup?' · '+F(matchup.allowed,1)+' '+metricLabel(p)+' · '+matchup.games+' recorded games':' · opponent rating unavailable');
    return '<td><div class="st-heat-cell '+difficulty+'" tabindex="0" title="'+E(tip)+'"><b>'+matchupHtml+'</b><small>'+(!opponent?.bye&&matchup?String(matchup.rank):'—')+'</small></div></td>';

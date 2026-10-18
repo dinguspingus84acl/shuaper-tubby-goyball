@@ -270,3 +270,13 @@ body.shua-studio-open>.view-mode-toggle{position:relative!important;inset:auto!i
  #shuaAnalyticsSection .st-week-opponent-logo{width:15px;height:15px;min-width:15px}
  #shuaAnalyticsSection .st-heat-cell b{font-size:10px}
 }
+
+/* Team-logo-only matchup cells; home/away and opponent remain in accessible logo alt and cell tooltip. */
+#shuaAnalyticsSection .st-week-opponent{display:flex;align-items:center;justify-content:center;width:100%;height:34px;gap:0}
+#shuaAnalyticsSection .st-week-opponent-logo{display:block;width:30px;height:30px;min-width:30px;max-width:30px;object-fit:contain}
+#shuaAnalyticsSection .st-heat-cell b{height:auto;min-height:30px}
+#shuaAnalyticsSection .st-schedule-tools label{flex:0 1 295px;max-width:295px;min-width:145px}
+@media(max-width:700px){
+ #shuaAnalyticsSection .st-week-opponent-logo{width:29px;height:29px;min-width:29px;max-width:29px}
+ #shuaAnalyticsSection .st-schedule-tools label{flex:0 1 215px;max-width:215px;min-width:145px}
+}

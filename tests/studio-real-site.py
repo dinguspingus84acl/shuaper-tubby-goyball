@@ -35,8 +35,13 @@ with sync_playwright() as pw:
      assert page.locator('#stScheduleRows tr').count()==36,'QB tab should include all ROS QBs'
      assert page.locator('#stScheduleSearch').get_attribute('placeholder')=='Search'
      assert page.locator('.st-schedule-tools .st-label').text_content().strip()=='Search'
-     assert page.locator('#stScheduleRows .st-schedule-rank').count()==36,'Number circles should replace text ROS ranks'
-     assert page.locator('#stScheduleRows .st-schedule-avatar').count()==36,'Circular faces should be present'
+     assert page.locator('#stScheduleRows .st-schedule-rank').count()==0,'Green rank badges must be removed'
+     assert page.locator('#stScheduleRows .st-schedule-avatar').count()==36,'Circular faces should remain'
+     assert page.locator('#stContent #stRange').count()==0,'Sample dropdown must not appear on Schedule'
+     assert page.locator('#stDashboard').count()==0,'Secondary dashboard selector should not appear'
+     assert page.locator('.st-navigation [data-st-view]').count()==9,'Clickable chart navigation must remain'
+     assert page.locator('#stScheduleRows .st-schedule-person-button').count()==36
+
      assert page.locator('#stScheduleRows .st-schedule-person-info').first.inner_text().find('ROS')==-1
      page.locator('#stScheduleSearch').fill('Josh Allen')
      assert page.locator('#stScheduleRows tr:visible').count()==1
@@ -57,7 +62,8 @@ with sync_playwright() as pw:
    page.locator('[data-st-view="schedule"]').click()
    page.wait_for_selector('#stScheduleRows [data-st-open="joshallen"]',timeout=45000)
    page.locator('[data-st-schedule-pos="QB"]').click()
-   page.locator('#stScheduleRows [data-st-open="joshallen"]').first.click()
+   # Click the face, not just the name: the entire player box must open the card.
+   page.locator('#stScheduleRows [data-st-open="joshallen"] .st-schedule-face').first.click()
    page.wait_for_selector('#modal.open #sosStat[role="button"]',timeout=20000)
    assert page.locator('#unifiedScheduleLink').count()==0,'Old Schedule shortcut should be removed'
    page.locator('#sosStat').click()

@@ -23,7 +23,7 @@ jobs:
           p = Path('index.html')
           text = p.read_text(encoding='utf-8')
           tag = '<script src="sos.js"></script>'
-          if tag not in text:
+          if 'src="sos.js"' not in text and 'src="sos.js?' not in text:
               text = text.replace('</body>', tag + '</body>')
               p.write_text(text, encoding='utf-8')
           PY

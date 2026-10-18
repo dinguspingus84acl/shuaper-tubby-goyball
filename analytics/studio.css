@@ -345,3 +345,137 @@ body.shua-studio-open>.view-mode-toggle{position:relative!important;inset:auto!i
  #shuaAnalyticsSection #stScheduleSearch{height:41px;min-height:41px}
  #shuaAnalyticsSection #stScheduleSuggestions{width:min(310px,calc(100vw - 30px))}
 }
+
+
+/* Schedule-only full-viewport layout, one toolbar row, and a single green position highlight. */
+body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) main{
+  box-sizing:border-box;width:100%;max-width:none;padding-inline:0!important;
+}
+#shuaAnalyticsSection[data-active-view="schedule"]{
+  box-sizing:border-box;width:100%;max-width:none;margin:0;padding:8px 0 24px;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-layout{
+  display:block!important;grid-template-columns:none!important;gap:0!important;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-navigation{display:none!important}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-dashboard-picker{
+  display:flex!important;flex-direction:column;gap:4px;
+  width:min(360px,100%);max-width:100%;min-width:0;margin:0 0 10px;padding:0 8px;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-dashboard-picker select{
+  min-height:42px;height:42px;width:100%;min-width:0;font-size:14px!important;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-workspace,
+#shuaAnalyticsSection[data-active-view="schedule"] #stContent{
+  width:100%;min-width:0;max-width:none;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] #stSource{display:none!important}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-positions{
+  margin:0 5px 8px;width:calc(100% - 10px);max-width:none;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-toolbar{
+  display:flex;flex-wrap:nowrap;align-items:end;justify-content:space-between;
+  gap:10px;width:100%;min-width:0;max-width:none;margin:0 0 8px;padding:0 8px;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-search-wrap{
+  position:relative;flex:1 1 auto;width:auto;min-width:0;max-width:360px;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-search-wrap label{
+  display:block;width:100%;max-width:none;margin-bottom:4px;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-filters{
+  flex:0 0 180px;min-width:0;width:180px;max-width:180px;margin:0!important;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-filters .st-controls{
+  margin:0;display:flex;gap:0;flex-wrap:nowrap;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-filters .st-controls label:first-child{
+  flex:1 1 100%!important;width:100%!important;min-width:0!important;max-width:100%!important;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-filters #stWeek{
+  display:block;width:100%;max-width:100%;min-width:0;min-height:41px;height:41px;
+  padding:5px 30px 5px 10px;white-space:nowrap;font-size:14px!important;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] #stScheduleSearch{
+  min-height:41px;height:41px;width:100%;font-size:14px;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-heatmap-panel{
+  box-sizing:border-box;margin:0 0 12px;border-radius:10px;padding:4px;
+  width:100%;max-width:none;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-heatmap-panel .st-heat-scroll{
+  box-sizing:border-box;display:block;width:100%;max-width:none;min-width:0;
+  height:calc(100dvh - 205px);min-height:320px;max-height:none!important;
+  overflow:auto;overscroll-behavior:contain;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-heatmap-panel .st-heat-table{
+  width:max-content!important;min-width:100%;max-width:none;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-heat-table thead th{
+  padding:0!important;line-height:1!important;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-week-sort{
+  min-height:29px!important;height:29px!important;
+  padding:3px 3px!important;margin:0!important;line-height:1.1!important;
+  font-size:11px!important;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-heat-table thead .st-heat-player{
+  min-height:29px!important;padding:5px!important;font-size:11px;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-panel .st-panel-head{
+  margin-bottom:9px;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-panel .st-panel-head p{display:none!important}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-row{
+  min-height:58px;padding:6px 8px;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best{
+  max-height:none;overflow:visible;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-average{
+  color:#2af0a4;font-variant-numeric:tabular-nums;
+}
+@media(hover:hover) and (pointer:fine){
+  #shuaAnalyticsSection .st-schedule-positions:has(button:hover) button[aria-pressed="true"]:not(:hover){
+    background:transparent!important;color:#a6bdd2!important;border-color:transparent!important;box-shadow:none!important;
+  }
+  #shuaAnalyticsSection .st-schedule-positions button:hover{
+    background:#0a3c36!important;color:var(--green)!important;
+    border-color:#20ac8a!important;box-shadow:inset 0 0 15px #24efa015!important;
+  }
+}
+@media(hover:none){
+  #shuaAnalyticsSection .st-schedule-positions button:hover:not([aria-pressed="true"]){
+    background:transparent!important;color:#a6bdd2!important;border-color:transparent!important;box-shadow:none!important;
+  }
+}
+@media(max-width:700px){
+  #shuaAnalyticsSection[data-active-view="schedule"]{padding:4px 0 18px}
+  #shuaAnalyticsSection[data-active-view="schedule"] .st-dashboard-picker{width:100%;padding:0 5px;margin:0 0 8px}
+  #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-toolbar{gap:7px;padding:0 5px;margin-bottom:6px}
+  #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-search-wrap{
+    flex:1 1 auto;width:auto;min-width:0;max-width:none;
+  }
+  #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-filters{
+    flex:0 0 135px;width:135px;min-width:0;max-width:135px;
+  }
+  #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-filters #stWeek{
+    height:40px;min-height:40px;font-size:16px!important;
+    padding-left:8px;padding-right:22px;
+  }
+  #shuaAnalyticsSection[data-active-view="schedule"] #stScheduleSearch{
+    height:40px;min-height:40px;font-size:16px;
+  }
+  #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-heatmap-panel{
+    margin:0 0 10px;padding:2px;border-radius:6px;
+  }
+  #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-heatmap-panel .st-heat-scroll{
+    height:calc(100dvh - 188px);min-height:300px;max-height:none!important;
+  }
+  #shuaAnalyticsSection[data-active-view="schedule"] .st-week-sort{
+    min-height:27px!important;height:27px!important;font-size:11px!important;
+  }
+  #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-panel{
+    margin-inline:3px;padding:9px;
+  }
+}

@@ -26,7 +26,7 @@ try:
     page.goto(BASE+'#analytics/trends',wait_until='domcontentloaded')
     page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=60000)
     def select_chart(view):
-     if width<=1000:page.select_option('#stDashboard',view)
+     if width<=1000 or page.locator('#stDashboard').is_visible():page.select_option('#stDashboard',view)
      else:page.locator('.st-navigation [data-st-view="'+view+'"]').click()
     assert page.locator('#stDashboard').count()==1
     assert page.locator('#stDashboard').is_visible()==(width<=1000)
@@ -42,6 +42,12 @@ try:
      if view=='schedule':
       page.wait_for_selector('#stScheduleRows tr',timeout=45000)
       assert page.locator('#stScheduleRows tr').count()==36
+      assert page.locator('#stScheduleBest .st-schedule-best-row').count()==36
+      assert page.locator('#stSource').is_hidden()
+      assert page.locator('.st-week-sort-hint').count()==0
+      assert page.locator('.st-heat-legend').count()==0
+      assert page.locator('.st-method').count()==0
+      assert page.locator('#stScheduleCount').count()==0
       assert page.evaluate('window.ShuaStudio.UI.dataset.espnRatings?.source')=='ESPN Fantasy Football mPositionalRatings'
       assert page.evaluate('window.ShuaStudio.UI.dataset.espnRatings?.positions?.QB?.DET?.rank')==32
       assert page.locator('#stScheduleSuggestions').count()==1

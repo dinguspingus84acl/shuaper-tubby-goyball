@@ -19,7 +19,7 @@ with sync_playwright() as pw:
    page.goto('http://127.0.0.1:8765/',wait_until='domcontentloaded',timeout=90000)
    page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=90000)
    def select_chart(view):
-    if width<=1000:page.select_option('#stDashboard',view)
+    if width<=1000 or page.locator('#stDashboard').is_visible():page.select_option('#stDashboard',view)
     else:page.locator('.st-navigation [data-st-view="'+view+'"]').click()
    if width<=1000:
     assert page.locator('#stDashboard').is_visible(),'Mobile chart dropdown should be visible'
@@ -42,6 +42,42 @@ with sync_playwright() as pw:
      assert page.locator('#stSeason').count()==0,'Schedule should remain 2026 only'
      assert page.locator('[data-st-schedule-pos="ALL"]').count()==0,'All filter must be removed'
      assert page.locator('#stScheduleRows tr').count()==36,'QB tab should include all ROS QBs'
+     assert page.locator('#stScheduleCount').count()==0,'Remove player count below Search'
+     assert page.locator('.st-heat-legend').count()==0,'Remove explanatory chart legend'
+     assert page.locator('.st-week-sort-hint').count()==0,'Remove schedule instructional copy'
+     assert page.locator('.st-method').count()==0,'Remove calculation notes from Schedule'
+     assert page.locator('#stSource').is_hidden(),'Remove bottom source notes from Schedule'
+     assert page.locator('.st-schedule-best-panel .st-panel-head p').count()==0,'Remove description under Best Remaining Schedules'
+     assert page.locator('#stScheduleBest .st-schedule-best-row').count()==36,'List every QB, not just the top 12'
+     assert page.locator('.st-schedule-toolbar').count()==1,'Search and Week must share one toolbar'
+     geom=page.evaluate("""() => {
+      const search=document.querySelector('#stScheduleSearch').getBoundingClientRect();
+      const week=document.querySelector('#stWeek').getBoundingClientRect();
+      const sc=document.querySelector('.st-heat-scroll').getBoundingClientRect();
+      const h=document.querySelector('.st-week-sort').getBoundingClientRect();
+      return {searchY:search.y,weekY:week.y,searchRight:search.right,weekX:week.x,scrollWidth:sc.width,scrollHeight:sc.height,headHeight:h.height,viewportWidth:innerWidth,viewportHeight:innerHeight};
+     }""")
+     assert abs(geom['searchY']-geom['weekY'])<=3,('Search and Week should be on the same row',geom)
+     assert geom['searchRight']<=geom['weekX']+1,('Week should be to the right of Search',geom)
+     assert geom['scrollWidth']>=geom['viewportWidth']-25,('Schedule table should span nearly full screen width',geom)
+     assert geom['scrollHeight']>=geom['viewportHeight']*.50,('Schedule table should fill most of the viewport height',geom)
+     assert geom['headHeight']<=32,('Shorten the week header row',geom)
+     averages=page.locator('#stScheduleBest .st-schedule-average').evaluate_all("(els)=>els.map(el=>Number(el.textContent)).filter(Number.isFinite)")
+     assert len(averages)>10 and averages==sorted(averages,reverse=True),'Best schedules must be sorted by HIGHEST average ESPN opponent rank'
+     average_check=page.evaluate("""() => {
+      const ds=window.ShuaStudio.UI.dataset,el=document.querySelector('#stScheduleBest .st-schedule-best-row');
+      const player=ds.scheduleRoster.QB.find(p=>p.key===el.dataset.stBestKey);
+      const start=Number(window.ShuaStudio.UI.state.week);
+      const ranks=Array.from({length:19-start},(_,i)=>start+i)
+       .map(w=>ds.schedule[player.team]?.[w]?.opponent)
+       .map(opp=>ds.espnRatings.positions.QB[opp]?.rank)
+       .filter(Number.isFinite);
+      const expected=ranks.length?ranks.reduce((a,b)=>a+b,0)/ranks.length:null;
+      return {expected,actual:parseFloat(el.querySelector('.st-schedule-average').textContent)};
+     }""")
+     if average_check['expected'] is not None:
+      assert abs(average_check['expected']-average_check['actual'])<0.11,('Average should use displayed ESPN OPRK, not inverted ease ranks',average_check)
+
      assert page.locator('#stPlayoffs').count()==0,'Schedule window filter should be gone'
      assert page.locator('#stDashboard option[value="schedule"]').text_content().strip()=='Schedule'
      assert page.locator('#stScheduleRows .st-schedule-team-logo').count()>0,'Team logos should precede the team text'
@@ -49,9 +85,19 @@ with sync_playwright() as pw:
      assert page.locator('#stScheduleRows .st-week-opponent > span').count()==0,'Opponent abbreviations should not appear beside matchup logos'
      assert page.locator('#stScheduleRows .st-week-opponent-logo').first.get_attribute('alt'),'Logo-only matchup must retain accessible team name'
      search_width=page.locator('#stScheduleSearch').evaluate('(x)=>x.getBoundingClientRect().width')
-     assert search_width>=(195 if width<700 else 250),('Search should be wider',search_width)
+     assert search_width>=(160 if width<700 else 250),('Search should be reasonably wide',search_width)
      position_tops=page.locator('.st-schedule-positions button').evaluate_all('(buttons)=>buttons.map(b=>Math.round(b.getBoundingClientRect().top))')
      assert len(position_tops)==5 and max(position_tops)-min(position_tops)<=2,'All positions must fit in one row'
+     if width>=1001:
+      page.locator('[data-st-schedule-pos="TE"]').hover()
+      highlight=page.evaluate("""() => {
+       const qb=document.querySelector('[data-st-schedule-pos="QB"]');
+       const te=document.querySelector('[data-st-schedule-pos="TE"]');
+       return {qb:getComputedStyle(qb).color,te:getComputedStyle(te).color,qbSelected:qb.getAttribute('aria-pressed')};
+      }""")
+      assert highlight['te']=='rgb(36, 239, 160)' and highlight['qb']!='rgb(36, 239, 160)',('Exactly one position should be green while hovering',highlight)
+      page.locator('#stScheduleSearch').hover()
+      assert page.locator('[data-st-schedule-pos="QB"]').get_attribute('aria-pressed')=='true'
      week_buttons=page.locator('.st-week-sort')
      assert week_buttons.count()>=2
      assert page.locator('.st-week-sort-icon').count()==0,'Inactive week arrows should be absent'
@@ -62,8 +108,8 @@ with sync_playwright() as pw:
      assert page.locator('#stWorkspace > .st-heading').count()==0,'Remove the schedule title and 2026 schedule eyebrow'
      assert page.locator('.st-schedule-heatmap-panel .st-panel-head').count()==0,'Remove duplicate heatmap heading'
      assert page.locator('#stDashboard option[value="schedule"]').text_content().strip().endswith('Schedule')
-     assert page.locator('#stWeek').evaluate('(x)=>x.getBoundingClientRect().width')>=155,'Week selector must display full text'
-     assert page.locator('#stScheduleSearch').evaluate('(x)=>x.getBoundingClientRect().width')<=305,'Search input should stay reasonably compact'
+     assert 120<=page.locator('#stWeek').evaluate('(x)=>x.getBoundingClientRect().width')<=200,'Week selector should fit beside search'
+     assert page.locator('#stScheduleSearch').evaluate('(x)=>x.getBoundingClientRect().width')<=370,'Search must fit alongside Week'
      assert page.locator('[data-st-sort-week]').count()>=2,'Each schedule week needs a sort button'
      first_week=page.locator('[data-st-sort-week]').first
      baseline=page.locator('#stScheduleRows tr').first.get_attribute('data-st-schedule-key')
@@ -84,7 +130,7 @@ with sync_playwright() as pw:
      assert page.locator('.st-week-sort.active').count()==0,'Third tap restores published ROS ordering'
      assert page.locator('#stScheduleRows tr').first.get_attribute('data-st-schedule-key')==baseline
      assert page.locator('#stScheduleSearch').get_attribute('placeholder')=='Search players'
-     assert page.locator('.st-schedule-tools .st-label').text_content().strip()=='Search'
+     assert page.locator('.st-schedule-toolbar .st-schedule-search-wrap .st-label').text_content().strip()=='Search'
      assert page.locator('#stScheduleRows .st-schedule-rank').count()==0,'Green rank badges must be removed'
      assert page.locator('#stScheduleRows .st-schedule-avatar').count()==36,'Circular faces should remain'
      assert page.locator('#stContent #stRange').count()==0,'Sample dropdown must not appear on Schedule'
@@ -122,6 +168,7 @@ with sync_playwright() as pw:
      for pos,total in [('WR',130),('TE',53),('RB',110),('DST',32),('QB',36)]:
       page.locator('[data-st-schedule-pos="'+pos+'"]').click()
       assert page.locator('#stScheduleRows tr').count()==total,(pos,'missing ROS or defense entries')
+      assert page.locator('#stScheduleBest .st-schedule-best-row').count()==total,(pos,'Best Remaining must include every selected-position player')
      assert page.locator('#stScheduleRows .st-schedule-face').count()>0,'Player portraits missing'
     page.wait_for_timeout(300)
     assert page.locator('#stContent .st-panel').count()>0,(engine,width,view,'missing panels')

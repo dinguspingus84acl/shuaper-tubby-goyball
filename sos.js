@@ -1,11 +1,11 @@
 (function(){
   let sos={};
-  const aliases={GB:'GNB',KC:'KAN',LV:'LVR',NE:'NWE',NO:'NOR',SF:'SFO',TB:'TAM',WSH:'WAS'};
+  const aliases={GNB:'GB',KAN:'KC',LVR:'LV',NWE:'NE',NOR:'NO',SFO:'SF',TAM:'TB',WSH:'WAS',JAC:'JAX'};
   const normalizeTeam=t=>aliases[t]||t;
 
-  fetch('strength-of-schedule.json',{cache:'no-store'})
+  fetch('analytics/espn-matchups-2026.json',{cache:'no-store'})
     .then(r=>r.json())
-    .then(d=>{sos=d.teams||{}; refresh();})
+    .then(d=>{if(d.scoring!=='full PPR; 4-point passing TD')throw Error('Unverified scoring');sos=d.positions||{}; refresh();})
     .catch(()=>{});
 
   function refresh(){
@@ -15,9 +15,11 @@
     if(!modal||!stats||!meta||!modal.classList.contains('open'))return;
 
     const parts=meta.textContent.split('·').map(x=>x.trim());
+    const yearTag=Number(parts[0]);
+    const current=!Number.isInteger(yearTag)||yearTag===2026;
     const team=normalizeTeam(parts[parts.length-2]||'');
     const position=parts[parts.length-1]||'';
-    const rank=sos[team]&&sos[team][position];
+    const rank=current?sos[position]?.[team]?.rank:null;
 
     let box=document.getElementById('sosStat');
     if(!rank){if(box)box.remove();return;}
@@ -28,7 +30,7 @@
       stats.appendChild(box);
     }
     box.innerHTML='<span>Strength of Schedule ↗</span><b>#'+rank+' of 32</b>';
-    box.title='Open 2026 Schedule heatmap · #1 easiest, #32 hardest';
+    box.title='Open ESPN full-PPR OPRK · #1 hardest, #32 easiest';
     box.setAttribute('role','button');
     box.setAttribute('tabindex','0');
     box.setAttribute('aria-label','Open '+position+' Strength of Schedule heatmap for '+(modal.dataset.unifiedName||document.getElementById('pn')?.textContent||'this player'));

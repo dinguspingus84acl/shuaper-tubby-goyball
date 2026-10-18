@@ -62,7 +62,7 @@ with sync_playwright() as pw:
      assert page.locator('#stWorkspace > .st-heading').count()==0,'Remove the schedule title and 2026 schedule eyebrow'
      assert page.locator('.st-schedule-heatmap-panel .st-panel-head').count()==0,'Remove duplicate heatmap heading'
      assert page.locator('#stDashboard option[value="schedule"]').text_content().strip().endswith('Schedule')
-     assert page.locator('#stWeek').evaluate('(x)=>x.getBoundingClientRect().width')<=125,'Week selector must be compact'
+     assert page.locator('#stWeek').evaluate('(x)=>x.getBoundingClientRect().width')>=155,'Week selector must display full text'
      assert page.locator('#stScheduleSearch').evaluate('(x)=>x.getBoundingClientRect().width')<=305,'Search input should stay reasonably compact'
      assert page.locator('[data-st-sort-week]').count()>=2,'Each schedule week needs a sort button'
      first_week=page.locator('[data-st-sort-week]').first
@@ -75,15 +75,15 @@ with sync_playwright() as pw:
      assert page.locator('.st-week-sort-icon').count()==1,'Only the active week should show a sort arrow'
      assert page.locator('.st-week-sort.active .st-week-sort-icon').evaluate('(x)=>getComputedStyle(x).color')=='rgb(54, 240, 174)','Selected arrow should be green'
      ranks=week_ranks()
-     assert len(ranks)>=2 and ranks==sorted(ranks),'Easiest matchups must sort first'
+     assert len(ranks)>=2 and ranks==sorted(ranks,reverse=True),'ESPN rank 32 should sort easiest first'
      first_week=page.locator('[data-st-sort-week]').first
      first_week.click()
      ranks=week_ranks()
-     assert ranks==sorted(ranks,reverse=True),'Second tap ranks hardest first'
+     assert ranks==sorted(ranks),'ESPN rank 1 should sort hardest first'
      page.locator('[data-st-sort-week]').first.click()
      assert page.locator('.st-week-sort.active').count()==0,'Third tap restores published ROS ordering'
      assert page.locator('#stScheduleRows tr').first.get_attribute('data-st-schedule-key')==baseline
-     assert page.locator('#stScheduleSearch').get_attribute('placeholder')=='Search'
+     assert page.locator('#stScheduleSearch').get_attribute('placeholder')=='Search players'
      assert page.locator('.st-schedule-tools .st-label').text_content().strip()=='Search'
      assert page.locator('#stScheduleRows .st-schedule-rank').count()==0,'Green rank badges must be removed'
      assert page.locator('#stScheduleRows .st-schedule-avatar').count()==36,'Circular faces should remain'
@@ -91,6 +91,29 @@ with sync_playwright() as pw:
      assert page.locator('#stDashboard').count()==1,'Dropdown should be provided to navigate charts'
      assert page.locator('.st-navigation [data-st-view]').count()==9,'Clickable chart navigation must remain'
      assert page.locator('#stScheduleRows .st-schedule-person-button').count()==36
+     espn_feed=page.evaluate('window.ShuaStudio.UI.dataset.espnRatings')
+     assert espn_feed['scoring']=='full PPR; 4-point passing TD'
+     assert len(espn_feed['positions']['QB'])==32 and len(espn_feed['positions']['DST'])==32
+     assert espn_feed['positions']['QB']['DET']['rank']==32
+     assert espn_feed['positions']['QB']['MIN']['rank']==1
+     page.locator('#stScheduleSearch').fill('Jahmyr')
+     page.wait_for_selector('#stScheduleSuggestions [data-st-suggest]',timeout=15000)
+     assert 'Jahmyr Gibbs' in page.locator('#stScheduleSuggestions').inner_text()
+     page.locator('#stScheduleSuggestions [data-st-suggest]').first.click()
+     assert page.locator('[data-st-schedule-pos="RB"]').get_attribute('aria-pressed')=='true'
+     assert page.locator('#stScheduleRows tr.st-schedule-highlight').count()==1
+     page.locator('[data-st-schedule-pos="QB"]').click()
+     if width<700:
+      page.evaluate("""() => {
+       const bar=document.querySelector('.st-schedule-positions'),q=bar.querySelector('[data-st-schedule-pos="QB"]'),te=bar.querySelector('[data-st-schedule-pos="TE"]');
+       const a=q.getBoundingClientRect(),b=te.getBoundingClientRect();
+       q.dispatchEvent(new PointerEvent('pointerdown',{pointerId:177,pointerType:'touch',bubbles:true,clientX:a.x+a.width/2,clientY:a.y+a.height/2}));
+       bar.dispatchEvent(new PointerEvent('pointermove',{pointerId:177,pointerType:'touch',bubbles:true,clientX:b.x+b.width/2,clientY:b.y+b.height/2}));
+       bar.dispatchEvent(new PointerEvent('pointerup',{pointerId:177,pointerType:'touch',bubbles:true,clientX:b.x+b.width/2,clientY:b.y+b.height/2}));
+      }""")
+      assert page.locator('[data-st-schedule-pos="TE"]').get_attribute('aria-pressed')=='true'
+      page.locator('[data-st-schedule-pos="QB"]').click()
+
 
      assert page.locator('#stScheduleRows .st-schedule-person-info').first.inner_text().find('ROS')==-1
      page.locator('#stScheduleSearch').fill('Josh Allen')
@@ -121,8 +144,8 @@ with sync_playwright() as pw:
    page.wait_for_function("""() => [...document.querySelectorAll('#unifiedGameLogPanel .espn-game-log-opponent')]
       .some(el => ['gl-sos-easy','gl-sos-neutral','gl-sos-tough'].some(cls => el.classList.contains(cls)))""",timeout=35000)
    matchup_result=page.evaluate("""async () => {
-     const ds=await window.ShuaStudio.Data.load(2026);
-     const grades=window.ShuaStudio.defense(ds,'QB',ds.latestWeek,0).byTeam;
+     const snapshot=await window.ShuaStudio.Data.espnMatchups(2026);
+     const grades=window.ShuaStudio.Data.espnDefense(snapshot,'QB').byTeam;
      const colored=[...document.querySelectorAll('#unifiedGameLogPanel .espn-game-log-opponent')]
        .find(el => el.matches('.gl-sos-easy,.gl-sos-neutral,.gl-sos-tough'));
      const team=window.ShuaStudio.canonicalTeam(colored.dataset.glOpponent);
@@ -131,6 +154,10 @@ with sync_playwright() as pw:
      return {team,rank,expected,actual:colored.className};
    }""")
    assert matchup_result['rank'] is not None and matchup_result['expected'] in matchup_result['actual'],matchup_result
+   assert page.evaluate("""() => {
+     const b=document.querySelector('#unifiedGameLogPanel .espn-game-log-opponent.gl-sos-easy, #unifiedGameLogPanel .espn-game-log-opponent.gl-sos-neutral, #unifiedGameLogPanel .espn-game-log-opponent.gl-sos-tough');
+     return b && b.offsetWidth>=90 && b.getBoundingClientRect().right>=b.querySelector('span').getBoundingClientRect().right;
+   }"""),'Colored matchup must cover entire game-log opponent label'
    page.locator('#unifiedProfileTabs [data-profile-tab="overview"]').click()
    assert page.locator('#unifiedScheduleLink').count()==0,'Old Schedule shortcut should be removed'
    page.locator('#sosStat').click()

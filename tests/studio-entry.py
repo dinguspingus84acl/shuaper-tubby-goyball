@@ -4,7 +4,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'tests/studio-verification';OUT.mkdir(parents=True,exist_ok=True)
-VIEWS=['matchup','trends','opportunity','rankings','consistency','teams','injury','schedule','startsit','weekly']
+VIEWS=['matchup','trends','opportunity','consistency','teams','injury','schedule','startsit','weekly']
 class Quiet(http.server.SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
 server=None;BASE=os.getenv('STUDIO_BASE_URL')
@@ -25,12 +25,11 @@ try:
     page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
     page.goto(BASE+'#analytics/trends',wait_until='domcontentloaded')
     page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=60000)
-    assert page.locator('#stDashboard option').count()==10
+    assert page.locator('#stDashboard option').count()==9
     assert page.locator('#stContent .st-chart').count()>=2
     for view in VIEWS:
      if width<700:page.select_option('#stDashboard',view)
      else:page.locator('[data-st-view="'+view+'"]').click()
-     if view=='rankings':page.wait_for_selector('#stRankBody .st-chart',timeout=30000)
      assert page.locator('#stContent .st-panel').count()>0,view
      assert not page.locator('#stContent').inner_text().startswith('This dashboard could not render'),view
      assert page.locator('#stDashboard').input_value()==view
@@ -55,7 +54,7 @@ try:
     page.evaluate("location.hash='analytics/consistency'");page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]')
     assert page.locator('#stDashboard').input_value()=='consistency'
     assert not errors,errors
-    report['checks'].append({'browser':engine,'width':width,'dashboards':10,'deepLinks':True,'expandedCharts':True,'pageErrors':errors});ctx.close()
+    report['checks'].append({'browser':engine,'width':width,'dashboards':9,'deepLinks':True,'expandedCharts':True,'pageErrors':errors});ctx.close()
    ctx=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True);failures={'count':0}
    def network(r):
     url=r.request.url

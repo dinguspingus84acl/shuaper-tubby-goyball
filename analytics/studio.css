@@ -99,3 +99,47 @@ body.shua-studio-open>.view-mode-toggle{position:relative!important;inset:auto!i
 .st-injury-impact{text-align:right}.st-injury-impact b{display:block;color:#e9f4fb;font-size:17px;font-variant-numeric:tabular-nums}.st-injury-impact.measured b{color:#24efa0}.st-injury-impact small{color:#9bb9c9;font-size:10px}
 @media(max-width:950px){.st-injury-layout{grid-template-columns:1fr}.st-injury-browser{position:static}.st-injury-list{display:flex;max-height:none;overflow-x:auto;overflow-y:hidden;padding-bottom:7px;scroll-snap-type:x proximity}.st-injury-item{min-width:180px;max-width:220px;scroll-snap-align:start}}
 @media(max-width:700px){.st-injury-filters label{flex-basis:calc(50% - 6px)}.st-injury-filters label:first-child{flex-basis:100%}.st-injury-benefit-row{gap:5px;grid-template-columns:17px minmax(0,1fr) auto}.st-injury-impact b{font-size:15px}}
+
+/* 2026 ROS schedule: all ranked skill players, 32 defenses, and visible headshots. */
+.st-schedule-positions{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.st-schedule-positions button{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.st-schedule-positions button small{display:inline-flex;justify-content:center;align-items:center;font-size:10px;line-height:1;border-radius:50px;padding:3px 5px;background:#ffffff18;color:inherit}
+.st-schedule-tools{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:10px 0 14px}
+.st-schedule-tools label{flex:1;max-width:470px;min-width:0}
+.st-schedule-tools .st-label{display:block;margin-bottom:5px}
+#stScheduleSearch{display:block;width:100%;height:42px;min-width:0;border:1px solid #315e78;border-radius:9px;background:#0d2b42;color:#efffff;padding:8px 12px;font-size:14px}
+#stScheduleSearch:focus-visible{outline:2px solid #24efa0;outline-offset:2px}
+#stScheduleCount{color:#a1c2d4;font-size:11px;white-space:nowrap;padding-bottom:13px}
+.st-heat-scroll{max-height:min(70dvh,760px);overflow:auto;overscroll-behavior:contain}
+.st-heat-table thead{position:sticky;top:0;z-index:5}
+.st-heat-table thead th{background:#0c2940!important}
+.st-heat-table thead .st-heat-player{z-index:7}
+.st-heat-table tbody tr[hidden]{display:none!important}
+.st-heat-table tbody tr.st-schedule-highlight .st-heat-player{background:#11443c!important;box-shadow:inset 0 0 0 2px #24efa0,5px 0 12px #07182780}
+.st-heat-table tbody tr.st-schedule-highlight .st-heat-cell{outline:1px solid #24efa055;outline-offset:-2px}
+.st-heat-table .st-heat-player{min-width:200px;max-width:200px}
+.st-schedule-person{display:flex;gap:8px;align-items:center;min-height:47px;min-width:0;overflow:hidden}
+.st-schedule-face{display:flex;align-items:center;justify-content:center;object-fit:contain;object-position:bottom;height:43px;width:42px;min-width:42px;border-radius:8px;background:#21425955;flex-shrink:0;font-size:13px}
+.st-schedule-face.st-schedule-team-photo{object-fit:contain;max-height:42px;padding:2px}
+.st-schedule-person-info{min-width:0;display:flex;align-items:flex-start;flex-direction:column;gap:2px;text-align:left}
+.st-schedule-person-info strong{color:#e9faff;display:block;font-size:12px;line-height:1.15;white-space:normal;overflow-wrap:anywhere;text-align:left}
+.st-schedule-person-info button{background:none!important;padding:0!important;border:0!important;text-align:left!important;color:inherit;cursor:pointer}
+.st-schedule-person-info button:hover strong{text-decoration:underline}
+.st-schedule-person-info small{color:#8cb1c9;font-size:10px;text-align:left}
+.st-schedule-best{display:grid;gap:2px}
+.st-schedule-best-row{display:grid;align-items:center;grid-template-columns:20px minmax(0,1fr) auto;gap:10px;border-bottom:1px solid #ffffff16;padding:8px 0}
+.st-schedule-best-row:last-child{border-bottom:0}
+.st-schedule-best-row>b{font-size:14px;color:#28efa5;font-variant-numeric:tabular-nums}
+.st-schedule-best-row .st-schedule-person{min-height:43px}
+@media(max-width:700px){
+ .st-schedule-positions{gap:5px}
+ .st-schedule-positions button{padding:8px 10px!important}
+ .st-heat-table .st-heat-player{min-width:164px;max-width:164px}
+ .st-schedule-face{height:38px;width:33px;min-width:33px}
+ .st-schedule-person{gap:5px}
+ .st-schedule-person-info strong{font-size:11px}
+ .st-schedule-person-info small{font-size:9px}
+ .st-schedule-tools{align-items:stretch;flex-wrap:wrap}
+ #stScheduleCount{padding:0}
+ .st-heat-scroll{max-height:68dvh}
+}

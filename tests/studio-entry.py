@@ -33,6 +33,10 @@ try:
      assert page.locator('#stContent .st-panel').count()>0,view
      assert not page.locator('#stContent').inner_text().startswith('This dashboard could not render'),view
      assert page.locator('#stDashboard').input_value()==view
+     if view=='schedule':
+      page.wait_for_selector('#stScheduleRows tr',timeout=45000)
+      assert page.locator('#stScheduleRows tr').count()==361
+      assert page.locator('#stSeason').count()==0
      assert page.url.endswith('#analytics/'+view),page.url
      assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2'),view
      if view in ['trends','opportunity','injury','schedule','weekly']:page.screenshot(path=str(OUT/f'release-{engine}-{width}-{view}.png'),full_page=True)
@@ -44,6 +48,7 @@ try:
     page.wait_for_function("window.ShuaStudio?.UI?.dataset?.year===2026",timeout=30000)
     assert page.locator('#stSeason').count()==0,'Schedule should not offer prior seasons'
     assert '2026' in page.locator('#stWorkspace .st-heading').inner_text()
+    page.wait_for_selector('#stScheduleRows tr',timeout=45000)
     assert page.locator('#stContent .st-heat-table').count()==1
     page.locator('[data-st-view="trends"]').click()
     page.wait_for_function("window.ShuaStudio?.UI?.dataset?.year===2025",timeout=30000)

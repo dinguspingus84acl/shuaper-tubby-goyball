@@ -1,0 +1,26 @@
+name: ESPN full-PPR source snapshot
+on:
+  push:
+    branches: [feature/espn-ranked-schedule-20261018]
+    paths: ['scripts/refresh-espn-matchups.py', '.github/workflows/espn-full-ppr-snapshot.yml']
+permissions:
+  contents: write
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/espn-ranked-schedule-20261018
+      - name: Fetch verified ESPN full-PPR positional ratings
+        run: python -u scripts/refresh-espn-matchups.py
+      - name: Publish validated JSON to preview branch
+        run: |
+          git config user.name 'SHUA Analytics Source'
+          git config user.email 'actions@users.noreply.github.com'
+          git add analytics/espn-matchups-2026.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Save ESPN full-PPR positional rankings for QA'
+            git push origin HEAD:feature/espn-ranked-schedule-20261018
+          fi

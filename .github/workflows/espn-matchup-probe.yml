@@ -44,3 +44,22 @@ jobs:
            except Exception as e:print("ERROR",repr(e),flush=True)
           
           PY
+      - name: Identify verified full PPR league
+        shell: bash
+        run: |
+          python - <<'PY'
+          import urllib.request,json
+          BASE="https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leagues/"
+          for lid in [2127,1299199286,456278,1137543,973347434,832360991,1789792391,1305,1438725,1299199286,1736183952]:
+           try:
+            req=lambda suffix:urllib.request.Request(BASE+str(lid)+"?view="+suffix,headers={"User-Agent":"Mozilla/5.0","Accept":"application/json"})
+            with urllib.request.urlopen(req("mSettings"),timeout=7) as f:d=json.load(f)
+            sc=d.get("settings",{}).get("scoringSettings",{})
+            points={int(i["statId"]):i.get("points") for i in sc.get("scoringItems",[]) if "statId" in i}
+            print("LEAGUE",lid,"PPR",points.get(53),"PASS_TD",points.get(4),"RANKTYPE",sc.get("playerRankType"),end=" ")
+            with urllib.request.urlopen(req("mPositionalRatings&scoringPeriodId=6"),timeout=7) as f:d2=json.load(f)
+            pos=d2.get("positionAgainstOpponent",{}).get("positionalRatings",{})
+            print("POSITIONS",[(k,len(v.get("ratingsByOpponent",{}))) for k,v in pos.items()])
+           except Exception as e:print("LEAGUE",lid,"ERROR",repr(e))
+          
+          PY

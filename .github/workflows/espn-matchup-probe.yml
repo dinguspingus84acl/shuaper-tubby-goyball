@@ -1,0 +1,42 @@
+name: ESPN public matchup probe
+on:
+  push:
+    branches: [feature/espn-matchup-source-20261018]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe official ESPN read APIs
+        shell: bash
+        run: |
+          python - <<'PY'
+          import urllib.request,json,re,html,urllib.error
+          u=[
+           "https://fantasy.espn.com/football/pointsagainst",
+           "https://fantasy.espn.com/football/pointsagainst?positionId=2",
+           "https://fantasy.espn.com/football/pointsagainst?positionId=3",
+           "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leagues/1438725?view=mPositionalRatings&scoringPeriodId=6",
+           "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leagues/1438725?view=mPositionalRatings&scoringPeriodId=6",
+           "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leagues/1?view=mPositionalRatings&scoringPeriodId=6",
+           "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026?view=proTeamStats_wl",
+          ]
+          for x in u:
+           print("URL",x,flush=True)
+           try:
+            req=urllib.request.Request(x,headers={'User-Agent':'Mozilla/5.0 (compatible; SHUA-Analytics/1.0)','Accept':'application/json,text/html'})
+            with urllib.request.urlopen(req,timeout=25) as r:
+             raw=r.read();print("STATUS",r.status,"BYTES",len(raw),"CONTENTTYPE",r.headers.get("Content-Type"))
+            s=raw.decode('utf-8','replace')
+            if s.lstrip().startswith('{'):
+             obj=json.loads(s);print("JSON KEYS",list(obj)[:30]);pos=obj.get('positionAgainstOpponent',{}).get('positionalRatings',{});print('RATINGS',list(pos)[:12],str(pos)[:2500])
+            else:
+             for term in ['Detroit Lions','TEAM AVG','positionalRatings','pointsAgainst','positionId','application/ld+json','__NEXT_DATA__','data-page']:
+              i=s.find(term)
+              print("FIND",term,i,repr(s[max(0,i-130):i+300]) if i>=0 else '')
+           except Exception as e:print("ERROR",repr(e),flush=True)
+          
+          PY

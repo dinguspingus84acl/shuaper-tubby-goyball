@@ -115,7 +115,7 @@ function dstDifficulty(ds,through,last){
  return {rows,byTeam:Object.fromEntries(rows.map(x=>[x.team,x]))};
 }
 function schedule(){
- const toolbar='<div class="st-schedule-filters">'+controls({week:true,season:false})+'</div>';
+ const toolbar='<div class="st-schedule-toolbar"><div class="st-schedule-search-wrap"><label for="stScheduleSearch"><span class="st-label">Search</span></label><input id="stScheduleSearch" type="search" placeholder="Search players" role="combobox" aria-autocomplete="list" aria-controls="stScheduleSuggestions" aria-expanded="false" autocomplete="off" value="'+E(state.scheduleQuery||'')+'"><div id="stScheduleSuggestions" role="listbox" aria-label="Matching players" hidden></div></div><div class="st-schedule-filters">'+controls({week:true,season:false})+'</div></div>';
  if(!dataset.scheduleRoster&&!dataset.scheduleRosterError){
   if(!dataset.scheduleRosterPending){
    const currentDataset=dataset;
@@ -132,7 +132,6 @@ function schedule(){
  if(dataset.scheduleRosterError)return toolbar+note('Unable to load schedule rosters: '+E(dataset.scheduleRosterError),true);
  const roster=dataset.scheduleRoster;
  const pos=['QB','RB','WR','TE','DST'].includes(state.schedulePos)?state.schedulePos:'QB';
- const total=['QB','RB','WR','TE','DST'].reduce((n,k)=>n+(roster[k]?.length||0),0);
  const players=roster[pos]||[];
  const through=Math.min(state.week-1,dataset.latestWeek);
  if(!dataset.espnRatings)return schedulePositions(roster)+toolbar+note('ESPN full-PPR matchup rankings are temporarily unavailable. '+E(dataset.espnRatingsError||'Retry later.')+' No local rankings are substituted.',true);
@@ -143,7 +142,7 @@ function schedule(){
  const weeks=Array.from({length:Math.max(0,19-state.week)},(_,i)=>i+state.week);
  const rows=players.map((player,index)=>{
   const grades=weeks.filter(w=>!dataset.schedule[player.team]?.[w]?.bye).map(w=>ratings[player.position]?.byTeam[dataset.schedule[player.team]?.[w]?.opponent]).filter(Boolean);
-  return {...player,rosOrder:index,average:avg(grades.map(d=>d.allowed)),rankAverage:avg(grades.map(d=>d.rank))};
+  return {...player,rosOrder:index,average:avg(grades.map(d=>d.allowed)),rankAverage:avg(grades.map(d=>d.espnRank))};
  });
  const activeWeek=weeks.includes(+state.scheduleSortWeek)&&state.scheduleSortWeek!=null?+state.scheduleSortWeek:null;
  const sortDirection=state.scheduleSortDirection==='hard'?'hard':'easy';
@@ -161,7 +160,6 @@ function schedule(){
  });
  const metricLabel=p=>p.position==='DST'?'opponent offensive turnovers / game':'PPR allowed per game';
  let body=schedulePositions(roster)+toolbar;
- body+='<div class="st-schedule-tools"><div class="st-schedule-search-wrap"><label for="stScheduleSearch"><span class="st-label">Search</span></label><input id="stScheduleSearch" type="search" placeholder="Search players" role="combobox" aria-autocomplete="list" aria-controls="stScheduleSuggestions" aria-expanded="false" autocomplete="off" value="'+E(state.scheduleQuery||'')+'"><div id="stScheduleSuggestions" role="listbox" aria-label="Matching players" hidden></div></div><span id="stScheduleCount">'+rows.length+' players</span></div>';
  const cells=rows.map(p=>{
   const highlighted=state.scheduleFocusKey===p.key;
   const playerRow='<tr data-st-schedule-key="'+E(p.key)+'" data-st-schedule-name="'+E(p.name.toLowerCase())+'" class="'+(highlighted?'st-schedule-highlight':'')+'"><th scope="row" class="st-heat-player">'+schedulePlayer(p)+'</th>';
@@ -183,13 +181,15 @@ function schedule(){
   return '<th scope="col" aria-sort="'+(selected?(sortDirection==='easy'?'ascending':'descending'):'none')+'"><button type="button" class="st-week-sort'+(selected?' active':'')+'" data-st-sort-week="'+w+'" aria-label="Week '+w+': '+description+'" title="Week '+w+' · '+description+'">W'+w+(indicator?' <span class="st-week-sort-icon" aria-hidden="true">'+indicator+'</span>':'')+'</button></th>';
  }).join('');
  body+='<section class="st-panel st-schedule-heatmap-panel">'+
-  '<div class="st-heat-legend"><span><i style="background:#24efa0"></i>ESPN 23–32 · easier</span><span><i style="background:#ffd15e"></i>13–22 · middle</span><span><i style="background:#ff617f"></i>1–12 · harder</span><span>— unrated / bye</span></div>'+
-  '<p class="st-week-sort-hint">Tap a week to rank matchups from easiest to hardest. Tap again to reverse; a third tap restores your ROS order.</p>'+
   '<div class="st-heat-scroll"><table class="st-heat-table"><thead><tr><th class="st-heat-player" scope="col">Player</th>'+weekHead+'</tr></thead><tbody id="stScheduleRows">'+cells+'</tbody></table></div></section>';
- const top=rows.filter(p=>p.rankAverage!==null).sort((a,b)=>a.rankAverage-b.rankAverage||(a.rosRank||999)-(b.rosRank||999)).slice(0,12);
- body+=panel('Best remaining schedules','Average matchup difficulty rank across reported opponents. Lower rank = easier within each position.',
-  '<div class="st-schedule-best">'+top.map((p,i)=>'<div class="st-schedule-best-row"><span class="st-rank-num">'+(i+1)+'</span>'+schedulePlayer(p)+'<b>#'+F(p.rankAverage,1)+'</b></div>').join('')+'</div>','cup');
- body+=method('2026 ESPN full-PPR opponent ratings with 4-point passing TDs (QB/RB/WR/TE/D/ST), scoring period '+dataset.espnRatings.scoringPeriodId+'. ESPN OPRK 1 is the hardest matchup; 32 is the easiest. Rankings are reported by ESPN and are not inferred from locally observed points. Updated '+new Date(dataset.espnRatings.fetchedAt).toLocaleString()+'. Player order defaults to your full published ROS position ranks. Unrated teams remain neutral; a bye is not a ranked opponent. Source: '+dataset.espnRatings.referenceUrl);
+ const best=[...rows].sort((a,b)=>{
+  const first=a.rankAverage,second=b.rankAverage;
+  if(first===null)return second===null?a.rosOrder-b.rosOrder:1;
+  if(second===null)return -1;
+  return second-first||a.rosOrder-b.rosOrder;
+ });
+ body+=panel('Best Remaining Schedules','',
+  '<div class="st-schedule-best" id="stScheduleBest">'+best.map((p,i)=>'<div class="st-schedule-best-row" data-st-best-key="'+E(p.key)+'"><span class="st-rank-num">'+(i+1)+'</span>'+schedulePlayer(p)+'<b class="st-schedule-average">'+(p.rankAverage===null?'—':F(p.rankAverage,1))+'</b></div>').join('')+'</div>','cup').replace('class="st-panel"','class="st-panel st-schedule-best-panel"');
  if(state.scheduleScrollPending&&state.scheduleFocusKey){
   const focus=state.scheduleFocusKey;
   state.scheduleScrollPending=false;
@@ -266,7 +266,7 @@ function weekly(){const week=state.week,rows=dataset.players.map(p=>{const g=G(p
 const renderers={trends,matchup,opportunity,consistency,teams,schedule,injury,startsit,weekly};
 function shell(){section.innerHTML=`<label class="st-dashboard-picker" for="stDashboard"><span class="st-label">Choose analytics chart</span><select id="stDashboard" aria-label="Choose analytics chart">${pages.map((p,i)=>`<option value="${p[0]}" ${state.view===p[0]?'selected':''}>${E(p[1])}</option>`).join('')}</select></label><div class="st-layout"><nav class="st-navigation" role="tablist" aria-label="Analytics dashboards">${pages.map((p,i)=>`<button class="st-tab" id="st-tab-${p[0]}" type="button" role="tab" data-st-view="${p[0]}" aria-controls="stWorkspace" aria-selected="${state.view===p[0]}"><span>${String(i+1).padStart(2,'0')}</span>${shortNames[i]}</button>`).join('')}</nav><div class="st-workspace" id="stWorkspace" role="tabpanel" aria-labelledby="st-tab-${state.view}">${state.view==='schedule'?'':`<header class="st-heading"><div><span class="st-eyebrow">${E(dataset?.year||state.year)} · ${dataset?.year<2026?'Historical archive':'Season analytics'}</span><h2>${E(pages.find(p=>p[0]===state.view)[1])}</h2><p>${E(pages.find(p=>p[0]===state.view)[2])}</p></div></header>`}<div id="stContent"></div><footer id="stSource" class="st-footnote"></footer></div></div>`;}
 function persist(){updateLink();try{localStorage.setItem('shuaStudioStateV1',JSON.stringify({...state,outWeeks:null}));}catch(e){}}
-function render(){if(!visible||!dataset)return;const id=++renderId;C.reset();shell();const host=document.getElementById('stContent');try{if(state.view==='rankings')rankings(id);else host.innerHTML=renderers[state.view]();}catch(e){host.innerHTML=note('This dashboard could not render. '+E(e.message),true);console.error('SHUA Studio render',e);}document.getElementById('stSource').textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');persist();section.dataset.ready='true';}
+function render(){if(!visible||!dataset)return;const id=++renderId;C.reset();section.dataset.activeView=state.view;shell();const host=document.getElementById('stContent');try{if(state.view==='rankings')rankings(id);else host.innerHTML=renderers[state.view]();}catch(e){host.innerHTML=note('This dashboard could not render. '+E(e.message),true);console.error('SHUA Studio render',e);}const footer=document.getElementById('stSource');if(footer)footer.textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');persist();section.dataset.ready='true';}
 let firstLoad=true;
 async function load(){const id=++epoch;if(firstLoad){firstLoad=false;let saved=null;try{saved=JSON.parse(localStorage.getItem('shuaStudioStateV1')||'null');}catch(e){}if(!saved?.year&&state.view!=='schedule'){state.year=await S.Data.preferredYear();if(id!==epoch)return;}}if(state.view==='schedule')state.year=2026;shell();const host=document.getElementById('stContent');section.dataset.ready='false';host.innerHTML='<div class="st-loading">Loading verified season data…<div class="st-skeleton" aria-hidden="true"></div></div>';try{const data=await S.Data.load(+state.year);if(id!==epoch)return;
 if(data.year===2026){
@@ -309,8 +309,6 @@ section.addEventListener('input',e=>{
   row.hidden=!!search&&!row.dataset.stScheduleName.includes(search);
   if(!row.hidden)count++;
  });
- const label=document.getElementById('stScheduleCount');
- if(label)label.textContent=count+' matching rows';
  showScheduleSuggestions(search);
 });
 section.addEventListener('input',e=>{if(e.target.id!=='stInjurySearch')return;const q=e.target.value.toLowerCase().trim();state.injurySearch=q;let count=0;section.querySelectorAll('#stInjuryList [data-st-injury]').forEach(el=>{el.hidden=!!q&&!el.dataset.name.includes(q);if(!el.hidden)count++;});const counter=document.getElementById('stInjuryCount');if(counter)counter.textContent=count+' players';});

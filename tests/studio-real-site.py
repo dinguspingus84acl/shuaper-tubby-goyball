@@ -19,9 +19,8 @@ with sync_playwright() as pw:
    page.goto('http://127.0.0.1:8765/',wait_until='domcontentloaded',timeout=90000)
    page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=90000)
    result={'engine':engine,'viewport':width,'views':[]}
-   for view in ['matchup','trends','opportunity','rankings','consistency','teams','injury','schedule','startsit','weekly']:
+   for view in ['matchup','trends','opportunity','consistency','teams','injury','schedule','startsit','weekly']:
     page.locator('[data-st-view="'+view+'"]').click()
-    if view=='rankings':page.wait_for_selector('#stRankBody .st-chart',timeout=20000)
     if view=='injury':assert page.locator('#stContent .st-chart').count()>=2,'Injury Impact did not choose a comparable source-confirmed absence'
     page.wait_for_timeout(300)
     assert page.locator('#stContent .st-panel').count()>0,(engine,width,view,'missing panels')

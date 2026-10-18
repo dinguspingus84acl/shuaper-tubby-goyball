@@ -18,9 +18,18 @@ with sync_playwright() as pw:
    page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto('http://127.0.0.1:8765/',wait_until='domcontentloaded',timeout=90000)
    page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=90000)
+   def select_chart(view):
+    if width<=1000:page.select_option('#stDashboard',view)
+    else:page.locator('.st-navigation [data-st-view="'+view+'"]').click()
+   if width<=1000:
+    assert page.locator('#stDashboard').is_visible(),'Mobile chart dropdown should be visible'
+    assert page.locator('.st-navigation').is_hidden(),'Swipeable chart tabs should be hidden on phone'
+   else:
+    assert page.locator('#stDashboard').is_hidden(),'Desktop keeps its sidebar navigation'
+    assert page.locator('.st-navigation').is_visible()
    result={'engine':engine,'viewport':width,'views':[]}
    for view in ['matchup','trends','opportunity','consistency','teams','injury','schedule','startsit','weekly']:
-    page.locator('[data-st-view="'+view+'"]').click()
+    select_chart(view)
     if view=='injury':
      assert page.locator('#stInjuryList [data-st-injury]').count()>0,'No injured offensive players listed'
      assert 'Who benefits most?' in page.locator('#stContent').inner_text()
@@ -38,7 +47,7 @@ with sync_playwright() as pw:
      assert page.locator('#stScheduleRows .st-schedule-rank').count()==0,'Green rank badges must be removed'
      assert page.locator('#stScheduleRows .st-schedule-avatar').count()==36,'Circular faces should remain'
      assert page.locator('#stContent #stRange').count()==0,'Sample dropdown must not appear on Schedule'
-     assert page.locator('#stDashboard').count()==0,'Secondary dashboard selector should not appear'
+     assert page.locator('#stDashboard').count()==1,'Dropdown should be provided to navigate charts'
      assert page.locator('.st-navigation [data-st-view]').count()==9,'Clickable chart navigation must remain'
      assert page.locator('#stScheduleRows .st-schedule-person-button').count()==36
 
@@ -59,7 +68,7 @@ with sync_playwright() as pw:
     if view in ['trends','opportunity','injury','schedule','weekly']:
      page.screenshot(path=str(OUT/f'{engine}-{width}-{view}.png'),full_page=True)
    # Clicking Schedule from a player card focuses that player in the heatmap.
-   page.locator('[data-st-view="schedule"]').click()
+   select_chart('schedule')
    page.wait_for_selector('#stScheduleRows [data-st-open="joshallen"]',timeout=45000)
    page.locator('[data-st-schedule-pos="QB"]').click()
    # Click the face, not just the name: the entire player box must open the card.
@@ -71,20 +80,20 @@ with sync_playwright() as pw:
    assert page.locator('#stScheduleRows tr.st-schedule-highlight').first.get_attribute('data-st-schedule-key')=='joshallen'
    assert page.locator('#modal.open').count()==0
    assert page.locator('[data-st-schedule-pos="QB"]').get_attribute('aria-pressed')=='true'
-   page.locator('[data-st-view="trends"]').click()
+   select_chart('trends')
    page.locator('[data-st-pos="WR"]').click()
    options=page.locator('#stPlayer option').evaluate_all('(es)=>es.map(e=>e.value)')
    if len(options)>1:
     page.select_option('#stPlayer',options[1]);assert page.locator('#stPlayer').input_value()==options[1]
    assert page.locator('#stContent .st-chart').count()>=1
    page.select_option('#stWeek','8');assert page.locator('#stWeek').input_value()=='8'
-   page.locator('[data-st-view="schedule"]').click();page.select_option('#stPlayoffs','playoffs')
+   select_chart('schedule');page.select_option('#stPlayoffs','playoffs')
    assert page.locator('#stPlayoffs').input_value()=='playoffs'
    assert page.locator('#stContent').inner_text().find('15')>=0
-   page.locator('[data-st-view="trends"]').click()
+   select_chart('trends')
    page.locator('.st-chart-hit').first.focus();assert page.locator('.st-tooltip:not([hidden])').count()
    page.locator('.st-legend-btn').first.click();assert page.locator('.st-legend-btn').first.get_attribute('aria-pressed')=='false'
-   page.locator('[data-st-view="weekly"]').click()
+   select_chart('weekly')
    page.locator('[data-st-open]').first.click()
    if page.locator('#modal.open').count():
     page.locator('#shuaPlayerInsights summary').click();page.wait_for_selector('#shuaPlayerInsights .st-svg',timeout=25000)

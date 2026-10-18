@@ -168,3 +168,25 @@ body.shua-studio-open>.view-mode-toggle{position:relative!important;inset:auto!i
 #shuaAnalyticsSection .st-schedule-person-button .st-schedule-person-info strong{color:#e9faff}
 #shuaAnalyticsSection .st-schedule-rank{display:none!important}
 @media(max-width:700px){#shuaAnalyticsSection .st-schedule-person-button{min-height:45px;gap:9px;padding:3px 2px}}
+
+/* Small screens: switch charts with a dropdown instead of a sideways-swiping tab ribbon.
+   Keep the existing desktop navigation unchanged. */
+@media (max-width:1000px){
+  #shuaAnalyticsSection .st-dashboard-picker{
+    display:flex!important;flex-direction:column;align-items:stretch;gap:7px;
+    width:100%;margin:2px 0 14px;padding:0;min-width:0;
+  }
+  #shuaAnalyticsSection .st-dashboard-picker .st-label{
+    font-size:11px;letter-spacing:.06em;font-weight:850;color:#9fc8d7;text-transform:uppercase;
+  }
+  #shuaAnalyticsSection #stDashboard{
+    display:block!important;min-height:48px;width:100%;max-width:100%;
+    font-size:16px!important;font-weight:800;color:#f0fff9;
+    border:1px solid #2b857d;border-radius:11px;
+    background:#0d3444;padding:10px 12px;cursor:pointer;
+  }
+  #shuaAnalyticsSection #stDashboard:focus-visible{outline:2px solid #24efa0;outline-offset:2px}
+  #shuaAnalyticsSection .st-navigation{display:none!important}
+  #shuaAnalyticsSection .st-layout{display:block!important}
+}
+@media (min-width:1001px){#shuaAnalyticsSection .st-dashboard-picker{display:none!important}}

@@ -39,6 +39,44 @@ async function load(year){return memo('season:'+year,async()=>{
  const rankData=await currentRanks().catch(()=>({overall:[],position:{}}));for(const p of players){const i=rankData.overall.findIndex(x=>key(x)===p.key);p.customRank=i<0?null:i+1;p.customPositionRank=rankData.position[p.position]?.find(x=>key(x.name)===p.key)?.rank??null;}
  return {year,players,schedule:sched,weeks,latestWeek:Math.max(...weeks),source,warnings,fetchedAt:new Date().toISOString(),snapshotAt:stored?.generatedAt||null,rankData,enrichment:!!enrichment||!!stored};
  });}
+async function espnMatchups(year=YEAR){
+ if(+year!==YEAR)return null;
+ return memo('espn-matchups:'+year,async()=>{
+  const raw=await json('analytics/espn-matchups-2026.json',{cache:'no-store'});
+  if(raw?.schema!==1||raw.season!==YEAR||raw.scoring!=='full PPR; 4-point passing TD')
+   throw new Error('Verified ESPN PPR matchup data is unavailable');
+  for(const pos of ['QB','RB','WR','TE','DST']){
+   const teams=raw.positions?.[pos];
+   if(!teams||Object.keys(teams).length!==32||Object.values(teams).some(v=>!Number.isInteger(v.rank)||v.rank<1||v.rank>32||!Number.isFinite(v.allowed)))
+    throw new Error('ESPN returned incomplete '+pos+' matchup rankings');
+  }
+  return raw;
+ });
+}
+function espnDefense(snapshot,pos){
+ const grades=snapshot?.positions?.[pos];
+ if(!grades)return null;
+ const rows=Object.entries(grades).map(([team,v])=>({
+  team,
+  // Keep internal ease rank for existing sorting/color schemes. The displayed
+  // OPRK number is the unmodified ESPN official rank, 1 hardest / 32 easiest.
+  rank:33-v.rank,
+  espnRank:v.rank,
+  allowed:v.allowed,
+  games:null,
+  source:'ESPN',
+  series:[]
+ })).sort((a,b)=>a.rank-b.rank||a.team.localeCompare(b.team));
+ return {
+  rows,
+  byTeam:Object.fromEntries(rows.map(r=>[r.team,r])),
+  league:S.mean(rows.map(r=>r.allowed)),
+  through:snapshot.scoringPeriodId,
+  source:'ESPN Fantasy full-PPR positional ratings',
+  fetchedAt:snapshot.fetchedAt,
+  sourceUrl:snapshot.referenceUrl
+ };
+}
 async function currentRanks(){return memo('currentRanks',async()=>{const [b,r]=await Promise.all([json('big-board.json',{cache:'no-store'}),json('ros-rankings.json',{cache:'no-store'})]);return {overall:(b.players||[]).map(x=>typeof x==='string'?x:x.name),position:r};});}
 async function scheduleRoster(ds){
  return memo('schedule-roster:'+ds.year,async()=>{
@@ -84,5 +122,5 @@ async function rankHistory(path='big-board.json'){
  });
 }
 async function preferredYear(){try{const m=await json('analytics/manifest.json',{cache:'no-store'});const ys=Object.keys(m.datasets||{}).map(Number).filter(y=>y<=YEAR);return ys.length?Math.max(...ys):YEAR;}catch(e){return YEAR;}}
-S.Data={load,schedule,scheduleRoster,rankHistory,currentRanks,json,normalise,parseEspn,preferredYear,clear(){cache.clear();},YEAR};
+S.Data={load,schedule,scheduleRoster,espnMatchups,espnDefense,rankHistory,currentRanks,json,normalise,parseEspn,preferredYear,clear(){cache.clear();},YEAR};
 })();

@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   if (window.ShuaStudioLoader) return;
-  const version = '20261017-studio-release2';
+  const version = '20261018-hide-ranking-movement2';
   const base = new URL('.', document.currentScript.src);
   const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js', 'analytics/ui.js'];
   const tests = [() => window.ShuaStudio?.aggregate, () => window.ShuaStudio?.Data,
@@ -74,7 +74,7 @@
     if (styleReady && window.ShuaStudio?.UI) return Promise.resolve(window.ShuaStudio.UI);
     attempt++; window.__shuaStudioLoading = true;
     if (button && !window.ShuaStudio?.UI) button.textContent = 'Loading analytics…';
-    loading('Loading the ten interactive dashboards…');
+    loading('Loading the nine interactive dashboards…');
     inflight = (async () => {
       if (!styleReady) { await asset('analytics/studio.css', true); styleReady = true; }
       for (let i = 0; i < paths.length; i++) {

@@ -4,7 +4,9 @@ Nine interactive dashboards based on the approved dark-neon visual concepts. The
 
 ## Entry points
 
-Open **Analytics** in the desktop navigation or phone hamburger. **Schedule** is fixed to the 2026 season and includes all 329 players in the published ROS rankings plus 32 NFL D/ST units; choose All or any position, and search player names. Player headshots are sourced from current ESPN or the site's existing headshot index; unknown teams remain unrated. The player-card Overview shortcut **2026 Schedule →** opens the heatmap focused on that player. The Studio has matchup difficulty, player trends, advanced opportunity, consistency, team opportunity, injury impact, schedule heatmap, start/sit, and weekly performance screens. Player cards open the existing profile; **Back to Analytics** closes only that profile. Overview includes expandable performance analytics. Depth Charts links to the selected team's opportunity breakdown.
+Open **Analytics** in desktop navigation or the phone menu. **Schedule** remains 2026-only and includes every published ROS QB/RB/WR/TE plus all 32 NFL D/ST units. It supports one-row QB/RB/WR/TE/D/ST filters, press-and-drag selection on mobile, and searchable player suggestions that jump directly to a highlighted row. The player's **Strength of Schedule** item opens the relevant Schedule position. Other Analytics views retain their own seasons.
+
+**2026 opponent matchup grades are official ESPN full-PPR positional ratings**, fetched from a publicly readable ESPN league whose scoring settings are validated as 1 point/reception and 4 points/passing TD (ESPN league 456278). We save a validated ESPN API snapshot under `analytics/espn-matchups-2026.json` and refresh it every six hours. All QB/RB/WR/TE/DST matchups in Schedule, the Matchups view, Start/Sit and the 2026 Game Logs use that same ESPN source. If ESPN data cannot be read, we leave the scores unrated instead of quietly substituting calculated ranks. ESPN OPRK ranks **1 = hardest, 32 = easiest**, which is the numbering shown in cells. Green shows easier matchups; red shows tougher. The Game Log's points-scored highlights stay separate. Archived Game Logs are not labeled with unavailable current ESPN opponent grades.
 
 ## Data and definitions
 
@@ -13,14 +15,14 @@ Open **Analytics** in the desktop navigation or phone hamburger. **Schedule** is
 - Snaps: PFR snap counts distributed by nflverse, joined by player and week.
 - Red-zone opportunities: carries plus targets on non-nullified plays inside the 20. Inside-10 touches: carries plus completed receptions. Kneeldowns are excluded.
 - Injury cohorts: explicit weekly **Out** reports from nflverse. Missing stats alone never establish injury. Manually selected absent weeks are clearly labelled a scenario. With/without comparisons report sample sizes and are descriptive, not guaranteed redistribution or a diagnosis.
-- Matchups: position PPR allowed per defensive game, using only observations before the selected week. Rank 1 is easiest (most PPR allowed); byes are not zero-valued opponents. Schedule colors represent these ranks, not home/away.
+- Matchups: 2026 uses ESPN full-PPR position-specific opponent rank data for QB, RB, WR, TE and D/ST. ESPN OPRK 1 = toughest / 32 = easiest. The saved source is linked and timestamped. Byes are not ranked opponents. Older archive-season advanced comparison charts use observed local statistics only when explicitly labeled.
 - Trend averages require complete 3- or 5-appearance windows. Nulls do not become zero, negative fantasy scores are retained, and consistency thresholds are independent rates (not stacked parts of a whole).
 - Start/sit reference estimate: mean of the last 3 appearances adjusted by 20% of opponent/league PPR-allowed difference, capped at plus/minus 15%. Not an ESPN projection or calibrated confidence. Custom rankings remain a separate unchanged factor.
 - Route participation is not inferred from snap percentage. Unsupported metrics display **Not reported**, never invented mockup values. Dates and coverage are visible in the source footer.
 
 ## Refresh and recovery
 
-`Refresh analytics data` runs every six hours, on custom-ranking changes, or through GitHub Actions' **Run workflow**. It validates the new data, retains the previous season file when a feed fails or returns substantially fewer games, commits only analytics data, and explicitly requests a Pages rebuild. It uses the repository token; no paid API keys or new accounts are required. A refresh failure leaves the last verified timestamp visible.
+`Refresh analytics data` runs every six hours, on custom-ranking changes, or through GitHub Actions' **Run workflow**. It validates both ESPN positional opponent rankings and season source data, retains the last verified snapshot if an ESPN feed fails, commits only analytics data, and requests a Pages rebuild. It uses the repository token; no paid API keys or new accounts are required. A refresh failure leaves the last verified timestamp visible.
 
 For a full local rebuild: `python scripts/refresh-analytics-studio.py` in a full Git checkout. The source builder reads existing historical archives; do not replace unavailable current-season data with an older year under a current-year label.
 
@@ -32,6 +34,6 @@ For a full local rebuild: `python scripts/refresh-analytics-studio.py` in a full
 
 Studio styling is scoped to the analytics section and its profile components. Existing iPhone viewport/safe-area/full-bleed rules are unchanged. The only existing enhancement function touched is a guard that prevents the legacy profile-nav decorator from dereferencing buttons owned by the unified profile navigation.
 
-### Defensive schedule ratings
+### Official ESPN D/ST ratings
 
-For DST entries, opponent difficulty is a *turnover-opportunity proxy* based on the opposing offense's recorded interceptions thrown and fumbles lost per game. It is **not** total fantasy D/ST points allowed; sacks, points allowed and return scores are not included. Offensive positions continue to use position-specific PPR conceded.
+D/ST matchup cells now use ESPN's actual position 16 points-against ranks, **not** the earlier turnover-only proxy. The public league must pass the full-PPR settings check, and the API response must contain exactly 32 teams for each position before it can replace an existing verified snapshot.

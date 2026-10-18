@@ -19,7 +19,7 @@ with sync_playwright() as pw:
    page.goto('http://127.0.0.1:8765/',wait_until='domcontentloaded',timeout=90000)
    page.wait_for_selector('#shuaAnalyticsSection[data-ready="true"]',timeout=90000)
    def select_chart(view):
-    if width<=1000:page.select_option('#stDashboard',view)
+    if width<=1000 or page.locator('#stDashboard').is_visible():page.select_option('#stDashboard',view)
     else:page.locator('.st-navigation [data-st-view="'+view+'"]').click()
    if width<=1000:
     assert page.locator('#stDashboard').is_visible(),'Mobile chart dropdown should be visible'

@@ -21,7 +21,13 @@ with sync_playwright() as pw:
    result={'engine':engine,'viewport':width,'views':[]}
    for view in ['matchup','trends','opportunity','consistency','teams','injury','schedule','startsit','weekly']:
     page.locator('[data-st-view="'+view+'"]').click()
-    if view=='injury':assert page.locator('#stContent .st-chart').count()>=2,'Injury Impact did not choose a comparable source-confirmed absence'
+    if view=='injury':
+     assert page.locator('#stInjuryList [data-st-injury]').count()>0,'No injured offensive players listed'
+     assert 'Who benefits most?' in page.locator('#stContent').inner_text()
+     assert page.locator('#stContent .st-chart').count()>=2,'Injury impact chart missing'
+     page.select_option('#stInjuryPos','WR')
+     assert page.locator('#stInjuryList [data-st-injury]').count()>0
+     page.select_option('#stInjuryPos','ALL')
     page.wait_for_timeout(300)
     assert page.locator('#stContent .st-panel').count()>0,(engine,width,view,'missing panels')
     assert not page.locator('#stContent').inner_text().startswith('This dashboard could not render'),(view,page.locator('#stContent').inner_text())

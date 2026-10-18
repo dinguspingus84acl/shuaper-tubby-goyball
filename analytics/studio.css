@@ -73,3 +73,29 @@ body.shua-studio-open main>:not(#shuaAnalyticsSection){display:none!important}
 body.shua-studio-open>.view-mode-toggle{position:relative!important;inset:auto!important;width:max-content;margin:0 12px 14px auto!important;z-index:auto}
 @media(max-width:1000px){.st-dashboard-picker{display:block;margin:0 0 10px;max-width:100%}.st-dashboard-picker select{min-height:46px;font-size:14px!important}.st-topline{margin-bottom:14px}.st-chart-dialog{padding:13px}.st-chart-dialog-head h2{font-size:17px}}
 @media(max-width:700px){.st-dashboard-picker select{font-size:16px!important}.st-expand{min-height:34px}.st-podium .st-feature-top{height:103px}.st-podium .st-feature .st-face{height:114px;width:134px}.st-chart-dialog{width:calc(100% - 12px);max-height:calc(100dvh - 16px)}}
+
+
+/* Injured players and beneficiaries */
+.st-injury-header{margin:8px 0 16px}.st-injury-header h3{font-size:clamp(23px,3vw,30px);letter-spacing:-.035em;margin:6px 0;color:#f3fbff;font-weight:900}
+.st-injury-header p{font-size:13px;line-height:1.6;color:#a8c4d6;max-width:750px}
+.st-injury-filters{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:12px 0 16px}.st-injury-filters label{flex:1 1 145px;min-width:0}
+.st-injury-layout{display:grid;grid-template-columns:minmax(225px,290px) minmax(0,1fr);gap:18px;align-items:start}
+.st-injury-browser{position:sticky;top:10px;background:linear-gradient(150deg,#0d2a42,#071829);border:1px solid #2a4c64;padding:12px;border-radius:16px;min-width:0}
+.st-injury-browser-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 12px}.st-injury-browser-top b{font-size:14px}.st-injury-browser-top span{font-size:11px;color:#98bbcc}
+.st-injury-browser label{display:block}.st-injury-browser .st-label{display:block;margin-bottom:5px}
+#stInjurySearch{display:block;width:100%;min-height:43px;border:1px solid #3a5b72;background:#102d44;color:#f3fbff;border-radius:9px;padding:9px 11px;font-size:15px;margin-bottom:10px}
+#stInjurySearch:focus-visible{outline:2px solid #24efa0;outline-offset:1px}
+.st-injury-list{display:grid;gap:6px;max-height:525px;overflow:auto;scrollbar-width:thin}
+.st-injury-item{display:flex;gap:8px;align-items:center;width:100%;min-width:0;text-align:left;cursor:pointer;padding:7px;border-radius:10px;background:#132d45;color:#f4fbff;border:1px solid transparent}
+.st-injury-item.selected{border-color:#24efa0;background:#153b44}.st-injury-item[hidden]{display:none}
+.st-injury-face{width:38px;height:42px;object-fit:cover;object-position:top;border-radius:7px;background:#26445c;flex-shrink:0}
+.st-injury-name{display:flex;flex-direction:column;min-width:0;flex:1;gap:2px}.st-injury-name b{font-size:12px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.st-injury-name small{font-size:10px;color:#92b2c5}
+.st-injury-tag{max-width:79px;flex-shrink:0;text-align:center;font-size:9px;line-height:1.2;border-radius:6px;padding:5px;color:#ffdf8a;background:#5a4826;font-weight:850}
+.st-injury-tag.out,.st-injury-tag.injured-reserve,.st-injury-tag.doubtful{color:#ff9eae;background:#5c2835}
+.st-injury-time{font-size:10px;line-height:1.6;margin:12px 4px 0;color:#88aebe}
+.st-injury-detail{min-width:0}.st-injury-note{border-left:3px solid #e9aa60;border-radius:6px;background:#13293d;padding:10px 12px;font-size:12px;color:#c4dce9;margin:-4px 0 15px}
+.st-injury-evidence{font-size:11px;line-height:1.4;color:#cfe4eb;margin-top:9px}.st-injury-evidence small{display:block;color:#94b3c4;margin-top:3px}
+.st-injury-benefit-row{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:10px;align-items:center;border-bottom:1px solid #ffffff16;padding:10px 0}.st-injury-benefit-row:last-child{border-bottom:0}
+.st-injury-impact{text-align:right}.st-injury-impact b{display:block;color:#e9f4fb;font-size:17px;font-variant-numeric:tabular-nums}.st-injury-impact.measured b{color:#24efa0}.st-injury-impact small{color:#9bb9c9;font-size:10px}
+@media(max-width:950px){.st-injury-layout{grid-template-columns:1fr}.st-injury-browser{position:static}.st-injury-list{display:flex;max-height:none;overflow-x:auto;overflow-y:hidden;padding-bottom:7px;scroll-snap-type:x proximity}.st-injury-item{min-width:180px;max-width:220px;scroll-snap-align:start}}
+@media(max-width:700px){.st-injury-filters label{flex-basis:calc(50% - 6px)}.st-injury-filters label:first-child{flex-basis:100%}.st-injury-benefit-row{gap:5px;grid-template-columns:17px minmax(0,1fr) auto}.st-injury-impact b{font-size:15px}}

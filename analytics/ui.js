@@ -127,14 +127,14 @@ function schedule(){
    return '<td><div class="st-heat-cell '+difficulty+'" tabindex="0" title="'+E(tip)+'"><b>'+E(label)+'</b><small>'+(!opponent?.bye&&matchup?matchup.rank+' easiest':'—')+'</small></div></td>';
   }).join('')+'</tr>';
  }).join('');
- body+=panel('Rest-of-season schedule heatmap','All '+all.length+' players and defenses. Opponent difficulty is measured separately by position.',
+ body+=panel('Rest-of-season schedule heatmap','Showing '+rows.length+' of '+total+' ranked players and defenses. Matchups are graded by position.',
   '<div class="st-heat-legend"><span><i style="background:#24efa0"></i>Ranks 1–10 · easier</span><span><i style="background:#ffd15e"></i>11–20 · middle</span><span><i style="background:#ff617f"></i>21+ · harder</span><span>— unrated / bye</span></div>'+
   '<div class="st-heat-scroll"><table class="st-heat-table"><thead><tr><th class="st-heat-player" scope="col">Player</th>'+weeks.map(w=>'<th scope="col">W'+w+'</th>').join('')+'</tr></thead><tbody id="stScheduleRows">'+cells+'</tbody></table></div>',
   'calendar',state.playoffs?'Playoffs W15–17':'From W'+state.week);
  const top=rows.filter(p=>p.rankAverage!==null).sort((a,b)=>a.rankAverage-b.rankAverage||(a.rosRank||999)-(b.rosRank||999)).slice(0,12);
  body+=panel('Best remaining schedules','Average matchup difficulty rank across reported opponents. Lower rank = easier within each position.',
   '<div class="st-schedule-best">'+top.map((p,i)=>'<div class="st-schedule-best-row"><span class="st-rank-num">'+(i+1)+'</span>'+schedulePlayer(p)+'<b>#'+F(p.rankAverage,1)+'</b></div>').join('')+'</div>','cup');
- body+=method('2026 only. Player rows use the full published QB/RB/WR/TE rest-of-season rankings in their existing order; all 32 NFL D/ST units are also included. Position difficulty for offensive players uses historical full-PPR points conceded. D/ST difficulty uses an expressly limited proxy: interceptions plus lost fumbles committed by the upcoming opponent per completed game. D/ST ratings are NOT complete fantasy defense projections (sacks, points conceded, scores and return TDs are not covered). In the All view, compare difficulty ranks rather than raw PPR or turnover totals. No opponent or headshot is fabricated when unavailable. Missing team mappings show as unrated.');
+ body+=method('2026 only. Player rows use the full published QB/RB/WR/TE rest-of-season rankings in their existing order; all 32 NFL D/ST units are also included. Position difficulty for offensive players uses historical full-PPR points conceded. D/ST difficulty uses an expressly limited proxy: interceptions plus lost fumbles committed by the upcoming opponent per completed game. D/ST ratings are NOT complete fantasy defense projections (sacks, points conceded, scores and return TDs are not covered). Across different positions, compare difficulty ranks rather than raw PPR or turnover totals. No opponent or headshot is fabricated when unavailable. Missing team mappings show as unrated.');
  if(state.scheduleScrollPending&&state.scheduleFocusKey){
   const focus=state.scheduleFocusKey;
   state.scheduleScrollPending=false;

@@ -62,6 +62,7 @@ function espnDefense(snapshot,pos){
   // OPRK number is the unmodified ESPN official rank, 1 hardest / 32 easiest.
   rank:33-v.rank,
   espnRank:v.rank,
+  score:Math.round(100*(v.rank-1)/31),
   allowed:v.allowed,
   games:null,
   source:'ESPN',

@@ -114,7 +114,7 @@ body.shua-studio-open>.view-mode-toggle{position:relative!important;inset:auto!i
 .st-heat-table thead{position:sticky;top:0;z-index:5}
 .st-heat-table thead th{background:#0c2940!important}
 .st-heat-table thead .st-heat-player{z-index:7}
-.st-heat-table tbody tr[hidden]{display:none!important}
+#shuaAnalyticsSection .st-heat-table tbody tr[hidden]{display:none!important}
 .st-heat-table tbody tr.st-schedule-highlight .st-heat-player{background:#11443c!important;box-shadow:inset 0 0 0 2px #24efa0,5px 0 12px #07182780}
 .st-heat-table tbody tr.st-schedule-highlight .st-heat-cell{outline:1px solid #24efa055;outline-offset:-2px}
 .st-heat-table .st-heat-player{min-width:200px;max-width:200px}

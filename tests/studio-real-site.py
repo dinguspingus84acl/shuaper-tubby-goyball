@@ -34,7 +34,7 @@ with sync_playwright() as pw:
      assert page.locator('[data-st-schedule-pos="ALL"]').count()==0,'All filter must be removed'
      assert page.locator('#stScheduleRows tr').count()==36,'QB tab should include all ROS QBs'
      assert page.locator('#stScheduleSearch').get_attribute('placeholder')=='Search'
-     assert page.locator('.st-schedule-tools .st-label').inner_text()=='Search'
+     assert page.locator('.st-schedule-tools .st-label').text_content().strip()=='Search'
      assert page.locator('#stScheduleRows .st-schedule-rank').count()==36,'Number circles should replace text ROS ranks'
      assert page.locator('#stScheduleRows .st-schedule-avatar').count()==36,'Circular faces should be present'
      assert page.locator('#stScheduleRows .st-schedule-person-info').first.inner_text().find('ROS')==-1

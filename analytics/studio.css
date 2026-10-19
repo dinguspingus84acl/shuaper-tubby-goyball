@@ -598,3 +598,16 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-position-filter select,
 #shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-chart-filter select{min-height:34px;padding:5px 8px;background:#112940;color:white;border:1px solid #3b5b72;border-radius:7px}
 #shuaAnalyticsSection[data-active-view="weekly"] .st-grid2{gap:9px}
+
+/* Weekly leaderboard: compact scoring rows and consistent round portraits. */
+#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row{grid-template-columns:18px minmax(0,1fr) 66px 70px;gap:6px;padding:4px 0;min-height:42px}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-num{font-size:11px}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row .st-person{display:flex;align-items:center;gap:7px;min-width:0}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row .st-face{width:34px!important;height:34px!important;min-width:34px!important;flex:0 0 34px!important;border:2px solid #587fa0!important;border-radius:50%!important;object-fit:cover!important;object-position:center top!important;background:#17364c!important;box-shadow:0 0 0 1px #ffffff24}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-person strong{font-size:12px;line-height:1.15}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-person small{margin-top:1px;font-size:9px}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row .st-score{font-size:14px;padding:4px 3px;border-radius:6px}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row .st-score small:empty{display:none!important}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row .st-spark{height:25px}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-panel{margin-bottom:9px}
+@media(max-width:700px){#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row{grid-template-columns:16px minmax(0,1fr) 57px 44px;gap:4px;padding:3px 0}#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row .st-face{width:30px!important;height:30px!important;min-width:30px!important;flex-basis:30px!important}}

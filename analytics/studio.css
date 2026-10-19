@@ -479,3 +479,23 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
     margin-inline:3px;padding:9px;
   }
 }
+
+/* Team-based remaining schedule leaderboard, 32 NFL teams for selected position. */
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team{
+ display:flex;align-items:center;gap:11px;min-width:0;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team-logo{
+ width:35px;height:35px;min-width:35px;object-fit:contain;flex-shrink:0;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team strong{
+ font-size:14px;line-height:1.25;color:#f0f9ff;overflow-wrap:anywhere;
+}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-average{
+ min-width:50px;text-align:right;font-size:18px;
+}
+@media(max-width:700px){
+ #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team-logo{
+  width:30px;height:30px;min-width:30px;
+ }
+ #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team strong{font-size:13px}
+}

@@ -316,13 +316,13 @@ function weekly(){
  const positionFilter='<label class="st-weekly-position-filter">Position <select id="stWeeklyPos">'+['ALL','QB','RB','WR','TE'].map(p=>'<option value="'+p+'"'+((state.weeklyPos||'ALL')===p?' selected':'')+'>'+p+'</option>').join('')+'</select></label>';
  const chartFilter='<label class="st-weekly-chart-filter">Chart week <select id="stWeeklyChartWeek">'+weeks.map(w=>'<option value="'+w+'"'+(chartWeek===w?' selected':'')+'>Week '+w+'</option>').join('')+'</select></label>';
  return controls({week:true})+positionFilter+(rows.length?'':note('No recorded player statistics for Week '+week+'. Choose a completed week.',true))
- +panel('Top fantasy scorers','',rankedRows(top,p=>F(p.g.points),'PPR points',10),'cup')
+ +panel('Top fantasy scorers · PPR points','',rankedRows(top,p=>F(p.g.points),'',10),'cup')
  +'<div class="st-grid2">'
- +panel('Below recent form','Previous-three-game average is the comparison baseline, not an official projection.',rankedRows(under,p=>F(p.delta),'PPR vs recent form',10),'trend')
- +panel('Above recent form','Previous-three-game average is the comparison baseline, not an official projection.',rankedRows(above,p=>'+'+F(p.delta),'PPR vs recent form',10),'trend')
- +panel('Target leaders','',rankedRows(targets,p=>F(p.g.targets,0),'targets',10),'target')
- +panel('Rushing leaders','',rankedRows(rush,p=>F(p.g.rushYds,0),'rush yards',10))
- +panel('Playing-time changes','',changes.length?rankedRows(changes,p=>(p.change>0?'+':'')+F(p.change,0),'pct-point change',10):C.empty('No paired snap reports.'))+'</div>'
+ +panel('Below recent form · PPR difference','Versus previous three-game average, not an official projection.',rankedRows(under,p=>F(p.delta),'',10),'trend')
+ +panel('Above recent form · PPR difference','Versus previous three-game average, not an official projection.',rankedRows(above,p=>'+'+F(p.delta),'',10),'trend')
+ +panel('Target leaders · targets','',rankedRows(targets,p=>F(p.g.targets,0),'',10),'target')
+ +panel('Rushing leaders · rush yards','',rankedRows(rush,p=>F(p.g.rushYds,0),'',10))
+ +panel('Playing-time changes · percentage points','',changes.length?rankedRows(changes,p=>(p.change>0?'+':'')+F(p.change,0),'',10):C.empty('No paired snap reports.'))+'</div>'
  +chartFilter+panel('Weekly top fantasy scorers','',C.bars({title:'Top ten weekly PPR scorers',labels:chartTop.map(p=>chartName(p)),players:chartTop,series:[{name:'Week '+chartWeek+' PPR',values:chartTop.map(p=>p.g.points)}]}));
 }
 const renderers={trends,matchup,opportunity,usage,consistency,teams,schedule,injury,startsit,weekly};

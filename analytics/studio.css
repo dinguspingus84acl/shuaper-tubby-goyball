@@ -584,3 +584,17 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:first-child{position:sticky;left:0;z-index:2;background:#091d30;min-width:190px;box-shadow:4px 0 10px #0005}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table thead th{position:sticky;top:0;z-index:4;background:#10273e}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table thead th:first-child{z-index:5}
+
+/* Injury report: vertical list above the analysis, not a horizontal carousel. */
+#shuaAnalyticsSection[data-active-view="injury"] .st-injury-layout{display:flex!important;flex-direction:column!important;gap:12px!important}
+#shuaAnalyticsSection[data-active-view="injury"] .st-injury-browser{position:relative!important;top:auto!important;width:100%!important;max-width:none!important;box-sizing:border-box}
+#shuaAnalyticsSection[data-active-view="injury"] .st-injury-list{display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;overflow-x:hidden!important;overflow-y:auto!important;width:100%!important;max-height:55dvh!important}
+#shuaAnalyticsSection[data-active-view="injury"] .st-injury-item{width:100%!important;flex:0 0 auto!important}
+#shuaAnalyticsSection[data-active-view="injury"] .st-injury-detail{width:100%!important;min-width:0!important}
+#shuaAnalyticsSection[data-active-view="injury"] .st-method,#shuaAnalyticsSection[data-active-view="injury"] #stSource{display:none!important}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-method,#shuaAnalyticsSection[data-active-view="weekly"] #stSource{display:none!important}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-position-filter,
+#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-chart-filter{display:inline-flex;gap:8px;align-items:center;margin:5px 10px 12px 0;font-size:12px}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-position-filter select,
+#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-chart-filter select{min-height:34px;padding:5px 8px;background:#112940;color:white;border:1px solid #3b5b72;border-radius:7px}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-grid2{gap:9px}

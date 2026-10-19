@@ -547,3 +547,26 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #unifiedPerformancePanel .st-footnote{display:none!important}
 #unifiedPerformancePanel .st-boom-link{display:block;width:100%;background:#112940;color:#fff;border:1px solid #365b79;border-radius:9px;padding:10px;font-weight:900;margin:10px 0 7px;cursor:pointer;text-align:left}
 #unifiedPerformancePanel .st-chart svg{touch-action:none}
+
+/* Sticky full-name column for Boom/Bust horizontal scrolling. */
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table th:first-child,
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table td:first-child{
+ position:sticky!important;left:0!important;z-index:4!important;
+ min-width:185px!important;width:185px!important;max-width:220px!important;
+ background:#091d30!important;box-shadow:5px 0 9px #03101bc0;
+ white-space:normal!important;
+}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table thead th:first-child{z-index:6!important;background:#092037!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table .st-person-copy,
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table .st-person-copy strong{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:normal!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table .st-person{min-width:0}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-display-picker{display:flex;flex-direction:column;gap:2px;flex:0 0 auto;min-width:78px}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-display-picker select{height:37px;min-width:78px;max-width:105px;padding:5px 7px;border-radius:8px}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-team-inline{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;color:inherit;font:inherit;text-align:left;padding:5px 0;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-team-inline img{height:32px;width:32px;object-fit:contain;flex:0 0 32px}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-team-inline strong{font-size:13px;white-space:normal;line-height:1.2}
+@media(max-width:700px){
+ #shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table th:first-child,
+ #shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table td:first-child{min-width:170px!important;width:170px!important}
+ #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-display-picker select{height:34px}
+}

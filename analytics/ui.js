@@ -309,6 +309,7 @@ section.addEventListener('click',e=>{
  }
  const tab=e.target.closest('[data-st-view]');if(tab){navigate(tab.dataset.stView);return;}const injured=e.target.closest('[data-st-injury]');if(injured){state.injuredKey=injured.dataset.stInjury;render();return;}const schedulePos=e.target.closest('[data-st-schedule-pos]');if(schedulePos){state.schedulePos=schedulePos.dataset.stSchedulePos;state.scheduleFocusKey='';state.scheduleQuery='';render();return;}const pos=e.target.closest('[data-st-pos]');if(pos){state.pos=pos.dataset.stPos;state.player='';state.compare=[];render();return;}const teamLink=e.target.closest('[data-st-depth-team]');if(teamLink){
   const team=teamLink.dataset.stDepthTeam;
+  window.shuaScheduleDepthReturn={view:'schedule',scrollX:window.scrollX,scrollY:window.scrollY,heatX:section.querySelector('.st-heat-scroll')?.scrollLeft||0,heatY:section.querySelector('.st-heat-scroll')?.scrollTop||0};
   const depthSelect=document.getElementById('depthTeam');
   const depthButton=document.querySelector('.positions [data-pos="DEPTH"]');
   if(depthSelect){depthSelect.value=team;depthSelect.dispatchEvent(new Event('change',{bubbles:true}));}
@@ -397,6 +398,19 @@ function openSchedule(name='',position=''){
  state.scheduleScrollPending=!!name;
  navigate('schedule');
 }
+window.shuaReturnFromDepthToSchedule=function(){
+ const saved=window.shuaScheduleDepthReturn;if(!saved)return false;
+ window.shuaScheduleDepthReturn=null;
+ const analyticsButton=document.getElementById('studioNav');
+ if(analyticsButton)analyticsButton.click();else open();
+ navigate('schedule');
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+   const sc=section.querySelector('.st-heat-scroll');
+   if(sc){sc.scrollLeft=saved.heatX;sc.scrollTop=saved.heatY;}
+   window.scrollTo(saved.scrollX,saved.scrollY);
+ }));
+ return true;
+};
 S.UI={open,close,navigate,openSchedule,get state(){return state;},get dataset(){return dataset;},async profile(name,target){const ds=await S.Data.load(+state.year),p=ds.players.find(p=>p.key===key(name));if(!p){target.innerHTML=C.empty('No recorded appearances in '+state.year+'.');return;}const gs=G(p),c=S.consistency(p);target.innerHTML=`<p class="st-footnote">${ds.year} · ${E(ds.source)}</p><div class="st-metrics">${metric('PPG',F(c.mean),c.n+' games')}${metric('Median',F(c.median),'Recorded points')}${metric('Observed P10',F(c.floor),'Lower score range')}${metric('Observed P90',F(c.ceiling),'Upper score range')}</div>`+C.line({title:'Weekly scoring',labels:gs.map(g=>'W'+g.week),series:[{name:'PPR',values:gs.map(g=>g.points)},{name:'3-game average',values:S.rolling(gs.map(g=>g.points),3)},{name:'5-game average',values:S.rolling(gs.map(g=>g.points),5)}]})+`<div class="st-grid4">${c.rates.map((r,i)=>C.ring(r.percent,r.threshold+'+',r.count+'/'+c.n+' games',C.colors[i])).join('')}</div>`;}};
 const depth=document.getElementById('depthSection');if(depth&&!document.getElementById('stDepthLink')){const div=document.createElement('div');div.id='stDepthLink';div.style.margin='10px 0';div.innerHTML='<button type="button" class="st-button">View team opportunity charts ↗</button>';div.querySelector('button').onclick=()=>{state.team=S.canonicalTeam(document.getElementById('depthTeam')?.value||'DET');state.view='teams';state.week=0;open();};depth.prepend(div);}
 window.dispatchEvent(new Event('ShuaStudioReady'));

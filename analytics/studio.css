@@ -611,3 +611,11 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row .st-spark{height:25px}
 #shuaAnalyticsSection[data-active-view="weekly"] .st-panel{margin-bottom:9px}
 @media(max-width:700px){#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row{grid-template-columns:16px minmax(0,1fr) 57px 44px;gap:4px;padding:3px 0}#shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row .st-face{width:30px!important;height:30px!important;min-width:30px!important;flex-basis:30px!important}}
+
+/* Weekly Performance position selector: five equal buttons with thumb-drag highlighting. */
+#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-positions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;width:100%;max-width:550px;margin:6px 0 12px;touch-action:pan-y}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-positions button{min-width:0;min-height:38px;padding:7px 5px;border:1px solid #35536b;border-radius:8px;background:#0d253a;color:#a6bed1;font-size:12px;font-weight:900;cursor:pointer;touch-action:pan-y}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-positions button[aria-pressed="true"]{background:#0b7451!important;border-color:#29efaa!important;color:#fff!important;box-shadow:inset 0 0 0 1px #2befad88}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-metric-filter{display:flex;align-items:center;gap:10px;margin:6px 0 12px;font-size:12px;color:#a3b9cd}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-metric-filter select{flex:1;min-width:0;max-width:420px;min-height:39px;padding:6px 9px;background:#112940;color:white;border:1px solid #3b5b72;border-radius:8px}
+@media(max-width:700px){#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-positions{max-width:none;gap:4px}#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-positions button{min-height:43px;font-size:12px}}

@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   if (window.ShuaStudioLoader) return;
-  const version = '20261019-weekly-one-rank22';
+  const version = '20261019-weekly-stat-sort23';
   const base = new URL('.', document.currentScript.src);
   const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js', 'analytics/ui.js'];
   const tests = [() => window.ShuaStudio?.aggregate, () => window.ShuaStudio?.Data,

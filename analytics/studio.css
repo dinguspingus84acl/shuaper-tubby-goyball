@@ -506,3 +506,12 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 
 #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team-button{width:100%;font:inherit;color:inherit;text-align:left;background:transparent;border:0;border-bottom:1px solid #ffffff16;cursor:pointer}
 #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team-button:hover,#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team-button:focus-visible{background:rgba(37,239,165,.10);outline:1px solid rgba(37,239,165,.38)}
+
+/* Make the WR hit-rate comparison span the entire analytics workspace. */
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel{width:100%;max-width:none;grid-column:1/-1;box-sizing:border-box}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel .st-table-wrap{width:100%;max-width:none;overflow-x:auto}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel table{width:100%;min-width:660px;table-layout:auto}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel th,#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel td{padding:13px 15px;font-size:clamp(12px,1.05vw,16px)}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel td:first-child{min-width:165px}
+#unifiedPerformancePanel .st-profile-hit-comparison{width:100%;overflow-x:auto}
+#unifiedPerformancePanel .st-profile-hit-comparison table{width:100%;min-width:550px}

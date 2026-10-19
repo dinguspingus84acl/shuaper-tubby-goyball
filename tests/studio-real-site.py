@@ -48,9 +48,9 @@ with sync_playwright() as pw:
      assert page.locator('.st-method').count()==0,'Remove calculation notes from Schedule'
      assert page.locator('#stSource').is_hidden(),'Remove bottom source notes from Schedule'
      assert page.locator('.st-schedule-best-panel .st-panel-head p').count()==0,'Remove description under Best Remaining Schedules'
-     assert page.locator('#stScheduleBest .st-schedule-best-row').count()==36,'Best Remaining must include every QB'
-     assert page.locator('#stScheduleBest .st-schedule-person').count()==36,'Player profile rows must show portraits'
-     assert len(set(page.locator('#stScheduleBest .st-schedule-best-row').evaluate_all('(rows)=>rows.map(el=>el.dataset.stBestKey)')))==36,'Every QB must be unique'
+     assert page.locator('#stScheduleBest .st-schedule-best-row').count()==32,'Show all 32 NFL teams'
+     assert page.locator('#stScheduleBest [data-st-depth-team]').count()==32,'Teams link to their depth charts'
+     assert len(set(page.locator('#stScheduleBest [data-st-depth-team]').evaluate_all('(rows)=>rows.map(el=>el.dataset.stDepthTeam)')))==32
      assert page.locator('.st-schedule-toolbar').count()==1,'Search and Week must share one toolbar'
      geom=page.evaluate("""() => {
       const search=document.querySelector('#stScheduleSearch').getBoundingClientRect();
@@ -68,14 +68,14 @@ with sync_playwright() as pw:
      assert len(averages)>10 and averages==sorted(averages,reverse=True),'Best schedules must be sorted by HIGHEST average ESPN opponent rank'
      average_check=page.evaluate("""() => {
       const ds=window.ShuaStudio.UI.dataset,el=document.querySelector('#stScheduleBest .st-schedule-best-row');
-      const player=ds.scheduleRoster.QB.find(p=>p.key===el.dataset.stBestKey);
+      const team=el.dataset.stDepthTeam;
       const start=Number(window.ShuaStudio.UI.state.week);
       const ranks=Array.from({length:19-start},(_,i)=>start+i)
-       .map(w=>ds.schedule[player.team]?.[w]?.opponent)
+       .map(w=>ds.schedule[team]?.[w]?.opponent)
        .map(opp=>ds.espnRatings.positions.QB[opp]?.rank)
        .filter(Number.isFinite);
       const expected=ranks.length?ranks.reduce((a,b)=>a+b,0)/ranks.length:null;
-      return {player:player.name,expected,actual:parseFloat(el.querySelector('.st-schedule-average').textContent)};
+      return {team,expected,actual:parseFloat(el.querySelector('.st-schedule-average').textContent)};
      }""")
      if average_check['expected'] is not None:
       assert abs(average_check['expected']-average_check['actual'])<0.11,('Average should use displayed ESPN OPRK, not inverted ease ranks',average_check)
@@ -170,7 +170,7 @@ with sync_playwright() as pw:
      for pos,total in [('WR',130),('TE',53),('RB',110),('DST',32),('QB',36)]:
       page.locator('[data-st-schedule-pos="'+pos+'"]').click()
       assert page.locator('#stScheduleRows tr').count()==total,(pos,'missing ROS or defense entries')
-      assert page.locator('#stScheduleBest .st-schedule-best-row').count()==total,(pos,'Best Remaining must include every selected-position player')
+      assert page.locator('#stScheduleBest .st-schedule-best-row').count()==32,(pos,'Best Remaining must include every NFL team')
      assert page.locator('#stScheduleRows .st-schedule-face').count()>0,'Player portraits missing'
     page.wait_for_timeout(300)
     assert page.locator('#stContent .st-panel').count()>0,(engine,width,view,'missing panels')

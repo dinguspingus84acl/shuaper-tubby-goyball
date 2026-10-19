@@ -182,16 +182,22 @@ function schedule(){
  }).join('');
  body+='<section class="st-panel st-schedule-heatmap-panel">'+
   '<div class="st-heat-scroll"><table class="st-heat-table"><thead><tr><th class="st-heat-player" scope="col">Player</th>'+weekHead+'</tr></thead><tbody id="stScheduleRows">'+cells+'</tbody></table></div></section>';
- const best=[...rows].sort((a,b)=>{
-  if(a.rankAverage===null)return b.rankAverage===null?a.rosOrder-b.rosOrder:1;
+ const bestTeams=Object.keys(S.teams).map(team=>{
+  const grades=weeks.map(w=>{
+   const matchup=dataset.schedule[team]?.[w];
+   if(!matchup?.known||matchup.bye)return null;
+   return ratings[pos]?.byTeam[matchup.opponent]?.espnRank??null;
+  }).filter(Number.isFinite);
+  return {team,rankAverage:avg(grades)};
+ }).sort((a,b)=>{
+  if(a.rankAverage===null)return b.rankAverage===null?S.teams[a.team].localeCompare(S.teams[b.team]):1;
   if(b.rankAverage===null)return -1;
-  return b.rankAverage-a.rankAverage||a.rosOrder-b.rosOrder;
+  return b.rankAverage-a.rankAverage||S.teams[a.team].localeCompare(S.teams[b.team]);
  });
  body+=panel('Best Remaining Schedules','',
-  '<div class="st-schedule-best" id="stScheduleBest">'+best.map((p,i)=>{
-   const playerMarkup=schedulePlayer(p);
-   return '<div class="st-schedule-best-row" data-st-best-key="'+E(p.key)+'"'+(p.position==='DST'?'':' data-st-open="'+E(p.key)+'" role="button" tabindex="0" aria-label="Open '+E(p.name)+' profile"')+'><span class="st-rank-num">'+(i+1)+'</span>'+playerMarkup+'<b class="st-schedule-average">'+(p.rankAverage===null?'—':F(p.rankAverage,1))+'</b></div>';
-  }).join('')+'</div>','cup').replace('class="st-panel"','class="st-panel st-schedule-best-panel"');
+  '<div class="st-schedule-best" id="stScheduleBest">'+bestTeams.map((entry,i)=>
+   '<button type="button" class="st-schedule-best-row st-schedule-best-team-button" data-st-depth-team="'+E(entry.team)+'"><span class="st-rank-num">'+(i+1)+'</span><span class="st-schedule-best-team">'+logo(entry.team,'st-schedule-best-team-logo')+'<strong>'+E(S.teams[entry.team])+'</strong></span><b class="st-schedule-average">'+(entry.rankAverage===null?'—':F(entry.rankAverage,1))+'</b></button>'
+  ).join('')+'</div>','cup').replace('class="st-panel"','class="st-panel st-schedule-best-panel"');
  if(state.scheduleScrollPending&&state.scheduleFocusKey){
   const focus=state.scheduleFocusKey;
   state.scheduleScrollPending=false;
@@ -301,7 +307,15 @@ section.addEventListener('click',e=>{
   if(nextScroll){nextScroll.scrollLeft=x;nextScroll.scrollTop=y;}
   return;
  }
- const tab=e.target.closest('[data-st-view]');if(tab){navigate(tab.dataset.stView);return;}const injured=e.target.closest('[data-st-injury]');if(injured){state.injuredKey=injured.dataset.stInjury;render();return;}const schedulePos=e.target.closest('[data-st-schedule-pos]');if(schedulePos){state.schedulePos=schedulePos.dataset.stSchedulePos;state.scheduleFocusKey='';state.scheduleQuery='';render();return;}const pos=e.target.closest('[data-st-pos]');if(pos){state.pos=pos.dataset.stPos;state.player='';state.compare=[];render();return;}const player=e.target.closest('[data-st-open]');if(player){showPlayer(player.dataset.stOpen);return;}const arch=e.target.closest('[data-st-archive]');if(arch){state.year=+arch.dataset.stArchive;state.week=0;load();}if(e.target.closest('[data-st-retry]')){S.Data.clear();load();}});
+ const tab=e.target.closest('[data-st-view]');if(tab){navigate(tab.dataset.stView);return;}const injured=e.target.closest('[data-st-injury]');if(injured){state.injuredKey=injured.dataset.stInjury;render();return;}const schedulePos=e.target.closest('[data-st-schedule-pos]');if(schedulePos){state.schedulePos=schedulePos.dataset.stSchedulePos;state.scheduleFocusKey='';state.scheduleQuery='';render();return;}const pos=e.target.closest('[data-st-pos]');if(pos){state.pos=pos.dataset.stPos;state.player='';state.compare=[];render();return;}const teamLink=e.target.closest('[data-st-depth-team]');if(teamLink){
+  const team=teamLink.dataset.stDepthTeam;
+  const depthSelect=document.getElementById('depthTeam');
+  const depthButton=document.querySelector('.positions [data-pos="DEPTH"]');
+  if(depthSelect){depthSelect.value=team;depthSelect.dispatchEvent(new Event('change',{bubbles:true}));}
+  if(depthButton)depthButton.click();
+  if(depthSelect){depthSelect.value=team;depthSelect.dispatchEvent(new Event('change',{bubbles:true}));}
+  return;
+ }const player=e.target.closest('[data-st-open]');if(player){showPlayer(player.dataset.stOpen);return;}const arch=e.target.closest('[data-st-archive]');if(arch){state.year=+arch.dataset.stArchive;state.week=0;load();}if(e.target.closest('[data-st-retry]')){S.Data.clear();load();}});
 section.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.st-schedule-best-row[data-st-open]')){e.preventDefault();showPlayer(e.target.dataset.stOpen);}});
 section.addEventListener('change',e=>{const id=e.target.id,v=e.target.value;if(id==='stDashboard'){navigate(v);return;}if(id==='stSchedulePlayer'){state.scheduleFocusKey=v;state.scheduleScrollPending=true;render();return;}if(id==='stInjuryPos'){state.injuryPos=v;state.injuredKey='';render();return;}if(id==='stInjuryStatus'){state.injuryStatus=v;state.injuredKey='';render();return;}if(id==='stSeason'){if(state.view==='schedule')return;state.year=+v;state.week=0;state.outWeeks=null;load();return;}if(id==='stPlayer'){state.player=v;state.outWeeks=null;}else if(id==='stTeam'){state.team=v;state.player='';state.outWeeks=null;}else if(id==='stWeek'){state.week=+v;state.outWeeks=null;if(state.view==='schedule'){state.scheduleSortWeek=null;state.scheduleSortDirection=null;}}else if(id==='stRange')state.range=+v;else if(id==='stRankSource')state.rankSource=v;else if(id==='stPlayoffs'){state.playoffs=v==='playoffs';state.scheduleSortWeek=null;state.scheduleSortDirection=null;}else if(id==='stInjuredPlayer'){state.player=v;state.outWeeks=null;}else if(id.startsWith('stCompare')){state.compare=[0,1,2,3].map(i=>document.getElementById('stCompare'+i)?.value).filter(Boolean);state.compare=[...new Set(state.compare)];}else if(e.target.matches('[data-st-out]'))state.outWeeks=[...section.querySelectorAll('[data-st-out]:checked')].map(e=>+e.dataset.stOut);else return;render();});
 section.addEventListener('input',e=>{

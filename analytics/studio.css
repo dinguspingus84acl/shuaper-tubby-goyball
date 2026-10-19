@@ -515,3 +515,26 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel td:first-child{min-width:165px}
 #unifiedPerformancePanel .st-profile-hit-comparison{width:100%;overflow-x:auto}
 #unifiedPerformancePanel .st-profile-hit-comparison table{width:100%;min-width:550px}
+
+/* Immersive comparison workspace: readable but denser rows and round portraits. */
+#shuaAnalyticsSection[data-active-view="consistency"]{max-width:none!important;width:100%!important;padding:2px 0 15px!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-layout{display:block!important;width:100%!important;max-width:none!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-navigation{display:none!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-workspace,
+#shuaAnalyticsSection[data-active-view="consistency"] #stContent{width:100%!important;max-width:none!important;min-width:0!important;padding:0!important;margin:0!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel{width:100%!important;max-width:none!important;padding:5px!important;margin:3px 0!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel .st-panel-head{padding:6px 8px!important;margin:0!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel table{width:100%!important;min-width:520px!important;border-collapse:collapse!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel th,
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel td{padding:5px 6px!important;font-size:12px!important;line-height:1.2!important;white-space:nowrap}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-person{gap:6px!important;min-height:31px!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-person .st-face{width:30px!important;height:30px!important;min-width:30px!important;flex:0 0 30px!important;border-radius:50%!important;object-fit:cover!important;overflow:hidden!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-person-copy strong{font-size:12px!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-person-copy small{font-size:10px!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table{max-height:calc(100dvh - 155px);min-height:65dvh;overflow:auto!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table thead th{position:sticky;top:0;z-index:3;background:#092037}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-filter-head{display:grid;gap:3px}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-filter-head button{border:0;background:transparent;color:inherit;font-weight:800;font-size:12px;padding:2px;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-filter-head select{max-width:100%;font-size:11px;padding:3px 2px;background:#112b41;color:#fff;border:1px solid #365268;border-radius:5px}
+#shuaAnalyticsSection[data-active-view="consistency"] #stSource{display:none!important}
+@media(max-width:700px){#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel td,#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel th{padding:4px!important;font-size:11px!important}}

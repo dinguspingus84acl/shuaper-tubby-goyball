@@ -1009,7 +1009,8 @@ function ensureUi(){
   tabs.innerHTML=[
     ['overview','Overview'],
     ['gamelog','Game Log'],
-    ['history','History']
+    ['history','History'],
+    ['performance','Performance']
   ].map(([k,l])=>'<button type="button" class="unified-profile-tab" data-profile-tab="'+k+'">'+l+'</button>').join('');
 
   const panels=document.createElement('div');
@@ -1017,7 +1018,8 @@ function ensureUi(){
   panels.innerHTML=
     '<div id="unifiedOverviewPanel" class="unified-profile-panel" data-profile-panel="overview"></div>'+
     '<div id="unifiedGameLogPanel" class="unified-profile-panel" data-profile-panel="gamelog" hidden></div>'+ 
-    '<div id="unifiedHistoryPanel" class="unified-profile-panel" data-profile-panel="history" hidden></div>';
+    '<div id="unifiedHistoryPanel" class="unified-profile-panel" data-profile-panel="history" hidden></div>'+ 
+    '<div id="unifiedPerformancePanel" class="unified-profile-panel" data-profile-panel="performance" hidden></div>';
 
   const profileTop=document.getElementById('profileTop');
   profileTop.insertAdjacentElement('afterend',tabs);
@@ -1026,7 +1028,7 @@ function ensureUi(){
   const overview=document.getElementById('unifiedOverviewPanel');
   if(injury)overview.appendChild(injury);
   if(stats)overview.appendChild(stats);
-  if(notes)overview.appendChild(notes);
+  if(notes)document.getElementById('unifiedPerformancePanel')?.appendChild(notes);
 
   tabs.addEventListener('click',e=>{
     const btn=e.target.closest('[data-profile-tab]');
@@ -1037,7 +1039,7 @@ function ensureUi(){
 }
 function activateTab(key){
   if(key==='notes')key='overview';
-  if(!['overview','gamelog','history'].includes(key))key='overview';
+  if(!['overview','gamelog','history','performance'].includes(key))key='overview';
   preferredProfileTab=key;
   try{sessionStorage.setItem('shuaProfileTab',key)}catch(e){}
   const tabs=document.querySelectorAll('[data-profile-tab]');

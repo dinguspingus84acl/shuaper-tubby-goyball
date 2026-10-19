@@ -182,20 +182,16 @@ function schedule(){
  }).join('');
  body+='<section class="st-panel st-schedule-heatmap-panel">'+
   '<div class="st-heat-scroll"><table class="st-heat-table"><thead><tr><th class="st-heat-player" scope="col">Player</th>'+weekHead+'</tr></thead><tbody id="stScheduleRows">'+cells+'</tbody></table></div></section>';
- const bestTeams=Object.keys(S.teams).map(team=>{
-  const grades=weeks.map(week=>{
-   const scheduled=dataset.schedule[team]?.[week];
-   if(!scheduled?.known||scheduled.bye)return null;
-   return ratings[pos]?.byTeam[scheduled.opponent]?.espnRank??null;
-  }).filter(rank=>Number.isFinite(rank));
-  return {team,rankAverage:avg(grades),games:grades.length};
- }).sort((a,b)=>{
-  if(a.rankAverage===null)return b.rankAverage===null?S.teams[a.team].localeCompare(S.teams[b.team]):1;
+ const best=[...rows].sort((a,b)=>{
+  if(a.rankAverage===null)return b.rankAverage===null?a.rosOrder-b.rosOrder:1;
   if(b.rankAverage===null)return -1;
-  return b.rankAverage-a.rankAverage||S.teams[a.team].localeCompare(S.teams[b.team]);
+  return b.rankAverage-a.rankAverage||a.rosOrder-b.rosOrder;
  });
  body+=panel('Best Remaining Schedules','',
-  '<div class="st-schedule-best" id="stScheduleBest">'+bestTeams.map((entry,i)=>'<div class="st-schedule-best-row" data-st-best-team="'+E(entry.team)+'"><span class="st-rank-num">'+(i+1)+'</span><div class="st-schedule-best-team">'+logo(entry.team,'st-schedule-best-team-logo')+'<strong>'+E(S.teams[entry.team])+'</strong></div><b class="st-schedule-average">'+(entry.rankAverage===null?'—':F(entry.rankAverage,1))+'</b></div>').join('')+'</div>','cup').replace('class="st-panel"','class="st-panel st-schedule-best-panel"');
+  '<div class="st-schedule-best" id="stScheduleBest">'+best.map((p,i)=>{
+   const playerMarkup=schedulePlayer(p);
+   return '<div class="st-schedule-best-row" data-st-best-key="'+E(p.key)+'"><span class="st-rank-num">'+(i+1)+'</span>'+playerMarkup+'<b class="st-schedule-average">'+(p.rankAverage===null?'—':F(p.rankAverage,1))+'</b></div>';
+  }).join('')+'</div>','cup').replace('class="st-panel"','class="st-panel st-schedule-best-panel"');
  if(state.scheduleScrollPending&&state.scheduleFocusKey){
   const focus=state.scheduleFocusKey;
   state.scheduleScrollPending=false;

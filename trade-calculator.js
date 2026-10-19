@@ -229,11 +229,11 @@ function updateWhy(){
     '<div class="trade-why-delta">'+(state.left.length&&state.right.length?'Difference: '+delta.toFixed(1):'Add players to both sides.')+'</div>';
 }
 function hockeyBlurb(winner,pct){
-  if(!winner)return 'Dead even. Toss the puck.';
+  if(!winner)return 'Both sides have comparable fantasy trade value.';
   const side=winner==='left'?'Top':'Bottom';
-  if(pct>=20)return side+' side wins big. Absolute heater.';
-  if(pct>=10)return side+' side wins. Clean snipe.';
-  return side+' side by a hair. Greasy one.';
+  if(pct>=20)return side+' side has a substantial value advantage.';
+  if(pct>=10)return side+' side has a clear value advantage.';
+  return side+' side has a slight value advantage.';
 }
 function updateVerdict(){
   const a=adjustedSum('left'),b=adjustedSum('right');

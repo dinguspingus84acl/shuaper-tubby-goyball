@@ -1143,10 +1143,10 @@ function installPhoneSwipeDismiss(){
   profile.dataset.phoneSwipeDismiss='2';
 
   let tracking=false,mode='',startY=0,startX=0,lastY=0,lastX=0,startTime=0,suppressClickUntil=0;
-  let horizontalAllowed=false;
+  let horizontalAllowed=false,tabSwipe=false;
 
   const reset=()=>{
-    tracking=false;mode='';horizontalAllowed=false;
+    tracking=false;mode='';horizontalAllowed=false;tabSwipe=false;
     profile.style.transition='transform .18s ease-out, opacity .18s ease-out';
     profile.style.transform='';profile.style.opacity='';
     const modal=document.getElementById('modal');if(modal)modal.style.background='';
@@ -1157,6 +1157,7 @@ function installPhoneSwipeDismiss(){
     if(!isPhoneProfileSheet()||e.touches.length!==1)return;
     const t=e.touches[0];
     tracking=true;mode='';startY=lastY=t.clientY;startX=lastX=t.clientX;startTime=performance.now();
+    tabSwipe=!!e.target.closest('.unified-profile-panel');
     horizontalAllowed=!e.target.closest('button,input,select,textarea,a,.unified-profile-tabs,.espn-stat-filters,.espn-game-log-tabs,.espn-game-log-table-wrap,.espn-live-filters,.espn-live-meta');
   },{passive:true});
 
@@ -1174,7 +1175,7 @@ function installPhoneSwipeDismiss(){
       e.preventDefault();
       const currentId=document.getElementById('modal')?.dataset.id||'';
       const dir=dx<0?'next':'prev';
-      const canMove=!!adjacentPlayerId(currentId,dir);
+      const tabOrder=['overview','gamelog','history','performance'];const tabIndex=tabOrder.indexOf(preferredProfileTab);const canMove=tabSwipe?(dir==='next'?tabIndex<tabOrder.length-1:tabIndex>0):!!adjacentPlayerId(currentId,dir);
       const resisted=canMove?dx:dx*.22;
       const pull=Math.max(-180,Math.min(180,resisted*.72));
       profile.style.transition='none';profile.style.transform='translateX('+pull+'px)';
@@ -1198,11 +1199,11 @@ function installPhoneSwipeDismiss(){
     if(mode==='horizontal'){
       const velocity=Math.abs(dx)/elapsed,dir=dx<0?'next':'prev';
       const currentId=document.getElementById('modal')?.dataset.id||'';
-      const target=adjacentPlayerId(currentId,dir);
+      const tabs=['overview','gamelog','history','performance'];const tabIndex=tabs.indexOf(preferredProfileTab);const target=tabSwipe?tabs[tabIndex+(dir==='next'?1:-1)]:adjacentPlayerId(currentId,dir);
       if(target&&(Math.abs(dx)>=72||(Math.abs(dx)>=42&&velocity>=.42))){
         suppressClickUntil=Date.now()+450;
         markSwipeHintLearned();
-        openAdjacentPlayer(target,dir,true);
+        if(tabSwipe){reset();activateTab(target);document.querySelector('[data-profile-tab="'+target+'"]')?.scrollIntoView({block:'nearest',inline:'nearest'});}else openAdjacentPlayer(target,dir,true);
       }else reset();
       mode='';return;
     }

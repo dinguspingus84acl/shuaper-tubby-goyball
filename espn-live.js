@@ -199,9 +199,9 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 }
 .espn-game-log-opponent{display:flex;align-items:center;gap:6px;min-width:0}
 .espn-game-log-opponent-logo{width:18px;height:18px;object-fit:contain;flex:0 0 18px}
-.espn-game-log-opponent{gap:5px;width:100%;min-width:94px;max-width:none;min-height:31px;padding:5px 8px;border:1px solid transparent;border-radius:8px;box-sizing:border-box;font-size:12px;white-space:nowrap;justify-content:flex-start}
+.espn-game-log-opponent{gap:5px;width:max-content;min-width:0;max-width:100%;min-height:28px;padding:3px 5px;border:1px solid transparent;border-radius:8px;box-sizing:border-box;font-size:12px;white-space:nowrap;justify-content:flex-start}
 .espn-game-log-opponent .espn-game-log-opponent-logo{width:18px;height:18px;flex:0 0 18px}
-.espn-game-log-opponent>span{display:block;white-space:nowrap;flex:1;text-align:left}
+.espn-game-log-opponent>span{display:inline;white-space:nowrap;flex:0 0 auto;text-align:left}
 .espn-game-log-table th:nth-child(2),.espn-game-log-table td:nth-child(2){width:106px!important;min-width:106px!important;max-width:none!important;white-space:nowrap!important;text-align:left!important}
 body.phone-mode .espn-game-log-table th:nth-child(2),body.phone-mode .espn-game-log-table td:nth-child(2){width:106px!important;min-width:106px!important;max-width:none!important}
 .espn-game-log-table-wrap{max-width:100%;overflow-x:auto!important}

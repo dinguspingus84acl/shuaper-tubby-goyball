@@ -419,8 +419,7 @@ document.addEventListener('touchend',e=>{if(!('PointerEvent' in window)&&e.chang
 window.shuaReturnFromDepthToSchedule=function(){
  const saved=window.shuaScheduleDepthReturn;if(!saved)return false;
  window.shuaScheduleDepthReturn=null;
- const analyticsButton=document.getElementById('studioNav');
- if(analyticsButton)analyticsButton.click();else open();
+ open();
  navigate('schedule');
  requestAnimationFrame(()=>requestAnimationFrame(()=>{
    const sc=section.querySelector('.st-heat-scroll');

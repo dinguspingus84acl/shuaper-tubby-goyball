@@ -1049,6 +1049,7 @@ function activateTab(key){
   if(!name)return;
   if(key==='gamelog')loadGameLog(name);
   if(key==='history')loadHistory(name);
+  if(key==='performance')document.getElementById('modal')?.dispatchEvent(new CustomEvent('shuaPerformanceTabActive',{detail:{name}}));
 }
 function renderOverviewRanks(name){
   const hist=historicalSeed();

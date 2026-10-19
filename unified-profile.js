@@ -1138,90 +1138,42 @@ function dismissPhoneProfile(){
   resetPhoneProfileSheet();
 }
 function installPhoneSwipeDismiss(){
-  const profile=document.querySelector('#modal .profile');
-  if(!profile||profile.dataset.phoneSwipeDismiss==='2')return;
-  profile.dataset.phoneSwipeDismiss='2';
-
-  let tracking=false,mode='',startY=0,startX=0,lastY=0,lastX=0,startTime=0,suppressClickUntil=0;
-  let horizontalAllowed=false,tabSwipe=false;
-
-  const reset=()=>{
-    tracking=false;mode='';horizontalAllowed=false;tabSwipe=false;
-    profile.style.transition='transform .18s ease-out, opacity .18s ease-out';
-    profile.style.transform='';profile.style.opacity='';
-    const modal=document.getElementById('modal');if(modal)modal.style.background='';
-    setTimeout(()=>{if(profile.isConnected)profile.style.transition=''},190);
-  };
-
-  profile.addEventListener('touchstart',e=>{
-    if(!isPhoneProfileSheet()||e.touches.length!==1)return;
-    const t=e.touches[0];
-    tracking=true;mode='';startY=lastY=t.clientY;startX=lastX=t.clientX;startTime=performance.now();
-    tabSwipe=!!e.target.closest('.unified-profile-panel');
-    horizontalAllowed=!e.target.closest('button,input,select,textarea,a,.unified-profile-tabs,.espn-stat-filters,.espn-game-log-tabs,.espn-game-log-table-wrap,.espn-live-filters,.espn-live-meta');
-  },{passive:true});
-
-  profile.addEventListener('touchmove',e=>{
-    if(!tracking||e.touches.length!==1)return;
-    const t=e.touches[0],dy=t.clientY-startY,dx=t.clientX-startX;
-    lastY=t.clientY;lastX=t.clientX;
-    if(!mode){
-      if(Math.max(Math.abs(dx),Math.abs(dy))<9)return;
-      if(horizontalAllowed&&Math.abs(dx)>Math.abs(dy)*1.15)mode='horizontal';
-      else if(dy>0&&profile.scrollTop<=1&&Math.abs(dy)>Math.abs(dx)*1.05)mode='vertical';
-      else{tracking=false;return}
-    }
-    if(mode==='horizontal'){
-      e.preventDefault();
-      const currentId=document.getElementById('modal')?.dataset.id||'';
-      const dir=dx<0?'next':'prev';
-      const tabOrder=['overview','gamelog','history','performance'];const tabIndex=tabOrder.indexOf(preferredProfileTab);const canMove=tabSwipe?(dir==='next'?tabIndex<tabOrder.length-1:tabIndex>0):!!adjacentPlayerId(currentId,dir);
-      const resisted=canMove?dx:dx*.22;
-      const pull=Math.max(-180,Math.min(180,resisted*.72));
-      profile.style.transition='none';profile.style.transform='translateX('+pull+'px)';
-      profile.style.opacity=String(1-Math.min(.13,Math.abs(pull)/1300));
-      return;
-    }
-    if(mode==='vertical'){
-      if(dy<=0)return;
-      e.preventDefault();
-      const pull=Math.min(220,dy*.66),progress=Math.min(1,pull/220);
-      profile.style.transition='none';profile.style.transform='translateY('+pull+'px)';
-      profile.style.opacity=String(1-progress*.18);
-      const modal=document.getElementById('modal');if(modal)modal.style.background='rgba(2,6,13,'+(1-progress*.72)+')';
-    }
-  },{passive:false});
-
-  profile.addEventListener('touchend',()=>{
-    if(!tracking){reset();return}
-    const dy=lastY-startY,dx=lastX-startX,elapsed=Math.max(1,performance.now()-startTime);
-    tracking=false;
-    if(mode==='horizontal'){
-      const velocity=Math.abs(dx)/elapsed,dir=dx<0?'next':'prev';
-      const currentId=document.getElementById('modal')?.dataset.id||'';
-      const tabs=['overview','gamelog','history','performance'];const tabIndex=tabs.indexOf(preferredProfileTab);const target=tabSwipe?tabs[tabIndex+(dir==='next'?1:-1)]:adjacentPlayerId(currentId,dir);
-      if(target&&(Math.abs(dx)>=72||(Math.abs(dx)>=42&&velocity>=.42))){
-        suppressClickUntil=Date.now()+450;
-        markSwipeHintLearned();
-        if(tabSwipe){reset();activateTab(target);document.querySelector('[data-profile-tab="'+target+'"]')?.scrollIntoView({block:'nearest',inline:'nearest'});}else openAdjacentPlayer(target,dir,true);
-      }else reset();
-      mode='';return;
-    }
-    if(mode==='vertical'){
-      const velocity=dy/elapsed;
-      if(dy>=105||(dy>=58&&velocity>=.48)){
-        suppressClickUntil=Date.now()+400;
-        profile.style.transition='transform .18s ease-in, opacity .18s ease-in';
-        profile.style.transform='translateY(105dvh)';profile.style.opacity='.82';
-        setTimeout(dismissPhoneProfile,180);
-      }else reset();
-      mode='';return;
-    }
-    reset();
-  },{passive:true});
-
-  profile.addEventListener('touchcancel',reset,{passive:true});
-  profile.addEventListener('click',e=>{if(Date.now()<suppressClickUntil){e.preventDefault();e.stopPropagation()}},true);
+ const sheet=document.querySelector('#modal .profile');
+ if(!sheet||sheet.dataset.phoneSwipeDismiss==='3')return;
+ sheet.dataset.phoneSwipeDismiss='3';
+ let gesture=null;
+ const ignore='button,input,select,textarea,a,svg,.st-chart,.espn-game-log-table-wrap,.st-table-wrap,[data-st-chart-host]';
+ sheet.addEventListener('touchstart',e=>{
+  if(!isPhoneProfileSheet()||e.touches.length!==1)return;
+  const t=e.touches[0];
+  const panel=e.target.closest('.unified-profile-panel');
+  gesture={x:t.clientX,y:t.clientY,lastX:t.clientX,lastY:t.clientY,started:performance.now(),mode:null,
+    tab:!!panel&&!e.target.closest(ignore),blocked:!!e.target.closest(ignore)};
+ },{passive:true});
+ sheet.addEventListener('touchmove',e=>{
+  if(!gesture||e.touches.length!==1)return;
+  const t=e.touches[0],dx=t.clientX-gesture.x,dy=t.clientY-gesture.y;
+  gesture.lastX=t.clientX;gesture.lastY=t.clientY;
+  if(!gesture.mode){
+   if(Math.max(Math.abs(dx),Math.abs(dy))<12)return;
+   if(!gesture.blocked&&Math.abs(dx)>Math.abs(dy)*1.35)gesture.mode='horizontal';
+   else if(dy>0&&sheet.scrollTop<=1&&Math.abs(dy)>Math.abs(dx)*1.25)gesture.mode='vertical';
+   else{gesture=null;return;}
+  }
+  if(gesture.mode==='horizontal'){e.preventDefault();return;}
+  if(gesture.mode==='vertical'){e.preventDefault();sheet.style.transform='translateY('+Math.min(170,dy*.55)+'px)';}
+ },{passive:false});
+ sheet.addEventListener('touchend',()=>{
+  const g=gesture;gesture=null;if(!g)return;
+  sheet.style.transform='';
+  const dx=g.lastX-g.x,dy=g.lastY-g.y,dt=Math.max(1,performance.now()-g.started);
+  if(g.mode==='horizontal'&&Math.abs(dx)>=55&&Math.abs(dx)>Math.abs(dy)*1.25){
+   const tabs=['overview','gamelog','history','performance'],i=tabs.indexOf(preferredProfileTab),next=tabs[i+(dx<0?1:-1)];
+   if(g.tab&&next){activateTab(next);const tab=document.querySelector('[data-profile-tab="'+next+'"]');tab?.scrollIntoView({inline:'nearest',block:'nearest'});return;}
+   if(!g.tab){const id=document.getElementById('modal')?.dataset.id||'',dir=dx<0?'next':'prev',target=adjacentPlayerId(id,dir);if(target)openAdjacentPlayer(target,dir,true);}
+  }else if(g.mode==='vertical'&&(dy>=100||(dy>=60&&dy/dt>.5)))dismissPhoneProfile();
+ },{passive:true});
+ sheet.addEventListener('touchcancel',()=>{gesture=null;sheet.style.transform='';},{passive:true});
 }
 
 function prepareUnified(name,seed=null){

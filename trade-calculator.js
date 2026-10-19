@@ -283,7 +283,7 @@ function showMatches(side){
   const q=norm(input.value);
   if(!q){results.innerHTML='';results.style.display='none';return;}
   const taken=allSelected();
-  const matches=tradePlayers.filter(p=>!taken.has(norm(p.name))&&norm(p.name).includes(q)).slice(0,10);
+  const seenMatches=new Set();const matches=tradePlayers.filter(p=>{const name=norm(p.name);if(taken.has(name)||!name.includes(q)||seenMatches.has(name))return false;seenMatches.add(name);return true}).slice(0,10);
   if(!matches.length){
     results.innerHTML='<div class="trade-empty">No players found</div>';
     results.style.display='block';

@@ -398,19 +398,24 @@ function openSchedule(name='',position=''){
  state.scheduleScrollPending=!!name;
  navigate('schedule');
 }
-let shuaDepthSwipeStart=null;
-document.addEventListener('touchstart',e=>{
+let shuaDepthGesture=null;
+function shuaDepthStart(x,y,target){
  const depth=document.getElementById('depthSection');
- if(!window.shuaScheduleDepthReturn||!depth||depth.hidden||!depth.contains(e.target)||e.touches.length!==1)return;
- if(e.target.closest('input,select,button,[role="listbox"],.depth-select-wrap'))return;
- shuaDepthSwipeStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
-},{passive:true});
-document.addEventListener('touchend',e=>{
- if(!shuaDepthSwipeStart||!e.changedTouches.length)return;
- const dx=e.changedTouches[0].clientX-shuaDepthSwipeStart.x,dy=e.changedTouches[0].clientY-shuaDepthSwipeStart.y;
- shuaDepthSwipeStart=null;
- if(dx< -75&&Math.abs(dx)>Math.abs(dy)*1.4)window.shuaReturnFromDepthToSchedule?.();
-},{passive:true});
+ if(!window.shuaScheduleDepthReturn||!depth||depth.hidden||!depth.contains(target))return;
+ if(target.closest('input,select,button,[role="listbox"],.depth-select-wrap'))return;
+ shuaDepthGesture={x,y};
+}
+function shuaDepthEnd(x,y){
+ const start=shuaDepthGesture;shuaDepthGesture=null;
+ if(!start)return;
+ const dx=x-start.x,dy=y-start.y;
+ if(dx < -55&&Math.abs(dx)>Math.abs(dy)*1.25)window.shuaReturnFromDepthToSchedule?.();
+}
+document.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;shuaDepthStart(e.clientX,e.clientY,e.target);},true);
+document.addEventListener('pointerup',e=>{if(e.pointerType==='touch')shuaDepthEnd(e.clientX,e.clientY);},true);
+document.addEventListener('pointercancel',()=>{shuaDepthGesture=null;},true);
+document.addEventListener('touchstart',e=>{if(!('PointerEvent' in window)&&e.touches.length===1)shuaDepthStart(e.touches[0].clientX,e.touches[0].clientY,e.target);},{passive:true,capture:true});
+document.addEventListener('touchend',e=>{if(!('PointerEvent' in window)&&e.changedTouches.length)shuaDepthEnd(e.changedTouches[0].clientX,e.changedTouches[0].clientY);},{passive:true,capture:true});
 window.shuaReturnFromDepthToSchedule=function(){
  const saved=window.shuaScheduleDepthReturn;if(!saved)return false;
  window.shuaScheduleDepthReturn=null;

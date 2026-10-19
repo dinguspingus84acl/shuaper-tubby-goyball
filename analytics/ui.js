@@ -357,6 +357,23 @@ section.addEventListener('keydown',e=>{
   }
  }
 });
+let boomDrag=null,boomReturnGesture=null;
+section.addEventListener('pointerdown',e=>{
+ if(state.view!=='consistency'||e.pointerType!=='touch')return;
+ const bar=e.target.closest('.st-position'),button=e.target.closest('[data-st-pos]');
+ if(bar&&button){boomDrag={id:e.pointerId,bar,last:button.dataset.stPos};try{bar.setPointerCapture(e.pointerId);}catch(_){}return;}
+ if(window.shuaBoomReturnPlayer)boomReturnGesture={id:e.pointerId,x:e.clientX,y:e.clientY};
+});
+section.addEventListener('pointermove',e=>{
+ if(!boomDrag||e.pointerId!==boomDrag.id)return;
+ const buttons=[...boomDrag.bar.querySelectorAll('[data-st-pos]')];
+ const closest=buttons.reduce((best,b)=>{const box=b.getBoundingClientRect(),d=Math.abs(e.clientX-(box.left+box.right)/2);return !best||d<best.d?{b,d}:best;},null)?.b;
+ if(closest&&closest.dataset.stPos!==boomDrag.last){boomDrag.last=closest.dataset.stPos;buttons.forEach(b=>b.setAttribute('aria-pressed',String(b===closest)));e.preventDefault();}
+});
+section.addEventListener('pointerup',e=>{
+ if(boomDrag&&e.pointerId===boomDrag.id){const pos=boomDrag.last;boomDrag=null;if(state.pos!==pos){state.pos=pos;render();}return;}
+ if(boomReturnGesture&&e.pointerId===boomReturnGesture.id){const g=boomReturnGesture;boomReturnGesture=null;if(e.clientX-g.x< -60&&Math.abs(e.clientX-g.x)>Math.abs(e.clientY-g.y)*1.2){const name=window.shuaBoomReturnPlayer;window.shuaBoomReturnPlayer=null;close();window.openUnifiedPlayerProfileByName?.(name);}}
+});
 let schedulePositionDrag=null;
 function schedulePositionAt(x,y,bar){
  const rect=bar.getBoundingClientRect();

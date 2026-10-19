@@ -4,8 +4,8 @@
 const S=globalThis.ShuaStudio,C=S.Chart,{esc:E,fmt:F,num:N,mean:avg,sum,key,aggregate:A,games:G}=S;
 if(S.UI)return;
 const main=document.querySelector('main'),navigation=document.querySelector('.positions');if(!main||!navigation)return;
-const pages=[['matchup','Matchup difficulty','Who has the most favorable opponent?'],['trends','Fantasy points trends','Weekly production, rolling averages and opportunity.'],['opportunity','Advanced opportunity','The workload behind the fantasy points.'],['consistency','Boom / bust consistency','Hit rates, observed floor and week-to-week variance.'],['teams','Team opportunity','See who controls the offense.'],['injury','Injury impact','Compare teammate usage with and without a starter.'],['schedule','Schedule','Position-specific opponents, week by week.'],['startsit','Start / sit','Compare your options without changing your rankings.'],['weekly','Weekly performance','Scorers, opportunity leaders and changes from recent form.']];
-const shortNames=['Matchups','Player trends','Opportunity','Consistency','Team shares','Injury impact','Schedule','Start / sit','Weekly report'];
+const pages=[['opportunity','Advanced opportunity','The workload behind the fantasy points.'],['consistency','Boom / bust consistency','Hit rates, observed floor and week-to-week variance.'],['teams','Team opportunity','See who controls the offense.'],['injury','Injury impact','Compare teammate usage with and without a starter.'],['schedule','Schedule','Position-specific opponents, week by week.'],['startsit','Start / sit','Compare your options without changing your rankings.'],['weekly','Weekly performance','Scorers, opportunity leaders and changes from recent form.']];
+const shortNames=['Opportunity','Consistency','Team shares','Injury impact','Schedule','Start / sit','Weekly report'];
 let section=document.getElementById('shuaAnalyticsSection');if(!section){section=document.createElement('section');section.id='shuaAnalyticsSection';section.hidden=true;main.append(section);}section.className='st-studio';
 let button=document.querySelector('.positions [data-pos="ANALYTICS"]');if(!button){button=document.createElement('button');button.className='pos';button.dataset.pos='ANALYTICS';button.textContent='Analytics';navigation.append(button);}button.id='studioNav';
 let state={view:'weekly',year:2026,pos:'RB',player:'',team:'DET',week:0,range:0,rankSource:'big-board.json',playoffs:false,compare:[],outWeeks:null};try{const saved=JSON.parse(localStorage.getItem('shuaStudioStateV1')||'null');if(saved){state={...state,...saved};if(!pages.some(p=>p[0]===state.view))state.view='weekly';if(![2024,2025,2026].includes(+state.year))state.year=2026;state.outWeeks=null;}}catch(e){}
@@ -14,7 +14,7 @@ function linkedView(){const m=location.hash.match(/^#analytics\/([a-z]+)$/);retu
 const initialView=linkedView();if(initialView){if(state.view==='schedule'&&initialView!=='schedule'&&[2024,2025,2026].includes(+state.scheduleReturnYear)){state.year=+state.scheduleReturnYear;state.scheduleReturnYear=null;}state.view=initialView;state.week=0;}
 if(state.view==='schedule'&&+state.year!==2026){state.scheduleReturnYear=+state.year;state.year=2026;}
 function updateLink(){if(!visible)return;try{const u=new URL(location.href);u.hash='analytics/'+state.view;history.replaceState(history.state,'',u);}catch(e){}}
-function navigate(view){if(!pages.some(p=>p[0]===view))return;
+function navigate(view){if(!pages.some(p=>p[0]===view))view='consistency';
  if(view==='schedule'){if(state.view!=='schedule'&&+state.year!==2026)state.scheduleReturnYear=+state.year;state.year=2026;}
  else if(state.view==='schedule'&&[2024,2025,2026].includes(+state.scheduleReturnYear)){state.year=+state.scheduleReturnYear;state.scheduleReturnYear=null;}
  state.view=view;state.outWeeks=null;if(view==='injury')state.injuryInitialized=0;
@@ -124,7 +124,8 @@ function dstDifficulty(ds,through,last){
  return {rows,byTeam:Object.fromEntries(rows.map(x=>[x.team,x]))};
 }
 function schedule(){
- const toolbar='<div class="st-schedule-toolbar"><div class="st-schedule-search-wrap"><label for="stScheduleSearch"><span class="st-label">Search</span></label><input id="stScheduleSearch" type="search" placeholder="Search players" role="combobox" aria-autocomplete="list" aria-controls="stScheduleSuggestions" aria-expanded="false" autocomplete="off" value="'+E(state.scheduleQuery||'')+'"><div id="stScheduleSuggestions" role="listbox" aria-label="Matching players" hidden></div></div><div class="st-schedule-filters">'+controls({week:true,season:false})+'</div></div>';
+ const teamMode=state.scheduleDisplay==='team';
+ const toolbar='<div class="st-schedule-toolbar"><label class="st-schedule-display-picker"><span class="st-label">View</span><select id="stScheduleDisplay" aria-label="Schedule rows"><option value="player"'+(!teamMode?' selected':'')+'>Player</option><option value="team"'+(teamMode?' selected':'')+'>Team</option></select></label><div class="st-schedule-search-wrap"><label for="stScheduleSearch"><span class="st-label">Search</span></label><input id="stScheduleSearch" type="search" placeholder="Search players" role="combobox" aria-autocomplete="list" aria-controls="stScheduleSuggestions" aria-expanded="false" autocomplete="off" value="'+E(state.scheduleQuery||'')+'"><div id="stScheduleSuggestions" role="listbox" aria-label="Matching players" hidden></div></div><div class="st-schedule-filters">'+controls({week:true,season:false})+'</div></div>';
  if(!dataset.scheduleRoster&&!dataset.scheduleRosterError){
   if(!dataset.scheduleRosterPending){
    const currentDataset=dataset;
@@ -141,7 +142,7 @@ function schedule(){
  if(dataset.scheduleRosterError)return toolbar+note('Unable to load schedule rosters: '+E(dataset.scheduleRosterError),true);
  const roster=dataset.scheduleRoster;
  const pos=['QB','RB','WR','TE','DST'].includes(state.schedulePos)?state.schedulePos:'QB';
- const players=roster[pos]||[];
+ const players=teamMode?Object.keys(S.teams).map((team,index)=>({key:'team-'+team,name:S.teams[team],team,position:pos,rosOrder:index})):roster[pos]||[];
  const through=Math.min(state.week-1,dataset.latestWeek);
  if(!dataset.espnRatings)return schedulePositions(roster)+toolbar+note('ESPN full-PPR matchup rankings are temporarily unavailable. '+E(dataset.espnRatingsError||'Retry later.')+' No local rankings are substituted.',true);
  const ratings={};
@@ -171,7 +172,7 @@ function schedule(){
  let body=schedulePositions(roster)+toolbar;
  const cells=rows.map(p=>{
   const highlighted=state.scheduleFocusKey===p.key;
-  const playerRow='<tr data-st-schedule-key="'+E(p.key)+'" data-st-schedule-name="'+E(p.name.toLowerCase())+'" class="'+(highlighted?'st-schedule-highlight':'')+'"><th scope="row" class="st-heat-player">'+schedulePlayer(p)+'</th>';
+  const playerRow='<tr data-st-schedule-key="'+E(p.key)+'" data-st-schedule-name="'+E(p.name.toLowerCase())+'" class="'+(highlighted?'st-schedule-highlight':'')+'"><th scope="row" class="st-heat-player">'+(teamMode?'<button type="button" class="st-schedule-team-inline" data-st-depth-team="'+E(p.team)+'">'+logo(p.team,'st-schedule-team-logo')+'<strong>'+E(p.name)+'</strong></button>':schedulePlayer(p))+'</th>';
   return playerRow+weeks.map(w=>{
    const opponent=dataset.schedule[p.team]?.[w];
    const matchup=ratings[p.position]?.byTeam[opponent?.opponent];
@@ -190,7 +191,7 @@ function schedule(){
   return '<th scope="col" aria-sort="'+(selected?(sortDirection==='easy'?'ascending':'descending'):'none')+'"><button type="button" class="st-week-sort'+(selected?' active':'')+'" data-st-sort-week="'+w+'" aria-label="Week '+w+': '+description+'" title="Week '+w+' · '+description+'">W'+w+(indicator?' <span class="st-week-sort-icon" aria-hidden="true">'+indicator+'</span>':'')+'</button></th>';
  }).join('');
  body+='<section class="st-panel st-schedule-heatmap-panel">'+
-  '<div class="st-heat-scroll"><table class="st-heat-table"><thead><tr><th class="st-heat-player" scope="col">Player</th>'+weekHead+'</tr></thead><tbody id="stScheduleRows">'+cells+'</tbody></table></div></section>';
+  '<div class="st-heat-scroll"><table class="st-heat-table"><thead><tr><th class="st-heat-player" scope="col">'+(teamMode?'Team':'Player')+'</th>'+weekHead+'</tr></thead><tbody id="stScheduleRows">'+cells+'</tbody></table></div></section>';
  const bestTeams=Object.keys(S.teams).map(team=>{
   const grades=weeks.map(w=>{
    const matchup=dataset.schedule[team]?.[w];
@@ -329,7 +330,7 @@ section.addEventListener('click',e=>{
   return;
  }const player=e.target.closest('[data-st-open]');if(player){showPlayer(player.dataset.stOpen);return;}const arch=e.target.closest('[data-st-archive]');if(arch){state.year=+arch.dataset.stArchive;state.week=0;load();}if(e.target.closest('[data-st-retry]')){S.Data.clear();load();}});
 section.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.st-schedule-best-row[data-st-open]')){e.preventDefault();showPlayer(e.target.dataset.stOpen);}});
-section.addEventListener('change',e=>{if(e.target.matches('[data-st-hit-filter]')){state.hitFilters=state.hitFilters||[0,0,0,0];state.hitFilters[Number(e.target.dataset.stHitFilter)]=Number(e.target.value);render();return;}const id=e.target.id,v=e.target.value;if(id==='stDashboard'){navigate(v);return;}if(id==='stSchedulePlayer'){state.scheduleFocusKey=v;state.scheduleScrollPending=true;render();return;}if(id==='stInjuryPos'){state.injuryPos=v;state.injuredKey='';render();return;}if(id==='stInjuryStatus'){state.injuryStatus=v;state.injuredKey='';render();return;}if(id==='stSeason'){if(state.view==='schedule')return;state.year=+v;state.week=0;state.outWeeks=null;load();return;}if(id==='stPlayer'){state.player=v;state.outWeeks=null;}else if(id==='stTeam'){state.team=v;state.player='';state.outWeeks=null;}else if(id==='stWeek'){state.week=+v;state.outWeeks=null;if(state.view==='schedule'){state.scheduleSortWeek=null;state.scheduleSortDirection=null;}}else if(id==='stRange')state.range=+v;else if(id==='stRankSource')state.rankSource=v;else if(id==='stPlayoffs'){state.playoffs=v==='playoffs';state.scheduleSortWeek=null;state.scheduleSortDirection=null;}else if(id==='stInjuredPlayer'){state.player=v;state.outWeeks=null;}else if(id.startsWith('stCompare')){state.compare=[0,1,2,3].map(i=>document.getElementById('stCompare'+i)?.value).filter(Boolean);state.compare=[...new Set(state.compare)];}else if(e.target.matches('[data-st-out]'))state.outWeeks=[...section.querySelectorAll('[data-st-out]:checked')].map(e=>+e.dataset.stOut);else return;render();});
+section.addEventListener('change',e=>{if(e.target.id==='stScheduleDisplay'){state.scheduleDisplay=e.target.value;state.scheduleQuery='';state.scheduleFocusKey='';render();return;}if(e.target.matches('[data-st-hit-filter]')){state.hitFilters=state.hitFilters||[0,0,0,0];state.hitFilters[Number(e.target.dataset.stHitFilter)]=Number(e.target.value);render();return;}const id=e.target.id,v=e.target.value;if(id==='stDashboard'){navigate(v);return;}if(id==='stSchedulePlayer'){state.scheduleFocusKey=v;state.scheduleScrollPending=true;render();return;}if(id==='stInjuryPos'){state.injuryPos=v;state.injuredKey='';render();return;}if(id==='stInjuryStatus'){state.injuryStatus=v;state.injuredKey='';render();return;}if(id==='stSeason'){if(state.view==='schedule')return;state.year=+v;state.week=0;state.outWeeks=null;load();return;}if(id==='stPlayer'){state.player=v;state.outWeeks=null;}else if(id==='stTeam'){state.team=v;state.player='';state.outWeeks=null;}else if(id==='stWeek'){state.week=+v;state.outWeeks=null;if(state.view==='schedule'){state.scheduleSortWeek=null;state.scheduleSortDirection=null;}}else if(id==='stRange')state.range=+v;else if(id==='stRankSource')state.rankSource=v;else if(id==='stPlayoffs'){state.playoffs=v==='playoffs';state.scheduleSortWeek=null;state.scheduleSortDirection=null;}else if(id==='stInjuredPlayer'){state.player=v;state.outWeeks=null;}else if(id.startsWith('stCompare')){state.compare=[0,1,2,3].map(i=>document.getElementById('stCompare'+i)?.value).filter(Boolean);state.compare=[...new Set(state.compare)];}else if(e.target.matches('[data-st-out]'))state.outWeeks=[...section.querySelectorAll('[data-st-out]:checked')].map(e=>+e.dataset.stOut);else return;render();});
 section.addEventListener('input',e=>{
  if(e.target.id!=='stScheduleSearch')return;
  const search=e.target.value.trim().toLowerCase();state.scheduleQuery=search;

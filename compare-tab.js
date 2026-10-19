@@ -186,7 +186,7 @@ function renderSuggestions(slot,q){
   const key=norm(q);
   if(!key){box.hidden=true;box.innerHTML='';return}
   const other=selected[slot===0?1:0];
-  const list=allPlayers().filter(p=>norm(p.name).includes(key)&&(!other||norm(p.name)!==norm(other.name))).slice(0,10);
+  const seen=new Set();const list=allPlayers().filter(p=>{const n=norm(p.name);if(!n.includes(key)||(other&&n===norm(other.name))||seen.has(n))return false;seen.add(n);return true}).slice(0,10);
   if(!list.length){box.innerHTML='<div class="compare-suggestion"><div><strong>No players found</strong></div></div>';box.hidden=false;return}
   box.innerHTML=list.map(p=>'<button type="button" class="compare-suggestion" data-pick-slot="'+slot+'" data-player-name="'+esc(p.name)+'"><span><strong>'+esc(p.name)+'</strong><small>'+esc(p.position)+' · '+esc(p.team||'—')+'</small></span><span class="compare-suggestion-rank">'+(p.overallRank?'#'+p.overallRank:'')+'</span></button>').join('');
   box.hidden=false;

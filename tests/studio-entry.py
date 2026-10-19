@@ -42,7 +42,9 @@ try:
      if view=='schedule':
       page.wait_for_selector('#stScheduleRows tr',timeout=45000)
       assert page.locator('#stScheduleRows tr').count()==36
-      assert page.locator('#stScheduleBest .st-schedule-best-row').count()==36
+      assert page.locator('#stScheduleBest .st-schedule-best-row').count()==32
+      assert page.locator('#stScheduleBest .st-schedule-best-team-logo').count()==32
+      assert page.locator('#stScheduleBest .st-schedule-person').count()==0
       assert page.locator('#stSource').is_hidden()
       assert page.locator('.st-week-sort-hint').count()==0
       assert page.locator('.st-heat-legend').count()==0

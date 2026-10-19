@@ -538,3 +538,12 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="consistency"] .st-hit-filter-head select{max-width:100%;font-size:11px;padding:3px 2px;background:#112b41;color:#fff;border:1px solid #365268;border-radius:5px}
 #shuaAnalyticsSection[data-active-view="consistency"] #stSource{display:none!important}
 @media(max-width:700px){#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel td,#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-full-panel th{padding:4px!important;font-size:11px!important}}
+
+#shuaAnalyticsSection[data-active-view="consistency"] .st-person .st-face{border:2px solid #4a7090!important;box-shadow:0 0 0 1px rgba(255,255,255,.16)!important;border-radius:50%!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-filter-head{gap:1px!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-filter-head select{font-size:9px!important;padding:1px 0!important;height:21px!important;width:51px!important;justify-self:center}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-position{touch-action:pan-y}
+#unifiedPerformancePanel .st-data{display:none!important}
+#unifiedPerformancePanel .st-footnote{display:none!important}
+#unifiedPerformancePanel .st-boom-link{display:block;width:100%;background:#112940;color:#fff;border:1px solid #365b79;border-radius:9px;padding:10px;font-weight:900;margin:10px 0 7px;cursor:pointer;text-align:left}
+#unifiedPerformancePanel .st-chart svg{touch-action:none}

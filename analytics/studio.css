@@ -499,3 +499,7 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
  }
  #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team strong{font-size:13px}
 }
+
+/* Full-row interaction on the player remaining-schedule leaderboard. */
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-row[data-st-open]{cursor:pointer;border-radius:8px;padding-inline:5px}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-row[data-st-open]:is(:hover,:focus-visible){background:rgba(37,239,165,.09);outline:1px solid rgba(37,239,165,.4)}

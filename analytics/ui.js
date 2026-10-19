@@ -401,6 +401,26 @@ section.addEventListener('keydown',e=>{
   }
  }
 });
+let weeklyDrag=null;
+section.addEventListener('pointerdown',e=>{
+ if(state.view!=='weekly'||e.pointerType==='mouse')return;
+ const button=e.target.closest('[data-st-weekly-pos]'),bar=button?.closest('.st-weekly-positions');
+ if(!bar)return;
+ weeklyDrag={id:e.pointerId,bar,last:button.dataset.stWeeklyPos};
+ try{bar.setPointerCapture(e.pointerId);}catch(_){}
+});
+section.addEventListener('pointermove',e=>{
+ const d=weeklyDrag;if(!d||e.pointerId!==d.id)return;
+ const buttons=[...d.bar.querySelectorAll('[data-st-weekly-pos]')];
+ const nearest=buttons.reduce((best,b)=>{const r=b.getBoundingClientRect(),distance=Math.abs(e.clientX-(r.left+r.right)/2);return !best||distance<best.distance?{b,distance}:best;},null)?.b;
+ if(nearest){d.last=nearest.dataset.stWeeklyPos;buttons.forEach(b=>b.setAttribute('aria-pressed',String(b===nearest)));e.preventDefault();}
+});
+section.addEventListener('pointerup',e=>{
+ const d=weeklyDrag;if(!d||e.pointerId!==d.id)return;
+ weeklyDrag=null;try{d.bar.releasePointerCapture(e.pointerId);}catch(_){}
+ if(state.weeklyPos!==d.last){state.weeklyPos=d.last;render();}
+});
+section.addEventListener('pointercancel',()=>{weeklyDrag=null;});
 let boomDrag=null,boomReturnGesture=null;
 section.addEventListener('pointerdown',e=>{
  if(state.view!=='consistency'||e.pointerType!=='touch')return;

@@ -503,3 +503,6 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 /* Full-row interaction on the player remaining-schedule leaderboard. */
 #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-row[data-st-open]{cursor:pointer;border-radius:8px;padding-inline:5px}
 #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-row[data-st-open]:is(:hover,:focus-visible){background:rgba(37,239,165,.09);outline:1px solid rgba(37,239,165,.4)}
+
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team-button{width:100%;font:inherit;color:inherit;text-align:left;background:transparent;border:0;border-bottom:1px solid #ffffff16;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team-button:hover,#shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-best-team-button:focus-visible{background:rgba(37,239,165,.10);outline:1px solid rgba(37,239,165,.38)}

@@ -1028,7 +1028,7 @@ function ensureUi(){
   const overview=document.getElementById('unifiedOverviewPanel');
   if(injury)overview.appendChild(injury);
   if(stats)overview.appendChild(stats);
-  if(notes)document.getElementById('unifiedPerformancePanel')?.appendChild(notes);
+  if(notes)overview.appendChild(notes);
 
   tabs.addEventListener('click',e=>{
     const btn=e.target.closest('[data-profile-tab]');

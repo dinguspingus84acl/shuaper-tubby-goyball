@@ -296,5 +296,6 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('.compare-picker'))document.querySelectorAll('.compare-suggestions').forEach(x=>x.hidden=true);
 });
 
-window.ShuaCompareTab={show:showCompare};
+button.remove();
+window.ShuaCompareTab={show:showCompare,mount(root){if(!root)return;root.appendChild(section);section.hidden=false;restoreCompareState();renderCompare();}};
 })();

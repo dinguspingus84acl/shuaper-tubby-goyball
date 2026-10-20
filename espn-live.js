@@ -108,6 +108,7 @@ let headshotIndexPromise=null;
 const style=document.createElement('style');
 style.id='espnLiveStyles';
 style.textContent=`
+@media(min-width:1001px){#espnLiveSection .espn-stat-bar{grid-template-columns:1fr!important}#espnLiveSection .espn-stat-primary{gap:10px!important}#espnLiveSection .espn-team-filter-wrap{min-width:110px!important}#espnLiveSection .espn-chart-sort{display:flex;justify-content:flex-end;padding:7px 12px;background:#07182a}#espnLiveSection .espn-chart-sort select{max-width:245px}}\n
 @media(min-width:1001px){
  #espnLiveSection .espn-live-head,#espnLiveSection .espn-live-row{grid-template-columns:48px minmax(230px,1fr) 215px!important}
  #espnLiveSection .espn-live-head> :nth-child(3),#espnLiveSection .espn-live-head> :nth-child(4),#espnLiveSection .espn-live-head> :nth-child(5),
@@ -400,6 +401,16 @@ section.innerHTML=`
           <button type="button" class="espn-filter" data-espn-filter="WR">WR</button>
           <button type="button" class="espn-filter" data-espn-filter="TE">TE</button>
         </div>
+
+      </div>
+      <div class="espn-stat-bar">
+        <div class="espn-stat-primary">
+          <span class="espn-stat-label">Stats</span>
+          <div class="espn-stat-filters">
+            <button type="button" class="espn-view-btn active" data-espn-view="TOTAL">Season</button>
+            <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
+          </div>
+          <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
         <div class="espn-team-filter-wrap">
           <span class="espn-team-filter-title">Teams</span>
           <button id="espnTeamFilterButton" class="espn-team-filter-button" type="button" aria-haspopup="listbox" aria-expanded="false">
@@ -409,23 +420,16 @@ section.innerHTML=`
           <div id="espnTeamFilterMenu" class="espn-team-filter-menu" role="listbox" hidden></div>
           <select id="espnTeamFilter" hidden aria-hidden="true" tabindex="-1"><option value="ALL">All</option></select>
         </div>
-      </div>
-      <div class="espn-stat-bar">
-        <div class="espn-stat-primary">
-          <span class="espn-stat-label">Stats</span>
-          <div class="espn-stat-filters">
-            <button type="button" class="espn-view-btn active" data-espn-view="TOTAL">Season</button>
-            <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
-          </div>
         </div>
         <div class="espn-stats-right-controls">
-          <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
-          <select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Sort players by stat"></select>
+          
+          
         </div>
       </div>
     </div>
     <div class="espn-live-card">
-      <div class="espn-live-head">
+      <div class="espn-chart-sort"><select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Sort players by stat"></select></div>
+    <div class="espn-live-head">
         <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div>PPR Pts</div><div class="espn-selected-stat-head-spacer" aria-hidden="true"></div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open Stats to load rankings.</div></div>

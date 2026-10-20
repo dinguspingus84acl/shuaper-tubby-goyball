@@ -674,3 +674,15 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="teams"] .st-team-nfl-filter{margin:5px 0 10px}
 #shuaAnalyticsSection[data-active-view="teams"] .st-team-nfl-filter select{background:#102b43;color:white;border:1px solid #3b6178;border-radius:7px;padding:7px;margin-left:8px}
 #shuaAnalyticsSection[data-active-view="injury"] .st-injury-detail .st-chart{display:block!important}
+
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-opportunity-pos{display:flex;gap:5px;margin:0 0 10px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-opportunity-pos button{flex:1;padding:7px 5px;color:#a7bccc;background:#10283d;border:1px solid #385269;border-radius:7px;font-weight:800;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-opportunity-pos button[aria-pressed="true"]{background:#0b7451;border-color:#24efa0;color:white}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-graph{display:flex;flex-direction:column;gap:7px;max-height:410px;overflow-y:auto}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-row{display:grid;grid-template-columns:minmax(120px,1.25fr) minmax(70px,1fr) 46px;gap:7px;align-items:center;font-size:11px;min-height:30px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-player{display:flex;align-items:center;gap:6px;min-width:0}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-player span{font-weight:800;white-space:normal;line-height:1.2}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-logo{width:25px;height:25px;object-fit:contain;flex:0 0 25px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-track{background:#18394c;height:12px;border-radius:5px;overflow:hidden}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-track>div{height:100%;background:#24efa0;border-radius:5px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-row>b{text-align:right;font-variant-numeric:tabular-nums}

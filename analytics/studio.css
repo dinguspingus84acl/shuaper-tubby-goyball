@@ -695,3 +695,6 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-player{gap:5px}
 #shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-row{grid-template-columns:minmax(160px,1.7fr) minmax(65px,1fr) 46px}
 @media(max-width:700px){#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-row{grid-template-columns:minmax(140px,1.5fr) minmax(50px,1fr) 42px}#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-player{font-size:10px}}
+
+#shuaAnalyticsSection[data-active-view="injury"] .st-injury-name b{display:flex;align-items:center;gap:5px;min-width:0}
+#shuaAnalyticsSection[data-active-view="injury"] .st-injury-team-logo{height:17px;width:17px;object-fit:contain;flex:0 0 17px}

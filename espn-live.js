@@ -108,6 +108,13 @@ let headshotIndexPromise=null;
 const style=document.createElement('style');
 style.id='espnLiveStyles';
 style.textContent=`
+@media(min-width:1001px){
+ #espnLiveSection .espn-live-toolbar{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:9px!important;flex-wrap:wrap!important}
+ #espnLiveSection .espn-team-filter-wrap{margin-left:0!important;min-width:100px!important}
+ #espnLiveSection .espn-live-head{font-size:.53rem!important;letter-spacing:0!important;padding:5px 10px!important}
+ #espnLiveSection .espn-live-head>div:nth-child(-n+2){font-size:.53rem!important;font-weight:800!important}
+}
+
 @media(min-width:1001px){#espnLiveSection .espn-stat-bar{grid-template-columns:1fr!important}#espnLiveSection .espn-stat-primary{gap:10px!important}#espnLiveSection .espn-team-filter-wrap{min-width:110px!important}#espnLiveSection .espn-chart-sort{display:flex;justify-content:flex-end;padding:7px 12px;background:#07182a}#espnLiveSection .espn-chart-sort select{max-width:245px}}\n
 @media(min-width:1001px){
  #espnLiveSection .espn-live-head,#espnLiveSection .espn-live-row{grid-template-columns:48px minmax(230px,1fr) 215px!important}
@@ -401,16 +408,6 @@ section.innerHTML=`
           <button type="button" class="espn-filter" data-espn-filter="WR">WR</button>
           <button type="button" class="espn-filter" data-espn-filter="TE">TE</button>
         </div>
-
-      </div>
-      <div class="espn-stat-bar">
-        <div class="espn-stat-primary">
-          <span class="espn-stat-label">Stats</span>
-          <div class="espn-stat-filters">
-            <button type="button" class="espn-view-btn active" data-espn-view="TOTAL">Season</button>
-            <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
-          </div>
-          <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
         <div class="espn-team-filter-wrap">
           <span class="espn-team-filter-title">Teams</span>
           <button id="espnTeamFilterButton" class="espn-team-filter-button" type="button" aria-haspopup="listbox" aria-expanded="false">
@@ -420,6 +417,16 @@ section.innerHTML=`
           <div id="espnTeamFilterMenu" class="espn-team-filter-menu" role="listbox" hidden></div>
           <select id="espnTeamFilter" hidden aria-hidden="true" tabindex="-1"><option value="ALL">All</option></select>
         </div>
+      </div>
+      <div class="espn-stat-bar">
+        <div class="espn-stat-primary">
+          <span class="espn-stat-label">Stats</span>
+          <div class="espn-stat-filters">
+            <button type="button" class="espn-view-btn active" data-espn-view="TOTAL">Season</button>
+            <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
+          </div>
+          <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
+
         </div>
         <div class="espn-stats-right-controls">
           

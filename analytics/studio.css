@@ -639,3 +639,17 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="consistency"] .st-hit-filter-head select{order:1}
 #shuaAnalyticsSection[data-active-view="startsit"] .st-embedded-compare{width:100%;max-width:100%;margin:14px 0}
 #shuaAnalyticsSection[data-active-view="startsit"] .compare-shell{width:100%;max-width:100%;margin:0}
+
+#shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-rank-toolbar{margin:0 0 10px!important;padding:4px 2px 9px;border-bottom:1px solid #ffffff18}
+#shuaAnalyticsSection[data-active-view="weekly"] .st-panel:has(.st-weekly-rank-toolbar){padding-top:9px!important}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-logo-picker{display:flex;align-items:end;gap:8px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-filter-logo{width:38px;height:38px;object-fit:contain}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-std{align-self:end;min-height:38px;padding:7px 12px;border:1px solid #3d806d;border-radius:8px;background:#102b3c;color:#d6fdec;font-weight:800;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-std[aria-pressed="true"]{background:#0b7451;color:white;border-color:#24efa0}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-hero{display:flex;gap:10px;align-items:center;margin:4px 0 12px;font-size:17px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-hero-logo{height:45px;width:45px;object-fit:contain}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table th,#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table td{vertical-align:middle!important;line-height:1.1!important;border-bottom:1px solid #ffffff12;padding:6px 8px!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table table{border-spacing:0!important;border-collapse:collapse!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-filter-head{display:flex!important;gap:2px!important;align-items:center!important;justify-content:center!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-filter-head button{padding:1px!important}
+#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table td:not(:first-child),#shuaAnalyticsSection[data-active-view="consistency"] .st-hit-rate-table th:not(:first-child){text-align:center!important}

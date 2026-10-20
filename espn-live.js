@@ -108,6 +108,13 @@ let headshotIndexPromise=null;
 const style=document.createElement('style');
 style.id='espnLiveStyles';
 style.textContent=`
+@media(min-width:1001px){
+ #espnLiveSection .espn-live-head,#espnLiveSection .espn-live-row{grid-template-columns:48px minmax(230px,1fr) 215px!important}
+ #espnLiveSection .espn-live-head> :nth-child(3),#espnLiveSection .espn-live-head> :nth-child(4),#espnLiveSection .espn-live-head> :nth-child(5),
+ #espnLiveSection .espn-live-row> .espn-pos,#espnLiveSection .espn-live-row> .espn-team,#espnLiveSection .espn-live-row> .espn-points{display:none!important}
+ #espnLiveSection .espn-player-meta-pos{display:inline!important}
+}
+
 #espnLiveSection{margin-top:8px}
 .espn-live-shell{display:grid;gap:8px}
 .espn-sticky-controls{display:grid;gap:8px}

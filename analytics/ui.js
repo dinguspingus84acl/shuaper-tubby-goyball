@@ -95,13 +95,14 @@ function teams(){
  members.sort((a,b)=>((b.targets||0)+(b.rushAtt||0))-((a.targets||0)+(a.rushAtt||0)));
  const displayMembers=allNFL?members.slice(0,12):members;
  const carr=displayMembers.filter(p=>p.position==='RB'&&N(p.rushAtt)>0).map(p=>({...p,value:p.rushAtt}));
- const tgt=displayMembers.filter(p=>p.position==='WR'&&N(p.targets)>0).map(p=>({...p,value:p.targets}));
- const teTargets=displayMembers.filter(p=>p.position==='TE'&&N(p.targets)>0).map(p=>({...p,value:p.targets}));
+ const tgt=members.filter(p=>p.position==='WR'&&N(p.targets)>0).sort((a,b)=>b.targets-a.targets).map(p=>({...p,value:p.targets}));
+ const teTargets=members.filter(p=>p.position==='TE'&&N(p.targets)>0).sort((a,b)=>b.targets-a.targets).map(p=>({...p,value:p.targets}));
  const red=displayMembers.filter(p=>N(p.redZone)>0).map(p=>({...p,value:p.redZone}));
- const snaps=displayMembers.filter(p=>N(p.snapRate)!==null).sort((a,b)=>b.snapRate-a.snapRate).slice(0,12);
+ const snapPos=state.teamSnapPos||'ALL';
+ const snaps=members.filter(p=>N(p.snapRate)!==null&&(snapPos==='ALL'||p.position===snapPos)).sort((a,b)=>b.snapRate-a.snapRate).slice(0,12);
  const opportunityPos=state.teamOpportunityPos||'ALL';
- const opportunityRows=displayMembers.filter(p=>opportunityPos==='ALL'||p.position===opportunityPos);
- const snapRows='<div class="st-team-snap-graph">'+snaps.map(p=>'<div class="st-team-snap-row"><div class="st-team-snap-player">'+logo(p.team,'st-team-snap-logo')+'<span>'+E(p.name)+'</span></div><div class="st-team-snap-track"><div style="width:'+Math.max(0,Math.min(100,p.snapRate))+'%"></div></div><b>'+F(p.snapRate,1,'%')+'</b></div>').join('')+'</div>';
+ const opportunityRows=members.filter(p=>opportunityPos==='ALL'||p.position===opportunityPos).sort((a,b)=>(N(b.targets)||0)-(N(a.targets)||0)).slice(0,allNFL?12:100);
+ const snapRows='<div class="st-team-opportunity-pos">'+['ALL','QB','RB','WR','TE'].map(pos=>'<button type="button" data-st-team-snap-pos="'+pos+'" aria-pressed="'+(snapPos===pos)+'">'+pos+'</button>').join('')+'</div><div class="st-team-snap-graph">'+snaps.map(p=>'<div class="st-team-snap-row"><div class="st-team-snap-player">'+logo(p.team,'st-team-snap-logo')+face(p,'st-team-snap-face')+'<span>'+E(p.name)+' · '+E(p.position)+'</span></div><div class="st-team-snap-track"><div style="width:'+Math.max(0,Math.min(100,p.snapRate))+'%"></div></div><b>'+F(p.snapRate,1,'%')+'</b></div>').join('')+'</div>';
  const options=Array.from({length:18},(_,i)=>[String(i+1),'Week '+(i+1)]);
  const teamOptions=[['ALL','Entire NFL'],...Object.entries(S.teams).sort((a,b)=>a[1].localeCompare(b[1]))];
  const toolbar='<div class="st-team-logo-picker">'+(allNFL?'':logo(state.team,'st-team-filter-logo'))+'<div class="st-team-custom-picker"><button type="button" data-st-team-menu-toggle aria-expanded="false" aria-label="Choose NFL team">'+(allNFL?'🏈':logo(state.team,'st-team-menu-logo'))+'<span>'+(allNFL?'Entire NFL':E(allNFL?'Entire NFL':S.teams[state.team]))+'</span><span>⌄</span></button><div class="st-team-menu" id="stTeamMenu" hidden>'+teamOptions.map(([code,name])=>'<button type="button" data-st-select-team="'+E(code)+'">'+(code==='ALL'?'🏈':logo(code,'st-team-menu-logo'))+'<span>'+E(name)+'</span></button>').join('')+'</div></div></div>'+'<button type="button" class="st-team-std" data-st-team-std aria-pressed="'+(selected==='STD')+'">Season to Date</button>'+select('stTeamWindow','Week',options,selected==='STD'?String(through):selected);
@@ -381,6 +382,7 @@ section.addEventListener('click',e=>{
  if(currentSuggestions&&!e.target.closest('.st-schedule-search-wrap'))currentSuggestions.hidden=true;
  const boom=e.target.closest('[data-st-open-boom]');if(boom){document.getElementById('close')?.click();navigate('consistency');open();return;}
  const weeklyPos=e.target.closest('[data-st-weekly-pos]');if(weeklyPos){state.weeklyPos=weeklyPos.dataset.stWeeklyPos;render();return;}
+ const snapChoice=e.target.closest('[data-st-team-snap-pos]');if(snapChoice){state.teamSnapPos=snapChoice.dataset.stTeamSnapPos;render();return;}
  const teamOpportunity=e.target.closest('[data-st-team-opportunity-pos]');if(teamOpportunity){state.teamOpportunityPos=teamOpportunity.dataset.stTeamOpportunityPos;render();return;}
  const teamToggle=e.target.closest('[data-st-team-menu-toggle]');if(teamToggle){const menu=section.querySelector('#stTeamMenu');if(menu){menu.hidden=!menu.hidden;teamToggle.setAttribute('aria-expanded',String(!menu.hidden));}return;}
  const teamChoice=e.target.closest('[data-st-select-team]');if(teamChoice){state.team=teamChoice.dataset.stSelectTeam;render();return;}

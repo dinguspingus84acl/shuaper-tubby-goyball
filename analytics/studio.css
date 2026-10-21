@@ -698,3 +698,13 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 
 #shuaAnalyticsSection[data-active-view="injury"] .st-injury-name b{display:flex;align-items:center;gap:5px;min-width:0}
 #shuaAnalyticsSection[data-active-view="injury"] .st-injury-team-logo{height:17px;width:17px;object-fit:contain;flex:0 0 17px}
+
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-share-ranked{display:flex;flex-direction:column;gap:3px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-share-item{display:grid;grid-template-columns:20px minmax(0,1fr) 65px;align-items:center;gap:5px;padding:5px 3px;border-bottom:1px solid #ffffff12}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-share-item>b{text-align:right;font-size:14px;color:#2ce5a7;font-variant-numeric:tabular-nums}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-share-item .st-person .st-face{height:34px;width:34px;flex:0 0 34px;object-fit:cover;border-radius:50%;border:2px solid #5e819d}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-player small{color:#a3b9cd;font-size:10px;flex-shrink:0}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-search-label{display:flex;flex:1;flex-direction:column;gap:5px;min-width:145px;font-size:11px;color:#9eb8cf}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-search-label input{height:40px;width:100%;min-width:0;background:#112a40;color:#fff;border:1px solid #47647c;border-radius:8px;padding:8px 10px;font-size:13px}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-heading{display:none}
+#shuaAnalyticsSection[data-active-view="schedule"] .st-global-search{display:none!important}

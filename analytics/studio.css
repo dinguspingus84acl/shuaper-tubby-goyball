@@ -708,3 +708,5 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-search-label input{height:40px;width:100%;min-width:0;background:#112a40;color:#fff;border:1px solid #47647c;border-radius:8px;padding:8px 10px;font-size:13px}
 #shuaAnalyticsSection[data-active-view="startsit"] .st-heading{display:none}
 #shuaAnalyticsSection[data-active-view="schedule"] .st-global-search{display:none!important}
+
+#shuaAnalyticsSection[data-active-view="startsit"] .st-chart .st-data,#shuaAnalyticsSection[data-active-view="startsit"] .st-chart .st-chart-unit{display:none!important}

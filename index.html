@@ -277,4 +277,45 @@ function depthView(){let s=$('#depthTeam');if(!depthCharts.length)return;if(!s.o
     border:0!important;
   }
 }
-</style></body></html>
+</style>
+<style id="shua-my-teams-styles">
+body.my-teams-open main>*:not(#shuaMyTeams){display:none!important}
+body.my-teams-open main>#shuaMyTeams{display:block!important}
+#shuaMyTeams{color:#eef8ff;max-width:1220px;margin:0 auto;padding:18px 10px 75px}
+#shuaMyTeams .myteams-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 17px}
+#shuaMyTeams h2{font-size:clamp(21px,2.5vw,29px);line-height:1.15;margin:0 0 6px;font-weight:900}
+#shuaMyTeams .myteams-header p{margin:0;color:#9db5c9;font-size:12px}
+#shuaMyTeams .myteams-count{padding:7px 12px;border-radius:99px;color:#28efa5;background:#10352e;border:1px solid #236d52;font-size:12px;font-weight:850;white-space:nowrap}
+#shuaMyTeams .myteams-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#shuaMyTeams .myteams-card{background:linear-gradient(155deg,#0d2b43,#081d30);border:1px solid #274b65;border-radius:13px;padding:16px;min-width:0}
+#shuaMyTeams .myteams-league{font-size:11px;text-transform:uppercase;letter-spacing:.055em;color:#9db9cf;font-weight:780;margin:0 0 9px}
+#shuaMyTeams .myteams-name{font-size:17px;font-weight:870;overflow-wrap:anywhere;line-height:1.3}
+#shuaMyTeams .myteams-platform{margin-top:14px;font-size:10px;color:#74a48e;text-transform:uppercase;letter-spacing:.07em}
+body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;color:#c8ffeb!important;border-color:#26d69a!important}
+@media(max-width:850px){#shuaMyTeams .myteams-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){#shuaMyTeams{padding:10px 7px 65px}#shuaMyTeams .myteams-grid{grid-template-columns:1fr;gap:9px}#shuaMyTeams .myteams-card{padding:13px}#shuaMyTeams .myteams-name{font-size:16px}}
+</style>
+<script id="shua-my-teams-script">
+(()=>{
+'use strict';
+const leagues=[["Suffern Fantasy","Cokeheads"],["Brickhouse FFL","Rachaad Whte Power"],["2025 Fun","Brown Syndrome"],["Clear Eyes Full Hearts Cant Lose","Waddle U Doin Step Bro"],["Minorities","Strib Club"],["UB Puck","Diddy Party"],["Fantasy Football","Ride My C Rod"],["UB BUZZ","Jailen Naled Her"],["Sweat League","Jack Me Goff"],["Dits Fantasy","John Porker Tech"],["Bick and Dalls League","Devante No Dadams"],["Chut Fantasy League","That Puzzy got BOWERS"]];
+const nav=document.querySelector('.positions');
+const main=document.querySelector('main');
+if(!nav||!main||document.querySelector('#shuaMyTeams'))return;
+const button=document.createElement('button');
+button.type='button';button.className='pos';button.dataset.pos='MYTEAMS';button.textContent='My Teams';
+nav.appendChild(button);
+const section=document.createElement('section');
+section.id='shuaMyTeams';section.hidden=true;
+const escapeHtml=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+section.innerHTML='<header class="myteams-header"><div><h2>My Teams</h2><p>Your 2026 ESPN fantasy football leagues</p></div><span class="myteams-count">'+leagues.length+' Teams</span></header><div class="myteams-grid">'+leagues.map(([league,team])=>'<article class="myteams-card"><div class="myteams-league">'+escapeHtml(league)+'</div><div class="myteams-name">'+escapeHtml(team)+'</div><div class="myteams-platform">ESPN · 2026</div></article>').join('')+'</div>';
+main.appendChild(section);
+function show(){document.body.classList.add('my-teams-open');section.hidden=false;nav.querySelectorAll('.pos').forEach(b=>b.classList.toggle('active',b===button));}
+function hide(){document.body.classList.remove('my-teams-open');section.hidden=true;button.classList.remove('active');}
+nav.addEventListener('click',e=>{const target=e.target.closest('[data-pos]');if(!target)return;if(target===button){e.preventDefault();e.stopImmediatePropagation();show();}else hide();},true);
+document.addEventListener('click',e=>{if(e.target.closest('#shuaMyTeams'))return;if(e.target.closest('#studioNav'))hide();},true);
+if(location.hash==='#my-teams')show();
+button.addEventListener('click',()=>{if(!document.body.classList.contains('my-teams-open'))show();});
+})();
+</script>
+</body></html>

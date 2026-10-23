@@ -314,6 +314,32 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
 #shuaMyTeams .myteams-roster-row>strong{text-align:right;font-size:10px;color:#dbf7ff}
 #shuaMyTeams .myteams-empty{color:#b9cbd9;font-size:12px;padding:8px}
 @media(min-width:800px){#shuaMyTeams .myteams-card:has(.myteams-roster:not([hidden])){grid-column:span 2}}
+
+#shuaMyTeams .myteams-header-right{display:flex;align-items:center;gap:10px}
+#shuaMyTeams .myteams-header-right label{font-size:11px;color:#abc3d8}
+#shuaMyTeams #myTeamsYear{margin-left:5px;padding:7px;color:white;background:#0c2a41;border:1px solid #42627d;border-radius:8px}
+#shuaMyTeams .myteams-card:has(.myteams-roster:not([hidden])){grid-column:1/-1!important}
+#shuaMyTeams .myteams-subnav{display:flex;flex-wrap:wrap;gap:5px;padding:0 0 9px}
+#shuaMyTeams .myteams-subnav button{background:#153449;color:#bbcad9;border:1px solid #39566e;border-radius:7px;padding:8px 10px;font-size:11px;font-weight:800;cursor:pointer}
+#shuaMyTeams .myteams-subnav button[aria-selected="true"]{background:#125240;color:#fff;border-color:#24efa0}
+#shuaMyTeams .myteams-table-scroll{overflow:auto}
+#shuaMyTeams .myteams-table{border-collapse:collapse;width:100%;font-size:12px;min-width:420px}
+#shuaMyTeams .myteams-table th,#shuaMyTeams .myteams-table td{padding:9px 5px;border-bottom:1px solid #ffffff18;text-align:right;font-variant-numeric:tabular-nums}
+#shuaMyTeams .myteams-table th:nth-child(2),#shuaMyTeams .myteams-table td:nth-child(2){text-align:left}
+#shuaMyTeams .myteams-table th{color:#9fb8cf}
+#shuaMyTeams .myteams-nfl-logo{height:16px!important;width:16px!important;object-fit:contain!important;border-radius:0!important;vertical-align:middle;display:inline-block}
+#shuaMyTeams .myteams-player small{display:flex;align-items:center;gap:4px}
+#shuaMyTeams .myteams-injury{font-weight:900;color:#ffa54d;font-style:normal}
+#shuaMyTeams .myteams-match{display:grid;grid-template-columns:1fr 32px 1fr;align-items:center;gap:8px;padding:11px 6px;border-top:1px solid #ffffff14}
+#shuaMyTeams .myteams-match>div{display:flex;justify-content:space-between;gap:6px;font-size:11px}
+#shuaMyTeams .myteams-match small{color:#789aaa;text-align:center;font-size:10px}
+#shuaMyTeams .myteams-data-caption{font-size:11px;color:#9fb8ca}
+#shuaMyTeams .myteams-wire-row{display:flex;gap:8px;align-items:center;border-top:1px solid #ffffff18;padding:7px 3px}
+#shuaMyTeams .myteams-wire-row>img{height:36px;width:36px;border-radius:50%;object-fit:cover}
+#shuaMyTeams .myteams-wire-row>span{flex:1;font-size:12px}
+#shuaMyTeams .myteams-wire-row small{display:block;font-size:10px;color:#afbed0}
+#shuaMyTeams .myteams-wire-row em{font-style:normal;color:#3ce2ac;font-size:10px}
+@media(max-width:520px){#shuaMyTeams .myteams-header{align-items:flex-start}#shuaMyTeams .myteams-header-right{flex-direction:column;align-items:flex-end;gap:4px}}
 </style>
 <script id="shua-my-teams-script">
 (()=>{
@@ -332,31 +358,75 @@ nav.appendChild(button);
 const section=document.createElement('section');
 section.id='shuaMyTeams';section.hidden=true;
 const escapeHtml=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function rosterHtml(index){
- const snapshot=rosterSnapshots[index];
- if(!snapshot?.roster?.length)return '<p class="myteams-empty">Roster unavailable from ESPN for this team.</p>';
- const slotOrder=['QB','RB','WR','TE','RB/WR/TE','FLEX','OP','D/ST','K','Bench','IR'];
- const items=[...snapshot.roster].sort((a,b)=>{
-  const ia=slotOrder.indexOf(a.slot),ib=slotOrder.indexOf(b.slot);
-  return (ia<0?20:ia)-(ib<0?20:ib)||a.name.localeCompare(b.name);
- });
- return '<div class="myteams-roster-head"><span>Lineup</span><span>Player</span><span>Position</span></div>'+items.map(p=>{
- const image=p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
- const nfl=p.nfl?'<small>'+escapeHtml(p.nfl)+'</small>':'';
- const injury=p.status&&p.status!=='Active'?'<small class="myteams-injury">'+escapeHtml(p.status)+'</small>':'';
- return '<div class="myteams-roster-row"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player">'+image+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b>'+nfl+injury+'</span></div><strong>'+escapeHtml(p.pos||'—')+'</strong></div>';
+
+const teamIndex=leagues.map(([league,team],index)=>({league,team,index,id:rosterSnapshots[index]?.id||'',teamId:rosterSnapshots[index]?.team||''})).filter(x=>!/^diddy party/i.test(x.team.trim()));
+const nflLogo=team=>{const code={JAX:'jax',LA:'lar',LAR:'lar',LAC:'lac',LV:'lv',OAK:'lv',WAS:'wsh',WSH:'wsh',GB:'gb',GNB:'gb',KC:'kc',KAN:'kc',NO:'no',NOR:'no',NE:'ne',NWE:'ne',TB:'tb',TAM:'tb',SF:'sf',SFO:'sf',NYG:'nyg',NYJ:'nyj'}[String(team||'').toUpperCase()]||String(team||'').toLowerCase();return /^[a-z]{2,3}$/.test(code)?'<img class="myteams-nfl-logo" loading="lazy" src="https://a.espncdn.com/i/teamlogos/nfl/500/'+code+'.png" alt="" onerror="this.style.display=\'none\'">':''};
+const fmt=x=>Number.isFinite(Number(x))?Number(x).toFixed(2):'—';
+const rosterHtml=index=>{
+ const snapshot=rosterSnapshots[index];if(!snapshot?.roster?.length)return '<p class="myteams-empty">No roster snapshot available for this season.</p>';
+ const order=['QB','RB','WR','TE','FLEX','RB/WR/TE','OP','D/ST','K','Bench','IR'];
+ return '<div class="myteams-roster-head"><span>Slot</span><span>Player</span><span>Pos</span></div>'+[...snapshot.roster].sort((a,b)=>{const i=order.indexOf(a.slot),j=order.indexOf(b.slot);return(i<0?20:i)-(j<0?20:j)}).map(p=>{
+  const dst=p.pos==='D/ST'||p.pos==='DST'||/D\/ST|Defense/i.test(p.name||'');
+  const faceImg=dst?nflLogo(p.nfl):p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
+  const status=/^questionable$/i.test(p.status)?'Q':/^doubtful$/i.test(p.status)?'D':p.status&&p.status!=='Active'?p.status:'';
+  return '<div class="myteams-roster-row"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.nfl)+escapeHtml(p.nfl||'FA')+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></div><strong>'+escapeHtml(p.pos||'—')+'</strong></div>';
+ }).join('');
+};
+const leagueFor=id=>leagueData.find(x=>x.id===id);
+function standingHtml(id){
+ const standings=leagueFor(id)?.standings||[];
+ if(!standings.length)return '<p class="myteams-empty">Standings unavailable.</p>';
+ return '<div class="myteams-table-scroll"><table class="myteams-table"><thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>T</th><th>PF</th><th>PA</th></tr></thead><tbody>'+[...standings].sort((a,b)=>(a.rank??99)-(b.rank??99)).map(t=>'<tr><td>'+escapeHtml(t.rank||'—')+'</td><td>'+escapeHtml(t.teamName||'Unknown')+'</td><td>'+escapeHtml(t.wins??'—')+'</td><td>'+escapeHtml(t.losses??'—')+'</td><td>'+escapeHtml(t.ties??'0')+'</td><td>'+fmt(t.pointsFor)+'</td><td>'+fmt(t.pointsAgainst)+'</td></tr>').join('')+'</tbody></table></div>';
+}
+function matchupHtml(id){
+ const l=leagueFor(id),matches=l?.matchups||[];
+ if(!matches.length)return '<p class="myteams-empty">Matchups unavailable.</p>';
+ return '<p class="myteams-data-caption">Week '+escapeHtml(l.week||'current')+' · ESPN snapshot</p>'+matches.map(m=>{
+ const side=(t)=>'<span>'+escapeHtml(t?.teamName||'—')+'</span><strong>'+fmt(t?.currentPoints??t?.totalPoints)+'</strong>';
+ return '<div class="myteams-match"><div>'+side(m.home)+'</div><small>VS</small><div>'+side(m.away)+'</div></div>';
  }).join('');
 }
-section.innerHTML='<header class="myteams-header"><div><h2>My Teams</h2><p>Your 2026 ESPN fantasy football leagues</p></div><span class="myteams-count">'+leagues.length+' Teams</span></header><div class="myteams-grid">'+leagues.map(([league,team])=>'<article class="myteams-card"><button type="button" class="myteams-card-trigger" data-myteams-open="'+leagues.findIndex(x=>x[0]===league)+'" aria-expanded="false"><div class="myteams-league">'+escapeHtml(league)+'</div><div class="myteams-name">'+escapeHtml(team)+'</div><div class="myteams-platform">ESPN · 2026</div><span class="myteams-chevron">View roster ▾</span></button><div class="myteams-roster" hidden></div></article>').join('')+'</div>';
+function wireHtml(id){
+ const players=waiverData.find(x=>x.id===id)?.players||[];
+ if(!players.length)return '<p class="myteams-empty">Waiver-wire snapshot unavailable.</p>';
+ return '<p class="myteams-data-caption">Top 25 available players · ESPN snapshot</p>'+players.map(p=>{
+ const status=p.acquisitionState==='waivers'?'Waivers':'Free agent';
+ return '<div class="myteams-wire-row"><img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id||'')+'.png" alt="" onerror="this.style.display=\'none\'"><span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+escapeHtml(p.position||'')+' · '+nflLogo(p.team)+escapeHtml(p.team||'FA')+'</small></span><em>'+status+'</em></div>';
+ }).join('');
+}
+function panelHtml(item,tab){
+ if(item.year!==2026)return '<p class="myteams-empty">Historical league listing from Flaim. Past roster, standings, matchup and waiver snapshots are not loaded for this season.</p>';
+ if(tab==='roster')return rosterHtml(item.index);
+ if(tab==='standings')return standingHtml(item.id);
+ if(tab==='matchups')return matchupHtml(item.id);
+ return wireHtml(item.id);
+}
+function renderTeams(year){
+ const current=year===2026;
+ const cards=current?teamIndex.map(x=>({...x,year:2026})):pastTeams.filter(x=>x.year===year&&!/^diddy party/i.test(String(x.teamName||'').trim())).map(x=>({league:x.leagueName,team:x.teamName,year,id:x.id,teamId:x.teamId,index:-1}));
+ section.querySelector('.myteams-count').textContent=cards.length+' Teams';
+ section.querySelector('.myteams-header p').textContent='Your '+year+' ESPN fantasy football leagues';
+ section.querySelector('.myteams-grid').innerHTML=cards.map((item,i)=>'<article class="myteams-card"><button type="button" class="myteams-card-trigger" data-myteams-open="'+i+'" aria-expanded="false"><div class="myteams-league">'+escapeHtml(item.league)+'</div><div class="myteams-name">'+escapeHtml(item.team)+'</div><div class="myteams-platform">ESPN · '+year+'</div></button><div class="myteams-roster" hidden></div></article>').join('');
+ section._cards=cards;
+}
+section.innerHTML='<header class="myteams-header"><div><h2>My Teams</h2><p>2026 ESPN fantasy football leagues</p></div><div class="myteams-header-right"><label>Year <select id="myTeamsYear">'+[2026,2025,2024,2023,2022,2021,2020].map(y=>'<option value="'+y+'">'+y+'</option>').join('')+'</select></label><span class="myteams-count">11 Teams</span></div></header><div class="myteams-grid"></div>';
 main.appendChild(section);
+renderTeams(2026);
+section.addEventListener('change',e=>{if(e.target.id==='myTeamsYear')renderTeams(Number(e.target.value));});
 section.addEventListener('click',e=>{
+ const tab=e.target.closest('[data-myteams-tab]');
+ if(tab){const holder=tab.closest('.myteams-roster'),item=section._cards[Number(holder?.dataset.index)];if(!item)return;holder.querySelectorAll('[data-myteams-tab]').forEach(el=>el.setAttribute('aria-selected',String(el===tab)));holder.querySelector('.myteams-tab-content').innerHTML=panelHtml(item,tab.dataset.myteamsTab);return;}
  const trigger=e.target.closest('[data-myteams-open]');if(!trigger)return;
- const idx=Number(trigger.dataset.myteamsOpen),card=trigger.closest('.myteams-card'),panel=card?.querySelector('.myteams-roster');
+ const i=Number(trigger.dataset.myteamsOpen),card=trigger.closest('.myteams-card'),panel=card?.querySelector('.myteams-roster');
  if(!panel)return;
- const wasOpen=!panel.hidden;
+ const open=panel.hidden;
  section.querySelectorAll('.myteams-roster').forEach(el=>el.hidden=true);
  section.querySelectorAll('[data-myteams-open]').forEach(el=>el.setAttribute('aria-expanded','false'));
- if(!wasOpen){panel.innerHTML=rosterHtml(idx);panel.hidden=false;trigger.setAttribute('aria-expanded','true');}
+ if(open){
+  const item=section._cards[i];panel.dataset.index=String(i);
+  panel.innerHTML='<div class="myteams-subnav">'+['roster','standings','matchups','waivers'].map((tab,j)=>'<button type="button" data-myteams-tab="'+tab+'" aria-selected="'+(!j)+'">'+(tab==='waivers'?'Waiver Wire':tab[0].toUpperCase()+tab.slice(1))+'</button>').join('')+'</div><div class="myteams-tab-content">'+panelHtml(item,'roster')+'</div>';
+  panel.hidden=false;trigger.setAttribute('aria-expanded','true');
+ }
 });
 function show(){document.body.classList.add('my-teams-open');section.hidden=false;nav.querySelectorAll('.pos').forEach(b=>b.classList.toggle('active',b===button));}
 function hide(){document.body.classList.remove('my-teams-open');section.hidden=true;button.classList.remove('active');}

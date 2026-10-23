@@ -340,6 +340,8 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
 #shuaMyTeams .myteams-wire-row small{display:block;font-size:10px;color:#afbed0}
 #shuaMyTeams .myteams-wire-row em{font-style:normal;color:#3ce2ac;font-size:10px}
 @media(max-width:520px){#shuaMyTeams .myteams-header{align-items:flex-start}#shuaMyTeams .myteams-header-right{flex-direction:column;align-items:flex-end;gap:4px}}
+
+#shuaMyTeams .myteams-player-open{display:flex;align-items:center;gap:7px;background:transparent;border:0;color:inherit;text-align:left;padding:0;cursor:pointer;min-width:0}#shuaMyTeams .myteams-player-open:hover b{text-decoration:underline;color:#50efb0}#shuaMyTeams .myteams-nfl-logo{background:transparent!important;box-shadow:none!important;border:0!important}#shuaMyTeams .myteams-roster-row>strong{font-variant-numeric:tabular-nums;color:#91abc2}
 </style>
 <script id="shua-my-teams-script">
 (()=>{
@@ -365,11 +367,11 @@ const fmt=x=>Number.isFinite(Number(x))?Number(x).toFixed(2):'—';
 const rosterHtml=index=>{
  const snapshot=rosterSnapshots[index];if(!snapshot?.roster?.length)return '<p class="myteams-empty">No roster snapshot available for this season.</p>';
  const order=['QB','RB','WR','TE','FLEX','RB/WR/TE','OP','D/ST','K','Bench','IR'];
- return '<div class="myteams-roster-head"><span>Slot</span><span>Player</span><span>Pos</span></div>'+[...snapshot.roster].sort((a,b)=>{const i=order.indexOf(a.slot),j=order.indexOf(b.slot);return(i<0?20:i)-(j<0?20:j)}).map(p=>{
+ return '<div class="myteams-roster-head"><span>Slot</span><span>Player</span><span>Proj</span></div>'+[...snapshot.roster].sort((a,b)=>{const i=order.indexOf(a.slot),j=order.indexOf(b.slot);return(i<0?20:i)-(j<0?20:j)}).map(p=>{
   const dst=p.pos==='D/ST'||p.pos==='DST'||/D\/ST|Defense/i.test(p.name||'');
   const faceImg=dst?nflLogo(p.nfl):p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
-  const status=/^questionable$/i.test(p.status)?'Q':/^doubtful$/i.test(p.status)?'D':p.status&&p.status!=='Active'?p.status:'';
-  return '<div class="myteams-roster-row"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.nfl)+escapeHtml(p.nfl||'FA')+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></div><strong>'+escapeHtml(p.pos||'—')+'</strong></div>';
+  const status=/^questionable$/i.test(p.status)?'Q':/^doubtful$/i.test(p.status)?'D':/^(day.to.day|dtd)$/i.test(p.status)?'DTD':p.status&&p.status!=='Active'?p.status:'';
+  return '<div class="myteams-roster-row"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open" data-myteams-player="'+escapeHtml(p.name||'')+'">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.nfl)+escapeHtml(p.nfl||'FA')+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="Projection unavailable">—</strong></div>';
  }).join('');
 };
 const leagueFor=id=>leagueData.find(x=>x.id===id);
@@ -414,6 +416,7 @@ main.appendChild(section);
 renderTeams(2026);
 section.addEventListener('change',e=>{if(e.target.id==='myTeamsYear')renderTeams(Number(e.target.value));});
 section.addEventListener('click',e=>{
+ const player=e.target.closest('[data-myteams-player]');if(player){const name=player.dataset.myteamsPlayer;if(typeof window.openUnifiedPlayerProfileByName==='function')window.openUnifiedPlayerProfileByName(name);else if(typeof window.openPlayerProfileByName==='function')window.openPlayerProfileByName(name);return;}
  const tab=e.target.closest('[data-myteams-tab]');
  if(tab){const holder=tab.closest('.myteams-roster'),item=section._cards[Number(holder?.dataset.index)];if(!item)return;holder.querySelectorAll('[data-myteams-tab]').forEach(el=>el.setAttribute('aria-selected',String(el===tab)));holder.querySelector('.myteams-tab-content').innerHTML=panelHtml(item,tab.dataset.myteamsTab);return;}
  const trigger=e.target.closest('[data-myteams-open]');if(!trigger)return;

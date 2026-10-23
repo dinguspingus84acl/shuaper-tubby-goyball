@@ -367,6 +367,36 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
 #shuaMyTeams .myteams-transaction div{display:grid;gap:4px;margin-top:4px}
 #shuaMyTeams .myteams-transaction span{color:#c4d2dd}
 @media(max-width:520px){#shuaMyTeams .myteams-schedule-row{grid-template-columns:48px 55px minmax(0,1fr) 75px;gap:4px;font-size:10px}}
+
+/* My Teams mobile layout: keep season selector below the mobile navigation area. */
+#shuaMyTeams .myteams-header{flex-wrap:wrap}
+#shuaMyTeams .myteams-header-right{margin-left:auto}
+#shuaMyTeams .myteams-defense-badge{width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex:0 0 38px}
+#shuaMyTeams .myteams-defense-badge .myteams-nfl-logo{width:35px!important;height:35px!important;object-fit:contain!important;background:transparent!important}
+#shuaMyTeams .myteams-waiver-table{min-width:0!important;width:100%;table-layout:fixed}
+#shuaMyTeams .myteams-waiver-table th,#shuaMyTeams .myteams-waiver-table td{padding:8px 3px!important;font-size:11px}
+#shuaMyTeams .myteams-waiver-table th:nth-child(1),#shuaMyTeams .myteams-waiver-table td:nth-child(1){width:25px;text-align:center}
+#shuaMyTeams .myteams-waiver-table th:nth-child(2),#shuaMyTeams .myteams-waiver-table td:nth-child(2){width:auto;text-align:left}
+#shuaMyTeams .myteams-waiver-table th:nth-child(3),#shuaMyTeams .myteams-waiver-table td:nth-child(3){width:43px}
+#shuaMyTeams .myteams-waiver-table th:nth-child(4),#shuaMyTeams .myteams-waiver-table td:nth-child(4){width:64px}
+#shuaMyTeams .myteams-waiver-table th:nth-child(5),#shuaMyTeams .myteams-waiver-table td:nth-child(5){width:63px}
+#shuaMyTeams .myteams-waiver-table .myteams-player-open{max-width:100%;gap:5px}
+#shuaMyTeams .myteams-waiver-table .myteams-player-open img{width:29px;height:29px;flex:0 0 29px}
+#shuaMyTeams .myteams-waiver-table .myteams-player-open span{min-width:0}
+#shuaMyTeams .myteams-waiver-table .myteams-player-open b{overflow-wrap:anywhere;font-size:11px}
+@media(max-width:600px){
+ #shuaMyTeams{padding-top:44px!important}
+ #shuaMyTeams .myteams-header{display:flex;align-items:flex-start;flex-direction:column;gap:12px}
+ #shuaMyTeams .myteams-header-right{width:100%;flex-direction:row;justify-content:space-between;align-items:center;margin-left:0}
+ #shuaMyTeams #myTeamsYear{margin-left:8px;min-height:38px}
+ #shuaMyTeams .myteams-subnav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+ #shuaMyTeams .myteams-subnav button{padding:8px 4px;font-size:10px;min-width:0}
+ #shuaMyTeams .myteams-table{min-width:0;width:100%;font-size:10px}
+ #shuaMyTeams .myteams-table:not(.myteams-waiver-table) th,#shuaMyTeams .myteams-table:not(.myteams-waiver-table) td{padding:7px 2px;font-size:10px}
+ #shuaMyTeams .myteams-table:not(.myteams-waiver-table) th:nth-child(2),#shuaMyTeams .myteams-table:not(.myteams-waiver-table) td:nth-child(2){max-width:132px;overflow-wrap:anywhere}
+ #shuaMyTeams .myteams-table-scroll{width:100%;max-width:100%;overflow-x:auto}
+ #shuaMyTeams .myteams-wire-positions{display:flex;flex-wrap:wrap;gap:4px}
+}
 </style>
 <script src="my-teams-data.js?v=20261023-2"></script><script id="shua-my-teams-script">
 (()=>{
@@ -396,7 +426,7 @@ const rosterHtml=(index,archive)=>{
  const order=['QB','RB','WR','TE','FLEX','RB/WR/TE','OP','D/ST','K','Bench','IR'];
  return '<div class="myteams-roster-head"><span>Slot</span><span>Player</span><span>Proj</span></div>'+[...snapshot.roster].sort((a,b)=>{const i=order.indexOf(a.slot),j=order.indexOf(b.slot);return(i<0?20:i)-(j<0?20:j)}).map(p=>{
   const dst=p.pos==='D/ST'||p.pos==='DST'||/D\/ST|Defense/i.test(p.name||'');
-  const faceImg=dst?nflLogo(p.nfl):p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
+  const faceImg=dst?'<span class="myteams-defense-badge">'+nflLogo(p.nfl)+'</span>':p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
   const status=/^questionable$/i.test(p.status)?'Q':/^doubtful$/i.test(p.status)?'D':/^(day.to.day|dtd)$/i.test(p.status)?'DTD':p.status&&p.status!=='Active'?p.status:'';
   return '<div class="myteams-roster-row"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open" data-myteams-player="'+escapeHtml(p.name||'')+'">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.nfl)+escapeHtml(p.nfl||'FA')+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="Projection unavailable">—</strong></div>';
  }).join('');
@@ -419,10 +449,10 @@ function wireHtml(id,position='ALL'){
  const players=waiverData.find(x=>x.id===id)?.players||[];
  if(!players.length)return '<p class="myteams-empty">Waiver-wire data unavailable.</p>';
  const choices=['ALL','QB','RB','WR','TE','K','D/ST'];
- const eligible=players.filter(p=>(position==='ALL'||p.position===position)&&Number.isFinite(Number(p.ppg)));
- eligible.sort((a,b)=>Number(b.ppg)-Number(a.ppg));
+ const eligible=players.filter(p=>(position==='ALL'||p.position===position)&&Number.isFinite(Number(p.seasonProjection)));
+ eligible.sort((a,b)=>Number(b.seasonProjection)-Number(a.seasonProjection));
  const leaders=eligible.slice(0,10);
- return '<p class="myteams-data-caption">Top 10 by ESPN season PPG · Week-ahead projections unavailable</p><div class="myteams-wire-positions">'+choices.map(k=>'<button type="button" data-myteams-wire-pos="'+k+'" aria-pressed="'+(position===k)+'">'+k+'</button>').join('')+'</div><div class="myteams-table-scroll"><table class="myteams-table myteams-waiver-table"><thead><tr><th>#</th><th>Player</th><th>Pos</th><th>PPG</th><th>Availability</th></tr></thead><tbody>'+leaders.map((p,i)=>{
+ return '<p class="myteams-data-caption">Top 10 by ESPN season projection · Weekly projections unavailable</p><div class="myteams-wire-positions">'+choices.map(k=>'<button type="button" data-myteams-wire-pos="'+k+'" aria-pressed="'+(position===k)+'">'+k+'</button>').join('')+'</div><div class="myteams-table-scroll"><table class="myteams-table myteams-waiver-table"><thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Proj. season</th><th>Availability</th></tr></thead><tbody>'+leaders.map((p,i)=>{
  const status=p.acquisitionState==='waivers'?'Waivers':'FA';
  const dst=p.position==='D/ST';
  const head=dst?nflLogo(p.team):p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';

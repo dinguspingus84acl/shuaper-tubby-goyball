@@ -373,6 +373,46 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
 #shuaMyTeams .myteams-header-right{margin-left:auto}
 #shuaMyTeams .myteams-defense-badge{width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex:0 0 38px}
 #shuaMyTeams .myteams-defense-badge .myteams-nfl-logo{width:35px!important;height:35px!important;object-fit:contain!important;background:transparent!important}
+#shuaMyTeams .myteams-standings{min-width:0;table-layout:fixed}
+#shuaMyTeams .myteams-standings th:first-child{width:27px}
+#shuaMyTeams .myteams-standings th:nth-child(2){width:43%;text-align:left}
+#shuaMyTeams .myteams-standings th:nth-child(3){width:70px}
+#shuaMyTeams .myteams-standings .myteams-standing-name{overflow-wrap:anywhere;font-weight:750;line-height:1.25}
+#shuaMyTeams .myteams-team-logo{width:27px;height:27px;object-fit:contain;flex:none;border-radius:5px;background:transparent}
+#shuaMyTeams .myteams-standing-identity{display:flex;align-items:center;gap:6px;min-width:0}
+#shuaMyTeams .myteams-card-identity{display:flex;align-items:center;gap:10px}
+#shuaMyTeams .myteams-card-identity .myteams-team-logo{width:41px;height:41px}
+#shuaMyTeams .myteams-roster-head,#shuaMyTeams .myteams-roster-row{grid-template-columns:52px minmax(0,1fr) 48px}
+#shuaMyTeams .myteams-roster-row .myteams-defense-badge{background:transparent}
+#shuaMyTeams .myteams-wire-positions button{flex:0 0 auto;min-height:36px}
+#shuaMyTeams .myteams-waiver-table .myteams-player-open .myteams-nfl-logo{width:16px!important;height:16px!important;flex:0 0 16px;border-radius:0}
+#shuaMyTeams .myteams-schedule-row .myteams-outcome{display:inline-flex;justify-content:center;border-radius:4px;padding:3px 0;background:#173b51}
+#shuaMyTeams .myteams-schedule-row .myteams-outcome[data-result="W"]{background:#174d37;color:#68f3a5}
+#shuaMyTeams .myteams-schedule-row .myteams-outcome[data-result="L"]{background:#502635;color:#ff9caa}
+#shuaMyTeams .myteams-transaction .myteams-faab{color:#51e9a7}
+#shuaMyTeams .myteams-bye{color:#a8bcd1;font-weight:750;white-space:nowrap}
+#shuaMyTeams .myteams-bye.is-now{color:#ffca70}
+@media(max-width:600px){
+ #shuaMyTeams .myteams-grid{gap:6px}
+ #shuaMyTeams .myteams-card-trigger{padding:11px 12px}
+ #shuaMyTeams .myteams-league{margin-bottom:4px;font-size:10px}
+ #shuaMyTeams .myteams-name{font-size:14px;line-height:1.2}
+ #shuaMyTeams .myteams-platform{margin-top:5px}
+ #shuaMyTeams .myteams-roster{padding:6px 5px 8px}
+ #shuaMyTeams .myteams-roster-row{padding:5px 1px;gap:4px;grid-template-columns:42px minmax(0,1fr) 42px}
+ #shuaMyTeams .myteams-roster-head{grid-template-columns:42px minmax(0,1fr) 42px}
+ #shuaMyTeams .myteams-player img{width:30px;height:30px;flex-basis:30px}
+ #shuaMyTeams .myteams-player-open{gap:5px}
+ #shuaMyTeams .myteams-player b{font-size:11px;line-height:1.15}
+ #shuaMyTeams .myteams-player small{font-size:9px;flex-wrap:wrap;gap:3px}
+ #shuaMyTeams .myteams-subnav{grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
+ #shuaMyTeams .myteams-subnav button{padding:8px 2px;font-size:10px}
+ #shuaMyTeams .myteams-schedule-row{grid-template-columns:44px 34px minmax(0,1fr) 80px;gap:4px}
+ #shuaMyTeams .myteams-schedule-row .myteams-standing-identity{min-width:0;overflow-wrap:anywhere}
+ #shuaMyTeams .myteams-waiver-table th:nth-child(5),#shuaMyTeams .myteams-waiver-table td:nth-child(5){width:54px}
+ #shuaMyTeams .myteams-waiver-table th:nth-child(4),#shuaMyTeams .myteams-waiver-table td:nth-child(4){width:45px}
+ #shuaMyTeams .myteams-acquire{padding:3px 2px;font-size:9px}
+}
 #shuaMyTeams .myteams-waiver-table{min-width:0!important;width:100%;table-layout:fixed}
 #shuaMyTeams .myteams-waiver-table th,#shuaMyTeams .myteams-waiver-table td{padding:8px 3px!important;font-size:11px}
 #shuaMyTeams .myteams-waiver-table th:nth-child(1),#shuaMyTeams .myteams-waiver-table td:nth-child(1){width:25px;text-align:center}
@@ -395,7 +435,12 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
  #shuaMyTeams .myteams-table:not(.myteams-waiver-table) th,#shuaMyTeams .myteams-table:not(.myteams-waiver-table) td{padding:7px 2px;font-size:10px}
  #shuaMyTeams .myteams-table:not(.myteams-waiver-table) th:nth-child(2),#shuaMyTeams .myteams-table:not(.myteams-waiver-table) td:nth-child(2){max-width:132px;overflow-wrap:anywhere}
  #shuaMyTeams .myteams-table-scroll{width:100%;max-width:100%;overflow-x:auto}
- #shuaMyTeams .myteams-wire-positions{display:flex;flex-wrap:wrap;gap:4px}
+ #shuaMyTeams .myteams-wire-positions{display:flex;flex-wrap:nowrap;gap:4px;overflow-x:auto;scrollbar-width:thin}
+ #shuaMyTeams .myteams-standings th,#shuaMyTeams .myteams-standings td{font-size:10px;padding:9px 2px}
+ #shuaMyTeams .myteams-standings .myteams-team-logo{width:21px;height:21px}
+ #shuaMyTeams .myteams-standings th:nth-child(3){width:52px}
+ #shuaMyTeams .myteams-header-right{justify-content:flex-start;gap:12px}
+ #shuaMyTeams{padding-top:12px!important}
 }
 </style>
 <script src="my-teams-data.js?v=20261023-2"></script><script id="shua-my-teams-script">
@@ -406,6 +451,7 @@ const transactionData=window.ShuaMyTeamsData.transactionData;
 const historicalData=window.ShuaMyTeamsData.historicalData;
 const pastTeams=window.ShuaMyTeamsData.pastTeams;
 const waiverData=window.ShuaMyTeamsData.waiverData;
+const scheduleData=window.ShuaMyTeamsData.scheduleData||[];
 const leagueData=window.ShuaMyTeamsData.leagueData;
 const leagues=window.ShuaMyTeamsData.leagues;
 const nav=document.querySelector('.positions');
@@ -421,6 +467,9 @@ const escapeHtml=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>'
 const teamIndex=leagues.map(([league,team],index)=>({league,team,index,id:rosterSnapshots[index]?.id||'',teamId:rosterSnapshots[index]?.team||''})).filter(x=>!/^diddy party/i.test(x.team.trim()));
 const nflLogo=team=>{const code={JAX:'jax',LA:'lar',LAR:'lar',LAC:'lac',LV:'lv',OAK:'lv',WAS:'wsh',WSH:'wsh',GB:'gb',GNB:'gb',KC:'kc',KAN:'kc',NO:'no',NOR:'no',NE:'ne',NWE:'ne',TB:'tb',TAM:'tb',SF:'sf',SFO:'sf',NYG:'nyg',NYJ:'nyj'}[String(team||'').toUpperCase()]||String(team||'').toLowerCase();return /^[a-z]{2,3}$/.test(code)?'<img class="myteams-nfl-logo" loading="lazy" src="https://a.espncdn.com/i/teamlogos/nfl/500/'+code+'.png" alt="" onerror="this.style.display=\'none\'">':''};
 const fmt=x=>Number.isFinite(Number(x))?Number(x).toFixed(2):'—';
+const byeWeeks={CAR:5,KC:5,CIN:6,DET:6,MIA:6,MIN:6,BUF:7,JAX:7,LAC:7,WSH:7,WAS:7,HOU:8,NO:8,NYG:8,SF:8,PIT:9,TEN:9,CHI:10,DEN:10,PHI:10,TB:10,ATL:11,CLE:11,GB:11,LAR:11,LA:11,NE:11,SEA:11,BAL:13,IND:13,LV:13,NYJ:13,ARI:14,ARZ:14,DAL:14};
+const weeklyProjection=(p,week)=>{const value=p?.weeklyProjections?.[week]??(Number(p?.projectionWeek)===week?p?.weeklyProjection:null);return value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value))?fmt(value):'—'};
+const fantasyLogo=t=>{const url=t?.logoUrl||t?.logo;if(typeof url!=='string'||!/^https:\/\//i.test(url))return '';return '<img class="myteams-team-logo" loading="lazy" src="'+escapeHtml(url)+'" alt="" onerror="this.remove()">'};
 const rosterHtml=(index,archive)=>{
  const snapshot=archive?{roster:archive.roster}:rosterSnapshots[index];if(!snapshot?.roster?.length)return '<p class="myteams-empty">No roster snapshot available for this season.</p>';
  const order=['QB','RB','WR','TE','FLEX','RB/WR/TE','OP','D/ST','K','Bench','IR'];
@@ -428,13 +477,16 @@ const rosterHtml=(index,archive)=>{
   const dst=p.pos==='D/ST'||p.pos==='DST'||/D\/ST|Defense/i.test(p.name||'');
   const faceImg=dst?'<span class="myteams-defense-badge">'+nflLogo(p.nfl)+'</span>':p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
   const status=/^questionable$/i.test(p.status)?'Q':/^doubtful$/i.test(p.status)?'D':/^(day.to.day|dtd)$/i.test(p.status)?'DTD':p.status&&p.status!=='Active'?p.status:'';
-  return '<div class="myteams-roster-row"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open" data-myteams-player="'+escapeHtml(p.name||'')+'">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.nfl)+escapeHtml(p.nfl||'FA')+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="Projection unavailable">—</strong></div>';
+  const proj=weeklyProjection(p,leagueFor(snapshot.id)?.week||7);
+  const bye=archive?null:byeWeeks[String(p.nfl||'').toUpperCase()];
+  const byeLabel=bye?'<span class="myteams-bye'+(bye===(leagueFor(snapshot.id)?.week||7)?' is-now':'')+'">BYE '+bye+'</span>':'';
+  return '<div class="myteams-roster-row"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open" data-myteams-player="'+escapeHtml(p.name||'')+'">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.nfl)+escapeHtml(dst?'D/ST · ':'')+escapeHtml(p.nfl||'FA')+' '+byeLabel+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="'+(proj==='—'?'ESPN weekly projection unavailable':'ESPN weekly projection')+'">'+proj+'</strong></div>';
  }).join('');
 };
 const leagueFor=id=>leagueData.find(x=>x.id===id);
 function standingsTable(standings){
  if(!standings.length)return '<p class="myteams-empty">Standings unavailable.</p>';
- return '<div class="myteams-table-scroll"><table class="myteams-table"><thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>T</th><th>PF</th><th>PA</th></tr></thead><tbody>'+[...standings].sort((a,b)=>(a.rank??99)-(b.rank??99)).map(t=>'<tr><td>'+escapeHtml(t.rank||'—')+'</td><td>'+escapeHtml(t.teamName||'Unknown')+'</td><td>'+escapeHtml(t.wins??'—')+'</td><td>'+escapeHtml(t.losses??'—')+'</td><td>'+escapeHtml(t.ties??'0')+'</td><td>'+fmt(t.pointsFor)+'</td><td>'+fmt(t.pointsAgainst)+'</td></tr>').join('')+'</tbody></table></div>';
+ return '<div class="myteams-table-scroll"><table class="myteams-table myteams-standings"><thead><tr><th>#</th><th>Team</th><th>W–L–T</th><th>PF</th><th>PA</th></tr></thead><tbody>'+[...standings].sort((a,b)=>(a.rank??99)-(b.rank??99)).map(t=>'<tr><td>'+escapeHtml(t.rank??'—')+'</td><td><span class="myteams-standing-identity">'+fantasyLogo(t)+'<span class="myteams-standing-name">'+escapeHtml(t.teamName||'Unknown')+'</span></span></td><td>'+escapeHtml((t.wins??'—')+'–'+(t.losses??'—')+'–'+(t.ties??0))+'</td><td>'+fmt(t.pointsFor)+'</td><td>'+fmt(t.pointsAgainst)+'</td></tr>').join('')+'</tbody></table></div>';
 }
 function standingHtml(id){return standingsTable(leagueFor(id)?.standings||[]);}
 function matchupHtml(id){
@@ -446,18 +498,20 @@ function matchupHtml(id){
  }).join('');
 }
 function wireHtml(id,position='ALL'){
- const players=waiverData.find(x=>x.id===id)?.players||[];
+ const players=(waiverData.find(x=>x.id===id)?.players||[]).filter(p=>['free_agent','waivers'].includes(String(p.acquisitionState||'').toLowerCase()));
  if(!players.length)return '<p class="myteams-empty">Waiver-wire data unavailable.</p>';
  const choices=['ALL','QB','RB','WR','TE','K','D/ST'];
- const eligible=players.filter(p=>(position==='ALL'||p.position===position)&&Number.isFinite(Number(p.seasonProjection)));
- eligible.sort((a,b)=>Number(b.seasonProjection)-Number(a.seasonProjection));
- const leaders=eligible.slice(0,10);
- return '<p class="myteams-data-caption">Top 10 by ESPN season projection · Weekly projections unavailable</p><div class="myteams-wire-positions">'+choices.map(k=>'<button type="button" data-myteams-wire-pos="'+k+'" aria-pressed="'+(position===k)+'">'+k+'</button>').join('')+'</div><div class="myteams-table-scroll"><table class="myteams-table myteams-waiver-table"><thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Proj. season</th><th>Availability</th></tr></thead><tbody>'+leaders.map((p,i)=>{
+ const week=leagueFor(id)?.week||7;
+ const eligible=players.filter(p=>position==='ALL'||p.position===position);
+ const hasProjections=eligible.some(p=>weeklyProjection(p,week)!=='—');
+ if(hasProjections)eligible.sort((a,b)=>(Number(weeklyProjection(b,week))||-1)-(Number(weeklyProjection(a,week))||-1));
+ const leaders=hasProjections?eligible.filter(p=>weeklyProjection(p,week)!=='—').slice(0,10):eligible.slice(0,10);
+ return '<p class="myteams-data-caption">Week '+week+' · '+(hasProjections?'Top available players by ESPN weekly projection':'Available players · ESPN weekly projections not provided in snapshot; shown in source order')+'</p><div class="myteams-wire-positions">'+choices.map(k=>'<button type="button" data-myteams-wire-pos="'+k+'" aria-pressed="'+(position===k)+'">'+k+'</button>').join('')+'</div>'+(!leaders.length?'<p class="myteams-empty">No available '+escapeHtml(position)+' players in this snapshot.</p>':'<div class="myteams-table-scroll"><table class="myteams-table myteams-waiver-table"><thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Proj.</th><th>Availability</th></tr></thead><tbody>'+leaders.map((p,i)=>{
  const status=p.acquisitionState==='waivers'?'Waivers':'FA';
  const dst=p.position==='D/ST';
- const head=dst?nflLogo(p.team):p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
- return '<tr><td>'+(i+1)+'</td><td><button class="myteams-player-open" type="button" data-myteams-player="'+escapeHtml(p.name||'')+'">'+head+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.team)+escapeHtml(p.team||'FA')+'</small></span></button></td><td>'+escapeHtml(p.position||'—')+'</td><td>'+fmt(p.ppg)+'</td><td><span class="myteams-acquire">'+status+'</span></td></tr>';
- }).join('')+'</tbody></table></div>';
+ const head=dst?'<span class="myteams-defense-badge">'+nflLogo(p.team)+'</span>':p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
+ return '<tr><td>'+(i+1)+'</td><td><button class="myteams-player-open" type="button" data-myteams-player="'+escapeHtml(p.name||'')+'">'+head+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.team)+escapeHtml(p.team||'FA')+'</small></span></button></td><td>'+escapeHtml(p.position||'—')+'</td><td>'+weeklyProjection(p,week)+'</td><td><span class="myteams-acquire">'+status+'</span></td></tr>';
+ }).join('')+'</tbody></table></div>');
 }
 function historyFinish(item){
  const archive=historicalData.find(x=>x.id===item.id&&x.year===item.year&&x.teamId===String(item.teamId));
@@ -469,7 +523,10 @@ function historyFinish(item){
 }
 function scheduleHtml(item){
  if(item.year!==2026)return '<p class="myteams-empty">Historical schedule not loaded.</p>';
- const records=scheduleData.filter(x=>x.id===item.id).concat([{id:item.id,week:7,matchups:leagueFor(item.id)?.matchups||[]}]).sort((a,b)=>a.week-b.week);
+ const records=scheduleData.filter(x=>x.id===item.id);
+ const liveWeek=leagueFor(item.id)?.week||7;
+ if(!records.some(x=>x.week===liveWeek))records.push({id:item.id,week:liveWeek,matchups:leagueFor(item.id)?.matchups||[]});
+ records.sort((a,b)=>a.week-b.week);
  const tid=String(item.teamId);
  return '<div class="myteams-schedule">'+records.map(w=>{
   const match=w.matchups.find(m=>String(m.home?.teamId)===tid||String(m.away?.teamId)===tid);
@@ -477,9 +534,9 @@ function scheduleHtml(item){
   const mine=String(match.home?.teamId)===tid?match.home:match.away;
   const opp=mine===match.home?match.away:match.home;
   const score=Number(mine?.currentPoints??mine?.totalPoints),against=Number(opp?.currentPoints??opp?.totalPoints);
-  const finished=w.week<7;
+  const finished=w.week<liveWeek;
   const outcome=finished?(Number.isFinite(score)&&Number.isFinite(against)?score===against?'T':score>against?'W':'L':'—'):'Upcoming / Live';
-  return '<div class="myteams-schedule-row"><span>Week '+w.week+'</span><b>'+escapeHtml(outcome)+'</b><span>vs '+escapeHtml(opp?.teamName||'—')+'</span><strong>'+fmt(score)+' – '+fmt(against)+'</strong></div>';
+  return '<div class="myteams-schedule-row"><span>Week '+w.week+'</span><b class="myteams-outcome" data-result="'+escapeHtml(outcome)+'">'+escapeHtml(outcome)+'</b><span class="myteams-standing-identity">'+fantasyLogo(opp)+'<span>vs '+escapeHtml(opp?.teamName||'—')+'</span></span><strong>'+((w.week>liveWeek)?'—':fmt(score)+' – '+fmt(against))+'</strong></div>';
  }).join('')+'</div>';
 }
 function transactionsHtml(item){
@@ -487,7 +544,7 @@ function transactionsHtml(item){
  const entry=transactionData.find(x=>x.id===item.id);
  const tx=entry?.tx||[];
  if(!tx.length)return '<p class="myteams-empty">No recent team moves in the retrieved window.</p>';
- return '<p class="myteams-data-caption">Recent completed adds, drops, waivers and trades · '+(entry.truncated?'Limited to latest 100 results':'Available ESPN transaction snapshot')+'</p>'+tx.filter(x=>x.status==='complete'||x.status==='executed').map(x=>'<div class="myteams-transaction"><small>'+escapeHtml(x.date||'')+' · '+escapeHtml(x.type||'Move')+'</small><div>'+(x.added?.length?'<b>Added: '+escapeHtml(x.added.join(', '))+'</b>':'')+(x.dropped?.length?'<span>Dropped: '+escapeHtml(x.dropped.join(', '))+'</span>':'')+(x.type==='trade'&&!x.added?.length?'<span>Trade completed (player details unavailable)</span>':'')+'</div></div>').join('');
+ return '<p class="myteams-data-caption">ESPN transactions · '+(entry.truncated?'Latest 100 results':'Available snapshot')+'</p>'+tx.map(x=>'<div class="myteams-transaction"><small>'+escapeHtml(x.date||'')+' · '+escapeHtml(x.type||'Move')+' · '+escapeHtml(x.status||'Unknown')+(Number(x.faab)>0?' · <span class="myteams-faab">$'+escapeHtml(x.faab)+' FAAB</span>':'')+'</small><div>'+(x.added?.length?'<b>Added: '+escapeHtml(x.added.join(', '))+'</b>':'')+(x.dropped?.length?'<span>Dropped: '+escapeHtml(x.dropped.join(', '))+'</span>':'')+(x.type==='trade'&&!x.added?.length?'<span>Trade details unavailable</span>':'')+'</div></div>').join('');
 }
 function panelHtml(item,tab){
  if(item.year!==2026){const archive=historicalData.find(x=>x.id===item.id&&x.year===item.year&&x.teamId===String(item.teamId));if(tab==='roster')return rosterHtml(-1,archive);if(tab==='standings')return archive?.standings?.length?standingsTable(archive.standings):'<p class="myteams-empty">Historical standings unavailable.</p>';return '<p class="myteams-empty">Historical matchup and waiver snapshots not available for this year.</p>';}
@@ -503,7 +560,7 @@ function renderTeams(year){
  const cards=current?teamIndex.map(x=>({...x,year:2026})):pastTeams.filter(x=>x.year===year&&x.id!=='646444846'&&!/^diddy party/i.test(String(x.teamName||'').trim())).map(x=>({league:x.leagueName,team:x.teamName,year,id:x.id,teamId:x.teamId,index:-1}));
  section.querySelector('.myteams-count').textContent=cards.length+' Teams';
  section.querySelector('.myteams-header p').textContent='Your '+year+' ESPN fantasy football leagues';
- section.querySelector('.myteams-grid').innerHTML=cards.map((item,i)=>'<article class="myteams-card"><button type="button" class="myteams-card-trigger" data-myteams-open="'+i+'" aria-expanded="false"><div class="myteams-league">'+escapeHtml(item.league)+'</div><div class="myteams-name">'+escapeHtml(item.team)+'</div><div class="myteams-platform">ESPN · '+year+'</div></button><div class="myteams-roster" hidden></div></article>').join('');
+ section.querySelector('.myteams-grid').innerHTML=cards.map((item,i)=>'<article class="myteams-card"><button type="button" class="myteams-card-trigger" data-myteams-open="'+i+'" aria-expanded="false"><div class="myteams-league">'+escapeHtml(item.league)+'</div><div class="myteams-card-identity">'+fantasyLogo(item)+'<div class="myteams-name">'+escapeHtml(item.team)+'</div></div>'+(current?'':'<div class="myteams-finish">'+escapeHtml(historyFinish(item))+'</div>')+'<div class="myteams-platform">ESPN · '+year+'</div></button><div class="myteams-roster" hidden></div></article>').join('');
  section._cards=cards;
 }
 section.innerHTML='<header class="myteams-header"><div><h2>My Teams</h2><p>2026 ESPN fantasy football leagues</p></div><div class="myteams-header-right"><label>Year <select id="myTeamsYear">'+[2026,2025,2024,2023,2022,2021,2020].map(y=>'<option value="'+y+'">'+y+'</option>').join('')+'</select></label><span class="myteams-count">11 Teams</span></div></header><div class="myteams-grid"></div>';

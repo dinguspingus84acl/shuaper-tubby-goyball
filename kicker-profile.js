@@ -2,6 +2,7 @@
 (()=>{
 'use strict';
 const cache=new Map();
+const scheduleCache=new Map();
 const seasons=[2026,2025,2024,2023,2022,2021,2020];
 const teamCodes={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',DAL:'dal',DEN:'den',DET:'det',GB:'gb',HOU:'hou',IND:'ind',JAX:'jax',KC:'kc',LAC:'lac',LAR:'lar',LV:'lv',MIA:'mia',MIN:'min',NE:'ne',NO:'no',NYG:'nyg',NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SF:'sf',TB:'tb',TEN:'ten',WAS:'wsh',WSH:'wsh'};
 const teamById={1:'ATL',2:'BUF',3:'CHI',4:'CIN',5:'CLE',6:'DAL',7:'DEN',8:'DET',9:'GB',10:'TEN',11:'IND',12:'KC',13:'LV',14:'LAR',15:'MIA',16:'MIN',17:'NE',18:'NO',19:'NYG',20:'NYJ',21:'PHI',22:'ARI',23:'PIT',24:'LAC',25:'SF',26:'SEA',27:'TB',28:'WAS',29:'CAR',30:'JAX',33:'BAL',34:'HOU'};
@@ -50,6 +51,10 @@ function ensure(){
  #unifiedProfilePanels .kp-year{display:flex;align-items:center;gap:8px;margin:8px 0 12px;color:#adc6d8;font-size:12px}
  #unifiedProfilePanels .kp-year select{background:#14364f;border:1px solid #3c6078;color:white;border-radius:7px;padding:7px}
  #unifiedProfilePanels .kp-empty{color:#b5c9d8;font-size:12px;padding:12px 2px}
+ #unifiedGameLogPanel .kicker-log-table{width:100%!important;min-width:0!important;table-layout:fixed}
+ #unifiedGameLogPanel .kicker-log-table th:first-child,#unifiedGameLogPanel .kicker-log-table td:first-child{width:42px!important}
+ #unifiedGameLogPanel .kicker-log-table th:nth-child(2),#unifiedGameLogPanel .kicker-log-table td:nth-child(2){width:auto!important;min-width:0!important}
+ #unifiedGameLogPanel .kicker-log-table th:last-child,#unifiedGameLogPanel .kicker-log-table td:last-child{width:88px!important;text-align:right!important;padding-right:14px!important}
  @media(max-width:600px){#shuaKickerProfile{align-items:stretch;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}#shuaKickerProfile .kp-card{max-height:100%;border-radius:0;border-left:0;border-right:0}#shuaKickerProfile .kp-portrait{width:64px;height:64px}#shuaKickerProfile .kp-name{font-size:18px}}
  `;
  document.head.appendChild(style);
@@ -83,10 +88,30 @@ async function getSeason(id,year){
     .sort((a,b)=>Number(a.scoringPeriodId)-Number(b.scoringPeriodId)).map(s=>({week:Number(s.scoringPeriodId),points:Number(s.appliedTotal)||0}));
    const points=Number.isFinite(Number(season?.appliedTotal))?Number(season.appliedTotal):games.reduce((sum,g)=>sum+g.points,0);
    if(!season&&!games.length)return null;
-   return {year,team:teamById[Number(p.proTeamId)]||'',points,gp:games.length,ppg:games.length?points/games.length:0,games};
+   return {year,team:teamById[Number(p.proTeamId)]||'',teamId:Number(p.proTeamId)||0,points,gp:games.length,ppg:games.length?points/games.length:0,games};
   }finally{clearTimeout(timeout)}
  })().catch(()=>null);
  cache.set(key,promise);return promise;
+}
+async function getSchedule(teamId,year){
+ if(!teamId)return new Map();
+ const key=teamId+':'+year;if(scheduleCache.has(key))return scheduleCache.get(key);
+ const promise=(async()=>{
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),8000);
+  try{
+   const response=await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/'+teamId+'/schedule?season='+year,{signal:controller.signal,cache:year===2026?'no-store':'force-cache'});
+   if(!response.ok)throw new Error('ESPN schedule '+response.status);
+   const data=await response.json(),out=new Map();
+   for(const event of data.events||[]){
+    const week=Number(event.week?.number),teams=event.competitions?.[0]?.competitors||[];
+    if(!week||!teams.some(c=>Number(c.team?.id)===teamId))continue;
+    const opponent=teams.find(c=>Number(c.team?.id)!==teamId);
+    if(opponent)out.set(week,opponent.team?.abbreviation||'');
+   }
+   return out;
+  }finally{clearTimeout(timeout)}
+ })().catch(()=>new Map());
+ scheduleCache.set(key,promise);return promise;
 }
 function summary(s){return '<div class="kp-summary"><div class="kp-stat"><small>Fantasy points</small><strong>'+pts(s?.points)+'</strong></div><div class="kp-stat"><small>Games</small><strong>'+(s?.gp??'—')+'</strong></div><div class="kp-stat"><small>Points / game</small><strong>'+pts(s?.ppg)+'</strong></div></div>';}
 async function showTab(tab){
@@ -138,10 +163,20 @@ async function renderGameLog(name,id,target){
  const year=selectedYears.get(String(id))||2026;
  target.innerHTML='<div class="unified-profile-loading">Loading '+year+' kicker game log…</div>';
  const row=await getSeason(id,year);
+ const opponents=row?await getSchedule(row.teamId,year):new Map();
  if(!profileAlive(target,name))return;
- const select='<label class="kp-year">Season <select aria-label="Kicker game log season">'+seasons.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+'</select></label>';
- target.innerHTML=select+(row?summary(row)+(row.games.length?'<table class="kp-table"><thead><tr><th>Week</th><th>Fantasy points</th></tr></thead><tbody>'+row.games.map(g=>'<tr><td>Week '+g.week+'</td><td>'+pts(g.points)+'</td></tr>').join('')+'</tbody></table>':'<div class="kp-empty">No completed weekly games found.</div>'):'<div class="kp-empty">No ESPN kicker game log for '+year+'.</div>');
- const control=target.querySelector('.kp-year select');
+ const title='<div class="espn-game-log-title"><strong>'+esc(name)+' Game Log</strong><span>'+year+' · ESPN Fantasy</span></div>';
+ const select='<div class="espn-game-log-controls"><div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" aria-label="Kicker game log season">'+seasons.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+'</select></div></div>';
+ const total=row?.points,ppg=row?.ppg,gp=row?.gp;
+ const summaryHtml=row?'<div class="espn-game-log-summary"><strong>'+year+' Season</strong><span>'+pts(ppg)+' PPG · '+pts(total)+' Pts · '+gp+' GP</span></div>':'';
+ const table=row?.games.length?'<div class="espn-game-log-table-wrap"><table class="espn-game-log-table kicker-log-table"><thead><tr><th>WK</th><th>OPP</th><th class="gl-pts">PTS</th></tr></thead><tbody>'+row.games.map(g=>{
+  const opp=opponents.get(g.week)||'',src=logo(opp);
+  const opponent='<div class="espn-game-log-opponent">'+(src?'<img class="espn-game-log-opponent-logo" src="'+src+'" alt="">':'')+'<span>'+esc(opp||'—')+'</span></div>';
+  const color=g.points<10?' gl-pts-low':g.points>=15?' gl-pts-high':' gl-pts-mid';
+  return '<tr><td>'+g.week+'</td><td>'+opponent+'</td><td class="gl-pts'+color+'">'+pts(g.points)+'</td></tr>';
+ }).join('')+'</tbody></table></div>':'<div class="espn-game-log-empty">No completed ESPN kicking games found for '+year+'.</div>';
+ target.innerHTML=title+summaryHtml+select+table;
+ const control=target.querySelector('.espn-game-log-year-select');
  if(control)control.onchange=()=>{selectedYears.set(String(id),Number(control.value));renderGameLog(name,id,target)};
 }
 window.ShuaKickerProfile={open,close,renderOverview,renderHistory,renderGameLog};

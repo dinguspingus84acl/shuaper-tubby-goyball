@@ -485,7 +485,7 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
  #shuaMyTeams{padding-top:12px!important}
 }
 </style>
-<script src="my-teams-data.js?v=20261023-2"></script><script src="my-teams-opponents.js?v=20261024-1"></script><script id="shua-my-teams-script">
+<script src="my-teams-data.js?v=20261023-2"></script><script src="my-teams-opponents.js?v=20261024-1"></script><script src="my-teams-injuries.js?v=20261024-1"></script><script id="shua-my-teams-script">
 (()=>{
 'use strict';
 const rosterSnapshots=window.ShuaMyTeamsData.rosterSnapshots;
@@ -495,6 +495,7 @@ const pastTeams=window.ShuaMyTeamsData.pastTeams;
 const waiverData=window.ShuaMyTeamsData.waiverData;
 const scheduleData=window.ShuaMyTeamsData.scheduleData||[];
 const opponentRosters=window.ShuaMyTeamsOpponents||[];
+const waiverInjuries=window.ShuaMyTeamsInjuries||[];
 const matchupLineups=window.ShuaMyTeamsMatchupLineups||[];
 const leagueData=window.ShuaMyTeamsData.leagueData;
 const leagues=window.ShuaMyTeamsData.leagues;
@@ -524,7 +525,7 @@ const rosterHtml=(index,archive)=>{
   const proj=weeklyProjection(p,leagueFor(snapshot.id)?.week||7);
   const bye=archive?null:byeWeeks[String(p.nfl||'').toUpperCase()];
   const byeLabel=bye===(leagueFor(snapshot.id)?.week||7)?'<span class="myteams-bye is-now">BYE</span>':'';
-  return '<div class="myteams-roster-row" data-myteams-player="'+escapeHtml(p.name||'')+'" role="button" tabindex="0"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.nfl)+escapeHtml(dst?'D/ST · ':'')+escapeHtml(p.nfl||'FA')+' '+byeLabel+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="'+(proj==='—'?'ESPN weekly projection unavailable':'ESPN weekly projection')+'">'+proj+'</strong></div>';
+  return '<div class="myteams-roster-row" data-myteams-player="'+escapeHtml(p.name||'')+'" data-myteams-player-id="'+escapeHtml(p.id||'')+'" data-myteams-player-pos="'+escapeHtml(p.pos||'')+'" data-myteams-player-team="'+escapeHtml(p.nfl||'')+'" role="button" tabindex="0"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+(dst?'':nflLogo(p.nfl))+escapeHtml(dst?'D/ST · ':'')+escapeHtml(p.nfl||'FA')+' '+byeLabel+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="'+(proj==='—'?'ESPN weekly projection unavailable':'ESPN weekly projection')+'">'+proj+'</strong></div>';
  }).join('');
 };
 const leagueFor=id=>leagueData.find(x=>x.id===id);
@@ -551,7 +552,12 @@ function matchupHtml(id){
  }).join('');
 }
 function wireHtml(id,position='ALL'){
- const players=(waiverData.find(x=>x.id===id)?.players||[]).filter(p=>['free_agent','waivers'].includes(String(p.acquisitionState||'').toLowerCase()));
+ const injuryMap=waiverInjuries.find(x=>x.id===id)?.players||{};
+ const players=(waiverData.find(x=>x.id===id)?.players||[]).filter(p=>{
+  if(!['free_agent','waivers'].includes(String(p.acquisitionState||'').toLowerCase()))return false;
+  const injury=injuryMap[String(p.id)];
+  return !(p.seasonEnding===true||/season.end/i.test(String(p.status||''))||(injury?.status==='IR'&&Number(injury.seasonProjection)===0));
+ });
  if(!players.length)return '<p class="myteams-empty">Waiver-wire data unavailable.</p>';
  const choices=['ALL','QB','RB','WR','TE','K','D/ST'];
  const week=leagueFor(id)?.week||7;
@@ -563,7 +569,7 @@ function wireHtml(id,position='ALL'){
  const status=p.acquisitionState==='waivers'?'Waivers':'FA';
  const dst=p.position==='D/ST';
  const head=dst?'<span class="myteams-defense-badge">'+nflLogo(p.team)+'</span>':p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
- return '<div class="myteams-wire-line"><span>'+(i+1)+'</span><button class="myteams-player-open" type="button" data-myteams-player="'+escapeHtml(p.name||'')+'">'+head+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.team)+escapeHtml(p.team||'FA')+'</small></span></button><span>'+escapeHtml(p.position||'—')+'</span><span>'+weeklyProjection(p,week)+'</span><span><span class="myteams-acquire">'+status+'</span></span></div>';
+ return '<div class="myteams-wire-line"><span>'+(i+1)+'</span><button class="myteams-player-open" type="button" data-myteams-player="'+escapeHtml(p.name||'')+'" data-myteams-player-id="'+escapeHtml(p.id||'')+'" data-myteams-player-pos="'+escapeHtml(p.position||'')+'" data-myteams-player-team="'+escapeHtml(p.team||'')+'">'+head+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+(dst?'':nflLogo(p.team))+escapeHtml(p.team||'FA')+'</small></span></button><span>'+escapeHtml(p.position||'—')+'</span><span>'+weeklyProjection(p,week)+'</span><span><span class="myteams-acquire">'+status+'</span></span></div>';
  }).join('')+'</div>');
 }
 function historyFinish(item){
@@ -630,7 +636,7 @@ renderTeams(2026);
 section.addEventListener('change',e=>{if(e.target.id==='myTeamsYear')renderTeams(Number(e.target.value));});
 section.addEventListener('keydown',e=>{const row=e.target.closest('.myteams-roster-row[data-myteams-player]');if(row&&row===e.target&&(e.key==='Enter'||e.key===' ')){e.preventDefault();row.click();}});
 section.addEventListener('click',e=>{
- const player=e.target.closest('[data-myteams-player]');if(player){const name=player.dataset.myteamsPlayer;if(typeof window.openUnifiedPlayerProfileByName==='function')window.openUnifiedPlayerProfileByName(name);else if(typeof window.openPlayerProfileByName==='function')window.openPlayerProfileByName(name);return;}
+ const player=e.target.closest('[data-myteams-player]');if(player){const name=player.dataset.myteamsPlayer,pos=player.dataset.myteamsPlayerPos||'';if(typeof window.openUnifiedPlayerProfileByName==='function'){const seed=pos==='K'?{id:player.dataset.myteamsPlayerId,name,team:player.dataset.myteamsPlayerTeam||'',position:'K',seasonYear:2026,source:'my-teams'}:null;window.openUnifiedPlayerProfileByName(name,seed);}else if(typeof window.openPlayerProfileByName==='function')window.openPlayerProfileByName(name);return;}
  const back=e.target.closest('[data-myteams-back]');if(back){const holder=back.closest('.myteams-roster');if(holder?._previousHtml!=null){holder.querySelector('.myteams-tab-content').innerHTML=holder._previousHtml;holder._previousHtml=null;}return;}
  const team=e.target.closest('[data-myteams-team]');if(team){const holder=team.closest('.myteams-roster'),item=section._cards[Number(holder?.dataset.index)];if(item){const content=holder.querySelector('.myteams-tab-content');holder._previousHtml=content.innerHTML;content.innerHTML=otherTeamHtml(item,team.dataset.myteamsTeam);}return;}
  const game=e.target.closest('[data-myteams-schedule-week]');if(game){const holder=game.closest('.myteams-roster'),item=section._cards[Number(holder?.dataset.index)],detail=game.nextElementSibling;if(item&&detail){const expand=detail.hidden;holder.querySelectorAll('.myteams-schedule-detail').forEach(x=>x.hidden=true);holder.querySelectorAll('[data-myteams-schedule-week]').forEach(x=>x.setAttribute('aria-expanded','false'));if(expand){detail.innerHTML=scheduleGameDetail(item,Number(game.dataset.myteamsScheduleWeek));detail.hidden=false;game.setAttribute('aria-expanded','true');}}return;}

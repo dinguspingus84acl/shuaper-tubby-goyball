@@ -392,6 +392,7 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
 #shuaMyTeams .myteams-transaction .myteams-faab{color:#51e9a7}
 #shuaMyTeams .myteams-bye{color:#a8bcd1;font-weight:750;white-space:nowrap}
 #shuaMyTeams .myteams-bye.is-now{color:#ffca70}
+#shuaMyTeams .myteams-standings-strip{display:none}
 @media(max-width:600px){
  #shuaMyTeams .myteams-grid{gap:6px}
  #shuaMyTeams .myteams-card-trigger{padding:11px 12px}
@@ -412,6 +413,17 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
  #shuaMyTeams .myteams-waiver-table th:nth-child(5),#shuaMyTeams .myteams-waiver-table td:nth-child(5){width:54px}
  #shuaMyTeams .myteams-waiver-table th:nth-child(4),#shuaMyTeams .myteams-waiver-table td:nth-child(4){width:45px}
  #shuaMyTeams .myteams-acquire{padding:3px 2px;font-size:9px}
+ #shuaMyTeams .myteams-standings-table-wrap{display:none}
+ #shuaMyTeams .myteams-standings-strip{display:flex;gap:7px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:5px 2px 12px;scrollbar-width:thin}
+ #shuaMyTeams .myteams-standing-card{flex:0 0 168px;min-width:0;scroll-snap-align:start;border:1px solid #34566c;background:#102b41;border-radius:9px;padding:9px}
+ #shuaMyTeams .myteams-standing-card-head{display:flex;align-items:flex-start;gap:6px;min-height:42px}
+ #shuaMyTeams .myteams-standing-rank{flex:none;color:#52e6aa;font-size:13px;font-weight:900}
+ #shuaMyTeams .myteams-standing-card-name{min-width:0;flex:1;overflow-wrap:anywhere;font-size:11px;font-weight:850;line-height:1.25}
+ #shuaMyTeams .myteams-standing-card .myteams-team-logo{width:24px;height:24px}
+ #shuaMyTeams .myteams-standing-card-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:7px;border-top:1px solid #ffffff20;padding-top:7px}
+ #shuaMyTeams .myteams-standing-card-stats span{display:grid;gap:3px;font-size:11px;font-weight:800;font-variant-numeric:tabular-nums}
+ #shuaMyTeams .myteams-standing-card-stats small{font-size:9px;color:#9cb6ca;font-weight:750}
+ #shuaMyTeams .myteams-standing-hint{font-size:10px;color:#91abc1;margin:1px 2px 5px}
 }
 #shuaMyTeams .myteams-waiver-table{min-width:0!important;width:100%;table-layout:fixed}
 #shuaMyTeams .myteams-waiver-table th,#shuaMyTeams .myteams-waiver-table td{padding:8px 3px!important;font-size:11px}
@@ -479,14 +491,17 @@ const rosterHtml=(index,archive)=>{
   const status=/^questionable$/i.test(p.status)?'Q':/^doubtful$/i.test(p.status)?'D':/^(day.to.day|dtd)$/i.test(p.status)?'DTD':p.status&&p.status!=='Active'?p.status:'';
   const proj=weeklyProjection(p,leagueFor(snapshot.id)?.week||7);
   const bye=archive?null:byeWeeks[String(p.nfl||'').toUpperCase()];
-  const byeLabel=bye?'<span class="myteams-bye'+(bye===(leagueFor(snapshot.id)?.week||7)?' is-now':'')+'">BYE '+bye+'</span>':'';
+  const byeLabel=bye===(leagueFor(snapshot.id)?.week||7)?'<span class="myteams-bye is-now">BYE WEEK</span>':'';
   return '<div class="myteams-roster-row"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open" data-myteams-player="'+escapeHtml(p.name||'')+'">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.nfl)+escapeHtml(dst?'D/ST · ':'')+escapeHtml(p.nfl||'FA')+' '+byeLabel+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="'+(proj==='—'?'ESPN weekly projection unavailable':'ESPN weekly projection')+'">'+proj+'</strong></div>';
  }).join('');
 };
 const leagueFor=id=>leagueData.find(x=>x.id===id);
 function standingsTable(standings){
  if(!standings.length)return '<p class="myteams-empty">Standings unavailable.</p>';
- return '<div class="myteams-table-scroll"><table class="myteams-table myteams-standings"><thead><tr><th>#</th><th>Team</th><th>W–L–T</th><th>PF</th><th>PA</th></tr></thead><tbody>'+[...standings].sort((a,b)=>(a.rank??99)-(b.rank??99)).map(t=>'<tr><td>'+escapeHtml(t.rank??'—')+'</td><td><span class="myteams-standing-identity">'+fantasyLogo(t)+'<span class="myteams-standing-name">'+escapeHtml(t.teamName||'Unknown')+'</span></span></td><td>'+escapeHtml((t.wins??'—')+'–'+(t.losses??'—')+'–'+(t.ties??0))+'</td><td>'+fmt(t.pointsFor)+'</td><td>'+fmt(t.pointsAgainst)+'</td></tr>').join('')+'</tbody></table></div>';
+ const sorted=[...standings].sort((a,b)=>(a.rank??99)-(b.rank??99));
+ const rows=sorted.map(t=>'<tr><td>'+escapeHtml(t.rank??'—')+'</td><td><span class="myteams-standing-identity">'+fantasyLogo(t)+'<span class="myteams-standing-name">'+escapeHtml(t.teamName||'Unknown')+'</span></span></td><td>'+escapeHtml((t.wins??'—')+'–'+(t.losses??'—')+'–'+(t.ties??0))+'</td><td>'+fmt(t.pointsFor)+'</td><td>'+fmt(t.pointsAgainst)+'</td></tr>').join('');
+ const cards=sorted.map(t=>'<div class="myteams-standing-card"><div class="myteams-standing-card-head"><span class="myteams-standing-rank">#'+escapeHtml(t.rank??'—')+'</span>'+fantasyLogo(t)+'<span class="myteams-standing-card-name">'+escapeHtml(t.teamName||'Unknown')+'</span></div><div class="myteams-standing-card-stats"><span><small>W–L–T</small>'+escapeHtml((t.wins??'—')+'–'+(t.losses??'—')+'–'+(t.ties??0))+'</span><span><small>PF</small>'+fmt(t.pointsFor)+'</span><span><small>PA</small>'+fmt(t.pointsAgainst)+'</span></div></div>').join('');
+ return '<div class="myteams-standing-hint">Swipe sideways to view all '+sorted.length+' teams →</div><div class="myteams-standings-strip" aria-label="League standings, swipe horizontally">'+cards+'</div><div class="myteams-table-scroll myteams-standings-table-wrap"><table class="myteams-table myteams-standings"><thead><tr><th>#</th><th>Team</th><th>W–L–T</th><th>PF</th><th>PA</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
 function standingHtml(id){return standingsTable(leagueFor(id)?.standings||[]);}
 function matchupHtml(id){

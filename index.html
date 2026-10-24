@@ -391,7 +391,29 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
 #shuaMyTeams .myteams-schedule-row .myteams-outcome[data-result="L"]{background:#502635;color:#ff9caa}
 #shuaMyTeams .myteams-transaction .myteams-faab{color:#51e9a7}
 #shuaMyTeams .myteams-bye{color:#a8bcd1;font-weight:750;white-space:nowrap}
-#shuaMyTeams .myteams-bye.is-now{color:#ffca70}
+#shuaMyTeams .myteams-bye.is-now{color:#ff526f;font-weight:950}
+#shuaMyTeams .myteams-compact-list{display:grid;gap:2px}
+#shuaMyTeams .myteams-standings-line{display:grid;grid-template-columns:24px minmax(100px,1fr) 68px 65px 65px;align-items:center;gap:5px;border-bottom:1px solid #ffffff15;padding:8px 4px;font-size:11px;font-variant-numeric:tabular-nums}
+#shuaMyTeams .myteams-standings-line>span:not(:nth-child(2)){text-align:right}
+#shuaMyTeams .myteams-standings-line .myteams-rank{color:#55e5a8;font-weight:900;text-align:left!important}
+#shuaMyTeams .myteams-standings-line.is-heading{color:#9ab8cd;font-size:9px;font-weight:850;padding-bottom:5px}
+#shuaMyTeams .myteams-team-open{border:0;background:transparent;color:inherit;display:flex;align-items:center;gap:6px;min-width:0;text-align:left;padding:0;font-weight:800;font-size:11px;cursor:pointer}
+#shuaMyTeams .myteams-team-open:hover,#shuaMyTeams .myteams-player-open:hover{color:#55e5a8}
+#shuaMyTeams .myteams-team-open .myteams-team-logo{width:22px;height:22px}
+#shuaMyTeams .myteams-wire-line{display:grid;grid-template-columns:22px minmax(0,1fr) 39px 47px 55px;align-items:center;gap:5px;border-bottom:1px solid #ffffff15;padding:6px 2px;font-size:11px}
+#shuaMyTeams .myteams-wire-line>span:not(:nth-child(2)){text-align:right;font-variant-numeric:tabular-nums}
+#shuaMyTeams .myteams-wire-line .myteams-player-open{min-width:0}
+#shuaMyTeams .myteams-wire-line .myteams-player-open>img{width:29px;height:29px;border-radius:50%;object-fit:cover;flex:none}
+#shuaMyTeams .myteams-wire-line .myteams-player-open b{display:block;line-height:1.2;font-size:11px;overflow-wrap:anywhere}
+#shuaMyTeams .myteams-wire-line .myteams-player-open small{display:flex;gap:4px;align-items:center;color:#9cb5c9;font-size:9px}
+#shuaMyTeams .myteams-back{border:1px solid #365c75;border-radius:7px;background:#15364f;color:#fff;padding:7px 10px;margin-bottom:8px;font-weight:800}
+#shuaMyTeams .myteams-schedule-game{border-bottom:1px solid #ffffff20}
+#shuaMyTeams .myteams-schedule-toggle{border:0;background:transparent;color:inherit;display:block;width:100%;text-align:left;padding:0}
+#shuaMyTeams .myteams-schedule-toggle .myteams-schedule-row{border-bottom:0}
+#shuaMyTeams .myteams-schedule-detail{padding:5px 6px 12px;background:#0b293f;border-radius:0 0 8px 8px}
+#shuaMyTeams .myteams-boxscore{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#shuaMyTeams .myteams-boxscore h4{margin:5px 0 7px;font-size:12px}
+#shuaMyTeams .myteams-boxscore-player{display:flex;justify-content:space-between;gap:4px;padding:5px 0;border-bottom:1px solid #ffffff15;font-size:10px}
 #shuaMyTeams .myteams-standings-strip{display:none}
 @media(max-width:600px){
  #shuaMyTeams .myteams-grid{gap:6px}
@@ -414,7 +436,15 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
  #shuaMyTeams .myteams-waiver-table th:nth-child(4),#shuaMyTeams .myteams-waiver-table td:nth-child(4){width:45px}
  #shuaMyTeams .myteams-acquire{padding:3px 2px;font-size:9px}
  #shuaMyTeams .myteams-standings-table-wrap{display:none}
- #shuaMyTeams .myteams-standings-strip{display:flex;gap:7px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:5px 2px 12px;scrollbar-width:thin}
+ #shuaMyTeams .myteams-standings-strip{display:none}
+ #shuaMyTeams .myteams-standings-line{grid-template-columns:19px minmax(0,1fr) 49px 51px 51px;gap:3px;padding:7px 1px;font-size:10px}
+ #shuaMyTeams .myteams-team-open{font-size:10px;gap:4px}
+ #shuaMyTeams .myteams-team-open .myteams-team-logo{width:18px;height:18px}
+ #shuaMyTeams .myteams-wire-line{grid-template-columns:17px minmax(0,1fr) 29px 41px 45px;gap:3px;padding:6px 1px;font-size:10px}
+ #shuaMyTeams .myteams-wire-line .myteams-player-open>img{width:27px;height:27px}
+ #shuaMyTeams .myteams-wire-line .myteams-player-open b{font-size:10px}
+ #shuaMyTeams .myteams-schedule-detail{padding:5px 3px 8px}
+ #shuaMyTeams .myteams-boxscore{gap:5px}
  #shuaMyTeams .myteams-standing-card{flex:0 0 168px;min-width:0;scroll-snap-align:start;border:1px solid #34566c;background:#102b41;border-radius:9px;padding:9px}
  #shuaMyTeams .myteams-standing-card-head{display:flex;align-items:flex-start;gap:6px;min-height:42px}
  #shuaMyTeams .myteams-standing-rank{flex:none;color:#52e6aa;font-size:13px;font-weight:900}
@@ -455,7 +485,7 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
  #shuaMyTeams{padding-top:12px!important}
 }
 </style>
-<script src="my-teams-data.js?v=20261023-2"></script><script id="shua-my-teams-script">
+<script src="my-teams-data.js?v=20261023-2"></script><script src="my-teams-opponents.js?v=20261024-1"></script><script id="shua-my-teams-script">
 (()=>{
 'use strict';
 const rosterSnapshots=window.ShuaMyTeamsData.rosterSnapshots;
@@ -464,6 +494,8 @@ const historicalData=window.ShuaMyTeamsData.historicalData;
 const pastTeams=window.ShuaMyTeamsData.pastTeams;
 const waiverData=window.ShuaMyTeamsData.waiverData;
 const scheduleData=window.ShuaMyTeamsData.scheduleData||[];
+const opponentRosters=window.ShuaMyTeamsOpponents||[];
+const matchupLineups=window.ShuaMyTeamsMatchupLineups||[];
 const leagueData=window.ShuaMyTeamsData.leagueData;
 const leagues=window.ShuaMyTeamsData.leagues;
 const nav=document.querySelector('.positions');
@@ -491,24 +523,30 @@ const rosterHtml=(index,archive)=>{
   const status=/^questionable$/i.test(p.status)?'Q':/^doubtful$/i.test(p.status)?'D':/^(day.to.day|dtd)$/i.test(p.status)?'DTD':p.status&&p.status!=='Active'?p.status:'';
   const proj=weeklyProjection(p,leagueFor(snapshot.id)?.week||7);
   const bye=archive?null:byeWeeks[String(p.nfl||'').toUpperCase()];
-  const byeLabel=bye===(leagueFor(snapshot.id)?.week||7)?'<span class="myteams-bye is-now">BYE WEEK</span>':'';
-  return '<div class="myteams-roster-row"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open" data-myteams-player="'+escapeHtml(p.name||'')+'">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.nfl)+escapeHtml(dst?'D/ST · ':'')+escapeHtml(p.nfl||'FA')+' '+byeLabel+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="'+(proj==='—'?'ESPN weekly projection unavailable':'ESPN weekly projection')+'">'+proj+'</strong></div>';
+  const byeLabel=bye===(leagueFor(snapshot.id)?.week||7)?'<span class="myteams-bye is-now">BYE</span>':'';
+  return '<div class="myteams-roster-row" data-myteams-player="'+escapeHtml(p.name||'')+'" role="button" tabindex="0"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.nfl)+escapeHtml(dst?'D/ST · ':'')+escapeHtml(p.nfl||'FA')+' '+byeLabel+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="'+(proj==='—'?'ESPN weekly projection unavailable':'ESPN weekly projection')+'">'+proj+'</strong></div>';
  }).join('');
 };
 const leagueFor=id=>leagueData.find(x=>x.id===id);
 function standingsTable(standings){
  if(!standings.length)return '<p class="myteams-empty">Standings unavailable.</p>';
  const sorted=[...standings].sort((a,b)=>(a.rank??99)-(b.rank??99));
- const rows=sorted.map(t=>'<tr><td>'+escapeHtml(t.rank??'—')+'</td><td><span class="myteams-standing-identity">'+fantasyLogo(t)+'<span class="myteams-standing-name">'+escapeHtml(t.teamName||'Unknown')+'</span></span></td><td>'+escapeHtml((t.wins??'—')+'–'+(t.losses??'—')+'–'+(t.ties??0))+'</td><td>'+fmt(t.pointsFor)+'</td><td>'+fmt(t.pointsAgainst)+'</td></tr>').join('');
- const cards=sorted.map(t=>'<div class="myteams-standing-card"><div class="myteams-standing-card-head"><span class="myteams-standing-rank">#'+escapeHtml(t.rank??'—')+'</span>'+fantasyLogo(t)+'<span class="myteams-standing-card-name">'+escapeHtml(t.teamName||'Unknown')+'</span></div><div class="myteams-standing-card-stats"><span><small>W–L–T</small>'+escapeHtml((t.wins??'—')+'–'+(t.losses??'—')+'–'+(t.ties??0))+'</span><span><small>PF</small>'+fmt(t.pointsFor)+'</span><span><small>PA</small>'+fmt(t.pointsAgainst)+'</span></div></div>').join('');
- return '<div class="myteams-standing-hint">Swipe sideways to view all '+sorted.length+' teams →</div><div class="myteams-standings-strip" aria-label="League standings, swipe horizontally">'+cards+'</div><div class="myteams-table-scroll myteams-standings-table-wrap"><table class="myteams-table myteams-standings"><thead><tr><th>#</th><th>Team</th><th>W–L–T</th><th>PF</th><th>PA</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+ const row=t=>'<div class="myteams-standings-line"><span class="myteams-rank">'+escapeHtml(t.rank??'—')+'</span><button class="myteams-team-open" type="button" data-myteams-team="'+escapeHtml(t.teamId??'')+'">'+fantasyLogo(t)+'<span>'+escapeHtml(t.teamName||'Unknown')+'</span></button><span>'+escapeHtml((t.wins??'—')+'–'+(t.losses??'—')+'–'+(t.ties??0))+'</span><span>'+fmt(t.pointsFor)+'</span><span>'+fmt(t.pointsAgainst)+'</span></div>';
+ return '<div class="myteams-compact-list"><div class="myteams-standings-line is-heading"><span>#</span><span>Team</span><span>W–L–T</span><span>PF</span><span>PA</span></div>'+sorted.map(row).join('')+'</div>';
 }
 function standingHtml(id){return standingsTable(leagueFor(id)?.standings||[]);}
+function otherTeamHtml(item,teamId){
+ const entry=item.year===2026?opponentRosters.find(x=>x.id===item.id&&String(x.teamId)===String(teamId)):null;
+ const title=entry?.teamName||leagueFor(item.id)?.standings?.find(x=>String(x.teamId)===String(teamId))?.teamName||'Team';
+ const own=item.year===2026&&String(item.teamId)===String(teamId)?rosterSnapshots[item.index]:null;
+ const roster=own?.roster||entry?.roster;
+ return '<button type="button" class="myteams-back" data-myteams-back>← Back</button><h3 style="margin:3px 0 9px">'+escapeHtml(title)+'</h3>'+(roster?.length?rosterHtml(-1,{roster}):'<p class="myteams-empty">Current roster snapshot unavailable for this team.</p>');
+}
 function matchupHtml(id){
  const l=leagueFor(id),matches=l?.matchups||[];
  if(!matches.length)return '<p class="myteams-empty">Matchups unavailable.</p>';
  return '<p class="myteams-data-caption">Week '+escapeHtml(l.week||'current')+' · ESPN snapshot</p>'+matches.map(m=>{
- const side=(t)=>'<span>'+escapeHtml(t?.teamName||'—')+'</span><strong>'+fmt(t?.currentPoints??t?.totalPoints)+'</strong>';
+ const side=(t)=>'<button class="myteams-team-open" type="button" data-myteams-team="'+escapeHtml(t?.teamId??'')+'">'+escapeHtml(t?.teamName||'—')+'</button><strong>'+fmt(t?.currentPoints??t?.totalPoints)+'</strong>';
  return '<div class="myteams-match"><div>'+side(m.home)+'</div><small>VS</small><div>'+side(m.away)+'</div></div>';
  }).join('');
 }
@@ -521,12 +559,12 @@ function wireHtml(id,position='ALL'){
  const hasProjections=eligible.some(p=>weeklyProjection(p,week)!=='—');
  if(hasProjections)eligible.sort((a,b)=>(Number(weeklyProjection(b,week))||-1)-(Number(weeklyProjection(a,week))||-1));
  const leaders=hasProjections?eligible.filter(p=>weeklyProjection(p,week)!=='—').slice(0,10):eligible.slice(0,10);
- return '<p class="myteams-data-caption">Week '+week+' · '+(hasProjections?'Top available players by ESPN weekly projection':'Available players · ESPN weekly projections not provided in snapshot; shown in source order')+'</p><div class="myteams-wire-positions">'+choices.map(k=>'<button type="button" data-myteams-wire-pos="'+k+'" aria-pressed="'+(position===k)+'">'+k+'</button>').join('')+'</div>'+(!leaders.length?'<p class="myteams-empty">No available '+escapeHtml(position)+' players in this snapshot.</p>':'<div class="myteams-table-scroll"><table class="myteams-table myteams-waiver-table"><thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Proj.</th><th>Availability</th></tr></thead><tbody>'+leaders.map((p,i)=>{
+ return '<p class="myteams-data-caption">Week '+week+' · '+(hasProjections?'Top available players by ESPN weekly projection':'Available players · weekly projections unavailable')+'</p><div class="myteams-wire-positions">'+choices.map(k=>'<button type="button" data-myteams-wire-pos="'+k+'" aria-pressed="'+(position===k)+'">'+k+'</button>').join('')+'</div>'+(!leaders.length?'<p class="myteams-empty">No available '+escapeHtml(position)+' players in this snapshot.</p>':'<div class="myteams-compact-list"><div class="myteams-wire-line myteams-standings-line is-heading"><span>#</span><span>Player</span><span>Pos</span><span>Proj.</span><span>Status</span></div>'+leaders.map((p,i)=>{
  const status=p.acquisitionState==='waivers'?'Waivers':'FA';
  const dst=p.position==='D/ST';
  const head=dst?'<span class="myteams-defense-badge">'+nflLogo(p.team)+'</span>':p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
- return '<tr><td>'+(i+1)+'</td><td><button class="myteams-player-open" type="button" data-myteams-player="'+escapeHtml(p.name||'')+'">'+head+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.team)+escapeHtml(p.team||'FA')+'</small></span></button></td><td>'+escapeHtml(p.position||'—')+'</td><td>'+weeklyProjection(p,week)+'</td><td><span class="myteams-acquire">'+status+'</span></td></tr>';
- }).join('')+'</tbody></table></div>');
+ return '<div class="myteams-wire-line"><span>'+(i+1)+'</span><button class="myteams-player-open" type="button" data-myteams-player="'+escapeHtml(p.name||'')+'">'+head+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+nflLogo(p.team)+escapeHtml(p.team||'FA')+'</small></span></button><span>'+escapeHtml(p.position||'—')+'</span><span>'+weeklyProjection(p,week)+'</span><span><span class="myteams-acquire">'+status+'</span></span></div>';
+ }).join('')+'</div>');
 }
 function historyFinish(item){
  const archive=historicalData.find(x=>x.id===item.id&&x.year===item.year&&x.teamId===String(item.teamId));
@@ -551,15 +589,23 @@ function scheduleHtml(item){
   const score=Number(mine?.currentPoints??mine?.totalPoints),against=Number(opp?.currentPoints??opp?.totalPoints);
   const finished=w.week<liveWeek;
   const outcome=finished?(Number.isFinite(score)&&Number.isFinite(against)?score===against?'T':score>against?'W':'L':'—'):'Upcoming / Live';
-  return '<div class="myteams-schedule-row"><span>Week '+w.week+'</span><b class="myteams-outcome" data-result="'+escapeHtml(outcome)+'">'+escapeHtml(outcome)+'</b><span class="myteams-standing-identity">'+fantasyLogo(opp)+'<span>vs '+escapeHtml(opp?.teamName||'—')+'</span></span><strong>'+((w.week>liveWeek)?'—':fmt(score)+' – '+fmt(against))+'</strong></div>';
+  return '<div class="myteams-schedule-game"><button class="myteams-schedule-toggle" type="button" data-myteams-schedule-week="'+w.week+'" aria-expanded="false"><span class="myteams-schedule-row"><span>Week '+w.week+'</span><b class="myteams-outcome" data-result="'+escapeHtml(outcome)+'">'+escapeHtml(outcome)+'</b><span class="myteams-standing-identity">'+fantasyLogo(opp)+'<span>vs '+escapeHtml(opp?.teamName||'—')+'</span></span><strong>'+((w.week>liveWeek)?'—':fmt(score)+' – '+fmt(against))+'</strong></span></button><div class="myteams-schedule-detail" hidden></div></div>';
  }).join('')+'</div>';
+}
+function scheduleGameDetail(item,week){
+ const entry=matchupLineups.find(x=>x.id===item.id&&Number(x.week)===week);
+ const match=entry?.matchups?.find(m=>String(m.home?.teamId)===String(item.teamId)||String(m.away?.teamId)===String(item.teamId));
+ const row=p=>'<div class="myteams-boxscore-player"><button type="button" class="myteams-player-open" data-myteams-player="'+escapeHtml(p.name||'')+'">'+escapeHtml(p.name||'Unknown')+'</button><strong>'+fmt(p.points)+'</strong></div>';
+ if(!match)return '<p class="myteams-empty">Player-level lineup and scores were not included in the saved ESPN snapshot for Week '+week+'. Team scores are shown above.</p>';
+ const side=t=>'<div><h4><button type="button" class="myteams-team-open" data-myteams-team="'+escapeHtml(t.teamId)+'">'+escapeHtml(t.teamName||'Team')+'</button></h4>'+(t.players||[]).map(row).join('')+'</div>';
+ return '<div class="myteams-boxscore">'+side(match.home)+side(match.away)+'</div>';
 }
 function transactionsHtml(item){
  if(item.year!==2026)return '<p class="myteams-empty">Historical transactions have not been loaded.</p>';
  const entry=transactionData.find(x=>x.id===item.id);
- const tx=entry?.tx||[];
+ const tx=(entry?.tx||[]).filter(x=>['complete','completed','executed','approved','processed'].includes(String(x.status||'').toLowerCase()));
  if(!tx.length)return '<p class="myteams-empty">No recent team moves in the retrieved window.</p>';
- return '<p class="myteams-data-caption">ESPN transactions · '+(entry.truncated?'Latest 100 results':'Available snapshot')+'</p>'+tx.map(x=>'<div class="myteams-transaction"><small>'+escapeHtml(x.date||'')+' · '+escapeHtml(x.type||'Move')+' · '+escapeHtml(x.status||'Unknown')+(Number(x.faab)>0?' · <span class="myteams-faab">$'+escapeHtml(x.faab)+' FAAB</span>':'')+'</small><div>'+(x.added?.length?'<b>Added: '+escapeHtml(x.added.join(', '))+'</b>':'')+(x.dropped?.length?'<span>Dropped: '+escapeHtml(x.dropped.join(', '))+'</span>':'')+(x.type==='trade'&&!x.added?.length?'<span>Trade details unavailable</span>':'')+'</div></div>').join('');
+ return '<p class="myteams-data-caption">Completed ESPN moves · '+(entry.truncated?'Latest 100 results':'Available snapshot')+'</p>'+tx.map(x=>'<div class="myteams-transaction"><small>'+escapeHtml(x.date||'')+' · '+escapeHtml(x.type||'Move')+(Number(x.faab)>0?' · <span class="myteams-faab">$'+escapeHtml(x.faab)+' FAAB</span>':'')+'</small><div>'+(x.added?.length?'<b>Added: '+escapeHtml(x.added.join(', '))+'</b>':'')+(x.dropped?.length?'<span>Dropped: '+escapeHtml(x.dropped.join(', '))+'</span>':'')+(x.type==='trade'&&!x.added?.length?'<span>Trade completed · player details unavailable</span>':'')+'</div></div>').join('');
 }
 function panelHtml(item,tab){
  if(item.year!==2026){const archive=historicalData.find(x=>x.id===item.id&&x.year===item.year&&x.teamId===String(item.teamId));if(tab==='roster')return rosterHtml(-1,archive);if(tab==='standings')return archive?.standings?.length?standingsTable(archive.standings):'<p class="myteams-empty">Historical standings unavailable.</p>';return '<p class="myteams-empty">Historical matchup and waiver snapshots not available for this year.</p>';}
@@ -582,8 +628,12 @@ section.innerHTML='<header class="myteams-header"><div><h2>My Teams</h2><p>2026 
 main.appendChild(section);
 renderTeams(2026);
 section.addEventListener('change',e=>{if(e.target.id==='myTeamsYear')renderTeams(Number(e.target.value));});
+section.addEventListener('keydown',e=>{const row=e.target.closest('.myteams-roster-row[data-myteams-player]');if(row&&row===e.target&&(e.key==='Enter'||e.key===' ')){e.preventDefault();row.click();}});
 section.addEventListener('click',e=>{
  const player=e.target.closest('[data-myteams-player]');if(player){const name=player.dataset.myteamsPlayer;if(typeof window.openUnifiedPlayerProfileByName==='function')window.openUnifiedPlayerProfileByName(name);else if(typeof window.openPlayerProfileByName==='function')window.openPlayerProfileByName(name);return;}
+ const back=e.target.closest('[data-myteams-back]');if(back){const holder=back.closest('.myteams-roster');if(holder?._previousHtml!=null){holder.querySelector('.myteams-tab-content').innerHTML=holder._previousHtml;holder._previousHtml=null;}return;}
+ const team=e.target.closest('[data-myteams-team]');if(team){const holder=team.closest('.myteams-roster'),item=section._cards[Number(holder?.dataset.index)];if(item){const content=holder.querySelector('.myteams-tab-content');holder._previousHtml=content.innerHTML;content.innerHTML=otherTeamHtml(item,team.dataset.myteamsTeam);}return;}
+ const game=e.target.closest('[data-myteams-schedule-week]');if(game){const holder=game.closest('.myteams-roster'),item=section._cards[Number(holder?.dataset.index)],detail=game.nextElementSibling;if(item&&detail){const expand=detail.hidden;holder.querySelectorAll('.myteams-schedule-detail').forEach(x=>x.hidden=true);holder.querySelectorAll('[data-myteams-schedule-week]').forEach(x=>x.setAttribute('aria-expanded','false'));if(expand){detail.innerHTML=scheduleGameDetail(item,Number(game.dataset.myteamsScheduleWeek));detail.hidden=false;game.setAttribute('aria-expanded','true');}}return;}
  const wirePosition=e.target.closest('[data-myteams-wire-pos]');if(wirePosition){const holder=wirePosition.closest('.myteams-roster'),item=section._cards[Number(holder?.dataset.index)];if(item)holder.querySelector('.myteams-tab-content').innerHTML=wireHtml(item.id,wirePosition.dataset.myteamsWirePos);return;}
  const tab=e.target.closest('[data-myteams-tab]');
  if(tab){const holder=tab.closest('.myteams-roster'),item=section._cards[Number(holder?.dataset.index)];if(!item)return;holder.querySelectorAll('[data-myteams-tab]').forEach(el=>el.setAttribute('aria-selected',String(el===tab)));holder.querySelector('.myteams-tab-content').innerHTML=panelHtml(item,tab.dataset.myteamsTab);return;}

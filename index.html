@@ -485,7 +485,7 @@ body.my-teams-open .positions [data-pos="MYTEAMS"]{background:#114b3a!important;
  #shuaMyTeams{padding-top:12px!important}
 }
 </style>
-<script src="my-teams-data.js?v=20261023-2"></script><script src="my-teams-opponents.js?v=20261024-1"></script><script src="my-teams-injuries.js?v=20261024-1"></script><script id="shua-my-teams-script">
+<script src="my-teams-data.js?v=20261023-2"></script><script src="my-teams-opponents.js?v=20261024-1"></script><script src="my-teams-injuries.js?v=20261024-1"></script><script src="kicker-profile.js?v=20261024-1"></script><script id="shua-my-teams-script">
 (()=>{
 'use strict';
 const rosterSnapshots=window.ShuaMyTeamsData.rosterSnapshots;
@@ -636,7 +636,7 @@ renderTeams(2026);
 section.addEventListener('change',e=>{if(e.target.id==='myTeamsYear')renderTeams(Number(e.target.value));});
 section.addEventListener('keydown',e=>{const row=e.target.closest('.myteams-roster-row[data-myteams-player]');if(row&&row===e.target&&(e.key==='Enter'||e.key===' ')){e.preventDefault();row.click();}});
 section.addEventListener('click',e=>{
- const player=e.target.closest('[data-myteams-player]');if(player){const name=player.dataset.myteamsPlayer,pos=player.dataset.myteamsPlayerPos||'';if(typeof window.openUnifiedPlayerProfileByName==='function'){const seed=pos==='K'?{id:player.dataset.myteamsPlayerId,name,team:player.dataset.myteamsPlayerTeam||'',position:'K',seasonYear:2026,source:'my-teams'}:null;window.openUnifiedPlayerProfileByName(name,seed);}else if(typeof window.openPlayerProfileByName==='function')window.openPlayerProfileByName(name);return;}
+ const player=e.target.closest('[data-myteams-player]');if(player){const name=player.dataset.myteamsPlayer,pos=player.dataset.myteamsPlayerPos||'';if(pos==='K'&&window.ShuaKickerProfile?.open?.({id:player.dataset.myteamsPlayerId,name,team:player.dataset.myteamsPlayerTeam||''}))return;if(typeof window.openUnifiedPlayerProfileByName==='function')window.openUnifiedPlayerProfileByName(name);else if(typeof window.openPlayerProfileByName==='function')window.openPlayerProfileByName(name);return;}
  const back=e.target.closest('[data-myteams-back]');if(back){const holder=back.closest('.myteams-roster');if(holder?._previousHtml!=null){holder.querySelector('.myteams-tab-content').innerHTML=holder._previousHtml;holder._previousHtml=null;}return;}
  const team=e.target.closest('[data-myteams-team]');if(team){const holder=team.closest('.myteams-roster'),item=section._cards[Number(holder?.dataset.index)];if(item){const content=holder.querySelector('.myteams-tab-content');holder._previousHtml=content.innerHTML;content.innerHTML=otherTeamHtml(item,team.dataset.myteamsTeam);}return;}
  const game=e.target.closest('[data-myteams-schedule-week]');if(game){const holder=game.closest('.myteams-roster'),item=section._cards[Number(holder?.dataset.index)],detail=game.nextElementSibling;if(item&&detail){const expand=detail.hidden;holder.querySelectorAll('.myteams-schedule-detail').forEach(x=>x.hidden=true);holder.querySelectorAll('[data-myteams-schedule-week]').forEach(x=>x.setAttribute('aria-expanded','false'));if(expand){detail.innerHTML=scheduleGameDetail(item,Number(game.dataset.myteamsScheduleWeek));detail.hidden=false;game.setAttribute('aria-expanded','true');}}return;}

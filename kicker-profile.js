@@ -39,6 +39,17 @@ function ensure(){
  #shuaKickerProfile .kp-year{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;color:#adcadb}
  #shuaKickerProfile .kp-year select{background:#17384e;color:white;border:1px solid #42627b;border-radius:7px;padding:7px}
  #shuaKickerProfile .kp-empty{color:#b5c9d8;font-size:12px;padding:12px 2px}
+ #unifiedProfilePanels .kp-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0 12px}
+ #unifiedProfilePanels .kp-stat{background:#102c43;border:1px solid #29485e;border-radius:8px;padding:9px 4px;text-align:center}
+ #unifiedProfilePanels .kp-stat small{display:block;color:#9fbbd0;font-size:10px;margin-bottom:4px}
+ #unifiedProfilePanels .kp-stat strong{font-size:16px}
+ #unifiedProfilePanels .kp-table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+ #unifiedProfilePanels .kp-table th,#unifiedProfilePanels .kp-table td{padding:9px 5px;border-bottom:1px solid #ffffff19;text-align:left}
+ #unifiedProfilePanels .kp-table th{font-size:10px;color:#9fb8ca}
+ #unifiedProfilePanels .kp-table th:last-child,#unifiedProfilePanels .kp-table td:last-child{text-align:right}
+ #unifiedProfilePanels .kp-year{display:flex;align-items:center;gap:8px;margin:8px 0 12px;color:#adc6d8;font-size:12px}
+ #unifiedProfilePanels .kp-year select{background:#14364f;border:1px solid #3c6078;color:white;border-radius:7px;padding:7px}
+ #unifiedProfilePanels .kp-empty{color:#b5c9d8;font-size:12px;padding:12px 2px}
  @media(max-width:600px){#shuaKickerProfile{align-items:stretch;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}#shuaKickerProfile .kp-card{max-height:100%;border-radius:0;border-left:0;border-right:0}#shuaKickerProfile .kp-portrait{width:64px;height:64px}#shuaKickerProfile .kp-name{font-size:18px}}
  `;
  document.head.appendChild(style);
@@ -99,5 +110,39 @@ function open(player){
  host.querySelector('.kp-top').innerHTML='<img class="kp-portrait" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+id+'.png" alt="" onerror="this.style.opacity=\'0\'"><div><h2 class="kp-name">'+esc(current.name)+'</h2><div class="kp-team">'+(lg?'<img src="'+lg+'" alt="">':'')+esc(current.team)+' · K</div></div><button class="kp-close" type="button" aria-label="Close">×</button>';
  host.hidden=false;document.body.classList.add('shua-kicker-open');host.querySelector('.kp-close').focus();showTab('overview');return true;
 }
-window.ShuaKickerProfile={open,close};
+const selectedYears=new Map();
+const safeName=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+function profileAlive(target,name){return target?.isConnected&&safeName(document.getElementById('modal')?.dataset.unifiedName)===safeName(name)}
+async function renderOverview(name,id,target){
+ if(!target)return;
+ target.innerHTML='<div class="stat"><span>2026 kicking</span><b>Loading…</b></div>';
+ const row=await getSeason(id,2026);
+ if(!profileAlive(target,name))return;
+ target.innerHTML='<div class="stat"><span>ESPN Points</span><b>'+pts(row?.points)+'</b></div><div class="stat"><span>PPG</span><b>'+pts(row?.ppg)+'</b></div><div class="stat"><span>Games</span><b>'+(row?.gp??'—')+'</b></div><div class="stat"><span>Position</span><b>K</b></div>';
+}
+async function renderHistory(name,id,target){
+ if(!target)return;
+ target.innerHTML='<div class="unified-profile-loading">Loading kicker history…</div>';
+ const results=await Promise.all(seasons.map(year=>getSeason(id,year)));
+ if(!profileAlive(target,name))return;
+ const rows=results.filter(Boolean);
+ target.innerHTML=rows.length?'<div class="player-history-card"><div class="player-history-head"><div>Year</div><div>Team</div><div>Finish</div><div>GP</div><div>PPG</div><div>Pts</div></div>'+rows.map(r=>'<div class="player-history-row" data-kicker-history-year="'+r.year+'" role="button" tabindex="0"><div class="player-history-year">› '+r.year+'</div><div class="player-history-team">'+esc(r.team)+'</div><div class="player-history-finish">—</div><div class="player-history-games">'+r.gp+'</div><div class="player-history-ppg">'+pts(r.ppg)+'</div><div class="player-history-points">'+pts(r.points)+'</div></div>').join('')+'<div class="player-history-note">Tap a season to open its game log.</div></div>':'<div class="player-history-empty">No ESPN kicking seasons found.</div>';
+ target.querySelectorAll('[data-kicker-history-year]').forEach(row=>{
+  const go=()=>{selectedYears.set(String(id),Number(row.dataset.kickerHistoryYear));document.querySelector('[data-profile-tab="gamelog"]')?.click()};
+  row.addEventListener('click',go);
+  row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}});
+ });
+}
+async function renderGameLog(name,id,target){
+ if(!target)return;
+ const year=selectedYears.get(String(id))||2026;
+ target.innerHTML='<div class="unified-profile-loading">Loading '+year+' kicker game log…</div>';
+ const row=await getSeason(id,year);
+ if(!profileAlive(target,name))return;
+ const select='<label class="kp-year">Season <select aria-label="Kicker game log season">'+seasons.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+'</select></label>';
+ target.innerHTML=select+(row?summary(row)+(row.games.length?'<table class="kp-table"><thead><tr><th>Week</th><th>Fantasy points</th></tr></thead><tbody>'+row.games.map(g=>'<tr><td>Week '+g.week+'</td><td>'+pts(g.points)+'</td></tr>').join('')+'</tbody></table>':'<div class="kp-empty">No completed weekly games found.</div>'):'<div class="kp-empty">No ESPN kicker game log for '+year+'.</div>');
+ const control=target.querySelector('.kp-year select');
+ if(control)control.onchange=()=>{selectedYears.set(String(id),Number(control.value));renderGameLog(name,id,target)};
+}
+window.ShuaKickerProfile={open,close,renderOverview,renderHistory,renderGameLog};
 })();

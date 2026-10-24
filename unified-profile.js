@@ -1047,11 +1047,20 @@ function activateTab(key){
   document.querySelectorAll('[data-profile-panel]').forEach(p=>p.hidden=p.dataset.profilePanel!==key);
   const name=document.getElementById('modal')?.dataset.unifiedName;
   if(!name)return;
+  if(key==='performance'&&document.getElementById('modal')?.dataset.unifiedPosition==='K'){
+    const panel=document.getElementById('unifiedPerformancePanel');
+    if(panel)panel.innerHTML='<div class="unified-profile-loading">Kicker analytics are not available in the QB/RB/WR/TE model. Use Game Log for weekly kicking points.</div>';
+    return;
+  }
   if(key==='gamelog')loadGameLog(name);
   if(key==='history')loadHistory(name);
   if(key==='performance')document.getElementById('modal')?.dispatchEvent(new CustomEvent('shuaPerformanceTabActive',{detail:{name}}));
 }
 function renderOverviewRanks(name){
+  if(activeSeed?.position==='K'&&activeSeed?.id){
+    window.ShuaKickerProfile?.renderOverview?.(name,activeSeed.id,document.getElementById('stats'));
+    return;
+  }
   const hist=historicalSeed();
   if(hist){renderHistoricalOverview(hist);return}
   const p=playerByName(name)||basePositionPlayer(name);
@@ -1088,6 +1097,10 @@ async function loadHistory(name){
   panel.dataset.loadedFor=norm(name);
   panel.dataset.ready='0';
   panel.innerHTML='<div class="unified-profile-loading">Loading ESPN history…</div>';
+  if(activeSeed?.position==='K'&&activeSeed?.id){
+    await window.ShuaKickerProfile?.renderHistory?.(name,activeSeed.id,panel);
+    panel.dataset.ready='1';return;
+  }
   if(window.ShuaPlayerHistory?.render){
     await window.ShuaPlayerHistory.render(name,panel);
     panel.dataset.ready='1';
@@ -1102,6 +1115,10 @@ async function loadGameLog(name){
   panel.dataset.loadedFor=norm(name);
   panel.dataset.ready='0';
   panel.innerHTML='<div class="unified-profile-loading">Loading game log…</div>';
+  if(activeSeed?.position==='K'&&activeSeed?.id){
+    await window.ShuaKickerProfile?.renderGameLog?.(name,activeSeed.id,panel);
+    panel.dataset.ready='1';return;
+  }
   if(window.ShuaEspnLive?.renderGameLog){
     const yr=seedYear(activeSeed);
     if(yr&&window.ShuaEspnLive?.renderGameLogYear)await window.ShuaEspnLive.renderGameLogYear(name,yr,panel);
@@ -1184,6 +1201,7 @@ function prepareUnified(name,seed=null){
   activeSeed=seed?{...seed,__historical:!!(seed.source==='nflverse'||(sy&&sy<2026))}:null;
   const modal=document.getElementById('modal');
   modal.dataset.unifiedName=name;
+  if(seed?.position==='K')modal.dataset.unifiedPosition='K';else delete modal.dataset.unifiedPosition;
   applyFeaturedProfile(name,seed);
   renderOverviewRanks(name);
   ensureStickyIdentity(name);
@@ -1194,7 +1212,7 @@ function prepareUnified(name,seed=null){
   if(gp){gp.dataset.loadedFor='';gp.dataset.ready='0';gp.innerHTML=''}
   const hp=document.getElementById('unifiedHistoryPanel');
   if(hp){hp.dataset.loadedFor='';hp.dataset.ready='0';hp.innerHTML=''}
-  activateTab(preferredProfileTab||'overview');
+  activateTab(seed?.position==='K'?'overview':preferredProfileTab||'overview');
   warmAdjacentProfiles(name);
 }
 async function openByName(name,seed=null){

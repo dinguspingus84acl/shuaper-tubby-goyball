@@ -590,6 +590,9 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="injury"] .st-injury-browser{position:relative!important;top:auto!important;width:100%!important;max-width:none!important;box-sizing:border-box}
 #shuaAnalyticsSection[data-active-view="injury"] .st-injury-list{display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;overflow-x:hidden!important;overflow-y:auto!important;width:100%!important;max-height:55dvh!important}
 #shuaAnalyticsSection[data-active-view="injury"] .st-injury-item{width:100%!important;flex:0 0 auto!important}
+#shuaAnalyticsSection[data-active-view="injury"] .st-injury-item{max-width:none!important;min-width:0!important}
+#shuaAnalyticsSection[data-active-view="injury"] .st-injury-name b{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.3;overflow-wrap:anywhere}
+#shuaAnalyticsSection[data-active-view="teams"] .st-team-opportunity-rank{font-weight:900;color:#9db6c9;text-align:center;min-width:28px}
 #shuaAnalyticsSection[data-active-view="injury"] .st-injury-detail{width:100%!important;min-width:0!important}
 #shuaAnalyticsSection[data-active-view="injury"] .st-method,#shuaAnalyticsSection[data-active-view="injury"] #stSource{display:none!important}
 #shuaAnalyticsSection[data-active-view="weekly"] .st-method,#shuaAnalyticsSection[data-active-view="weekly"] #stSource{display:none!important}
@@ -697,6 +700,7 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 @media(max-width:700px){#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-row{grid-template-columns:minmax(140px,1.5fr) minmax(50px,1fr) 42px}#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-player{font-size:10px}}
 
 #shuaAnalyticsSection[data-active-view="injury"] .st-injury-name b{display:flex;align-items:center;gap:5px;min-width:0}
+@media(max-width:700px){#shuaAnalyticsSection[data-active-view="injury"] .st-injury-browser{padding:8px!important;border-radius:10px!important}#shuaAnalyticsSection[data-active-view="injury"] .st-injury-item{gap:8px;padding:7px 8px!important}#shuaAnalyticsSection[data-active-view="injury"] .st-injury-name b{font-size:14px!important;flex-wrap:wrap}#shuaAnalyticsSection[data-active-view="injury"] .st-injury-tag{max-width:84px}#shuaAnalyticsSection[data-active-view="injury"] .st-injury-face{width:42px;height:45px}}
 #shuaAnalyticsSection[data-active-view="injury"] .st-injury-team-logo{height:17px;width:17px;object-fit:contain;flex:0 0 17px}
 
 #shuaAnalyticsSection[data-active-view="teams"] .st-team-share-ranked{display:flex;flex-direction:column;gap:3px}

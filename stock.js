@@ -1,0 +1,76 @@
+/* Draft stock across Jack's 11 included 2026 ESPN fantasy teams. */
+(()=>{
+'use strict';
+const source=window.ShuaStockDrafts;
+const nav=document.querySelector('.positions'),main=document.querySelector('main');
+if(!source?.leagues?.length||!nav||!main||document.getElementById('shuaStock'))return;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const logos={WAS:'wsh',WSH:'wsh',GB:'gb',GNB:'gb',LAR:'lar',LA:'lar',LAC:'lac',LV:'lv',JAX:'jax',KC:'kc',NE:'ne',NO:'no',SF:'sf',TB:'tb'};
+const logo=t=>{const code=logos[t]||String(t||'').toLowerCase();return /^[a-z]{2,3}$/.test(code)?'https://a.espncdn.com/i/teamlogos/nfl/500/'+code+'.png':''};
+const section=document.createElement('section');section.id='shuaStock';section.hidden=true;main.append(section);
+const button=document.createElement('button');button.type='button';button.className='pos';button.dataset.pos='STOCK';button.textContent='Stock';nav.append(button);
+const style=document.createElement('style');style.textContent=`
+body.shua-stock-open main>*:not(#shuaStock){display:none!important}body.shua-stock-open #shuaStock{display:block!important}
+body.shua-stock-open .positions [data-pos="STOCK"]{background:#114b3a!important;color:#c8ffeb!important;border-color:#26d69a!important}
+#shuaStock{max-width:1200px;margin:0 auto;color:#edf8ff;padding:17px 12px 75px}
+#shuaStock .stock-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+#shuaStock h2{font-size:clamp(21px,3vw,29px);font-weight:900;margin:0 0 3px}
+#shuaStock .stock-sub{font-size:12px;color:#98b7c9;margin:0}
+#shuaStock .stock-count{white-space:nowrap;color:#31e4a3;background:#10392e;border:1px solid #21674f;border-radius:30px;padding:7px 10px;font-size:12px;font-weight:850}
+#shuaStock .stock-filters{display:flex;gap:6px;overflow-x:auto;padding-bottom:9px;margin-bottom:10px;scrollbar-width:none}
+#shuaStock .stock-filters button{flex:0 0 auto;border:1px solid #3a586d;background:#0c2940;color:#b6cfe0;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:850;cursor:pointer}
+#shuaStock .stock-filters button[aria-pressed="true"]{color:#fff;background:#136348;border-color:#29dda0}
+#shuaStock .stock-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+#shuaStock .stock-group{min-width:0;background:#0a2034;border:1px solid #2a4c64;border-radius:13px;overflow:hidden}
+#shuaStock .stock-group-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#102c44}
+#shuaStock h3{margin:0;font-size:15px;font-weight:900}#shuaStock .stock-group-head small{color:#a0bcd0;font-size:11px}
+#shuaStock .stock-header,#shuaStock .stock-row{display:grid;grid-template-columns:27px minmax(0,1fr) 55px 60px;align-items:center;column-gap:7px}
+#shuaStock .stock-header{padding:8px 10px;color:#90abc0;font-size:9px;font-weight:850;text-transform:uppercase}
+#shuaStock .stock-header span:nth-child(n+3){text-align:right}
+#shuaStock .stock-row{padding:7px 10px;min-height:49px;border-top:1px solid #ffffff12}
+#shuaStock .stock-rank{text-align:center;color:#9bb3c4;font-size:12px;font-weight:800}
+#shuaStock .stock-person{display:flex;align-items:center;gap:8px;min-width:0;border:0;background:transparent;color:#f4faff;text-align:left;cursor:pointer;padding:0}
+#shuaStock .stock-face{height:38px;width:38px;flex:0 0 38px;object-fit:cover;border-radius:50%;background:#1b3b51}
+#shuaStock .stock-logo{height:15px;width:15px;object-fit:contain;vertical-align:middle;margin-right:4px}
+#shuaStock .stock-name{min-width:0;font-size:12px;font-weight:850;line-height:1.2;overflow-wrap:anywhere}
+#shuaStock .stock-meta{font-size:10px;color:#96b5c8;margin-top:4px}
+#shuaStock .stock-num{text-align:right;font-size:15px;font-weight:900;font-variant-numeric:tabular-nums}
+#shuaStock .stock-percent{text-align:right;color:#36e3a7;font-weight:900;font-size:13px;font-variant-numeric:tabular-nums}
+@media(max-width:750px){#shuaStock{padding:10px 4px 70px}#shuaStock .stock-groups{grid-template-columns:1fr;gap:9px}#shuaStock .stock-top{padding:0 4px}#shuaStock .stock-group-head{padding:9px 10px}#shuaStock .stock-row{grid-template-columns:23px minmax(0,1fr) 48px 52px;padding:6px;column-gap:5px}#shuaStock .stock-header{grid-template-columns:23px minmax(0,1fr) 48px 52px;padding:7px 6px;column-gap:5px}#shuaStock .stock-face{width:35px;height:35px;flex-basis:35px}#shuaStock .stock-name{font-size:12px}#shuaStock .stock-num{font-size:14px}#shuaStock .stock-percent{font-size:12px}}
+`;document.head.append(style);
+const order=['QB','RB','WR','TE','K','D/ST'];const denominator=source.leagues.length;
+const grouped=new Map(order.map(pos=>[pos,new Map()]));
+for(const league of source.leagues){
+ const seen=new Set();
+ for(const p of league.picks||[]){
+  if(!grouped.has(p.pos)||seen.has(String(p.id)))continue;seen.add(String(p.id));
+  const bucket=grouped.get(p.pos),key=String(p.id);
+  if(!bucket.has(key))bucket.set(key,{...p,leagues:[]});
+  bucket.get(key).leagues.push(league.name.trim());
+ }
+}
+const players=Object.fromEntries(order.map(pos=>[pos,[...grouped.get(pos).values()].sort((a,b)=>b.leagues.length-a.leagues.length||a.name.localeCompare(b.name))]));
+let filter='ALL';
+function render(){
+ const groups=order.filter(pos=>filter==='ALL'||filter===pos);
+ section.innerHTML='<div class="stock-top"><div><h2>Stock</h2><p class="stock-sub">2026 draft picks · Week 1 baseline</p></div><span class="stock-count">'+denominator+' Teams</span></div>'+
+ '<div class="stock-filters">'+['ALL',...order].map(pos=>'<button type="button" data-stock-position="'+pos+'" aria-pressed="'+(filter===pos)+'">'+pos+'</button>').join('')+'</div>'+
+ '<div class="stock-groups">'+groups.map(pos=>{
+  const list=players[pos];return '<div class="stock-group"><div class="stock-group-head"><h3>'+pos+'</h3><small>'+list.length+' drafted players</small></div><div class="stock-header"><span>#</span><span>Player</span><span>Teams</span><span>Stock %</span></div>'+
+  list.map((p,i)=>{const nfl=logo(p.nfl),defense=pos==='D/ST',portrait=defense?nfl:'https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png';
+   return '<div class="stock-row"><span class="stock-rank">'+(i+1)+'</span><button class="stock-person" type="button" data-stock-id="'+esc(p.id)+'" title="'+esc(p.leagues.join(' · '))+'"><img class="stock-face" src="'+portrait+'" loading="lazy" alt=""><span class="stock-name">'+esc(p.name)+'<span class="stock-meta">'+(defense?'D/ST · ':'')+(defense?'':nfl?'<img class="stock-logo" src="'+nfl+'" alt="">':'')+esc(p.nfl||'')+'</span></span></button><span class="stock-num">'+p.leagues.length+'</span><span class="stock-percent">'+(100*p.leagues.length/denominator).toFixed(1)+'%</span></div>';
+  }).join('')+'</div>';
+ }).join('')+'</div>';
+}
+section.addEventListener('click',e=>{
+ const pos=e.target.closest('[data-stock-position]');if(pos){filter=pos.dataset.stockPosition;render();return;}
+ const entry=e.target.closest('[data-stock-id]');if(!entry)return;
+ const p=Object.values(players).flat().find(p=>String(p.id)===entry.dataset.stockId);
+ if(p&&typeof window.openUnifiedPlayerProfileByName==='function')window.openUnifiedPlayerProfileByName(p.name,{id:p.id,name:p.name,team:p.nfl,position:p.pos,seasonYear:2026,source:'stock'});
+});
+function show(){document.body.classList.add('shua-stock-open');section.hidden=false;nav.querySelectorAll('.pos').forEach(b=>b.classList.toggle('active',b===button));}
+function hide(){document.body.classList.remove('shua-stock-open');section.hidden=true;button.classList.remove('active');}
+document.addEventListener('click',e=>{const target=e.target.closest('.positions [data-pos]');if(target&&target!==button)hide();},true);
+nav.addEventListener('click',e=>{const target=e.target.closest('[data-pos]');if(!target)return;if(target===button){e.preventDefault();e.stopImmediatePropagation();show();}else hide();},true);
+render();
+})();

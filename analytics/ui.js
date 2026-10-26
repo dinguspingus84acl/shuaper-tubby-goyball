@@ -107,7 +107,7 @@ function usage(){
     yardsPerRouteRun:routes>0&&N(a.recYds)!==null?a.recYds/routes:null,airYardsShare:null};
   });
  }
- const chosen=metrics.find(m=>m[0]===state.usageMetric)||metrics[0];
+ const chosen=metrics.find(m=>m[0]===state.usageMetric)||metrics[1];
  const rankedOrder=new Map((dataset.rankData?.overall||[]).map((name,i)=>[key(name),i]));
  const rows=entries.filter(x=>(!state.usagePos||state.usagePos==='ALL'||x.p.position===state.usagePos))
   .sort((a,b)=>(N(b[chosen[0]])??-Infinity)-(N(a[chosen[0]])??-Infinity)||(rankedOrder.get(a.p.key)??9999)-(rankedOrder.get(b.p.key)??9999)||a.p.name.localeCompare(b.p.name));

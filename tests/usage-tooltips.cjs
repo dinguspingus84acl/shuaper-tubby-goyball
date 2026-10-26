@@ -17,7 +17,7 @@ const catalog=extract('usageCatalog','array');
 const definitions=extract('usageDescriptions','object');
 const groups=extract('usageGroups','object');
 const names=new Set(catalog.map(row=>row[0]));
-assert.equal(names.size,30,'Expected 30 unique usage metrics after adding 10 advanced measures');
+assert.equal(names.size,42,'Expected 42 unique usage metrics after adding 12 further measures');
 assert.deepEqual([...Object.keys(definitions)].sort(),[...names].sort(),'A tooltip is required for every metric');
 for(const field of names){
  const [meaning,formula]=definitions[field];
@@ -34,4 +34,4 @@ assert.ok(js.includes('if(anchor===usageTooltipAnchor&&!anchor.contains(e.relate
 assert.ok(!css.includes('td[data-st-usage-field]{cursor:help}'),'Only info icons should advertise a tooltip on hover');
 assert.ok(css.includes('.st-usage-tooltip[hidden]'),'Tooltip needs a hidden state');
 assert.ok(js.includes('hideUsageTooltip();\n const host=section.querySelector'), 'Filtering must close stale tooltips');
-console.log('PASS: definitions for 30 usage metrics, icon-only hover/tap, immediate mouseout, sortable headers and tooltip lifecycle');
+console.log('PASS: definitions for 42 usage metrics, icon-only hover/tap, immediate mouseout, sortable headers and tooltip lifecycle');

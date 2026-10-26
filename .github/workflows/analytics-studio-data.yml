@@ -40,10 +40,13 @@ jobs:
         run: python -m pip install --disable-pip-version-check pyreadr
       - name: Merge ten source-backed advanced Usage statistics
         run: python -u scripts/enrich-ranked-advanced-usage.py
+      - name: Merge twelve further verified Usage statistics
+        run: python -u scripts/enrich-ranked-next-usage.py
       - name: Validate advanced usage calculations
         run: |
           node tests/usage-extra-metrics.cjs
           node tests/usage-advanced-metrics.cjs
+          node tests/usage-next-metrics.cjs
       - name: Publish data snapshots only
         id: save
         run: |

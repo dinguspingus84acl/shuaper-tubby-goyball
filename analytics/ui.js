@@ -95,7 +95,19 @@ const usageCatalog=[
  ['deepTargetRate','Deep target rate','Deep %',1,'%'],
  ['receivingFirstDownsPerRoute','Receiving first downs per route','Rec 1D/R',1,'%'],
  ['yardsAfterContactPerCarry','Yards after contact per carry','YACo/C',2,''],
- ['qbDesignedRushesPerGame','QB designed rushes per game','Des R/G',1,'']
+ ['qbDesignedRushesPerGame','QB designed rushes per game','Des R/G',1,''],
+ ['expectedFantasyPointsTrend','Last 3 vs previous 3 weeks expected fantasy points','xFP Δ',1,''],
+ ['expectedTouchdowns','Expected touchdowns','xTD',2,''],
+ ['endZoneTargets','End-zone targets','EZ Tgt',0,''],
+ ['targetShareTrend','Last 3 vs previous 3 weeks target share','Tgt Δ',1,' pp'],
+ ['fantasyPointsPerOpportunity','Fantasy points per opportunity','FP/Opp',2,''],
+ ['explosivePlayRate','Explosive play rate','Expl %',1,'%'],
+ ['rushingSuccessRate','Rushing success rate','Rush S%',1,'%'],
+ ['firstReadTargetShare','First-read target share','1st Rd %',1,'%'],
+ ['averageSeparation','Average separation at target arrival','Sep',2,' yd'],
+ ['epaPerDropback','EPA per QB dropback','EPA/DB',2,''],
+ ['completionPctOverExpected','Completion percentage over expected','CPOE',1,' pp'],
+ ['pressureToSackRate','Pressure-to-sack rate','P/S %',1,'%']
 ];
 // One definition per field keeps the table compact and gives every value the same explanation.
 // Formulas intentionally match the verified snapshot builders, including their coverage windows.
@@ -129,13 +141,26 @@ const usageDescriptions={
  deepTargetRate:['Percentage of the player\'s targets that traveled at least 20 yards downfield.','Targets with 20 or more air yards ÷ all player targets × 100 in verified nflverse weeks.'],
  receivingFirstDownsPerRoute:['How often one of the player\'s routes resulted in a receiving first down.','Receiving first downs from nflverse ÷ verified HeatRadar routes in those exact same weeks × 100; at least eight routes.'],
  yardsAfterContactPerCarry:['Average rushing yards earned after a defender first made contact.','PFR rushing yards after contact ÷ PFR rushing attempts from matched games.'],
- qbDesignedRushesPerGame:['Average called quarterback runs, separate from scrambles.','QB rushing attempts excluding flagged scrambles and kneeldowns ÷ recorded games verified in play-by-play.']
+ qbDesignedRushesPerGame:['Average called quarterback runs, separate from scrambles.','QB rushing attempts excluding flagged scrambles and kneeldowns ÷ recorded games verified in play-by-play.'],
+ expectedFantasyPointsTrend:['Recent change in opportunity-based expected PPR points.','Average ffopportunity xFP in the latest three NFL weeks minus the previous three; at least two matched games in each window.'],
+ expectedTouchdowns:['Expected touchdowns from opportunity quality. Currently unavailable without a validated player-level touchdown model.','Requires a calibrated xTD model for each player opportunity; no verified 2026 model is available.'],
+ endZoneTargets:['Targets thrown toward a receiver in the end zone, whether caught or missed.','Count passes whose verified air yards reach or exceed the distance from the line of scrimmage to the goal line.'],
+ targetShareTrend:['How much of the team passing workload a player is gaining or losing.','Average weekly target share in the latest three weeks minus the previous three, in percentage points; at least two verified weeks each.'],
+ fantasyPointsPerOpportunity:['Actual PPR production per rushing attempt or target.','Recorded ESPN PPR fantasy points ÷ total recorded rushing attempts and targets.'],
+ explosivePlayRate:['How frequently a player gains a large chunk of yards on a touch.','Rushes gaining 10+ yards plus receptions gaining 20+ yards ÷ all rushes and receptions × 100.'],
+ rushingSuccessRate:['Share of carries that gain enough yards for the down and distance.','Gain 40% of yards to go on first down, 60% on second, or 100% on third/fourth, divided by verified rushes × 100.'],
+ firstReadTargetShare:['How often a player is the designed first read. No verified 2026 charting is available.','Designed first-read targets ÷ team designed first-read targets × 100; cannot be inferred from total targets.'],
+ averageSeparation:['Distance from the nearest defender when the ball reaches the targeted receiver.','Target-weighted NFL Next Gen Stats separation in yards across matched games; unavailable when 2026 tracking is unpublished.'],
+ epaPerDropback:['Average expected points added by the offense on a quarterback dropback.','Sum nflverse play EPA for QB dropbacks, including sacks ÷ verified dropbacks.'],
+ completionPctOverExpected:['How much the QB outperforms modeled completion probability.','Average nflverse CPOE on attempts with reported completion probability (minimum 10 and at least 75% of verified attempts), in percentage points.'],
+ pressureToSackRate:['How frequently recorded defensive pressure turns into a sack.','PFR times sacked ÷ PFR times pressured × 100 across matched games.']
 };
 const usageGroups={
  volume:['espnPositionRank','snapShare','routesRun','routeParticipation','targetsPerGame','carriesPerGame','targetShare','carryShare','recentOpportunityChange'],
  opportunity:['espnPositionRank','targetShare','opportunityShare','airYardsShare','wopr','aDOT','redZoneOpportunities','highValueTouches'],
  efficiency:['espnPositionRank','targetsPerRouteRun','yardsPerRouteRun','yacPerReception','receivingFirstDowns','receivingYardsShare','aDOT','wopr'],
- advanced:['espnPositionRank','expectedFantasyPointsPerGame','fantasyPointsOverExpected','redZoneTargetShare','insideFiveCarryShare','insideTenTargets','routeParticipationTrend','deepTargetRate','receivingFirstDownsPerRoute','yardsAfterContactPerCarry','qbDesignedRushesPerGame']
+ advanced:['espnPositionRank','expectedFantasyPointsPerGame','fantasyPointsOverExpected','redZoneTargetShare','insideFiveCarryShare','insideTenTargets','routeParticipationTrend','deepTargetRate','receivingFirstDownsPerRoute','yardsAfterContactPerCarry','qbDesignedRushesPerGame'],
+ signals:['espnPositionRank','expectedFantasyPointsTrend','expectedTouchdowns','endZoneTargets','targetShareTrend','fantasyPointsPerOpportunity','explosivePlayRate','rushingSuccessRate','firstReadTargetShare','averageSeparation','epaPerDropback','completionPctOverExpected','pressureToSackRate']
 };
 const usageRouteFields=new Set(['routesRun','routeParticipation','targetsPerRouteRun','yardsPerRouteRun']);
 const usageReceivingFields=new Set(['aDOT','wopr','receivingYardsShare','yacPerReception','receivingFirstDowns','airYardsShare']);
@@ -151,6 +176,17 @@ function usageCoverage(field,anchor){
  if(!id)return '';
  const player=rankedUsage?.players?.[id];
  if(!player)return '';
+ if(usageGroups.signals.includes(field)){
+  const c=player.nextUsageCoverage||{};
+  if(field==='expectedTouchdowns')return 'Unavailable: no validated player-specific expected-touchdown model.';
+  if(field==='firstReadTargetShare')return 'Unavailable: no verified first-read target charting.';
+  if(field==='averageSeparation'&&!c.ngsWeeks)return 'Unavailable: official 2026 Next Gen Stats receiving data has not been published.';
+  if(field==='expectedFantasyPointsTrend')return 'Coverage: '+(c.trendRecentWeeks||0)+' recent and '+(c.trendPriorWeeks||0)+' previous xFP weeks.';
+  if(field==='targetShareTrend')return 'Coverage: '+(c.targetRecentWeeks||0)+' recent and '+(c.targetPriorWeeks||0)+' previous PBP weeks.';
+  if(field==='pressureToSackRate')return 'Coverage: '+(c.pressureWeeks||0)+' PFR passing weeks.';
+  if(field==='averageSeparation')return 'Coverage: '+(c.ngsWeeks||0)+' NGS receiving weeks.';
+  return 'Coverage: '+(c.pbpWeeks||0)+' matched play-by-play weeks; ESPN games for FP/Opp.';
+ }
  if(field==='routeParticipationTrend'){
   const c=player.routeTrendCoverage;
   return c?'Coverage: '+c.recentWeeks+' recent and '+c.priorWeeks+' earlier verified route weeks, through W'+c.throughWeek+'.':'Not enough verified route weeks in both windows.';
@@ -226,7 +262,7 @@ function currentEspnPositionRanks(){
 function fetchRankedUsage(){
  if(rankedUsage||rankedUsagePending||rankedUsageError)return;
  rankedUsagePending=true;
- S.Data.json('analytics/data/ranked-usage-2026.json?v=20261026-advanced-10a',{cache:'no-store'}).then(data=>{
+ S.Data.json('analytics/data/ranked-usage-2026.json?v=20261026-usage-signals12',{cache:'no-store'}).then(data=>{
   if(data.schema!==1||data.season!==2026||!data.players)throw new Error('Invalid ranked-player usage snapshot');
   rankedUsage=data;
  }).catch(err=>{rankedUsageError=err.message||String(err);}).finally(()=>{
@@ -275,12 +311,12 @@ function usage(){
    if(av!==null&&bv!==null&&av!==bv)return sortDirection==='asc'?av-bv:bv-av;
    return (rankedOrder.get(a.p.key)??9999)-(rankedOrder.get(b.p.key)??9999)||a.p.name.localeCompare(b.p.name);
   });
- const groupButtons='<div class="st-usage-groups" role="group" aria-label="Usage stat category">'+[['volume','Volume'],['opportunity','Opportunity'],['efficiency','Efficiency'],['advanced','Advanced']].map(([id,label])=>'<button type="button" data-st-usage-group="'+id+'" aria-pressed="'+(group===id)+'">'+label+'</button>').join('')+'</div>';
+ const groupButtons='<div class="st-usage-groups" role="group" aria-label="Usage stat category">'+[['volume','Volume'],['opportunity','Opportunity'],['efficiency','Efficiency'],['advanced','Advanced'],['signals','Signals']].map(([id,label])=>'<button type="button" data-st-usage-group="'+id+'" aria-pressed="'+(group===id)+'">'+label+'</button>').join('')+'</div>';
  const nav='<div class="st-usage-controls"><label>Position <select id="stUsagePos">'+['ALL','QB','RB','WR','TE'].map(p=>'<option value="'+p+'"'+((state.usagePos||'ALL')===p?' selected':'')+'>'+p+'</option>').join('')+'</select></label>'+groupButtons+'<label class="st-usage-rank-filter">Rank by <select id="stUsageMetric">'+metrics.map(m=>'<option value="'+m[0]+'"'+(chosen[0]===m[0]?' selected':'')+'>'+m[1]+'</option>').join('')+'</select></label></div>';
  const subtitle=isCurrent?rankedUsage.rankedPlayers+' ranked players · ESPN through W'+rankedUsage.throughWeek+(rankedUsage.routeThroughWeek?' · charted routes through W'+rankedUsage.routeThroughWeek:''):'Historical '+dataset.year+' recorded games';
  const cells=rows.map(x=>'<tr data-st-usage-key="'+E(x.p.key)+'"><td>'+person(x.p)+'</td>'+metrics.map(([field,label,,decimals,suffix])=>{
   const value=N(x[field]);
-  const signed=['recentOpportunityChange','routeParticipationTrend','fantasyPointsOverExpected'].includes(field);
+  const signed=['recentOpportunityChange','routeParticipationTrend','fantasyPointsOverExpected','expectedFantasyPointsTrend','targetShareTrend','epaPerDropback','completionPctOverExpected'].includes(field);
   const shown=(field==='espnPositionRank'&&value!==null?'#':'')+(signed&&value>0?'+':'')+F(x[field],decimals,suffix);
   return '<td data-st-usage-field="'+E(field)+'"'+(signed&&value!==null?' class="'+(value>0?'st-usage-gaining':value<0?'st-usage-losing':'')+'"':'')+'>'+shown+'</td>';
  }).join('')+'</tr>').join('');
@@ -290,7 +326,7 @@ function usage(){
   return '<th scope="col" data-st-usage-field="'+E(field)+'" aria-sort="'+(active?(sortDirection==='asc'?'ascending':'descending'):'none')+'"><span class="st-usage-head"><button type="button" class="st-usage-sort'+(active?' is-active':'')+'" data-st-usage-sort="'+E(field)+'" aria-label="Sort '+E(label)+' '+nextDirection+'">'+E(short)+' <span class="st-usage-sort-icon" aria-hidden="true">'+indicator+'</span></button><button type="button" class="st-usage-info" data-st-usage-info="'+E(field)+'" aria-label="Explain '+E(label)+' and its calculation" aria-controls="stUsageTooltip" aria-expanded="false">ⓘ</button></span></th>';
  }).join('');
  const table='<div class="st-table-wrap st-usage-table"><table><thead><tr><th scope="col">Player</th>'+headers+'</tr></thead><tbody>'+cells+'</tbody></table></div>';
- const footnote=isCurrent?'<div class="st-usage-note">Hover over ⓘ beside a stat (or tap ⓘ on a phone) for its meaning and calculation. — means unavailable, not zero. <details class="st-usage-method"><summary>Sources and coverage</summary><p>ESPN supplies recorded games and opportunities; nflverse/PFR supplies snaps, red-zone and receiving metrics. <a href="https://heatradar.app/nfl/routes" target="_blank" rel="noopener noreferrer">HeatRadar</a> supplies charted routes, TPRR, YPRR and route trend through Week '+E(rankedUsage.routeThroughWeek||'—')+'; incomplete charting and fractional-count rows are excluded. <a href="https://ffopportunity.ffverse.com/" target="_blank" rel="noopener noreferrer">ffopportunity</a> supplies modeled xFP and FPOE. <a href="https://github.com/nflverse/nflverse-data" target="_blank" rel="noopener noreferrer">nflverse play-by-play and advanced rushing data (CC BY 4.0)</a> supply goal-line, deep-target, first-down and yards-after-contact measures. Hover each ⓘ for player-specific source-week coverage.</p></details></div>':
+ const footnote=isCurrent?'<div class="st-usage-note">Hover over ⓘ beside a stat (or tap ⓘ on a phone) for its meaning and calculation. — means unavailable, not zero. <details class="st-usage-method"><summary>Sources and coverage</summary><p>ESPN supplies recorded games and opportunities; nflverse/PFR supplies snaps, red-zone, passing pressure and receiving metrics. <a href="https://heatradar.app/nfl/routes" target="_blank" rel="noopener noreferrer">HeatRadar</a> supplies charted routes, TPRR, YPRR and route trend through Week '+E(rankedUsage.routeThroughWeek||'—')+'. <a href="https://ffopportunity.ffverse.com/" target="_blank" rel="noopener noreferrer">ffopportunity</a> supplies modeled xFP, FPOE and recent xFP trends. <a href="https://github.com/nflverse/nflverse-data" target="_blank" rel="noopener noreferrer">nflverse play-by-play and PFR advanced data (CC BY 4.0)</a> supply verified remaining measures. xTD and first-read share are blank without suitable models or charting; NGS separation remains blank while its 2026 source is unavailable. Hover each ⓘ for source-week coverage.</p></details></div>':
   '<p class="st-usage-note">Hover over ⓘ beside a stat (or tap ⓘ on a phone) for its meaning and formula. Historical usage uses available recorded games; unverified metrics remain blank.</p>';
  return nav+panel('Usage analytics',subtitle,table+footnote);
 }

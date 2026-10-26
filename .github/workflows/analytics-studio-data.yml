@@ -27,6 +27,8 @@ jobs:
           python -u scripts/refresh-analytics-studio.py
       - name: Refresh ESPN full-PPR matchup ranks
         run: python -u scripts/refresh-espn-matchups.py
+      - name: Rebuild ranked-player advanced usage from the refreshed snapshots
+        run: node scripts/build-ranked-usage.cjs
       - name: Publish data snapshots only
         id: save
         run: |

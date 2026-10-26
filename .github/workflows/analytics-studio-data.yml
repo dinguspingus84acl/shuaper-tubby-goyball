@@ -47,6 +47,7 @@ jobs:
           node tests/usage-extra-metrics.cjs
           node tests/usage-advanced-metrics.cjs
           node tests/usage-next-metrics.cjs
+          node tests/fantasy-intelligence.cjs
       - name: Publish data snapshots only
         id: save
         run: |

@@ -194,6 +194,7 @@ def enrich(usage, season, expected_content, pbp_content, pfr_content, ngs_conten
     for identity, row in usage['players'].items():
         for field in FIELDS:
             row[field] = None
+        row['expectedWeeklyPpr'] = {}
         row.pop('nextUsageCoverage', None)
         p = players.get(identity)
         if not p:
@@ -208,6 +209,10 @@ def enrich(usage, season, expected_content, pbp_content, pfr_content, ngs_conten
         expected_weeks = [(week, expected[(identity, side, week)][1])
                           for side, week, _ in games
                           if (identity, side, week) in expected and expected[(identity, side, week)][1] is not None]
+        # Preserve every verified weekly observation for the player Performance
+        # expected-vs-actual chart. Missing weeks remain absent, never zero.
+        row['expectedWeeklyPpr'] = {str(week): round(value, 2)
+                                    for week, value in expected_weeks}
         trend, recent, prior = weighted_change(expected_weeks, through)
         row['expectedFantasyPointsTrend'] = trend
         record['expectedWeeks'] = len(expected_weeks)
@@ -298,6 +303,15 @@ def main():
     season = json.loads((ROOT / 'analytics/data/season-2026.json').read_text())
     counts = enrich(usage, season, read('expected', args.expected), read('pbp', args.pbp),
                     read('pfr_pass', args.pfr_pass), read('ngs_receiving', args.ngs_receiving, optional=True))
+    weekly = {'schema': 1, 'season': usage['season'], 'throughWeek': usage['throughWeek'],
+              'source': SOURCES['expected'],
+              'definition': 'Modeled ffopportunity weekly PPR matched only to recorded ESPN player games; absent is not zero',
+              'players': {identity: row.pop('expectedWeeklyPpr') for identity, row in usage['players'].items()
+                          if row.get('expectedWeeklyPpr')}}
+    for row in usage['players'].values():
+        row.pop('expectedWeeklyPpr', None)
+    usage.get('definitions', {}).pop('expectedWeeklyPpr', None)
+    (ROOT / 'analytics/data/expected-weekly-2026.json').write_text(json.dumps(weekly, separators=(',', ':')))
     path.write_text(json.dumps(usage, separators=(',', ':')))
     print('12 additional 2026 ranked Usage fields:', counts)
 

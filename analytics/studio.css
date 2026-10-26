@@ -893,3 +893,51 @@ body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-osp-pair{gap
 body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-osp-column{flex:0 0 31px;max-width:none}
 body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-osp-legend{flex:1 1 100%;justify-content:flex-start;margin:3px 2px}
 body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-osp-heading{flex-wrap:wrap}
+/* Fantasy Intelligence: source-backed discovery, configurable ranks and modeled outlook. */
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 13px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-header strong{font-size:23px;color:#f0f9ff;letter-spacing:-.035em}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-header span{font-size:11px;color:#9ab4c8}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;margin:0 0 14px;padding:4px;background:#091d30;border:1px solid #29475a;border-radius:11px;max-width:100%}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-nav button{flex:0 0 auto;min-height:40px;padding:7px 10px;background:transparent;border:1px solid transparent;border-radius:8px;color:#a9c0d4;font:inherit;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-nav button[aria-pressed=true]{background:#0d5647;color:#f0fff9;border-color:#22ce98}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-positions{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-positions button{padding:8px 12px;min-height:37px;color:#b2c9d9;background:#0e283d;border:1px solid #35546b;border-radius:8px;font:inherit;font-size:11px;font-weight:800;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-positions button[aria-pressed=true]{background:#145b4c;border-color:#2fe3a8;color:#fff}
+#shuaAnalyticsSection[data-active-view="intelligence"] button:focus-visible,#shuaAnalyticsSection[data-active-view="intelligence"] select:focus-visible,#shuaAnalyticsSection[data-active-view="intelligence"] input:focus-visible{outline:2px solid #36e7aa;outline-offset:2px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-controls{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:13px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-select{display:grid;gap:5px;flex:1;min-width:190px;max-width:370px;color:#a5bed0;font-size:11px;font-weight:750}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-select select{width:100%;height:40px;min-width:0;background:#102a40;border:1px solid #45677c;color:#e9f7ff;border-radius:8px;padding:6px 9px;font-size:13px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table{width:100%;max-height:67dvh;overflow:auto;margin-top:3px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table table{min-width:690px;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table th{color:#adc7db;text-align:left;white-space:nowrap;position:sticky;top:0;background:#102a40;z-index:1}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table th:not(:first-child),#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table td:not(:first-child){text-align:right}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table td,#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table th{padding:10px 9px;vertical-align:middle}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table tr:nth-child(even){background:#102a3d45}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table .st-person .st-face{width:33px;height:33px;min-width:33px;border-radius:50%;object-fit:cover}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table .st-person strong{font-size:12px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table .st-person small{font-size:10px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-negative{color:#ff9aa4}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-positive{color:#47e8a7}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-source,#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-note{margin:10px 4px 14px;color:#9bb6c9;font-size:11px;line-height:1.5}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-empty{padding:15px;color:#91acc3;font-size:13px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-weights{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:13px;padding:12px;background:#0e273a;border:1px solid #345266;border-radius:12px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-weight{display:grid;grid-template-columns:1fr auto;gap:6px;color:#a9c5d8;font-size:11px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-weight input{grid-column:1/-1;width:100%;accent-color:#24efa0;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-weight b{color:#e5ffef}
+#shuaAnalyticsSection[data-active-view="intelligence"] [data-st-intel-reset]{background:#153346;border:1px solid #4d6980;border-radius:7px;color:#eef7ff;font-weight:750;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-compare-pickers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:14px}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-compare-pickers .st-intel-select{max-width:none;min-width:0}
+#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-compare-pickers select{min-width:0}
+.st-intel-profile-title{font-size:16px;font-weight:800;margin:16px 0 10px;color:#e1fff3}
+.st-profile-insights .st-intel-source{color:#9bb8c9;font-size:11px;line-height:1.5;margin:8px 0 13px}
+@media(max-width:700px){
+ #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-header strong{font-size:20px}
+ #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-nav{gap:4px;padding:3px;margin-bottom:10px}
+ #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-nav button{font-size:11px;min-height:40px;padding:7px 9px}
+ #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-compare-pickers{grid-template-columns:1fr}
+ #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table table{min-width:620px;font-size:11px}
+ #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table td,#shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table th{padding:7px 6px}
+ #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table .st-person strong{font-size:11px}
+ #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-weights{grid-template-columns:repeat(2,minmax(0,1fr));padding:9px}
+ #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-select{max-width:none}
+}

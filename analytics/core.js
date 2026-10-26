@@ -2,7 +2,7 @@
 (function(root){
 'use strict';
 const S=root.ShuaStudio=root.ShuaStudio||{};
-const aliases={kennethwalkeriii:'kennethwalker',michaelpittmanjr:'michaelpittman',brianthomasjr:'brianthomas',marvinharrisonjr:'marvinharrison',chigokonkwo:'chigoziemokonkwo',lutherburdeniii:'lutherburden',haroldfanninjr:'haroldfannin',joshpalmer:'joshuapalmer'};
+const aliases={kennethwalkeriii:'kennethwalker',michaelpittmanjr:'michaelpittman',brianthomasjr:'brianthomas',marvinharrisonjr:'marvinharrison',chigokonkwo:'chigoziemokonkwo',lutherburdeniii:'lutherburden',haroldfanninjr:'haroldfannin',joshpalmer:'joshuapalmer',jamescookiii:'jamescook',travisetiennejr:'travisetienne',chrisgodwinjr:'chrisgodwin',deebosamuelsr:'deebosamuel',kylepittssr:'kylepitts'};
 const key=v=>{const s=String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');return aliases[s]||s;};
 const num=v=>v===null||v===undefined||v===''||typeof v==='boolean'?null:Number.isFinite(Number(v))?Number(v):null;
 const vals=a=>a.map(num).filter(v=>v!==null);

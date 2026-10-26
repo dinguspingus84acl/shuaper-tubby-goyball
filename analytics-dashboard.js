@@ -2,11 +2,13 @@
 (function () {
   'use strict';
   if (window.ShuaStudioLoader) return;
-  const version = '20261026-usage-signals12';
+  const version = '20261026-fantasy-intelligence9';
   const base = new URL('.', document.currentScript.src);
-  const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js', 'analytics/ui.js'];
+  const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js',
+    'analytics/intelligence.js', 'analytics/intelligence-view.js', 'analytics/ui.js'];
   const tests = [() => window.ShuaStudio?.aggregate, () => window.ShuaStudio?.Data,
-    () => window.ShuaStudio?.Chart, () => window.ShuaStudio?.UI];
+    () => window.ShuaStudio?.Chart, () => window.ShuaStudio?.Intelligence,
+    () => window.ShuaStudio?.IntelligenceView, () => window.ShuaStudio?.UI];
   const nav = document.querySelector('.positions');
   let button = nav?.querySelector('[data-pos="ANALYTICS"]');
   if (nav && !button) {
@@ -74,7 +76,7 @@
     if (styleReady && window.ShuaStudio?.UI) return Promise.resolve(window.ShuaStudio.UI);
     attempt++; window.__shuaStudioLoading = true;
     if (button && !window.ShuaStudio?.UI) button.textContent = 'Loading analytics…';
-    loading('Loading the nine interactive dashboards…');
+    loading('Loading your interactive fantasy analytics…');
     inflight = (async () => {
       if (!styleReady) { await asset('analytics/studio.css', true); styleReady = true; }
       for (let i = 0; i < paths.length; i++) {

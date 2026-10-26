@@ -15,6 +15,7 @@ jobs:
       - name: Syntax and calculation tests
         run: |
           node tests/analytics-core.cjs
+          node tests/heatradar-routes.cjs
           for f in analytics/*.js analytics-dashboard.js player-insights.js site-enhancements.js; do node --check "$f"; done
       - name: Install verification browsers
         run: |

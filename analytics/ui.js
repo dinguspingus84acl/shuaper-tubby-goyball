@@ -67,7 +67,7 @@ let rankedUsage=null,rankedUsagePending=false,rankedUsageError='';
 function fetchRankedUsage(){
  if(rankedUsage||rankedUsagePending||rankedUsageError)return;
  rankedUsagePending=true;
- S.Data.json('analytics/data/ranked-usage-2026.json?v=20261026-usage2',{cache:'no-store'}).then(data=>{
+ S.Data.json('analytics/data/ranked-usage-2026.json?v=20261026-heatradar1',{cache:'no-store'}).then(data=>{
   if(data.schema!==1||data.season!==2026||!data.players)throw new Error('Invalid ranked-player usage snapshot');
   rankedUsage=data;
  }).catch(err=>{rankedUsageError=err.message||String(err);}).finally(()=>{
@@ -86,8 +86,9 @@ function usage(){
   ['targetShare','Target share','Target %',1,'%'],
   ['opportunityShare','Opportunity share','Opp %',1,'%'],
   ['redZoneOpportunities','Red-zone opportunities','RZ opp',0,''],
+  ['routesRun','Charted routes run','Routes',0,''],
   ['routeParticipation','Route participation','Route %',1,'%'],
-  ['targetsPerRouteRun','Targets per route run','Tgt/route',2,''],
+  ['targetsPerRouteRun','Targets per route run','TPRR',1,'%'],
   ['yardsPerRouteRun','Yards per route run','Yds/route',2,''],
   ['airYardsShare','Air yards share','Air %',1,'%']
  ];
@@ -102,8 +103,8 @@ function usage(){
   for(const p of players){const a=A(p,state.week);if(N(a.targets)!==null)targets.set(p.team,(targets.get(p.team)||0)+a.targets);}
   entries=players.map(p=>{const a=A(p,state.week),t=N(a.targets),routes=N(a.routes);
    return {p,snapShare:N(a.snapRate),targetShare:t!==null&&targets.get(p.team)>0?100*t/targets.get(p.team):null,
-    opportunityShare:null,redZoneOpportunities:N(a.redZone),routeParticipation:N(a.routeRate),
-    targetsPerRouteRun:routes>0&&t!==null?t/routes:null,
+    opportunityShare:null,redZoneOpportunities:N(a.redZone),routesRun:routes,routeParticipation:N(a.routeRate),
+    targetsPerRouteRun:routes>0&&t!==null?100*t/routes:null,
     yardsPerRouteRun:routes>0&&N(a.recYds)!==null?a.recYds/routes:null,airYardsShare:null};
   });
  }
@@ -112,10 +113,18 @@ function usage(){
  const rows=entries.filter(x=>(!state.usagePos||state.usagePos==='ALL'||x.p.position===state.usagePos))
   .sort((a,b)=>(N(b[chosen[0]])??-Infinity)-(N(a[chosen[0]])??-Infinity)||(rankedOrder.get(a.p.key)??9999)-(rankedOrder.get(b.p.key)??9999)||a.p.name.localeCompare(b.p.name));
  const nav='<div class="st-usage-controls"><label>Position <select id="stUsagePos">'+['ALL','QB','RB','WR','TE'].map(p=>'<option value="'+p+'"'+((state.usagePos||'ALL')===p?' selected':'')+'>'+p+'</option>').join('')+'</select></label><label>Rank by <select id="stUsageMetric">'+metrics.map(m=>'<option value="'+m[0]+'"'+(chosen[0]===m[0]?' selected':'')+'>'+m[1]+'</option>').join('')+'</select></label></div>';
- const subtitle=isCurrent?'Your '+rankedUsage.rankedPlayers+' ranked players · through Week '+rankedUsage.throughWeek:'Historical '+dataset.year+' recorded games';
- const cells=rows.map(x=>'<tr><td>'+person(x.p)+'</td>'+metrics.map(([field,label,,decimals,suffix])=>'<td title="'+E(label)+'">'+F(x[field],decimals,suffix)+'</td>').join('')+'</tr>').join('');
+ const subtitle=isCurrent?'Your '+rankedUsage.rankedPlayers+' ranked players · through Week '+rankedUsage.throughWeek+(rankedUsage.routeThroughWeek?' · charted routes W1–'+rankedUsage.routeThroughWeek:''):'Historical '+dataset.year+' recorded games';
+ const routeFields=new Set(['routesRun','routeParticipation','targetsPerRouteRun','yardsPerRouteRun']);
+ const cells=rows.map(x=>'<tr><td>'+person(x.p)+'</td>'+metrics.map(([field,label,,decimals,suffix])=>{
+  let hint=label;
+  if(isCurrent&&routeFields.has(field)){
+   const coverage=x.routeCoverage;
+   hint=coverage?label+' · '+coverage.chartedWeeks+' valid charted weeks'+(coverage.excludedWeeks.length?' · excluded fractional data for W'+coverage.excludedWeeks.join(', W'):''):label+' · no verified charted routes reported';
+  }
+  return '<td title="'+E(hint)+'">'+F(x[field],decimals,suffix)+'</td>';
+ }).join('')+'</tr>').join('');
  const table='<div class="st-table-wrap st-usage-table"><table><thead><tr><th>Player</th>'+metrics.map(m=>'<th title="'+E(m[1])+'">'+E(m[2])+'</th>').join('')+'</tr></thead><tbody>'+cells+'</tbody></table></div>';
- const footnote=isCurrent?'<p class="st-usage-note">Shares use the recorded ESPN game snapshot, PFR snaps and <a href="https://github.com/nflverse" target="_blank" rel="noopener noreferrer">nflverse</a> usage. Air yards are nflverse play-by-play. Route metrics need independently charted routes; — means unavailable.</p>':
+ const footnote=isCurrent?'<p class="st-usage-note">Shares use ESPN/PFR/nflverse recorded stats. Charted routes, route participation, TPRR (%) and YPRR come from <a href="https://heatradar.app/nfl/routes" target="_blank" rel="noopener noreferrer">HeatRadar</a> (through W'+E(rankedUsage.routeThroughWeek||'—')+'). TPRR and YPRR use total targets/yards divided by total routes, not weekly averages. Fractional-count source rows are excluded; hover a route value for coverage. — means unavailable, not zero.</p>':
   '<p class="st-usage-note">Historical usage uses available recorded games; route-based values stay unavailable when routes were not charted.</p>';
  return nav+panel('Usage analytics',subtitle,table+footnote);
 }

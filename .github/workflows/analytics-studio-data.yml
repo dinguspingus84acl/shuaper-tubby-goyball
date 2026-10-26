@@ -24,6 +24,7 @@ jobs:
       - name: Fetch and validate source data
         run: |
           node tests/analytics-core.cjs
+          node tests/heatradar-routes.cjs
           python -u scripts/refresh-analytics-studio.py
       - name: Refresh ESPN full-PPR matchup ranks
         run: python -u scripts/refresh-espn-matchups.py
@@ -31,6 +32,10 @@ jobs:
         run: node scripts/build-ranked-usage.cjs
       - name: Enrich ranked-player air yards from nflverse
         run: python -u scripts/enrich-ranked-air-yards.py
+      - name: Refresh permitted HeatRadar weekly route charting
+        run: node scripts/refresh-heatradar-routes.cjs
+      - name: Merge verified routes into ranked-player usage
+        run: node scripts/enrich-ranked-heatradar-routes.cjs
       - name: Publish data snapshots only
         id: save
         run: |

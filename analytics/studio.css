@@ -578,7 +578,10 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#a3b9cd}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-controls select{min-height:36px;color:#fff;background:#11283e;border:1px solid #365268;border-radius:7px;padding:5px}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table{overflow:auto;max-height:75dvh}
-#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table table{width:100%;min-width:775px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table table{width:100%;min-width:1010px;font-variant-numeric:tabular-nums}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:not(:first-child){text-align:right;min-width:81px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th:not(:first-child){text-align:right}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-note{margin:9px 2px 0;color:#94a9be;font-size:11px;line-height:1.45}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th,#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td{padding:7px 9px;white-space:nowrap}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th:first-child,
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:first-child{position:sticky;left:0;z-index:2;background:#091d30;min-width:190px;box-shadow:4px 0 10px #0005}

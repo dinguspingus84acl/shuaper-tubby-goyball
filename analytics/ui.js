@@ -116,7 +116,7 @@ function weeklyTargetShare(team){
   }).join('');
   return '<div class="st-tss-week-row"><b>W'+w.week+'</b><div class="st-tss-track" role="img" aria-label="Week '+w.week+': '+E(labels.join('; '))+'">'+html+'</div><span class="st-tss-count">'+w.total+' tgt</span></div>';
  }).join('');
- const inside='<div class="st-tss-heading">'+logo(team,'st-tss-team-logo')+'<div><strong>'+E(S.teams[team]||team)+' TARGET SHARE</strong><small>Week by week · Top five target leaders</small></div>'+chooser+'</div>'+(compact.length?legend+'<div class="st-tss-weeks">'+rows+'</div>':note('No recorded targets are available for this team in the selected season.',true))+'<p class="st-tss-footnote">Percent of targets recorded for this team in the ESPN player-game feed each week. “Other” groups the remaining recorded players. Missing targets are never treated as official team totals.</p>';
+ const inside='<div class="st-tss-heading">'+logo(team,'st-tss-team-logo')+'<div><strong>'+E(S.teams[team]||team)+' TARGET SHARE</strong><small>Week by week · Top five target leaders</small></div>'+chooser+'</div>'+(compact.length?legend+'<div class="st-tss-weeks">'+rows+'</div>':note('No recorded targets are available for this team in the selected season.',true))+'<p class="st-tss-footnote">Percent of targets recorded for this team in the ESPN player-game feed each week. “Other” groups the remaining recorded players. The latest week may be incomplete until games finish; missing targets are never treated as official team totals.</p>';
  return '<div id="stTargetSharePanel">'+panel('Weekly target share',dataset.year+' · through Week '+through,inside,'target')+'</div>';
 }
 function teams(){
@@ -434,7 +434,7 @@ section.addEventListener('click',e=>{
  const snapChoice=e.target.closest('[data-st-team-snap-pos]');if(snapChoice){state.teamSnapPos=snapChoice.dataset.stTeamSnapPos;render();return;}
  const teamOpportunity=e.target.closest('[data-st-team-opportunity-pos]');if(teamOpportunity){state.teamOpportunityPos=teamOpportunity.dataset.stTeamOpportunityPos;render();return;}
  const teamToggle=e.target.closest('[data-st-team-menu-toggle]');if(teamToggle){const menu=section.querySelector('#stTeamMenu');if(menu){menu.hidden=!menu.hidden;teamToggle.setAttribute('aria-expanded',String(!menu.hidden));}return;}
- const teamChoice=e.target.closest('[data-st-select-team]');if(teamChoice){state.team=teamChoice.dataset.stSelectTeam;if(state.team!=='ALL')state.targetShareChartTeam=state.team;render();return;}
+ const teamChoice=e.target.closest('[data-st-select-team]');if(teamChoice){const next=teamChoice.dataset.stSelectTeam;if(next==='ALL'){if(S.teams[state.team])state.targetShareChartTeam=state.team;}else state.targetShareChartTeam=next;state.team=next;render();return;}
  const std=e.target.closest('[data-st-team-std]');if(std){state.teamWindow='STD';render();return;}
  const hitSort=e.target.closest('[data-st-hit-sort]');if(hitSort){state.hitSort=Number(hitSort.dataset.stHitSort);render();return;}
  const weekSort=e.target.closest('[data-st-sort-week]');

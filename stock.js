@@ -46,6 +46,9 @@ body.shua-stock-open .positions [data-pos="STOCK"]{background:#114b3a!important;
 #shuaStock .stock-down{color:#ff9098!important}#shuaStock .stock-up{color:#36e3a7!important}
 @media(max-width:750px){#shuaStock{padding:10px 4px 70px}#shuaStock .stock-groups{grid-template-columns:1fr;gap:9px}#shuaStock .stock-top{padding:0 4px}#shuaStock .stock-group-head{padding:9px 10px}#shuaStock .stock-row{grid-template-columns:23px minmax(0,1fr) 48px 52px;padding:6px;column-gap:5px}#shuaStock .stock-header{grid-template-columns:23px minmax(0,1fr) 48px 52px;padding:7px 6px;column-gap:5px}#shuaStock .stock-face{width:35px;height:35px;flex-basis:35px}#shuaStock .stock-name{font-size:12px}#shuaStock .stock-num{font-size:14px}#shuaStock .stock-percent{font-size:12px}}
 @media(max-width:750px){#shuaStock .stock-row.stock-current,#shuaStock .stock-header.stock-current{grid-template-columns:23px minmax(0,1fr) 34px 37px 55px}#shuaStock .stock-row.stock-performance,#shuaStock .stock-header.stock-performance{grid-template-columns:23px minmax(0,1fr) 30px 32px 49px 33px}#shuaStock .stock-value{font-size:11px}#shuaStock .stock-value small{font-size:9px}}
+body.phone-mode #shuaStock .stock-groups{grid-template-columns:1fr;gap:9px}
+body.phone-mode #shuaStock .stock-row.stock-current,body.phone-mode #shuaStock .stock-header.stock-current{grid-template-columns:23px minmax(0,1fr) 34px 37px 55px}
+body.phone-mode #shuaStock .stock-row.stock-performance,body.phone-mode #shuaStock .stock-header.stock-performance{grid-template-columns:23px minmax(0,1fr) 30px 32px 49px 33px}
 `;document.head.append(style);
 const order=['QB','RB','WR','TE','K','D/ST'];const denominator=source.leagues.length;
 const grouped=new Map(order.map(pos=>[pos,new Map()]));
@@ -81,7 +84,7 @@ function render(){
  '<div class="stock-filters">'+['ALL',...order].map(pos=>'<button type="button" data-stock-position="'+pos+'" aria-pressed="'+(filter===pos)+'">'+pos+'</button>').join('')+'</div>'+
  (metricError?'<p class="stock-sub">'+esc(metricError)+'</p>':'')+
  '<div class="stock-groups">'+groups.map(pos=>{
-  const list=mode==='draft'?players[pos]:combined(pos).filter(p=>mode!=='current'||(p.current?.length||0)>0||(p.leagues?.length||0)>0);
+  const list=mode==='draft'?players[pos]:combined(pos).filter(p=>mode==='performance'?(p.leagues?.length||0)>0:(p.current?.length||0)>0||(p.leagues?.length||0)>0);
   const cls=mode==='draft'?'':' stock-'+mode;
   const cols=mode==='draft'?['#','Player','Teams','Stock %']:mode==='current'?['#','Player','Draft','Now','Now %']:['#','Player','Picks','Rd','PPG / Pts','Pos #'];
   const stats=metricsById();

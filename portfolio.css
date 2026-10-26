@@ -69,3 +69,9 @@ body.shua-portfolio-open .positions [data-pos="COMMAND"]{background:#114b3a!impo
 #shuaPortfolio .pc-end{color:var(--pc-muted);font-size:11px;text-align:center;margin:16px 0}
 @media(max-width:740px){#shuaPortfolio{padding:8px 3px 75px}#shuaPortfolio .pc-grid{grid-template-columns:1fr;gap:8px}#shuaPortfolio .pc-heading{padding:0 5px}#shuaPortfolio .pc-summary{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}#shuaPortfolio .pc-summary .pc-card{padding:9px 5px}#shuaPortfolio .pc-summary span{font-size:9px}#shuaPortfolio .pc-summary strong{font-size:19px}#shuaPortfolio .pc-card{padding:9px}#shuaPortfolio .pc-team-head h3{font-size:13px}#shuaPortfolio .pc-tabs button{padding:9px 10px}#shuaPortfolio .pc-portrait{width:34px;height:34px;flex-basis:34px}#shuaPortfolio .pc-player{font-size:12px}#shuaPortfolio .pc-control-line{padding:0 4px}#shuaPortfolio .pc-compare{padding:9px}#shuaPortfolio .pc-table{min-width:530px}}
 @media(max-width:400px){#shuaPortfolio .pc-summary strong{font-size:17px}#shuaPortfolio .pc-summary span{font-size:8px}#shuaPortfolio .pc-stat{font-size:12px}}
+/* The site's Phone switch applies a class even when the browser viewport is wide. */
+body.phone-mode #shuaPortfolio .pc-grid{grid-template-columns:1fr;gap:8px}
+body.phone-mode #shuaPortfolio .pc-heading{padding-right:62px}
+body.phone-mode #shuaPortfolio .pc-card{padding:9px}
+body.phone-mode #shuaPortfolio .pc-summary{gap:4px}
+body.phone-mode #shuaPortfolio .pc-portrait{width:34px;height:34px;flex-basis:34px}

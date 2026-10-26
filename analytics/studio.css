@@ -582,6 +582,8 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:not(:first-child){text-align:right;min-width:81px}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th:not(:first-child){text-align:right}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-note{margin:9px 2px 0;color:#94a9be;font-size:11px;line-height:1.45}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table .st-person .st-face{height:34px;width:34px;min-width:34px;flex:0 0 34px;border-radius:50%;border:2px solid #4e7898;object-fit:cover;object-position:center top;background:#102d44}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table .st-person .st-avatar-fallback{min-height:34px;min-width:34px;border-radius:50%}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th,#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td{padding:7px 9px;white-space:nowrap}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th:first-child,
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:first-child{position:sticky;left:0;z-index:2;background:#091d30;min-width:190px;box-shadow:4px 0 10px #0005}

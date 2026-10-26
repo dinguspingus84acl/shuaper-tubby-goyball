@@ -626,6 +626,10 @@ function featuredLogoUrl(team){
   return '';
 }
 function featuredFaceHtml(player){
+  if(player?.position==='D/ST'){
+    const url=featuredLogoUrl(player?.team);
+    return url?'<img class="featured-photo featured-defense-logo" src="'+url+'" alt="'+String(player?.team||'')+' defense logo">':'<span class="featured-photo fallback">D/ST</span>';
+  }
   const urls=[];
   try{
     if(typeof playerPhotoId==='function'){
@@ -752,6 +756,7 @@ function applyFeaturedProfile(name,seed=null){
   const player=seed||playerByName(name);
   if(!player)return false;
   const team=String(player.team||'').toUpperCase();
+  const defense=player.position==='D/ST';
   const teamName=featuredTeamName(team);
   const logo=featuredLogoUrl(team);
   const parts=featuredNameParts(player.name||name);
@@ -766,6 +771,7 @@ function applyFeaturedProfile(name,seed=null){
   const hero=document.createElement('section');
   hero.id='featuredPlayerCard';
   hero.className='featured-player-card';
+  if(defense)hero.classList.add('featured-defense-profile');
   const nameLength=String(player.name||name).replace(/\s+/g,'').length;
   if(nameLength>=18)hero.classList.add('featured-name-xlong');
   else if(nameLength>=14)hero.classList.add('featured-name-long');
@@ -779,19 +785,20 @@ function applyFeaturedProfile(name,seed=null){
   hero.innerHTML=
     '<div class="featured-left">'+
       '<div class="featured-portrait-box">'+
-        (logo?'<img class="featured-bg-logo" src="'+logo+'" alt="">':'')+
+        (logo&&!defense?'<img class="featured-bg-logo" src="'+logo+'" alt="">':'')+
         featuredFaceHtml(player)+
       '</div>'+
       '<div class="featured-team-strip">'+
-        (logo?'<img class="featured-mini-logo" src="'+logo+'" alt="'+teamName+' logo">':'<span></span>')+
-        '<span class="featured-divider"></span>'+
+        (defense?'':logo?'<img class="featured-mini-logo" src="'+logo+'" alt="'+teamName+' logo">':'<span></span>')+
+        (defense?'':'<span class="featured-divider"></span>')+
         '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div><div class="featured-team-meta">'+initialMeta+'</div></div>'+
       '</div>'+
     '</div>'+
     '<div class="featured-right">'+
       '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span><span class="featured-jersey-number"></span></span></h2>'+
       '<div class="featured-bio">'+
-        (historical
+        (defense?stat('POSITION','D/ST')+stat('TEAM',team)+stat('SEASON','2026')+stat('TYPE','DEFENSE')
+          :historical
           ? stat('YEAR',String(seedYear(seed)))+stat('PPR PTS',Number.isFinite(Number(seed?.points))?Number(seed.points).toFixed(1):'—')+stat('PPG',Number.isFinite(Number(seed?.average))?Number(seed.average).toFixed(1):'—')+stat('GP',Number.isFinite(Number(seed?.gamesPlayed))?String(Number(seed.gamesPlayed)):'—')
           : stat('AGE','…')+stat('HEIGHT','…')+stat('WEIGHT','…')+stat('EXP','…'))+
       '</div>'+
@@ -799,7 +806,9 @@ function applyFeaturedProfile(name,seed=null){
 
   tabs.insertAdjacentElement('beforebegin',hero);
 
-  if(historical){
+  if(defense){
+    // NFL team defenses have no age, height, weight, or individual Sleeper bio.
+  }else if(historical){
     fillFeaturedBio(player,seed,null);
   }else{
     const override=PROFILE_BIO_OVERRIDES[norm(player.name)]||null;
@@ -1047,9 +1056,9 @@ function activateTab(key){
   document.querySelectorAll('[data-profile-panel]').forEach(p=>p.hidden=p.dataset.profilePanel!==key);
   const name=document.getElementById('modal')?.dataset.unifiedName;
   if(!name)return;
-  if(key==='performance'&&document.getElementById('modal')?.dataset.unifiedPosition==='K'){
+  if(key==='performance'&&['K','D/ST'].includes(document.getElementById('modal')?.dataset.unifiedPosition)){
     const panel=document.getElementById('unifiedPerformancePanel');
-    if(panel)panel.innerHTML='<div class="unified-profile-loading">Kicker analytics are not available in the QB/RB/WR/TE model. Use Game Log for weekly kicking points.</div>';
+    if(panel)panel.innerHTML='<div class="unified-profile-loading">'+(document.getElementById('modal')?.dataset.unifiedPosition==='K'?'Kicker':'Defense')+' analytics are not available in the QB/RB/WR/TE model. Use Game Log for weekly fantasy points.</div>';
     return;
   }
   if(key==='gamelog')loadGameLog(name);
@@ -1057,6 +1066,10 @@ function activateTab(key){
   if(key==='performance')document.getElementById('modal')?.dispatchEvent(new CustomEvent('shuaPerformanceTabActive',{detail:{name}}));
 }
 function renderOverviewRanks(name){
+  if(activeSeed?.position==='D/ST'){
+    window.ShuaDefenseProfile?.renderOverview?.(name,activeSeed.id,activeSeed.team,document.getElementById('stats'));
+    return;
+  }
   if(activeSeed?.position==='K'&&activeSeed?.id){
     window.ShuaKickerProfile?.renderOverview?.(name,activeSeed.id,document.getElementById('stats'));
     return;
@@ -1101,6 +1114,10 @@ async function loadHistory(name){
     await window.ShuaKickerProfile?.renderHistory?.(name,activeSeed.id,panel);
     panel.dataset.ready='1';return;
   }
+  if(activeSeed?.position==='D/ST'){
+    await window.ShuaDefenseProfile?.renderHistory?.(name,activeSeed.id,activeSeed.team,panel);
+    panel.dataset.ready='1';return;
+  }
   if(window.ShuaPlayerHistory?.render){
     await window.ShuaPlayerHistory.render(name,panel);
     panel.dataset.ready='1';
@@ -1117,6 +1134,10 @@ async function loadGameLog(name){
   panel.innerHTML='<div class="unified-profile-loading">Loading game log…</div>';
   if(activeSeed?.position==='K'&&activeSeed?.id){
     await window.ShuaKickerProfile?.renderGameLog?.(name,activeSeed.id,panel);
+    panel.dataset.ready='1';return;
+  }
+  if(activeSeed?.position==='D/ST'){
+    await window.ShuaDefenseProfile?.renderGameLog?.(name,activeSeed.id,activeSeed.team,panel);
     panel.dataset.ready='1';return;
   }
   if(window.ShuaEspnLive?.renderGameLog){
@@ -1201,7 +1222,7 @@ function prepareUnified(name,seed=null){
   activeSeed=seed?{...seed,__historical:!!(seed.source==='nflverse'||(sy&&sy<2026))}:null;
   const modal=document.getElementById('modal');
   modal.dataset.unifiedName=name;
-  if(seed?.position==='K')modal.dataset.unifiedPosition='K';else delete modal.dataset.unifiedPosition;
+  if(['K','D/ST'].includes(seed?.position))modal.dataset.unifiedPosition=seed.position;else delete modal.dataset.unifiedPosition;
   applyFeaturedProfile(name,seed);
   renderOverviewRanks(name);
   ensureStickyIdentity(name);
@@ -1212,8 +1233,8 @@ function prepareUnified(name,seed=null){
   if(gp){gp.dataset.loadedFor='';gp.dataset.ready='0';gp.innerHTML=''}
   const hp=document.getElementById('unifiedHistoryPanel');
   if(hp){hp.dataset.loadedFor='';hp.dataset.ready='0';hp.innerHTML=''}
-  activateTab(seed?.position==='K'?'overview':preferredProfileTab||'overview');
-  warmAdjacentProfiles(name);
+  activateTab(['K','D/ST'].includes(seed?.position)?'overview':preferredProfileTab||'overview');
+  if(!['K','D/ST'].includes(seed?.position))warmAdjacentProfiles(name);
 }
 async function openByName(name,seed=null){
   let p=playerByName(name);

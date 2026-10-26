@@ -150,7 +150,7 @@ function positionOpportunityShare(team){
   const header='<header class="st-osp-position-header"><strong>'+pos+'</strong><small>'
    +rows.length+' players · '+(N(total)===null?'No reported opportunities':F(total,0)+' opportunities')+'</small></header>';
   const players=rows.map(x=>{
-   const p=x.player,detail=F(x.opportunities,0)+' carries + targets',name=E(p.name);
+   const p=x.player,detail=F(x.opportunities,0)+' recorded opportunities',name=E(p.name);
    return '<div class="st-osp-player" role="listitem">'
     +'<div class="st-osp-pair" role="img" aria-label="'+name+': snap '+F(x.snapShare,1,'%')+', opportunity '+F(x.opportunityShare,1,'%')+'">'
     +bar(x.snapShare,'st-osp-snap','Snap share',p.name)

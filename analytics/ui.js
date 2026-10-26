@@ -87,11 +87,88 @@ const usageCatalog=[
  ['yacPerReception','Yards after catch per reception','YAC/R',1,''],
  ['receivingFirstDowns','Receiving first downs','Rec 1D',0,'']
 ];
+// One definition per field keeps the table compact and gives every value the same explanation.
+// Formulas intentionally match the verified snapshot builders, including their coverage windows.
+const usageDescriptions={
+ espnPositionRank:['Season-to-date PPR scoring finish among players at the same position.','Order recorded ESPN PPR point totals from highest to lowest; tied totals use points per game.'],
+ snapShare:['How often the player was on the field for their team\'s offensive snaps.','Player offensive snaps ÷ team offensive snaps × 100, using games with both counts.'],
+ routesRun:['How many receiving routes the player ran in charted games.','Add verified HeatRadar routes from valid reported weeks.'],
+ routeParticipation:['How often the player ran a route on their team\'s passing plays.','Verified charted routes ÷ team passing-play opportunities in those weeks × 100.'],
+ targetsPerGame:['Average passes thrown toward the player per recorded game.','Total recorded ESPN targets ÷ games with recorded stats.'],
+ carriesPerGame:['Average rushing attempts by the player per recorded game.','Total recorded ESPN rushing attempts ÷ games with recorded stats.'],
+ targetShare:['Percentage of the team\'s passes targeted to this player.','Player targets ÷ team targets reconstructed from player stats in the same weeks × 100.'],
+ carryShare:['Percentage of the team\'s rushing attempts taken by this player.','Player carries ÷ team carries reconstructed from the same recorded weeks × 100.'],
+ opportunityShare:['Share of targets and carries among teammates at this position.','Player (targets + carries) ÷ all teammates\' (targets + carries) at the same position and weeks × 100.'],
+ redZoneOpportunities:['Chances to score from inside the opponent\'s 20-yard line.','Add recorded red-zone rushing attempts and pass targets.'],
+ highValueTouches:['Rushing attempts and completed catches inside the opponent\'s 10.','Add inside-10 carries and receptions; incomplete targets do not count.'],
+ airYardsShare:['How much of the team\'s intended passing yardage went toward this player.','Player air yards ÷ team air yards × 100 across matched nflverse/ESPN weeks.'],
+ wopr:['Weighted measure of receiving opportunity from targets and air yards.','1.5 × (player targets ÷ team targets) + 0.7 × (player air yards ÷ team air yards), on matched weeks.'],
+ aDOT:['Average distance downfield that the player was targeted.','Total receiving air yards ÷ total targets across matched nflverse/ESPN weeks.'],
+ receivingYardsShare:['Percentage of the team\'s receiving yards earned by the player.','Player receiving yards ÷ team receiving yards × 100 across matched nflverse/ESPN weeks.'],
+ recentOpportunityChange:['Whether targets plus carries per game have risen or fallen recently.','Average (targets + carries) per game in the latest three NFL weeks minus the previous three; at least two games per window.'],
+ targetsPerRouteRun:['How often the player draws a target while running a route.','Charted targets ÷ charted routes × 100; requires at least eight valid routes.'],
+ yardsPerRouteRun:['Receiving yards gained for every route the player ran.','Charted receiving yards ÷ charted routes; requires at least eight valid routes.'],
+ yacPerReception:['Average receiving yards gained after the catch.','Total yards after catch ÷ receptions across matched nflverse/ESPN weeks.'],
+ receivingFirstDowns:['How many receptions resulted in a first down.','Sum recorded nflverse receiving first downs across matched ESPN weeks.']
+};
 const usageGroups={
  volume:['espnPositionRank','snapShare','routesRun','routeParticipation','targetsPerGame','carriesPerGame','targetShare','carryShare','recentOpportunityChange'],
  opportunity:['espnPositionRank','targetShare','opportunityShare','airYardsShare','wopr','aDOT','redZoneOpportunities','highValueTouches'],
  efficiency:['espnPositionRank','targetsPerRouteRun','yardsPerRouteRun','yacPerReception','receivingFirstDowns','receivingYardsShare','aDOT','wopr']
 };
+const usageRouteFields=new Set(['routesRun','routeParticipation','targetsPerRouteRun','yardsPerRouteRun']);
+const usageReceivingFields=new Set(['aDOT','wopr','receivingYardsShare','yacPerReception','receivingFirstDowns','airYardsShare']);
+let usageTooltip=null,usageTooltipAnchor=null,usageTooltipPinned=false;
+function hideUsageTooltip(){
+ if(usageTooltip)usageTooltip.hidden=true;
+ if(usageTooltipAnchor?.matches?.('.st-usage-info'))usageTooltipAnchor.setAttribute('aria-expanded','false');
+ usageTooltipAnchor=null;usageTooltipPinned=false;
+}
+function usageCoverage(field,anchor){
+ if(dataset?.year!==2026)return '';
+ const id=anchor.closest('tr')?.dataset.stUsageKey;
+ if(!id)return '';
+ const player=rankedUsage?.players?.[id];
+ if(!player)return '';
+ if(usageRouteFields.has(field)){
+  const c=player.routeCoverage;
+  return c?'Coverage: '+c.chartedWeeks+' verified route weeks'+(c.excludedWeeks?.length?'; excluded uncertain weeks '+c.excludedWeeks.join(', '):'')+'.':'No verified route charting for this player.';
+ }
+ if(usageReceivingFields.has(field)){
+  const c=player.nflverseCoverage;
+  return c?'Coverage: '+c.matchedWeeks+' of '+c.espnWeeks+' recorded weeks matched to nflverse.':'No matched nflverse weeks for this player.';
+ }
+ if(field==='recentOpportunityChange'&&player.recentOpportunityCoverage){
+  const c=player.recentOpportunityCoverage;
+  return 'Coverage: '+c.recentWeeks+' recent and '+c.priorWeeks+' prior recorded games.';
+ }
+ return '';
+}
+function showUsageTooltip(anchor,pinned=false){
+ const field=anchor?.dataset.stUsageField||anchor?.closest('[data-st-usage-field]')?.dataset.stUsageField;
+ const description=usageDescriptions[field];
+ if(!description||!visible||state.view!=='usage')return;
+ if(!usageTooltip){
+  usageTooltip=document.createElement('div');
+  usageTooltip.id='stUsageTooltip';usageTooltip.className='st-usage-tooltip';
+  usageTooltip.setAttribute('role','tooltip');usageTooltip.hidden=true;
+  document.body.append(usageTooltip);
+ }
+ if(usageTooltipAnchor?.matches?.('.st-usage-info'))usageTooltipAnchor.setAttribute('aria-expanded','false');
+ usageTooltipAnchor=anchor;usageTooltipPinned=pinned;
+ if(anchor.matches('.st-usage-info'))anchor.setAttribute('aria-expanded',String(pinned));
+ const label=usageCatalog.find(m=>m[0]===field)?.[1]||field;
+ const coverage=usageCoverage(field,anchor);
+ usageTooltip.innerHTML='<strong>'+E(label)+'</strong><p>'+E(description[0])+'</p><small><b>Calculation:</b> '+E(description[1])+'</small>'+(coverage?'<em>'+E(coverage)+'</em>':'');
+ usageTooltip.hidden=false;
+ const anchorRect=anchor.getBoundingClientRect(),tipRect=usageTooltip.getBoundingClientRect();
+ const left=Math.max(8,Math.min(innerWidth-tipRect.width-8,anchorRect.left+(anchorRect.width-tipRect.width)/2));
+ let top=anchorRect.top-tipRect.height-9;
+ if(top<8)top=anchorRect.bottom+9;
+ if(top+tipRect.height>innerHeight-8)top=Math.max(8,innerHeight-tipRect.height-8);
+ usageTooltip.style.left=Math.round(left)+'px';
+ usageTooltip.style.top=Math.round(top)+'px';
+}
 let usageRankDataset=null,usageRankCache=null;
 function currentEspnPositionRanks(){
  if(usageRankDataset===dataset&&usageRankCache)return usageRankCache;
@@ -160,33 +237,19 @@ function usage(){
  const groupButtons='<div class="st-usage-groups" role="group" aria-label="Usage stat category">'+[['volume','Volume'],['opportunity','Opportunity'],['efficiency','Efficiency']].map(([id,label])=>'<button type="button" data-st-usage-group="'+id+'" aria-pressed="'+(group===id)+'">'+label+'</button>').join('')+'</div>';
  const nav='<div class="st-usage-controls"><label>Position <select id="stUsagePos">'+['ALL','QB','RB','WR','TE'].map(p=>'<option value="'+p+'"'+((state.usagePos||'ALL')===p?' selected':'')+'>'+p+'</option>').join('')+'</select></label>'+groupButtons+'<label class="st-usage-rank-filter">Rank by <select id="stUsageMetric">'+metrics.map(m=>'<option value="'+m[0]+'"'+(chosen[0]===m[0]?' selected':'')+'>'+m[1]+'</option>').join('')+'</select></label></div>';
  const subtitle=isCurrent?rankedUsage.rankedPlayers+' ranked players · ESPN through W'+rankedUsage.throughWeek+(rankedUsage.routeThroughWeek?' · charted routes through W'+rankedUsage.routeThroughWeek:''):'Historical '+dataset.year+' recorded games';
- const routeFields=new Set(['routesRun','routeParticipation','targetsPerRouteRun','yardsPerRouteRun']);
- const nflverseFields=new Set(['aDOT','wopr','receivingYardsShare','yacPerReception','receivingFirstDowns','airYardsShare']);
- const cells=rows.map(x=>'<tr><td>'+person(x.p)+'</td>'+metrics.map(([field,label,,decimals,suffix])=>{
-  let hint=label;
-  if(isCurrent&&routeFields.has(field)){
-   const coverage=x.routeCoverage;
-   hint=coverage?label+' · '+coverage.chartedWeeks+' valid charted weeks'+(coverage.excludedWeeks.length?' · excluded fractional data for W'+coverage.excludedWeeks.join(', W'):''):label+' · no verified charted routes reported';
-  }
-  if(isCurrent&&nflverseFields.has(field)){
-   const c=x.nflverseCoverage;
-   hint=label+(c?' · nflverse matched '+c.matchedWeeks+'/'+c.espnWeeks+' ESPN weeks':' · no verified nflverse weeks');
-  }
-  if(field==='highValueTouches')hint+=' · carries plus completed receptions inside the 10; incomplete targets excluded';
-  if(field==='recentOpportunityChange')hint+=' · targets + carries per game, latest 3 NFL weeks minus prior 3; two observed games in each required';
-  if(field==='wopr')hint+=' · 1.5 × target share + 0.7 × air-yards share, from matched nflverse weeks';
+ const cells=rows.map(x=>'<tr data-st-usage-key="'+E(x.p.key)+'"><td>'+person(x.p)+'</td>'+metrics.map(([field,label,,decimals,suffix])=>{
   const value=N(x[field]);
   const shown=(field==='espnPositionRank'&&value!==null?'#':'')+(field==='recentOpportunityChange'&&value>0?'+':'')+F(x[field],decimals,suffix);
-  return '<td title="'+E(hint)+'"'+(field==='recentOpportunityChange'&&value!==null?' class="'+(value>0?'st-usage-gaining':value<0?'st-usage-losing':'')+'"':'')+'>'+shown+'</td>';
+  return '<td data-st-usage-field="'+E(field)+'"'+(field==='recentOpportunityChange'&&value!==null?' class="'+(value>0?'st-usage-gaining':value<0?'st-usage-losing':'')+'"':'')+'>'+shown+'</td>';
  }).join('')+'</tr>').join('');
  const headers=metrics.map(([field,label,short])=>{
   const active=chosen[0]===field,nextDirection=active?(sortDirection==='desc'?'ascending':'descending'):(field==='espnPositionRank'?'ascending':'descending');
   const indicator=active?(sortDirection==='asc'?'↑':'↓'):'↕';
-  return '<th scope="col" aria-sort="'+(active?(sortDirection==='asc'?'ascending':'descending'):'none')+'"><button type="button" class="st-usage-sort'+(active?' is-active':'')+'" data-st-usage-sort="'+E(field)+'" aria-label="Sort '+E(label)+' '+nextDirection+'" title="Sort '+E(label)+' '+nextDirection+'">'+E(short)+' <span class="st-usage-sort-icon" aria-hidden="true">'+indicator+'</span></button></th>';
+  return '<th scope="col" data-st-usage-field="'+E(field)+'" aria-sort="'+(active?(sortDirection==='asc'?'ascending':'descending'):'none')+'"><span class="st-usage-head"><button type="button" class="st-usage-sort'+(active?' is-active':'')+'" data-st-usage-sort="'+E(field)+'" aria-label="Sort '+E(label)+' '+nextDirection+'">'+E(short)+' <span class="st-usage-sort-icon" aria-hidden="true">'+indicator+'</span></button><button type="button" class="st-usage-info" data-st-usage-info="'+E(field)+'" aria-label="Explain '+E(label)+' and its calculation" aria-controls="stUsageTooltip" aria-expanded="false">ⓘ</button></span></th>';
  }).join('');
  const table='<div class="st-table-wrap st-usage-table"><table><thead><tr><th scope="col">Player</th>'+headers+'</tr></thead><tbody>'+cells+'</tbody></table></div>';
- const footnote=isCurrent?'<div class="st-usage-note">— means unavailable, not zero. <details class="st-usage-method"><summary>Stat definitions and coverage</summary><p>ESPN supplies games, carries, targets and actual PPR stats; nflverse/PFR supplies snaps, red-zone plays and receiving metrics. HVT means recorded carries plus completed receptions inside the 10, not all end-zone targets. WOPR = 1.5 × target share + 0.7 × air-yards share (unitless, matched weeks). L3 Δ is the change in targets + carries per game between the latest three NFL weeks and previous three (requires at least two appearances in each). <a href="https://heatradar.app/nfl/routes" target="_blank" rel="noopener noreferrer">HeatRadar</a> supplies routes, TPRR and YPRR through Week '+E(rankedUsage.routeThroughWeek||'—')+'; fractional-count source rows and unverified values are excluded. Receiving metrics use <a href="https://github.com/nflverse/nflverse-data" target="_blank" rel="noopener noreferrer">nflverse data (CC BY 4.0)</a>. Tap a column to sort; hover or long-press for coverage.</p></details></div>':
-  '<p class="st-usage-note">Historical usage uses available recorded games; unavailable verified source metrics remain blank.</p>';
+ const footnote=isCurrent?'<div class="st-usage-note">Hover over a stat, or tap a number / ⓘ, to see its meaning and calculation. — means unavailable, not zero. <details class="st-usage-method"><summary>Sources and coverage</summary><p>ESPN supplies recorded games and opportunities; nflverse/PFR supplies snaps, red-zone and receiving metrics. <a href="https://heatradar.app/nfl/routes" target="_blank" rel="noopener noreferrer">HeatRadar</a> supplies charted routes, TPRR and YPRR through Week '+E(rankedUsage.routeThroughWeek||'—')+'; incomplete charting and fractional-count rows are excluded. Receiving metrics use <a href="https://github.com/nflverse/nflverse-data" target="_blank" rel="noopener noreferrer">nflverse data (CC BY 4.0)</a>.</p></details></div>':
+  '<p class="st-usage-note">Hover over a stat, or tap a number / ⓘ, for its meaning and formula. Historical usage uses available recorded games; unverified metrics remain blank.</p>';
  return nav+panel('Usage analytics',subtitle,table+footnote);
 }
 /* Weekly target-share mix modeled after the supplied stacked Cardinals chart. */
@@ -568,9 +631,10 @@ function applyStudioSearch(){
 }
 function shell(){section.innerHTML=`<div class="st-global-search" ${['schedule','startsit'].includes(state.view)?'hidden':''}><input id="stGlobalSearch" type="search" aria-label="Search players across this analytics view" placeholder="Search players…" value="${E(state.studioSearch||'')}">${state.view==='weekly'?'<div id="stWeeklySearchResults" class="st-weekly-search-results" hidden></div>':''}</div><label class="st-dashboard-picker" for="stDashboard"><span class="st-label">Choose analytics chart</span><select id="stDashboard" aria-label="Choose analytics chart">${pages.map((p,i)=>`<option value="${p[0]}" ${state.view===p[0]?'selected':''}>${E(p[1])}</option>`).join('')}</select></label><div class="st-layout"><nav class="st-navigation" role="tablist" aria-label="Analytics dashboards">${pages.map((p,i)=>`<button class="st-tab" id="st-tab-${p[0]}" type="button" role="tab" data-st-view="${p[0]}" aria-controls="stWorkspace" aria-selected="${state.view===p[0]}"><span>${String(i+1).padStart(2,'0')}</span>${shortNames[i]}</button>`).join('')}</nav><div class="st-workspace" id="stWorkspace" role="tabpanel" aria-labelledby="st-tab-${state.view}">${['schedule','consistency','weekly','usage','teams','injury','startsit'].includes(state.view)?'':`<header class="st-heading"><div><span class="st-eyebrow">${E(dataset?.year||state.year)} · ${dataset?.year<2026?'Historical archive':'Season analytics'}</span><h2>${E(pages.find(p=>p[0]===state.view)[1])}</h2><p>${E(pages.find(p=>p[0]===state.view)[2])}</p></div></header>`}<div id="stContent"></div><footer id="stSource" class="st-footnote"></footer></div></div>`;}
 function persist(){updateLink();try{localStorage.setItem('shuaStudioStateV1',JSON.stringify({...state,outWeeks:null}));}catch(e){}}
-function render(){if(!visible||!dataset)return;const id=++renderId;C.reset();section.dataset.activeView=state.view;shell();const host=document.getElementById('stContent');try{if(state.view==='rankings')rankings(id);else host.innerHTML=renderers[state.view]();}catch(e){host.innerHTML=note('This dashboard could not render. '+E(e.message),true);console.error('SHUA Studio render',e);}
+function render(){hideUsageTooltip();if(!visible||!dataset)return;const id=++renderId;C.reset();section.dataset.activeView=state.view;shell();const host=document.getElementById('stContent');try{if(state.view==='rankings')rankings(id);else host.innerHTML=renderers[state.view]();}catch(e){host.innerHTML=note('This dashboard could not render. '+E(e.message),true);console.error('SHUA Studio render',e);}
  const footer=document.getElementById('stSource');if(footer)footer.hidden=['consistency','weekly','injury','teams'].includes(state.view);if(footer)footer.textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');applyStudioSearch();persist();section.dataset.ready='true';}
 function rerenderUsage(){
+ hideUsageTooltip();
  const host=section.querySelector('#stContent');
  if(!host||state.view!=='usage'||!dataset){render();return;}
  host.innerHTML=usage();
@@ -586,12 +650,47 @@ if(data.year===2026){
 }
 dataset=data;state.week=Math.max(1,Math.min(18,state.week||(['matchup','schedule','startsit'].includes(state.view)?dataset.latestWeek+1:dataset.latestWeek)));render();}catch(e){if(id!==epoch)return;host.innerHTML=note(E(e.message),true)+`<button type="button" class="st-button" data-st-archive="2025">Open the 2025 historical dashboards</button> <button type="button" class="st-button" data-st-retry>Retry current season</button>`;section.dataset.ready='error';}}
 function open(){if(state.view==='schedule'&&+state.year!==2026){state.scheduleReturnYear=+state.year;state.year=2026;}visible=true;document.body.classList.add('shua-studio-open');document.body.classList.remove('fantasy-home-mode','stats-mode','compare-mode','trade-mode','mobile-menu-open');for(const child of main.children){if(child===section)continue;if(!hiddenBefore.has(child))hiddenBefore.set(child,child.hidden);child.hidden=true;}section.hidden=false;navigation.querySelectorAll('.pos').forEach(b=>b.classList.toggle('active',b===button));try{localStorage.setItem('shuaPageStateV2',JSON.stringify({section:'ANALYTICS'}));}catch(e){}if(dataset&&dataset.year===+state.year)render();else load();}
-function close(){visible=false;try{if(linkedView()){const u=new URL(location.href);u.hash='';history.replaceState(history.state,'',u);}}catch(e){}document.body.classList.remove('shua-studio-open');epoch++;renderId++;section.hidden=true;for(const [el,hidden] of hiddenBefore){if(el.isConnected)el.hidden=hidden;}hiddenBefore.clear();}
-function showPlayer(k){const p=dataset?.players.find(x=>x.key===k)||Object.values(dataset?.scheduleRoster||{}).flat().find(x=>x.key===k);if(!p)return;let found=null;try{const candidates=[...(typeof board!=='undefined'?board:[]),...(typeof players!=='undefined'?players:[])];found=candidates.find(x=>key(x.name)===p.key);}catch(e){}if(found&&typeof window.profile==='function'){window.profile(found.id);document.getElementById('modal').dataset.studioProfile='1';return;}if(window.ShuaEspnLive?.openStatsPlayerByName?.(p.name)){document.getElementById('modal').dataset.studioProfile='1';return;}if(window.openUnifiedPlayerProfileByName){window.openUnifiedPlayerProfileByName(p.name);return;}state.view='trends';state.pos=p.position;state.player=p.key;state.week=dataset.latestWeek;render();}
+function close(){hideUsageTooltip();visible=false;try{if(linkedView()){const u=new URL(location.href);u.hash='';history.replaceState(history.state,'',u);}}catch(e){}document.body.classList.remove('shua-studio-open');epoch++;renderId++;section.hidden=true;for(const [el,hidden] of hiddenBefore){if(el.isConnected)el.hidden=hidden;}hiddenBefore.clear();}
+function showPlayer(k){hideUsageTooltip();const p=dataset?.players.find(x=>x.key===k)||Object.values(dataset?.scheduleRoster||{}).flat().find(x=>x.key===k);if(!p)return;let found=null;try{const candidates=[...(typeof board!=='undefined'?board:[]),...(typeof players!=='undefined'?players:[])];found=candidates.find(x=>key(x.name)===p.key);}catch(e){}if(found&&typeof window.profile==='function'){window.profile(found.id);document.getElementById('modal').dataset.studioProfile='1';return;}if(window.ShuaEspnLive?.openStatsPlayerByName?.(p.name)){document.getElementById('modal').dataset.studioProfile='1';return;}if(window.openUnifiedPlayerProfileByName){window.openUnifiedPlayerProfileByName(p.name);return;}state.view='trends';state.pos=p.position;state.player=p.key;state.week=dataset.latestWeek;render();}
 button.onclick=()=>open();
 window.addEventListener('hashchange',()=>{const v=linkedView();if(v)navigate(v);else if(visible)close();});
 document.addEventListener('click',e=>{const b=e.target.closest?.('.positions .pos');if(b&&b!==button&&visible)close();},true);
+section.addEventListener('pointerover',e=>{
+ if(e.pointerType==='touch'||usageTooltipPinned)return;
+ const anchor=e.target.closest?.('.st-usage-table [data-st-usage-field]');
+ if(anchor&&(anchor!==usageTooltipAnchor||usageTooltip?.hidden))showUsageTooltip(anchor);
+});
+section.addEventListener('pointerout',e=>{
+ if(e.pointerType==='touch'||usageTooltipPinned)return;
+ const anchor=e.target.closest?.('.st-usage-table [data-st-usage-field]');
+ if(anchor===usageTooltipAnchor&&!anchor.contains(e.relatedTarget))hideUsageTooltip();
+});
+section.addEventListener('focusin',e=>{
+ const anchor=e.target.closest?.('.st-usage-table [data-st-usage-field]');
+ if(anchor&&!usageTooltipPinned)showUsageTooltip(e.target.matches('.st-usage-info')?e.target:anchor);
+});
+section.addEventListener('focusout',e=>{
+ if(!usageTooltipPinned&&e.target.closest?.('.st-usage-table [data-st-usage-field]'))hideUsageTooltip();
+});
+document.addEventListener('pointerdown',e=>{
+ if(usageTooltipPinned&&!e.target.closest?.('.st-usage-info,.st-usage-table td[data-st-usage-field]'))hideUsageTooltip();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hideUsageTooltip();});
+window.addEventListener('resize',hideUsageTooltip);
+window.addEventListener('scroll',hideUsageTooltip,true);
 section.addEventListener('click',e=>{
+ const usageInfo=e.target.closest('[data-st-usage-info]');
+ if(usageInfo&&state.view==='usage'){
+  const wasPinned=usageTooltipPinned&&usageTooltipAnchor===usageInfo;
+  if(wasPinned)hideUsageTooltip();else showUsageTooltip(usageInfo,true);
+  return;
+ }
+ const usageValue=e.target.closest('.st-usage-table td[data-st-usage-field]');
+ if(usageValue&&state.view==='usage'){
+  const wasPinned=usageTooltipPinned&&usageTooltipAnchor===usageValue;
+  if(wasPinned)hideUsageTooltip();else showUsageTooltip(usageValue,true);
+  return;
+ }
  const usageRetry=e.target.closest('[data-st-usage-retry]');if(usageRetry){rankedUsageError='';fetchRankedUsage();render();return;}
  const usageGroup=e.target.closest('[data-st-usage-group]');if(usageGroup&&state.view==='usage'){
   const group=usageGroup.dataset.stUsageGroup;

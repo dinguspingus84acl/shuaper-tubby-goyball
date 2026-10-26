@@ -587,11 +587,23 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table table{width:100%;min-width:850px;font-variant-numeric:tabular-nums}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:not(:first-child){text-align:right;min-width:81px}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th:not(:first-child){text-align:right}
-#shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort{display:inline-flex;align-items:center;justify-content:flex-end;gap:5px;width:100%;min-height:36px;padding:0;border:0;background:transparent;color:#c8d8e7;font:inherit;font-weight:750;white-space:nowrap;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-head{display:flex;align-items:center;justify-content:flex-end;gap:2px;min-width:0}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort{display:inline-flex;align-items:center;justify-content:flex-end;gap:5px;min-width:0;flex:1;min-height:36px;padding:0;border:0;background:transparent;color:#c8d8e7;font:inherit;font-weight:750;white-space:nowrap;cursor:pointer}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort.is-active{color:#38e9ad}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort-icon{font-size:12px;line-height:1;opacity:.65}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort.is-active .st-usage-sort-icon{opacity:1}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort:focus-visible{outline:2px solid #38e9ad;outline-offset:2px;border-radius:4px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-info{width:23px;height:30px;flex:0 0 23px;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:5px;background:transparent;color:#7fa8bf;font:inherit;font-size:15px;cursor:help}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-info:hover,#shuaAnalyticsSection[data-active-view="usage"] .st-usage-info[aria-expanded="true"]{color:#39e5b0;background:#1b4458}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-info:focus-visible{outline:2px solid #38e9ad;outline-offset:1px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td[data-st-usage-field]{cursor:help}
+.st-usage-tooltip{position:fixed;z-index:1000000;box-sizing:border-box;width:min(310px,calc(100vw - 16px));padding:12px 13px;border:1px solid #378e80;border-radius:10px;background:#0b2437;color:#e5f5ff;box-shadow:0 12px 32px #000b;pointer-events:none;font-size:12px;line-height:1.42;overflow-wrap:anywhere}
+.st-usage-tooltip[hidden]{display:none!important}
+.st-usage-tooltip strong{display:block;color:#48eabd;font-size:13px;line-height:1.3;margin-bottom:5px}
+.st-usage-tooltip p{margin:0 0 8px;color:#e2eff8}
+.st-usage-tooltip small{display:block;color:#c0d3e2;font-size:11px;line-height:1.45}
+.st-usage-tooltip small b{color:#eefaff}
+.st-usage-tooltip em{display:block;margin-top:7px;padding-top:7px;border-top:1px solid #294b5d;color:#8eb9cc;font-size:10px;font-style:normal}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-note{margin:9px 2px 0;color:#94a9be;font-size:11px;line-height:1.45}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-method{display:inline;margin-left:4px}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-method summary{display:inline;color:#82dbcd;cursor:pointer;font-weight:750}
@@ -621,6 +633,8 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
  #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table .st-person .st-face{width:30px;height:30px;min-width:30px;flex-basis:30px}
  #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table .st-person strong{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2;font-size:12px;overflow-wrap:anywhere}
  #shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort{min-height:37px;gap:3px;font-size:11px}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-info{min-width:27px;width:27px;height:37px;flex-basis:27px;font-size:17px}
+ .st-usage-tooltip{width:min(292px,calc(100vw - 16px))}
 }
 
 /* Injury report: vertical list above the analysis, not a horizontal carousel. */

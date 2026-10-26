@@ -1,0 +1,71 @@
+/* Lightweight, mobile-first companion to My Teams. */
+body.shua-portfolio-open main>*:not(#shuaPortfolio){display:none!important}
+body.shua-portfolio-open #shuaPortfolio{display:block!important}
+body.shua-portfolio-open .positions [data-pos="COMMAND"]{background:#114b3a!important;color:#c8ffeb!important;border-color:#26d69a!important}
+#shuaPortfolio{--pc-bg:#0a2034;--pc-card:#102b43;--pc-edge:#2a4c64;--pc-muted:#a1bacc;--pc-green:#36e3a7;--pc-red:#ff747c;max-width:1320px;margin:0 auto;padding:14px 10px 85px;color:#eff8ff;min-width:0}
+#shuaPortfolio *{box-sizing:border-box}
+#shuaPortfolio button,#shuaPortfolio select,#shuaPortfolio input{font:inherit}
+#shuaPortfolio button{cursor:pointer}
+#shuaPortfolio .pc-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+#shuaPortfolio .pc-heading h2{font-size:clamp(20px,3vw,28px);font-weight:900;margin:0}
+#shuaPortfolio .pc-sub,#shuaPortfolio .pc-source{color:var(--pc-muted);font-size:11px;line-height:1.4}
+#shuaPortfolio .pc-source{margin:9px 2px 2px}
+#shuaPortfolio .pc-week{color:var(--pc-green);border:1px solid #286d58;border-radius:20px;background:#103c30;padding:7px 10px;font-weight:850;font-size:12px;white-space:nowrap}
+#shuaPortfolio .pc-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;white-space:nowrap;padding:3px 0 10px;margin-bottom:3px}
+#shuaPortfolio .pc-tabs button,#shuaPortfolio .pc-filters button{background:#0e2b43;border:1px solid #355269;border-radius:8px;color:#b9cfdd;padding:9px 12px;font-size:12px;font-weight:850;white-space:nowrap}
+#shuaPortfolio .pc-tabs button[aria-selected="true"],#shuaPortfolio .pc-filters button[aria-pressed="true"]{background:#136348;border-color:#2bdf9f;color:#fff}
+#shuaPortfolio .pc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#shuaPortfolio .pc-card{min-width:0;overflow:hidden;border:1px solid var(--pc-edge);border-radius:13px;background:var(--pc-bg);padding:11px}
+#shuaPortfolio .pc-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:11px}
+#shuaPortfolio .pc-summary .pc-card{padding:11px 9px}
+#shuaPortfolio .pc-summary strong{display:block;font-size:clamp(19px,3vw,26px);line-height:1.1;font-weight:900;font-variant-numeric:tabular-nums}
+#shuaPortfolio .pc-summary span{display:block;color:var(--pc-muted);font-size:10px;margin-top:5px}
+#shuaPortfolio .pc-team-head{display:flex;align-items:flex-start;justify-content:space-between;gap:7px;margin-bottom:7px}
+#shuaPortfolio h3{font-size:14px;line-height:1.22;margin:0;color:#fff}
+#shuaPortfolio .pc-team-name{font-size:11px;color:var(--pc-muted);margin-top:3px;overflow-wrap:anywhere}
+#shuaPortfolio .pc-seed{font-size:10px;font-weight:850;background:#163d57;border:1px solid #315d76;border-radius:14px;padding:4px 7px;white-space:nowrap}
+#shuaPortfolio .pc-record{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;margin:7px 0}
+#shuaPortfolio .pc-record span{font-size:11px;color:var(--pc-muted);font-weight:650;margin-left:4px}
+#shuaPortfolio .pc-matchup{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:5px 9px;font-size:11px;border-top:1px solid #ffffff1b;padding-top:8px}
+#shuaPortfolio .pc-matchup .pc-numeric{text-align:right;font-weight:850;font-variant-numeric:tabular-nums}
+#shuaPortfolio .pc-matchup small{display:block;color:var(--pc-muted);font-size:10px;font-weight:500}
+#shuaPortfolio .pc-green{color:var(--pc-green)!important}#shuaPortfolio .pc-red{color:var(--pc-red)!important}#shuaPortfolio .pc-amber{color:#f3c875!important}
+#shuaPortfolio .pc-open{display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:#123e42;border:1px solid #2b816e;color:#c9fff0;font-size:11px;font-weight:850;padding:7px 10px;margin-top:9px;min-height:33px}
+#shuaPortfolio .pc-control-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+#shuaPortfolio select,#shuaPortfolio input{min-width:0;max-width:100%;color:#ebf8ff;background:#092135;border:1px solid #3c5a70;border-radius:8px;padding:9px 10px;font-size:12px;min-height:38px}
+#shuaPortfolio .pc-control-line select{flex:1 1 190px}
+#shuaPortfolio .pc-control-line input{flex:2 1 200px}
+#shuaPortfolio .pc-filters{display:flex;align-items:center;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:9px}
+#shuaPortfolio .pc-filters button{padding:8px 10px}
+#shuaPortfolio .pc-item{display:flex;gap:9px;align-items:center;padding:8px 0;border-top:1px solid #ffffff1a;min-width:0}
+#shuaPortfolio .pc-item:first-of-type{border-top:0}
+#shuaPortfolio .pc-portrait{width:38px;height:38px;border-radius:50%;object-fit:contain;flex:0 0 38px;background:transparent}
+#shuaPortfolio .pc-info{flex:1 1 auto;min-width:0}
+#shuaPortfolio .pc-player{background:none;border:0;color:#f4faff;font-size:12px;text-align:left;font-weight:850;padding:0;line-height:1.25;overflow-wrap:anywhere}
+#shuaPortfolio .pc-meta{display:flex;gap:5px;align-items:center;font-size:10px;color:var(--pc-muted);margin-top:4px;flex-wrap:wrap}
+#shuaPortfolio .pc-nfl-logo{height:15px;width:15px;object-fit:contain}
+#shuaPortfolio .pc-stat{flex:0 0 auto;text-align:right;font-size:13px;font-weight:850;font-variant-numeric:tabular-nums}
+#shuaPortfolio .pc-stat small{display:block;font-size:10px;font-weight:500;color:var(--pc-muted)}
+#shuaPortfolio .pc-tag{font-size:9px;font-weight:900;padding:3px 6px;border-radius:5px;background:#21465d;color:#b6d6e8;white-space:nowrap}
+#shuaPortfolio .pc-tag.danger{background:#5a2834;color:#ff9198}#shuaPortfolio .pc-tag.warn{background:#594222;color:#f3c875}#shuaPortfolio .pc-tag.ok{background:#164c3c;color:#4ee8b0}
+#shuaPortfolio .pc-empty{font-size:12px;color:var(--pc-muted);padding:18px 10px;text-align:center;border:1px dashed #39576d;border-radius:10px}
+#shuaPortfolio .pc-note{color:#98b5c9;font-size:11px;padding:10px 0;line-height:1.5}
+#shuaPortfolio .pc-table-wrap{overflow-x:auto;max-width:100%;border:1px solid var(--pc-edge);border-radius:12px;background:var(--pc-bg)}
+#shuaPortfolio .pc-table{width:100%;border-collapse:collapse;min-width:570px;font-size:11px}
+#shuaPortfolio .pc-table th{font-size:10px;color:#a8c2d2;text-transform:uppercase;letter-spacing:.3px;background:#10304a;text-align:left;padding:10px 8px;white-space:nowrap}
+#shuaPortfolio .pc-table td{padding:9px 8px;border-top:1px solid #ffffff18;vertical-align:middle;font-variant-numeric:tabular-nums}
+#shuaPortfolio .pc-table th:not(:first-child),#shuaPortfolio .pc-table td:not(:first-child){text-align:right}
+#shuaPortfolio .pc-table td:first-child{min-width:172px}
+#shuaPortfolio .pc-table td .pc-player{white-space:normal}
+#shuaPortfolio .pc-lineup-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+#shuaPortfolio .pc-lineup-title small{color:var(--pc-muted);font-size:10px}
+#shuaPortfolio .pc-compare{padding:12px;margin:11px 0;border:1px solid #326f69;border-radius:12px;background:#0e2e3e}
+#shuaPortfolio .pc-compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#shuaPortfolio .pc-compare-grid select{width:100%;margin-top:6px}
+#shuaPortfolio .pc-compare-data{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+#shuaPortfolio .pc-metric-cell{background:#09263b;border:1px solid #2d4e65;border-radius:9px;padding:9px;font-size:11px}
+#shuaPortfolio .pc-metric-cell strong{display:block;font-size:15px;color:#ebf7ff;margin-top:3px}
+#shuaPortfolio .pc-history-rank{font-weight:900;font-size:13px}
+#shuaPortfolio .pc-end{color:var(--pc-muted);font-size:11px;text-align:center;margin:16px 0}
+@media(max-width:740px){#shuaPortfolio{padding:8px 3px 75px}#shuaPortfolio .pc-grid{grid-template-columns:1fr;gap:8px}#shuaPortfolio .pc-heading{padding:0 5px}#shuaPortfolio .pc-summary{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}#shuaPortfolio .pc-summary .pc-card{padding:9px 5px}#shuaPortfolio .pc-summary span{font-size:9px}#shuaPortfolio .pc-summary strong{font-size:19px}#shuaPortfolio .pc-card{padding:9px}#shuaPortfolio .pc-team-head h3{font-size:13px}#shuaPortfolio .pc-tabs button{padding:9px 10px}#shuaPortfolio .pc-portrait{width:34px;height:34px;flex-basis:34px}#shuaPortfolio .pc-player{font-size:12px}#shuaPortfolio .pc-control-line{padding:0 4px}#shuaPortfolio .pc-compare{padding:9px}#shuaPortfolio .pc-table{min-width:530px}}
+@media(max-width:400px){#shuaPortfolio .pc-summary strong{font-size:17px}#shuaPortfolio .pc-summary span{font-size:8px}#shuaPortfolio .pc-stat{font-size:12px}}

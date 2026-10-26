@@ -13,7 +13,7 @@ const routesFile=path.join(base,'analytics/data/heatradar-routes-2026.json');
 const aliases={kennethwalkeriii:'kennethwalker',michaelpittmanjr:'michaelpittman',brianthomasjr:'brianthomas',marvinharrisonjr:'marvinharrison',chigokonkwo:'chigoziemokonkwo',lutherburdeniii:'lutherburden',haroldfanninjr:'haroldfannin',joshpalmer:'joshuapalmer',jamescookiii:'jamescook'};
 const key=name=>{const n=String(name||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');return aliases[n]||n;};
 const round=(value,places=2)=>Number(value.toFixed(places));
-const routeFields=['routesRun','routeParticipation','targetsPerRouteRun','yardsPerRouteRun'];
+const routeFields=['routesRun','routeParticipation','targetsPerRouteRun','yardsPerRouteRun','routeParticipationTrend'];
 
 function enrich(usage,source){
  if(usage.schema!==1||usage.season!==2026||!usage.players||source.schema!==1||source.season!==2026||!Array.isArray(source.rows))throw new Error('Usage or HeatRadar data schema changed');
@@ -29,6 +29,7 @@ function enrich(usage,source){
   for(const field of routeFields)player[field]=null;
   delete player.routeWeeks;
   delete player.routeCoverage;
+  delete player.routeTrendCoverage;
   const candidates=indexed.get(key(player.name||playerKey)+'|'+player.position)||[];
   const excluded=candidates.filter(row=>row.uncertain);
   const accepted=candidates.filter(row=>!row.uncertain&&Number.isFinite(row.routes)&&Number.isFinite(row.targets)&&Number.isFinite(row.yards));
@@ -53,8 +54,23 @@ function enrich(usage,source){
    w.routeParticipation=!w.missingDenominator&&w.teamPasses>0?round(100*w.routes/w.teamPasses):null;
    w.targetsPerRouteRun=w.routes>=8?round(100*w.targets/w.routes):null;
    w.yardsPerRouteRun=w.routes>=8?round(w.yards/w.routes):null;
-   delete w.teamPasses;delete w.missingDenominator;
   }
+  // A three-NFL-week comparison of *verified* route opportunities. Compare
+  // weighted percentages, not averages of the rounded weekly percentages.
+  // Two charted weeks per window are required; missing weeks are never zeros.
+  const windowShare=(from,to)=>{
+   const valid=Object.entries(weeks).filter(([week,w])=>+week>=from&&+week<=to&&
+    !w.missingDenominator&&w.teamPasses>0);
+   if(valid.length<2)return null;
+   const total=valid.reduce((a,[,w])=>a+w.teamPasses,0);
+   return {share:100*valid.reduce((a,[,w])=>a+w.routes,0)/total,weeks:valid.length};
+  };
+  const current=windowShare(maxWeek-2,maxWeek),previous=windowShare(maxWeek-5,maxWeek-3);
+  player.routeParticipationTrend=current&&previous?round(current.share-previous.share):null;
+  if(player.routeParticipationTrend!==null){
+   player.routeTrendCoverage={recentWeeks:current.weeks,priorWeeks:previous.weeks,throughWeek:maxWeek};
+  }
+  for(const w of Object.values(weeks)){delete w.teamPasses;delete w.missingDenominator;}
   player.routeWeeks=weeks;
   if(routes<=0)continue;
   player.routesRun=round(routes,0);
@@ -72,7 +88,8 @@ function enrich(usage,source){
   routesRun:'Sum of HeatRadar charted routes from available valid weekly rows; missing or fractional-count rows are excluded',
   routeParticipation:'Player charted routes / sum of team passing-play denominators across the same valid weeks (percent)',
   targetsPerRouteRun:'Sum of charted targets / sum of charted routes over valid weeks, expressed as a percentage; suppressed below eight routes',
-  yardsPerRouteRun:'Sum of charted receiving yards / sum of charted routes over valid weeks; suppressed below eight routes'};
+  yardsPerRouteRun:'Sum of charted receiving yards / sum of charted routes over valid weeks; suppressed below eight routes',
+  routeParticipationTrend:'Weighted charted route participation in the latest three source weeks minus the prior three source weeks, in percentage points; at least two verified weeks in each window'};
  usage.limitations=(usage.limitations||[]).filter(s=>!/^Route participation, targets per route/.test(s)&&!/^Route participation, targets per route,/.test(s));
  usage.limitations.push('HeatRadar source through Week '+maxWeek+'; incomplete charting and fractional-count rows are excluded, never estimated. A player can have fewer valid route weeks than the league.');
  return {matched,uncertainPlayers,usedWeeks};

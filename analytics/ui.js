@@ -85,7 +85,17 @@ const usageCatalog=[
  ['targetsPerRouteRun','Targets per route run','TPRR',1,'%'],
  ['yardsPerRouteRun','Yards per route run','YPRR',2,''],
  ['yacPerReception','Yards after catch per reception','YAC/R',1,''],
- ['receivingFirstDowns','Receiving first downs','Rec 1D',0,'']
+ ['receivingFirstDowns','Receiving first downs','Rec 1D',0,''],
+ ['expectedFantasyPointsPerGame','Expected fantasy points per game','xFP/G',1,''],
+ ['fantasyPointsOverExpected','Fantasy points over expected','FPOE',1,''],
+ ['redZoneTargetShare','Red-zone target share','RZ Tgt %',1,'%'],
+ ['insideFiveCarryShare','Inside-5 carry share','I5 Car %',1,'%'],
+ ['insideTenTargets','Inside-10 targets','I10 Tgt',0,''],
+ ['routeParticipationTrend','Last 3 vs previous 3 weeks route participation','Route Δ',1,' pp'],
+ ['deepTargetRate','Deep target rate','Deep %',1,'%'],
+ ['receivingFirstDownsPerRoute','Receiving first downs per route','Rec 1D/R',1,'%'],
+ ['yardsAfterContactPerCarry','Yards after contact per carry','YACo/C',2,''],
+ ['qbDesignedRushesPerGame','QB designed rushes per game','Des R/G',1,'']
 ];
 // One definition per field keeps the table compact and gives every value the same explanation.
 // Formulas intentionally match the verified snapshot builders, including their coverage windows.
@@ -109,12 +119,23 @@ const usageDescriptions={
  targetsPerRouteRun:['How often the player draws a target while running a route.','Charted targets ÷ charted routes × 100; requires at least eight valid routes.'],
  yardsPerRouteRun:['Receiving yards gained for every route the player ran.','Charted receiving yards ÷ charted routes; requires at least eight valid routes.'],
  yacPerReception:['Average receiving yards gained after the catch.','Total yards after catch ÷ receptions across matched nflverse/ESPN weeks.'],
- receivingFirstDowns:['How many receptions resulted in a first down.','Sum recorded nflverse receiving first downs across matched ESPN weeks.']
+ receivingFirstDowns:['How many receptions resulted in a first down.','Sum recorded nflverse receiving first downs across matched ESPN weeks.'],
+ expectedFantasyPointsPerGame:['Expected PPR points from the player\'s actual opportunities and their quality. This is a model estimate, not a projection.','Add ffopportunity modeled passing, rushing and receiving PPR points, then divide by matched games.'],
+ fantasyPointsOverExpected:['How many PPR points the player scored above or below opportunity-based expectations. Positive values indicate outperformance.','Actual PPR points minus ffopportunity modeled PPR points, summed across matched weeks.'],
+ redZoneTargetShare:['Percentage of the team\'s red-zone passes targeted at this player.','Player targets on plays starting at the opponent 20 or closer ÷ all team targets there × 100, using matching weeks.'],
+ insideFiveCarryShare:['Percentage of the team\'s goal-line carries taken by this player.','Player carries starting at the opponent 5 or closer ÷ all team carries there × 100; excludes QB kneeldowns.'],
+ insideTenTargets:['How often passes were thrown to the player inside the opponent\'s 10-yard line.','Count play-by-play targets on snaps starting at the opponent 10 or closer, including incomplete passes.'],
+ routeParticipationTrend:['Change in how often the player ran a route on team passing plays. Positive means more participation recently.','Weighted route participation during the last three charted NFL weeks minus the previous three, in percentage points; at least two verified weeks per window.'],
+ deepTargetRate:['Percentage of the player\'s targets that traveled at least 20 yards downfield.','Targets with 20 or more air yards ÷ all player targets × 100 in verified nflverse weeks.'],
+ receivingFirstDownsPerRoute:['How often one of the player\'s routes resulted in a receiving first down.','Receiving first downs from nflverse ÷ verified HeatRadar routes in those exact same weeks × 100; at least eight routes.'],
+ yardsAfterContactPerCarry:['Average rushing yards earned after a defender first made contact.','PFR rushing yards after contact ÷ PFR rushing attempts from matched games.'],
+ qbDesignedRushesPerGame:['Average called quarterback runs, separate from scrambles.','QB rushing attempts excluding flagged scrambles and kneeldowns ÷ recorded games verified in play-by-play.']
 };
 const usageGroups={
  volume:['espnPositionRank','snapShare','routesRun','routeParticipation','targetsPerGame','carriesPerGame','targetShare','carryShare','recentOpportunityChange'],
  opportunity:['espnPositionRank','targetShare','opportunityShare','airYardsShare','wopr','aDOT','redZoneOpportunities','highValueTouches'],
- efficiency:['espnPositionRank','targetsPerRouteRun','yardsPerRouteRun','yacPerReception','receivingFirstDowns','receivingYardsShare','aDOT','wopr']
+ efficiency:['espnPositionRank','targetsPerRouteRun','yardsPerRouteRun','yacPerReception','receivingFirstDowns','receivingYardsShare','aDOT','wopr'],
+ advanced:['espnPositionRank','expectedFantasyPointsPerGame','fantasyPointsOverExpected','redZoneTargetShare','insideFiveCarryShare','insideTenTargets','routeParticipationTrend','deepTargetRate','receivingFirstDownsPerRoute','yardsAfterContactPerCarry','qbDesignedRushesPerGame']
 };
 const usageRouteFields=new Set(['routesRun','routeParticipation','targetsPerRouteRun','yardsPerRouteRun']);
 const usageReceivingFields=new Set(['aDOT','wopr','receivingYardsShare','yacPerReception','receivingFirstDowns','airYardsShare']);
@@ -130,6 +151,26 @@ function usageCoverage(field,anchor){
  if(!id)return '';
  const player=rankedUsage?.players?.[id];
  if(!player)return '';
+ if(field==='routeParticipationTrend'){
+  const c=player.routeTrendCoverage;
+  return c?'Coverage: '+c.recentWeeks+' recent and '+c.priorWeeks+' earlier verified route weeks, through W'+c.throughWeek+'.':'Not enough verified route weeks in both windows.';
+ }
+ if(field==='receivingFirstDownsPerRoute'){
+  const c=player.firstDownRouteCoverage;
+  return c?'Coverage: '+c.matchedWeeks+' of '+c.chartedWeeks+' charted route weeks matched to nflverse play-by-play.':'No usable overlapping route/play-by-play weeks.';
+ }
+ if(field==='expectedFantasyPointsPerGame'||field==='fantasyPointsOverExpected'){
+  const c=player.expectedPointsCoverage;
+  return c?'Coverage: '+c.matchedWeeks+' of '+c.espnWeeks+' games matched to ffopportunity.':'No matching expected-points games.';
+ }
+ if(field==='yardsAfterContactPerCarry'){
+  const c=player.pfrRushingCoverage;
+  return c?'Coverage: '+c.matchedWeeks+' of '+c.espnWeeks+' games matched to PFR.':'No verified PFR carries for these games.';
+ }
+ if(['redZoneTargetShare','insideFiveCarryShare','insideTenTargets','deepTargetRate','qbDesignedRushesPerGame'].includes(field)){
+  const c=player.advancedPbpCoverage;
+  return c?'Coverage: '+c.matchedWeeks+' of '+c.espnWeeks+' games verified in nflverse play-by-play.':'No matching play-by-play games.';
+ }
  if(usageRouteFields.has(field)){
   const c=player.routeCoverage;
   return c?'Coverage: '+c.chartedWeeks+' verified route weeks'+(c.excludedWeeks?.length?'; excluded uncertain weeks '+c.excludedWeeks.join(', '):'')+'.':'No verified route charting for this player.';
@@ -185,7 +226,7 @@ function currentEspnPositionRanks(){
 function fetchRankedUsage(){
  if(rankedUsage||rankedUsagePending||rankedUsageError)return;
  rankedUsagePending=true;
- S.Data.json('analytics/data/ranked-usage-2026.json?v=20261026-usage-metrics1',{cache:'no-store'}).then(data=>{
+ S.Data.json('analytics/data/ranked-usage-2026.json?v=20261026-advanced-10a',{cache:'no-store'}).then(data=>{
   if(data.schema!==1||data.season!==2026||!data.players)throw new Error('Invalid ranked-player usage snapshot');
   rankedUsage=data;
  }).catch(err=>{rankedUsageError=err.message||String(err);}).finally(()=>{
@@ -234,13 +275,14 @@ function usage(){
    if(av!==null&&bv!==null&&av!==bv)return sortDirection==='asc'?av-bv:bv-av;
    return (rankedOrder.get(a.p.key)??9999)-(rankedOrder.get(b.p.key)??9999)||a.p.name.localeCompare(b.p.name);
   });
- const groupButtons='<div class="st-usage-groups" role="group" aria-label="Usage stat category">'+[['volume','Volume'],['opportunity','Opportunity'],['efficiency','Efficiency']].map(([id,label])=>'<button type="button" data-st-usage-group="'+id+'" aria-pressed="'+(group===id)+'">'+label+'</button>').join('')+'</div>';
+ const groupButtons='<div class="st-usage-groups" role="group" aria-label="Usage stat category">'+[['volume','Volume'],['opportunity','Opportunity'],['efficiency','Efficiency'],['advanced','Advanced']].map(([id,label])=>'<button type="button" data-st-usage-group="'+id+'" aria-pressed="'+(group===id)+'">'+label+'</button>').join('')+'</div>';
  const nav='<div class="st-usage-controls"><label>Position <select id="stUsagePos">'+['ALL','QB','RB','WR','TE'].map(p=>'<option value="'+p+'"'+((state.usagePos||'ALL')===p?' selected':'')+'>'+p+'</option>').join('')+'</select></label>'+groupButtons+'<label class="st-usage-rank-filter">Rank by <select id="stUsageMetric">'+metrics.map(m=>'<option value="'+m[0]+'"'+(chosen[0]===m[0]?' selected':'')+'>'+m[1]+'</option>').join('')+'</select></label></div>';
  const subtitle=isCurrent?rankedUsage.rankedPlayers+' ranked players · ESPN through W'+rankedUsage.throughWeek+(rankedUsage.routeThroughWeek?' · charted routes through W'+rankedUsage.routeThroughWeek:''):'Historical '+dataset.year+' recorded games';
  const cells=rows.map(x=>'<tr data-st-usage-key="'+E(x.p.key)+'"><td>'+person(x.p)+'</td>'+metrics.map(([field,label,,decimals,suffix])=>{
   const value=N(x[field]);
-  const shown=(field==='espnPositionRank'&&value!==null?'#':'')+(field==='recentOpportunityChange'&&value>0?'+':'')+F(x[field],decimals,suffix);
-  return '<td data-st-usage-field="'+E(field)+'"'+(field==='recentOpportunityChange'&&value!==null?' class="'+(value>0?'st-usage-gaining':value<0?'st-usage-losing':'')+'"':'')+'>'+shown+'</td>';
+  const signed=['recentOpportunityChange','routeParticipationTrend','fantasyPointsOverExpected'].includes(field);
+  const shown=(field==='espnPositionRank'&&value!==null?'#':'')+(signed&&value>0?'+':'')+F(x[field],decimals,suffix);
+  return '<td data-st-usage-field="'+E(field)+'"'+(signed&&value!==null?' class="'+(value>0?'st-usage-gaining':value<0?'st-usage-losing':'')+'"':'')+'>'+shown+'</td>';
  }).join('')+'</tr>').join('');
  const headers=metrics.map(([field,label,short])=>{
   const active=chosen[0]===field,nextDirection=active?(sortDirection==='desc'?'ascending':'descending'):(field==='espnPositionRank'?'ascending':'descending');
@@ -248,7 +290,7 @@ function usage(){
   return '<th scope="col" data-st-usage-field="'+E(field)+'" aria-sort="'+(active?(sortDirection==='asc'?'ascending':'descending'):'none')+'"><span class="st-usage-head"><button type="button" class="st-usage-sort'+(active?' is-active':'')+'" data-st-usage-sort="'+E(field)+'" aria-label="Sort '+E(label)+' '+nextDirection+'">'+E(short)+' <span class="st-usage-sort-icon" aria-hidden="true">'+indicator+'</span></button><button type="button" class="st-usage-info" data-st-usage-info="'+E(field)+'" aria-label="Explain '+E(label)+' and its calculation" aria-controls="stUsageTooltip" aria-expanded="false">ⓘ</button></span></th>';
  }).join('');
  const table='<div class="st-table-wrap st-usage-table"><table><thead><tr><th scope="col">Player</th>'+headers+'</tr></thead><tbody>'+cells+'</tbody></table></div>';
- const footnote=isCurrent?'<div class="st-usage-note">Hover over ⓘ beside a stat (or tap ⓘ on a phone) for its meaning and calculation. — means unavailable, not zero. <details class="st-usage-method"><summary>Sources and coverage</summary><p>ESPN supplies recorded games and opportunities; nflverse/PFR supplies snaps, red-zone and receiving metrics. <a href="https://heatradar.app/nfl/routes" target="_blank" rel="noopener noreferrer">HeatRadar</a> supplies charted routes, TPRR and YPRR through Week '+E(rankedUsage.routeThroughWeek||'—')+'; incomplete charting and fractional-count rows are excluded. Receiving metrics use <a href="https://github.com/nflverse/nflverse-data" target="_blank" rel="noopener noreferrer">nflverse data (CC BY 4.0)</a>.</p></details></div>':
+ const footnote=isCurrent?'<div class="st-usage-note">Hover over ⓘ beside a stat (or tap ⓘ on a phone) for its meaning and calculation. — means unavailable, not zero. <details class="st-usage-method"><summary>Sources and coverage</summary><p>ESPN supplies recorded games and opportunities; nflverse/PFR supplies snaps, red-zone and receiving metrics. <a href="https://heatradar.app/nfl/routes" target="_blank" rel="noopener noreferrer">HeatRadar</a> supplies charted routes, TPRR, YPRR and route trend through Week '+E(rankedUsage.routeThroughWeek||'—')+'; incomplete charting and fractional-count rows are excluded. <a href="https://ffopportunity.ffverse.com/" target="_blank" rel="noopener noreferrer">ffopportunity</a> supplies modeled xFP and FPOE. <a href="https://github.com/nflverse/nflverse-data" target="_blank" rel="noopener noreferrer">nflverse play-by-play and advanced rushing data (CC BY 4.0)</a> supply goal-line, deep-target, first-down and yards-after-contact measures. Hover each ⓘ for player-specific source-week coverage.</p></details></div>':
   '<p class="st-usage-note">Hover over ⓘ beside a stat (or tap ⓘ on a phone) for its meaning and formula. Historical usage uses available recorded games; unverified metrics remain blank.</p>';
  return nav+panel('Usage analytics',subtitle,table+footnote);
 }

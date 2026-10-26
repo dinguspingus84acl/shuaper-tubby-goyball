@@ -36,8 +36,14 @@ jobs:
         run: node scripts/refresh-heatradar-routes.cjs
       - name: Merge verified routes into ranked-player usage
         run: node scripts/enrich-ranked-heatradar-routes.cjs
+      - name: Install expected-points data reader
+        run: python -m pip install --disable-pip-version-check pyreadr
+      - name: Merge ten source-backed advanced Usage statistics
+        run: python -u scripts/enrich-ranked-advanced-usage.py
       - name: Validate advanced usage calculations
-        run: node tests/usage-extra-metrics.cjs
+        run: |
+          node tests/usage-extra-metrics.cjs
+          node tests/usage-advanced-metrics.cjs
       - name: Publish data snapshots only
         id: save
         run: |

@@ -30,12 +30,14 @@ jobs:
         run: python -u scripts/refresh-espn-matchups.py
       - name: Rebuild ranked-player advanced usage from the refreshed snapshots
         run: node scripts/build-ranked-usage.cjs
-      - name: Enrich ranked-player air yards from nflverse
+      - name: Enrich ranked-player receiving metrics from nflverse
         run: python -u scripts/enrich-ranked-air-yards.py
       - name: Refresh permitted HeatRadar weekly route charting
         run: node scripts/refresh-heatradar-routes.cjs
       - name: Merge verified routes into ranked-player usage
         run: node scripts/enrich-ranked-heatradar-routes.cjs
+      - name: Validate advanced usage calculations
+        run: node tests/usage-extra-metrics.cjs
       - name: Publish data snapshots only
         id: save
         run: |

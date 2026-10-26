@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add verified receiving air-yards shares from nflverse weekly PBP summaries.
+"""Add verified receiving opportunity and efficiency from nflverse weekly stats.
 
 The nflverse stats_player release is CC-BY 4.0. No route metrics are inferred.
 Only weeks also present in the existing ESPN season snapshot are included.
@@ -9,6 +9,7 @@ import csv
 import gzip
 import io
 import json
+import math
 import re
 import unicodedata
 from collections import defaultdict
@@ -48,8 +49,15 @@ def canonical(team):
 
 def number(raw):
     if raw is None or raw == '':
-        return 0.0
-    return float(raw)
+        return None
+    value = float(raw)
+    return value if math.isfinite(value) else None
+
+
+def rounded_ratio(numerator, denominator, multiplier=1, digits=2):
+    if numerator is None or denominator is None or denominator <= 0:
+        return None
+    return round(multiplier * numerator / denominator, digits)
 
 
 def main():
@@ -64,23 +72,29 @@ def main():
     if content[:2] == b'\x1f\x8b':
         content = gzip.decompress(content)
     reader = csv.DictReader(io.StringIO(content.decode('utf-8-sig')))
-    required = {'player_display_name', 'season', 'week', 'season_type', 'team', 'receiving_air_yards'}
+    measures = ('receiving_air_yards', 'targets', 'receptions', 'receiving_yards',
+                'receiving_yards_after_catch', 'receiving_first_downs')
+    required = {'player_display_name', 'season', 'week', 'season_type', 'team', *measures}
     if not required.issubset(set(reader.fieldnames or ())):
         raise ValueError('nflverse weekly-player data is missing required columns')
 
-    team_air = defaultdict(float)
-    player_air = {}
+    team_totals = defaultdict(lambda: defaultdict(float))
+    player_weeks = {}
     for row in reader:
         if row['season'] != '2026' or row['season_type'] != 'REG':
             continue
         team = canonical(row['team'])
         week = int(row['week'])
-        air = number(row['receiving_air_yards'])
-        team_air[(team, week)] += air
+        if not 1 <= week <= 18:
+            continue
+        parsed = {measure: number(row[measure]) for measure in measures}
+        for measure, value in parsed.items():
+            if value is not None:
+                team_totals[(team, week)][measure] += value
         identity = (key(row['player_display_name']), team, week)
-        if identity in player_air:
+        if identity in player_weeks:
             raise ValueError('Duplicate nflverse player/team/week: %s' % (identity,))
-        player_air[identity] = air
+        player_weeks[identity] = parsed
 
     season = json.loads((ROOT / 'analytics/data/season-2026.json').read_text())
     path = ROOT / 'analytics/data/ranked-usage-2026.json'
@@ -90,29 +104,70 @@ def main():
                          for g in p.get('games', []) if g.get('hasStats') is not False and 1 <= int(g['week']) <= output['throughWeek']]
         for p in season['players']
     }
-    coverage = 0
+    coverage = defaultdict(int)
     for player_key, player in output['players'].items():
-        totals = [0.0, 0.0]
+        if player.get('position') not in ('RB', 'WR', 'TE'):
+            player['nflverseCoverage'] = {'matchedWeeks': 0, 'espnWeeks': len(valid_games.get(player_key, ())) }
+            for name in ('airYardsShare', 'aDOT', 'wopr', 'receivingYardsShare',
+                         'yacPerReception', 'receivingFirstDowns'):
+                player[name] = None
+            continue
+        totals = defaultdict(float)
         matched_weeks = 0
-        for team, week in valid_games.get(player_key, ()):
-            air = player_air.get((player_key, team, week))
-            team_total = team_air.get((team, week))
-            if air is None or team_total is None:
+        requested_weeks = valid_games.get(player_key, ())
+        for team, week in requested_weeks:
+            own = player_weeks.get((player_key, team, week))
+            team_total = team_totals.get((team, week))
+            if own is None or team_total is None:
                 continue
-            totals[0] += air
-            totals[1] += team_total
+            for measure in measures:
+                own_value = own.get(measure)
+                if own_value is not None:
+                    totals['own_'+measure] += own_value
+                totals['team_'+measure] += team_total.get(measure, 0)
             matched_weeks += 1
-        player['airYardsShare'] = round(100 * totals[0] / totals[1], 2) if totals[1] > 0 and matched_weeks else None
-        if player['airYardsShare'] is not None:
-            coverage += 1
-    output['playersWithAirYardsShare'] = coverage
+        player['nflverseCoverage'] = {'matchedWeeks': matched_weeks, 'espnWeeks': len(requested_weeks)}
+        if not matched_weeks:
+            for name in ('airYardsShare', 'aDOT', 'wopr', 'receivingYardsShare',
+                         'yacPerReception', 'receivingFirstDowns'):
+                player[name] = None
+            continue
+        get = lambda prefix, name: totals.get(prefix + name)
+        air = get('own_', 'receiving_air_yards')
+        targets = get('own_', 'targets')
+        team_air = get('team_', 'receiving_air_yards')
+        team_targets = get('team_', 'targets')
+        player['airYardsShare'] = rounded_ratio(air, team_air, 100)
+        player['aDOT'] = rounded_ratio(air, targets)
+        player['receivingYardsShare'] = rounded_ratio(
+            get('own_', 'receiving_yards'), get('team_', 'receiving_yards'), 100)
+        player['yacPerReception'] = rounded_ratio(
+            get('own_', 'receiving_yards_after_catch'), get('own_', 'receptions'))
+        first_downs = get('own_', 'receiving_first_downs')
+        player['receivingFirstDowns'] = int(first_downs) if first_downs is not None else None
+        player['wopr'] = (round(1.5 * targets / team_targets + 0.7 * air / team_air, 3)
+                          if targets is not None and team_targets and air is not None and team_air and team_air > 0
+                          else None)
+        for name in ('airYardsShare', 'aDOT', 'wopr', 'receivingYardsShare',
+                     'yacPerReception', 'receivingFirstDowns'):
+            if player[name] is not None:
+                coverage[name] += 1
+    output['playersWithAirYardsShare'] = coverage['airYardsShare']
+    output['additionalUsageCoverage'] = dict(coverage)
     output['airYardsSource'] = URL
-    output['definitions']['airYardsShare'] = ('Player receiving air yards divided by all receiving air yards for the same team '
-                                              'during matched recorded games; negative air yards are retained')
+    output['definitions'].update({
+        'airYardsShare': 'Player receiving air yards / all team receiving air yards in matched nflverse/ESPN weeks; negative air yards retained',
+        'aDOT': 'Sum of player receiving air yards / sum of player targets for matched nflverse/ESPN weeks',
+        'wopr': '1.5 × nflverse target share + 0.7 × nflverse air-yards share across matched weeks; dimensionless',
+        'receivingYardsShare': 'Player receiving yards / team receiving yards across the same matched nflverse/ESPN weeks',
+        'yacPerReception': 'Sum of nflverse receiving yards after catch / sum of receptions across matched weeks',
+        'receivingFirstDowns': 'Sum of nflverse receiving first downs across matched weeks',
+    })
     output['limitations'] = [text for text in output['limitations'] if not text.startswith('Route participation,')]
     output['limitations'].append('Route participation, targets per route and yards per route require independently charted routes; unavailable values remain null')
+    output['limitations'].append('nflverse receiving metrics use only matched ESPN weeks. A player may have fewer verified source weeks than recorded games; see source coverage.')
     path.write_text(json.dumps(output, separators=(',', ':')))
-    print(f'Air-yards shares available for {coverage}/{output["rankedPlayers"]} ranked players')
+    print(f'Additional nflverse usage coverage across {output["rankedPlayers"]} ranked players: {dict(coverage)}')
 
 
 if __name__ == '__main__':

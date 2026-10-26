@@ -20,18 +20,21 @@ const selections=new Map();
 for(const p of board.players||[]){const name=typeof p==='string'?p:p.name;if(name)selections.set(key(name),name);}
 for(const pos of ['QB','RB','WR','TE'])for(const p of ros[pos]||[]){if(p.name&&!selections.has(key(p.name)))selections.set(key(p.name),p.name);}
 const byKey=new Map((season.players||[]).map(p=>[key(p.name),p]));
-const teamTargets=new Map(),teamPositionOpps=new Map();
+const teamTargets=new Map(),teamCarries=new Map(),teamPositionOpps=new Map();
 for(const player of season.players||[]){
  for(const g of player.games||[]){
   if(g.hasStats===false||!(g.week>=1&&g.week<=18)||!g.team)continue;
   const teamWeek=g.team+'|'+g.week,targets=number(g.targets),carries=number(g.rushAtt);
   if(targets!==null)teamTargets.set(teamWeek,(teamTargets.get(teamWeek)||0)+targets);
+  if(carries!==null)teamCarries.set(teamWeek,(teamCarries.get(teamWeek)||0)+carries);
   if(['RB','WR','TE'].includes(player.position)&&targets!==null&&carries!==null){
    const k=teamWeek+'|'+player.position;
    teamPositionOpps.set(k,(teamPositionOpps.get(k)||0)+targets+carries);
   }
  }
 }
+const latestWeek=Math.max(0,...(season.players||[]).flatMap(p=>(p.games||[]).map(g=>Number(g.week)||0)));
+const average=games=>games.reduce((total,g)=>total+g.targets+g.rushAtt,0)/games.length;
 const result={};let matched=0,withSnaps=0,withTargets=0;
 for(const [playerKey,rankName] of selections){
  const p=byKey.get(playerKey),valid=p?(p.games||[]).filter(g=>g.hasStats!==false&&g.week>=1&&g.week<=18):[];
@@ -42,6 +45,12 @@ for(const [playerKey,rankName] of selections){
  const targets=sum(recorded.map(g=>g.targets));
  const teamTargetTotal=sum(recorded.map(g=>teamTargets.get(g.team+'|'+g.week)));
  const rushes=sum(valid.map(g=>g.rushAtt));
+ const teamCarryTotal=sum(valid.filter(g=>number(g.rushAtt)!==null).map(g=>teamCarries.get(g.team+'|'+g.week)));
+ const reportedInside10=valid.length&&valid.every(g=>number(g.inside10)!==null)?sum(valid.map(g=>g.inside10)):null;
+ const opportunityGames=valid.filter(g=>number(g.targets)!==null&&number(g.rushAtt)!==null);
+ const recent=opportunityGames.filter(g=>g.week>=latestWeek-2&&g.week<=latestWeek);
+ const prior=opportunityGames.filter(g=>g.week>=latestWeek-5&&g.week<=latestWeek-3);
+ const recentDelta=recent.length>=2&&prior.length>=2?rounded(average(recent)-average(prior),1):null;
  const opps=p&&['RB','WR','TE'].includes(p.position)?sum(valid.map(g=>number(g.targets)!==null&&number(g.rushAtt)!==null?+g.targets+(+g.rushAtt):null)):null;
  const posTotal=opps!==null?sum(valid.map(g=>teamPositionOpps.get(g.team+'|'+g.week+'|'+p.position))):null;
  const redZone=sum(valid.map(g=>g.redZone));
@@ -53,13 +62,19 @@ for(const [playerKey,rankName] of selections){
  result[playerKey]={name:rankName,id:p?String(p.id||''):null,position:p?.position||null,team,
   games:valid.length,snapShare,targetShare,opportunityShare:rounded(percent(opps,posTotal)),
   redZoneOpportunities:redZone,targets,teamTargets:teamTargetTotal,
+  targetsPerGame:valid.length&&targets!==null?rounded(targets/valid.length,1):null,
+  carriesPerGame:valid.length&&rushes!==null?rounded(rushes/valid.length,1):null,
+  carryShare:rounded(percent(rushes,teamCarryTotal)),
+  highValueTouches:reportedInside10,
+  recentOpportunityChange:recentDelta,
+  recentOpportunityCoverage:recentDelta!==null?{recentWeeks:recent.length,priorWeeks:prior.length}:null,
+  aDOT:null,wopr:null,receivingYardsShare:null,yacPerReception:null,receivingFirstDowns:null,
   // Source does not contain charted route/air-yard records. Keep missing values null.
   routeParticipation:null,targetsPerRouteRun:null,yardsPerRouteRun:null,airYardsShare:null};
 }
-const latestWeek=Math.max(0,...(season.players||[]).flatMap(p=>(p.games||[]).map(g=>Number(g.week)||0)));
 const output={schema:1,season:2026,throughWeek:latestWeek,sourceGeneratedAt:season.generatedAt||null,
  source:'Existing 2026 ESPN player-game stats with nflverse/PFR snaps and usage enrichment',
- definitions:{snapShare:'Player offensive snaps / team offensive snaps across games with both counts',targetShare:'Player recorded targets / all recorded targets for the same team in those weeks',opportunityShare:'Player targets plus carries / recorded targets plus carries of teammates at the same position over the same weeks',redZoneOpportunities:'Recorded red-zone carries plus targets'},
+ definitions:{snapShare:'Player offensive snaps / team offensive snaps across games with both counts',targetShare:'Player recorded targets / all recorded targets for the same team in those weeks',opportunityShare:'Player targets plus carries / recorded targets plus carries of teammates at the same position over the same weeks',redZoneOpportunities:'Recorded red-zone carries plus targets',targetsPerGame:'ESPN recorded targets divided by games with stats',carriesPerGame:'ESPN recorded carries divided by games with stats',carryShare:'ESPN recorded carries divided by team recorded carries in the same weeks',highValueTouches:'Recorded carries plus completed receptions at or inside the opponent 10-yard line (incomplete targets excluded)',recentOpportunityChange:'Targets plus carries per recorded game over the latest three NFL weeks, minus the previous three NFL weeks; minimum two observed games per window'},
  limitations:['2026 completed games only; incomplete game coverage can affect shares','Team target totals are reconstructed from the snapshot, not an official team-level total','Route participation, targets per route, yards per route and air-yards share require unavailable route/air-yards charting. Null means unavailable, never zero'],
  rankedPlayers:selections.size,matchedPlayers:matched,playersWithSnapShare:withSnaps,playersWithTargetShare:withTargets,players:result};
 const target=path.join(base,'analytics/data/ranked-usage-2026.json');

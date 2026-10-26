@@ -571,14 +571,20 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
  #shuaAnalyticsSection[data-active-view="schedule"] .st-schedule-display-picker select{height:34px}
 }
 
-/* Usage analytics: compare all five metrics without clipping player identity. */
+/* Usage analytics: compact grouped measures with stable, sortable columns. */
 #shuaAnalyticsSection[data-active-view="usage"]{max-width:none;width:100%;padding-inline:3px}
 #shuaAnalyticsSection[data-active-view="usage"] .st-layout{min-width:0}
-#shuaAnalyticsSection[data-active-view="usage"] .st-usage-controls{display:flex;gap:9px;flex-wrap:wrap;margin:5px 0 13px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-controls{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin:5px 0 11px}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#a3b9cd}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-controls select{min-height:36px;color:#fff;background:#11283e;border:1px solid #365268;border-radius:7px;padding:5px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;align-self:end;padding:3px;background:#0b2235;border:1px solid #2e4b60;border-radius:9px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-groups button{min-height:35px;padding:7px 11px;background:transparent;border:1px solid transparent;border-radius:7px;color:#a6bed1;white-space:nowrap;font:inherit;font-size:12px;font-weight:850;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-groups button[aria-pressed="true"]{background:#0c604b;border-color:#2ee4a5;color:#fff}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-groups button:focus-visible{outline:2px solid #38e9ad;outline-offset:2px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-rank-filter{min-width:160px;max-width:270px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-rank-filter select{width:100%;min-width:0}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table{overflow:auto;max-height:75dvh}
-#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table table{width:100%;min-width:1090px;font-variant-numeric:tabular-nums}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table table{width:100%;min-width:850px;font-variant-numeric:tabular-nums}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:not(:first-child){text-align:right;min-width:81px}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th:not(:first-child){text-align:right}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort{display:inline-flex;align-items:center;justify-content:flex-end;gap:5px;width:100%;min-height:36px;padding:0;border:0;background:transparent;color:#c8d8e7;font:inherit;font-weight:750;white-space:nowrap;cursor:pointer}
@@ -587,6 +593,11 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort.is-active .st-usage-sort-icon{opacity:1}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort:focus-visible{outline:2px solid #38e9ad;outline-offset:2px;border-radius:4px}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-note{margin:9px 2px 0;color:#94a9be;font-size:11px;line-height:1.45}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-method{display:inline;margin-left:4px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-method summary{display:inline;color:#82dbcd;cursor:pointer;font-weight:750}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-method p{margin:7px 0 2px;max-width:960px}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-gaining{color:#46df9f;font-weight:800}
+#shuaAnalyticsSection[data-active-view="usage"] .st-usage-losing{color:#f28d90;font-weight:800}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table .st-person .st-face{height:34px;width:34px;min-width:34px;flex:0 0 34px;border-radius:50%;border:2px solid #4e7898;object-fit:cover;object-position:center top;background:#102d44}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table .st-person .st-avatar-fallback{min-height:34px;min-width:34px;border-radius:50%}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th,#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td{padding:7px 9px;white-space:nowrap}
@@ -594,6 +605,23 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:first-child{position:sticky;left:0;z-index:2;background:#091d30;min-width:190px;box-shadow:4px 0 10px #0005}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table thead th{position:sticky;top:0;z-index:4;background:#10273e}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table thead th:first-child{z-index:5}
+@media(max-width:700px){
+ #shuaAnalyticsSection[data-active-view="usage"]{padding-inline:0}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-controls{display:grid;grid-template-columns:88px minmax(0,1fr);gap:6px;margin:3px 2px 9px}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-groups{grid-column:1/-1;grid-row:1;width:100%;box-sizing:border-box}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-groups button{min-height:39px;padding:7px 2px;font-size:12px}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-controls label{min-width:0;font-size:11px}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-controls select{width:100%;height:36px;min-height:36px;font-size:13px!important}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-rank-filter{min-width:0;max-width:none}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table{max-height:69dvh}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table table{min-width:750px}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th,#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td{padding:5px 6px;font-size:11px}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th:first-child,#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:first-child{min-width:174px;width:174px;max-width:174px}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:not(:first-child){min-width:67px}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table .st-person .st-face{width:30px;height:30px;min-width:30px;flex-basis:30px}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table .st-person strong{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2;font-size:12px;overflow-wrap:anywhere}
+ #shuaAnalyticsSection[data-active-view="usage"] .st-usage-sort{min-height:37px;gap:3px;font-size:11px}
+}
 
 /* Injury report: vertical list above the analysis, not a horizontal carousel. */
 #shuaAnalyticsSection[data-active-view="injury"] .st-injury-layout{display:flex!important;flex-direction:column!important;gap:12px!important}

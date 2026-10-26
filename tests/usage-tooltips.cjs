@@ -25,9 +25,13 @@ for(const field of names){
  assert.ok(formula.length>24,field+' needs a calculation');
 }
 for(const fields of Object.values(groups))for(const field of fields)assert.ok(names.has(field),'Unknown metric in usage group '+field);
-for(const token of ['data-st-usage-field','data-st-usage-info','showUsageTooltip(usageInfo,true)','showUsageTooltip(usageValue,true)']){
+for(const token of ['data-st-usage-field','data-st-usage-info',"e.target.closest?.('.st-usage-info')",'showUsageTooltip(usageInfo,true)']){
  assert.ok(js.includes(token),'Missing tooltip interaction '+token);
 }
+assert.ok(!js.includes('showUsageTooltip(usageValue,true)'),'Player stat values must not open tooltips');
+assert.ok(!js.includes("e.target.closest?.('.st-usage-table [data-st-usage-field]')"),'Hover is limited to the info icons');
+assert.ok(js.includes('if(anchor===usageTooltipAnchor&&!anchor.contains(e.relatedTarget))hideUsageTooltip();'),'Tooltip must close as soon as the pointer leaves its icon');
+assert.ok(!css.includes('td[data-st-usage-field]{cursor:help}'),'Only info icons should advertise a tooltip on hover');
 assert.ok(css.includes('.st-usage-tooltip[hidden]'),'Tooltip needs a hidden state');
 assert.ok(js.includes('hideUsageTooltip();\n const host=section.querySelector'), 'Filtering must close stale tooltips');
-console.log('PASS: explanations and formulas for all 20 usage metrics, hover/tap targets, sortable headers and tooltip lifecycle');
+console.log('PASS: definitions for 20 usage metrics, icon-only hover/tap, immediate mouseout, sortable headers and tooltip lifecycle');

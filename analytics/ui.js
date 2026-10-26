@@ -118,7 +118,7 @@ const usageGroups={
 };
 const usageRouteFields=new Set(['routesRun','routeParticipation','targetsPerRouteRun','yardsPerRouteRun']);
 const usageReceivingFields=new Set(['aDOT','wopr','receivingYardsShare','yacPerReception','receivingFirstDowns','airYardsShare']);
-let usageTooltip=null,usageTooltipAnchor=null,usageTooltipPinned=false;
+let usageTooltip=null,usageTooltipAnchor=null,usageTooltipPinned=false,usageLastPointerType='';
 function hideUsageTooltip(){
  if(usageTooltip)usageTooltip.hidden=true;
  if(usageTooltipAnchor?.matches?.('.st-usage-info'))usageTooltipAnchor.setAttribute('aria-expanded','false');
@@ -156,7 +156,7 @@ function showUsageTooltip(anchor,pinned=false){
  }
  if(usageTooltipAnchor?.matches?.('.st-usage-info'))usageTooltipAnchor.setAttribute('aria-expanded','false');
  usageTooltipAnchor=anchor;usageTooltipPinned=pinned;
- if(anchor.matches('.st-usage-info'))anchor.setAttribute('aria-expanded',String(pinned));
+ if(anchor.matches('.st-usage-info'))anchor.setAttribute('aria-expanded','true');
  const label=usageCatalog.find(m=>m[0]===field)?.[1]||field;
  const coverage=usageCoverage(field,anchor);
  usageTooltip.innerHTML='<strong>'+E(label)+'</strong><p>'+E(description[0])+'</p><small><b>Calculation:</b> '+E(description[1])+'</small>'+(coverage?'<em>'+E(coverage)+'</em>':'');
@@ -248,8 +248,8 @@ function usage(){
   return '<th scope="col" data-st-usage-field="'+E(field)+'" aria-sort="'+(active?(sortDirection==='asc'?'ascending':'descending'):'none')+'"><span class="st-usage-head"><button type="button" class="st-usage-sort'+(active?' is-active':'')+'" data-st-usage-sort="'+E(field)+'" aria-label="Sort '+E(label)+' '+nextDirection+'">'+E(short)+' <span class="st-usage-sort-icon" aria-hidden="true">'+indicator+'</span></button><button type="button" class="st-usage-info" data-st-usage-info="'+E(field)+'" aria-label="Explain '+E(label)+' and its calculation" aria-controls="stUsageTooltip" aria-expanded="false">ⓘ</button></span></th>';
  }).join('');
  const table='<div class="st-table-wrap st-usage-table"><table><thead><tr><th scope="col">Player</th>'+headers+'</tr></thead><tbody>'+cells+'</tbody></table></div>';
- const footnote=isCurrent?'<div class="st-usage-note">Hover over a stat, or tap a number / ⓘ, to see its meaning and calculation. — means unavailable, not zero. <details class="st-usage-method"><summary>Sources and coverage</summary><p>ESPN supplies recorded games and opportunities; nflverse/PFR supplies snaps, red-zone and receiving metrics. <a href="https://heatradar.app/nfl/routes" target="_blank" rel="noopener noreferrer">HeatRadar</a> supplies charted routes, TPRR and YPRR through Week '+E(rankedUsage.routeThroughWeek||'—')+'; incomplete charting and fractional-count rows are excluded. Receiving metrics use <a href="https://github.com/nflverse/nflverse-data" target="_blank" rel="noopener noreferrer">nflverse data (CC BY 4.0)</a>.</p></details></div>':
-  '<p class="st-usage-note">Hover over a stat, or tap a number / ⓘ, for its meaning and formula. Historical usage uses available recorded games; unverified metrics remain blank.</p>';
+ const footnote=isCurrent?'<div class="st-usage-note">Hover over ⓘ beside a stat (or tap ⓘ on a phone) for its meaning and calculation. — means unavailable, not zero. <details class="st-usage-method"><summary>Sources and coverage</summary><p>ESPN supplies recorded games and opportunities; nflverse/PFR supplies snaps, red-zone and receiving metrics. <a href="https://heatradar.app/nfl/routes" target="_blank" rel="noopener noreferrer">HeatRadar</a> supplies charted routes, TPRR and YPRR through Week '+E(rankedUsage.routeThroughWeek||'—')+'; incomplete charting and fractional-count rows are excluded. Receiving metrics use <a href="https://github.com/nflverse/nflverse-data" target="_blank" rel="noopener noreferrer">nflverse data (CC BY 4.0)</a>.</p></details></div>':
+  '<p class="st-usage-note">Hover over ⓘ beside a stat (or tap ⓘ on a phone) for its meaning and formula. Historical usage uses available recorded games; unverified metrics remain blank.</p>';
  return nav+panel('Usage analytics',subtitle,table+footnote);
 }
 /* Weekly target-share mix modeled after the supplied stacked Cardinals chart. */
@@ -656,24 +656,24 @@ button.onclick=()=>open();
 window.addEventListener('hashchange',()=>{const v=linkedView();if(v)navigate(v);else if(visible)close();});
 document.addEventListener('click',e=>{const b=e.target.closest?.('.positions .pos');if(b&&b!==button&&visible)close();},true);
 section.addEventListener('pointerover',e=>{
- if(e.pointerType==='touch'||usageTooltipPinned)return;
- const anchor=e.target.closest?.('.st-usage-table [data-st-usage-field]');
+ if(e.pointerType==='touch')return;
+ const anchor=e.target.closest?.('.st-usage-info');
  if(anchor&&(anchor!==usageTooltipAnchor||usageTooltip?.hidden))showUsageTooltip(anchor);
 });
 section.addEventListener('pointerout',e=>{
- if(e.pointerType==='touch'||usageTooltipPinned)return;
- const anchor=e.target.closest?.('.st-usage-table [data-st-usage-field]');
+ if(e.pointerType==='touch')return;
+ const anchor=e.target.closest?.('.st-usage-info');
  if(anchor===usageTooltipAnchor&&!anchor.contains(e.relatedTarget))hideUsageTooltip();
 });
 section.addEventListener('focusin',e=>{
- const anchor=e.target.closest?.('.st-usage-table [data-st-usage-field]');
- if(anchor&&!usageTooltipPinned)showUsageTooltip(e.target.matches('.st-usage-info')?e.target:anchor);
+ if(e.target.matches?.('.st-usage-info:focus-visible')&&!usageTooltipPinned)showUsageTooltip(e.target);
 });
 section.addEventListener('focusout',e=>{
- if(!usageTooltipPinned&&e.target.closest?.('.st-usage-table [data-st-usage-field]'))hideUsageTooltip();
+ if(!usageTooltipPinned&&e.target===usageTooltipAnchor&&e.target.matches?.('.st-usage-info'))hideUsageTooltip();
 });
 document.addEventListener('pointerdown',e=>{
- if(usageTooltipPinned&&!e.target.closest?.('.st-usage-info,.st-usage-table td[data-st-usage-field]'))hideUsageTooltip();
+ usageLastPointerType=e.pointerType;
+ if(usageTooltipPinned&&!e.target.closest?.('.st-usage-info'))hideUsageTooltip();
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')hideUsageTooltip();});
 window.addEventListener('resize',hideUsageTooltip);
@@ -681,14 +681,10 @@ window.addEventListener('scroll',hideUsageTooltip,true);
 section.addEventListener('click',e=>{
  const usageInfo=e.target.closest('[data-st-usage-info]');
  if(usageInfo&&state.view==='usage'){
-  const wasPinned=usageTooltipPinned&&usageTooltipAnchor===usageInfo;
-  if(wasPinned)hideUsageTooltip();else showUsageTooltip(usageInfo,true);
-  return;
- }
- const usageValue=e.target.closest('.st-usage-table td[data-st-usage-field]');
- if(usageValue&&state.view==='usage'){
-  const wasPinned=usageTooltipPinned&&usageTooltipAnchor===usageValue;
-  if(wasPinned)hideUsageTooltip();else showUsageTooltip(usageValue,true);
+  if(usageLastPointerType==='touch'||usageLastPointerType==='pen'){
+   const wasPinned=usageTooltipPinned&&usageTooltipAnchor===usageInfo;
+   if(wasPinned)hideUsageTooltip();else showUsageTooltip(usageInfo,true);
+  }
   return;
  }
  const usageRetry=e.target.closest('[data-st-usage-retry]');if(usageRetry){rankedUsageError='';fetchRankedUsage();render();return;}

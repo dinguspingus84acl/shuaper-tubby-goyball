@@ -596,7 +596,6 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-info{width:23px;height:30px;flex:0 0 23px;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:5px;background:transparent;color:#7fa8bf;font:inherit;font-size:15px;cursor:help}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-info:hover,#shuaAnalyticsSection[data-active-view="usage"] .st-usage-info[aria-expanded="true"]{color:#39e5b0;background:#1b4458}
 #shuaAnalyticsSection[data-active-view="usage"] .st-usage-info:focus-visible{outline:2px solid #38e9ad;outline-offset:1px}
-#shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td[data-st-usage-field]{cursor:help}
 .st-usage-tooltip{position:fixed;z-index:1000000;box-sizing:border-box;width:min(310px,calc(100vw - 16px));padding:12px 13px;border:1px solid #378e80;border-radius:10px;background:#0b2437;color:#e5f5ff;box-shadow:0 12px 32px #000b;pointer-events:none;font-size:12px;line-height:1.42;overflow-wrap:anywhere}
 .st-usage-tooltip[hidden]{display:none!important}
 .st-usage-tooltip strong{display:block;color:#48eabd;font-size:13px;line-height:1.3;margin-bottom:5px}

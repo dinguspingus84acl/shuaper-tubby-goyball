@@ -29,6 +29,8 @@ jobs:
         run: python -u scripts/refresh-espn-matchups.py
       - name: Rebuild ranked-player advanced usage from the refreshed snapshots
         run: node scripts/build-ranked-usage.cjs
+      - name: Enrich ranked-player air yards from nflverse
+        run: python -u scripts/enrich-ranked-air-yards.py
       - name: Publish data snapshots only
         id: save
         run: |

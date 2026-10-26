@@ -79,7 +79,7 @@ function usage(){
  const isCurrent=dataset.year===2026;
  if(isCurrent&&!rankedUsage){
   fetchRankedUsage();
-  return rankedUsageError?note('Ranked-player usage data is unavailable: '+E(rankedUsageError),true):'<div class="st-loading">Loading ranked-player usage…</div>';
+  return rankedUsageError?note('Ranked-player usage data is unavailable: '+E(rankedUsageError),true)+'<button type="button" class="st-button" data-st-usage-retry>Retry loading usage</button>':'<div class="st-loading">Loading ranked-player usage…</div>';
  }
  const metrics=[
   ['snapShare','Snap share','Snap %',1,'%'],
@@ -515,6 +515,7 @@ button.onclick=()=>open();
 window.addEventListener('hashchange',()=>{const v=linkedView();if(v)navigate(v);else if(visible)close();});
 document.addEventListener('click',e=>{const b=e.target.closest?.('.positions .pos');if(b&&b!==button&&visible)close();},true);
 section.addEventListener('click',e=>{
+ const usageRetry=e.target.closest('[data-st-usage-retry]');if(usageRetry){rankedUsageError='';fetchRankedUsage();render();return;}
  const chooseCompare=e.target.closest('[data-st-choose-compare]');if(chooseCompare){state.compare[Number(chooseCompare.dataset.stChooseCompare)]=chooseCompare.dataset.stKey;render();return;}
  const suggestion=e.target.closest('[data-st-suggest]');
  if(suggestion&&state.view==='schedule'){openScheduleSuggestion(suggestion);return;}

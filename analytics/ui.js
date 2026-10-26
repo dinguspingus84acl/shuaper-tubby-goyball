@@ -119,6 +119,57 @@ function weeklyTargetShare(team){
  const inside='<div class="st-tss-heading">'+logo(team,'st-tss-team-logo')+'<div><strong>'+E(S.teams[team]||team)+' TARGET SHARE</strong><small>Week by week · Top five target leaders</small></div>'+chooser+'</div>'+(compact.length?legend+'<div class="st-tss-weeks">'+rows+'</div>':note('No recorded targets are available for this team in the selected season.',true))+'<p class="st-tss-footnote">Percent of targets recorded for this team in the ESPN player-game feed each week. “Other” groups the remaining recorded players. The latest week may be incomplete until games finish; missing targets are never treated as official team totals.</p>';
  return '<div id="stTargetSharePanel">'+panel('Weekly target share',dataset.year+' · through Week '+through,inside,'target')+'</div>';
 }
+/* Team-specific paired snap / opportunity bars inspired by the supplied
+   Washington RB reference. Opp% is positional carries + targets share. */
+const opportunityColors={
+ ARI:['#97233f','#ffb612'],ATL:['#a71930','#a5acaf'],BAL:['#241773','#c4a454'],BUF:['#00338d','#e5293f'],
+ CAR:['#0085ca','#bfc0bf'],CHI:['#0b162a','#f06d27'],CIN:['#fb4f14','#ffaf67'],CLE:['#311d00','#ff6c26'],
+ DAL:['#003594','#869397'],DEN:['#002244','#ff762e'],DET:['#0076b6','#b0b7bc'],GB:['#203731','#ffb612'],
+ HOU:['#03202f','#e83e49'],IND:['#002c5f','#a2aaad'],JAX:['#006778','#d7a22a'],KC:['#e31837','#ffb81c'],
+ LAC:['#0080c6','#ffc20e'],LAR:['#003594','#ffa300'],LV:['#22252a','#a5acaf'],MIA:['#008e97','#fc4c02'],
+ MIN:['#4f2683','#ffc62f'],NE:['#002244','#e44356'],NO:['#29251c','#d3bc8d'],NYG:['#0b2265','#e33b48'],
+ NYJ:['#125740','#9bccb8'],PHI:['#004c54','#a5acaf'],PIT:['#22252a','#ffb612'],SEA:['#002244','#69be28'],
+ SF:['#aa0000','#b3995d'],TB:['#d50a0a','#ff7900'],TEN:['#0c2340','#4b92db'],WAS:['#5a1414','#ffb612']
+};
+function positionOpportunityShare(team){
+ const through=Math.min(dataset.latestWeek||0,18),selection=state.teamWindow||'STD';
+ const chosenWeek=selection==='STD'?0:Number(selection);
+ const groups=S.positionOpportunityShares(dataset,team,through,chosenWeek);
+ const [primary,accent]=opportunityColors[team]||['#173b55','#30bcdb'];
+ const period=chosenWeek?'Week '+chosenWeek:'Season to Date · through Week '+through;
+ const bar=(value,cls,label,player)=>{
+  const valid=N(value)!==null&&value>=0;
+  const v=valid?Math.min(100,value):0;
+  return '<div class="st-osp-column'+(valid?'':' st-osp-no-data')+'" style="--st-osp-height:'+v.toFixed(3)+'%"'
+   +' title="'+E(player+' · '+label+': '+(valid?F(value,1,'%'):'unavailable'))+'">'
+   +'<span class="st-osp-number">'+(valid?F(value,0,'%'):'—')+'</span>'
+   +'<span class="st-osp-bar '+cls+'"></span></div>';
+ };
+ const positionChart=pos=>{
+  const rows=groups[pos],total=rows[0]?.positionOpportunities;
+  const header='<header class="st-osp-position-header"><strong>'+pos+'</strong><small>'
+   +rows.length+' players · '+(N(total)===null?'No reported opportunities':F(total,0)+' opportunities')+'</small></header>';
+  const players=rows.map(x=>{
+   const p=x.player,detail=F(x.opportunities,0)+' carries + targets',name=E(p.name);
+   return '<div class="st-osp-player" role="listitem">'
+    +'<div class="st-osp-pair" role="img" aria-label="'+name+': snap '+F(x.snapShare,1,'%')+', opportunity '+F(x.opportunityShare,1,'%')+'">'
+    +bar(x.snapShare,'st-osp-snap','Snap share',p.name)
+    +bar(x.opportunityShare,'st-osp-opp','Opportunity share',p.name)+'</div>'
+    +'<button type="button" class="st-osp-player-button" data-st-open="'+E(p.key)+'" aria-label="Open '+name+' player card" title="'+name+' · '+E(detail)+'">'
+    +'<span class="st-osp-portrait">'+face(p,'st-osp-face')+'</span><span class="st-osp-player-name">'+name+'</span></button>'
+    +'<small class="st-osp-opps">'+F(x.opportunities,0)+' opp</small></div>';
+  }).join('');
+  return '<section class="st-osp-position">'+header+(players?'<div class="st-osp-players" role="list" aria-label="'+pos+' snap and opportunity shares">'+players+'</div>':
+   '<div class="st-osp-empty">No recorded '+pos+' opportunities or snaps for this period.</div>')+'</section>';
+ };
+ const heading='<div class="st-osp-heading">'+logo(team,'st-osp-logo')
+  +'<div class="st-osp-team-title"><strong>'+E(S.teams[team]||team)+'</strong><small>'+E(period)+'</small></div>'
+  +'<div class="st-osp-legend" aria-label="Chart key"><span><i class="st-osp-key-snap"></i>Snap%</span><span><i class="st-osp-key-opp"></i>Opp%</span></div></div>';
+ const caption='<p class="st-osp-note">Snap% = player offensive snaps ÷ team offensive snaps for games with reported counts (reported snap rate used when counts are missing). Opp% = player carries + targets ÷ all recorded carries + targets from <strong>the same position</strong> on this team. Both use '+E(period)+'. Missing data is shown as —; partial weeks may be incomplete.</p>';
+ return '<div id="stPositionSharePanel">'+panel('Snap & opportunity share','RB · WR · TE',
+  '<div class="st-osp-body" style="--st-osp-primary:'+primary+';--st-osp-accent:'+accent+'">'
+   +heading+['RB','WR','TE'].map(positionChart).join('')+caption+'</div>','chart')+'</div>';
+}
 function teams(){
  const selected=state.teamWindow||'STD',week=Number(selected),through=Math.min(dataset.latestWeek,18),allNFL=state.team==='ALL';
  const members=(allNFL?dataset.players.map(p=>({...p,...A(p,through)})):S.teamShares(dataset,state.team,through,0)).map(p=>{
@@ -157,7 +208,8 @@ function teams(){
    +panel('Red-zone opportunities','Recorded carries plus targets inside the 20; not receptions alone',redRows)
    +panel('Offensive snap rate','Weighted by recorded snaps and team snaps for this period',snapRows)+'</div>')
  +panel('Opportunity leaders','', '<div class="st-team-opportunity-pos">'+['ALL','RB','WR','TE'].map(pos=>'<button type="button" data-st-team-opportunity-pos="'+pos+'" aria-pressed="'+(opportunityPos===pos)+'">'+pos+'</button>').join('')+'</div><div class="st-table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Carries</th><th>Carry share</th><th>Targets</th><th>Target share</th><th>RZ opportunities</th><th>Snap rate</th></tr></thead><tbody>'+opportunityRows.map((p,i)=>'<tr><td class="st-team-opportunity-rank">'+(i+1)+'</td><td>'+person(p)+'</td><td>'+F(p.rushAtt,0)+'</td><td>'+F(p.carryShare,1,'%')+'</td><td>'+F(p.targets,0)+'</td><td>'+F(p.targetShare,1,'%')+'</td><td>'+F(p.redZone,0)+'</td><td>'+F(p.snapRate,1,'%')+'</td></tr>').join('')+'</tbody></table></div>')
- +weeklyTargetShare(allNFL?(S.teams[state.targetShareChartTeam]?state.targetShareChartTeam:'ARI'):state.team);
+ +weeklyTargetShare(allNFL?(S.teams[state.targetShareChartTeam]?state.targetShareChartTeam:'ARI'):state.team)
+ +positionOpportunityShare(allNFL?(S.teams[state.targetShareChartTeam]?state.targetShareChartTeam:'ARI'):state.team);
 }
 async function rankings(id){const base=positions()+controls({player:true,ranking:true});const host=document.getElementById('stContent');host.innerHTML=base+`<div id="stRankBody" class="st-loading">Reading your published ranking revisions…</div>`;let result;try{result=await S.Data.rankHistory(state.rankSource);}catch(e){if(id===renderId)document.getElementById('stRankBody').innerHTML=note('Ranking revisions could not be retrieved. '+E(e.message),true);return;}if(id!==renderId)return;historyData=result;const p=selected();if(!p)return;const snaps=result.snapshots.filter(x=>x.ranks?.[p.key]),labels=snaps.map(x=>new Date(x.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})),values=snaps.map(x=>x.ranks[p.key].rank),latest=values.at(-1),delta=values.length>1?values[0]-latest:null;const current=result.snapshots.at(-1)?.ranks||{},near=Object.entries(current).filter(([k,v])=>state.rankSource==='big-board.json'||v.position===state.pos).sort((a,b)=>a[1].rank-b[1].rank),idx=near.findIndex(([k])=>k===p.key);const first3=snaps.slice(-3);document.getElementById('stRankBody').outerHTML=`<div id="stRankBody">${hero(p,[['Latest custom rank',latest?'#'+latest:'Unranked'],['Published revisions',snaps.length]],delta===null?null:[(delta>0?'+':'')+delta+' places','change over shown revisions'])}${snaps.length===1?note('One published snapshot is available for this player. A line is not invented between nonexistent revisions.'):''}${panel('Ranking position over time','Lower numbers are better. Dates come from the actual Git commits.',C.line({title:'Custom ranking movement',labels,series:[{name:state.rankSource==='big-board.json'?'Your overall rank':'Your '+state.pos+' ROS rank',values}],invert:true,area:false}),'trend')}${panel('Revision timeline','Recorded commit messages—not inferred injury or performance events.',`<div class="st-timeline">${first3.map(s=>`<div><small>${E(new Date(s.date).toLocaleDateString())}</small><b>#${s.ranks[p.key].rank}</b><p>${E(s.message)}</p></div>`).join('')}</div>`)}${panel('Nearby in your rankings','Current neighboring players, in your exact order.',`<div class="st-grid4">${near.slice(Math.max(0,idx-2),idx+3).filter(([k])=>k!==p.key).map(([k,r])=>{const x=dataset.players.find(p=>p.key===k)||{key:k,name:r.name,position:r.position||'',team:''};return `<div class="st-feature">${person(x)}<span class="st-big-value">#${r.rank}<small>Custom rank</small></span></div>`;}).join('')}</div>`)}${method('Source: '+E(state.rankSource)+'. These charts read real Git revisions and never substitute ESPN finishing ranks. Missing players are omitted from a revision rather than assigned a fabricated rank. The underlying ranking files are not modified by Analytics.')}</div>`;}
 function schedulePositions(roster){
@@ -466,6 +518,8 @@ section.addEventListener('change',e=>{
  state.targetShareChartTeam=e.target.value;
  const old=section.querySelector('#stTargetSharePanel');
  if(old)old.outerHTML=weeklyTargetShare(e.target.value);
+ const opportunity=section.querySelector('#stPositionSharePanel');
+ if(opportunity)opportunity.outerHTML=positionOpportunityShare(e.target.value);
  persist();
 },true);
 section.addEventListener('change',e=>{if(e.target.matches('[data-st-compare-search]')){const idx=Number(e.target.dataset.stCompareSearch),candidate=dataset.players.find(p=>p.position===state.pos&&p.name.toLowerCase()===e.target.value.trim().toLowerCase());if(candidate){state.compare[idx]=candidate.key;render();}return;}if(e.target.id==='stTeamMetric'){state.teamMetric=e.target.value;render();return;}if(e.target.id==='stTeamWindow'){state.teamWindow=e.target.value;render();return;}if(e.target.id==='stWeeklyMetric'){state.weeklyMetric=e.target.value;render();return;}if(e.target.id==='stWeeklyPos'){state.weeklyPos=e.target.value;render();return;}if(e.target.id==='stWeeklyChartWeek'){state.weeklyChartWeek=Number(e.target.value);render();return;}if(e.target.id==='stUsagePos'){state.usagePos=e.target.value;render();return;}if(e.target.id==='stUsageMetric'){state.usageMetric=e.target.value;render();return;}if(e.target.id==='stScheduleDisplay'){state.scheduleDisplay=e.target.value;state.scheduleQuery='';state.scheduleFocusKey='';render();return;}if(e.target.matches('[data-st-hit-filter]')){state.hitFilters=state.hitFilters||[0,0,0,0];state.hitFilters[Number(e.target.dataset.stHitFilter)]=Number(e.target.value);render();return;}const id=e.target.id,v=e.target.value;if(id==='stDashboard'){navigate(v);return;}if(id==='stSchedulePlayer'){state.scheduleFocusKey=v;state.scheduleScrollPending=true;render();return;}if(id==='stInjuryPos'){state.injuryPos=v;state.injuredKey='';render();return;}if(id==='stInjuryStatus'){state.injuryStatus=v;state.injuredKey='';render();return;}if(id==='stSeason'){if(state.view==='schedule')return;state.year=+v;state.week=0;state.outWeeks=null;load();return;}if(id==='stPlayer'){state.player=v;state.outWeeks=null;}else if(id==='stTeam'){state.team=v;state.player='';state.outWeeks=null;}else if(id==='stWeek'){state.week=+v;state.outWeeks=null;if(state.view==='schedule'){state.scheduleSortWeek=null;state.scheduleSortDirection=null;}}else if(id==='stRange')state.range=+v;else if(id==='stRankSource')state.rankSource=v;else if(id==='stPlayoffs'){state.playoffs=v==='playoffs';state.scheduleSortWeek=null;state.scheduleSortDirection=null;}else if(id==='stInjuredPlayer'){state.player=v;state.outWeeks=null;}else if(id.startsWith('stCompare')){state.compare=[0,1,2,3].map(i=>document.getElementById('stCompare'+i)?.value).filter(Boolean);state.compare=[...new Set(state.compare)];}else if(e.target.matches('[data-st-out]'))state.outWeeks=[...section.querySelectorAll('[data-st-out]:checked')].map(e=>+e.dataset.stOut);else return;render();});

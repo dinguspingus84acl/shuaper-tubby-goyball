@@ -10,4 +10,18 @@ const ds={players:[{position:'RB',games:[{week:1,points:10,opponent:'DAL'},{week
 let d=S.defense(ds,'RB',2);assert.equal(d.byTeam.DAL.allowed,15);assert.equal(d.byTeam.DAL.games,1);assert.equal(d.byTeam.BUF.rank,1);assert.equal(d.byTeam.BUF.allowed,30);assert.equal(S.defense(ds,'RB',1).byTeam.BUF,undefined);
 const src={players:[{name:'A',key:'a',position:'RB',games:[{week:1,points:10,team:'DET',rushAtt:10,targets:5}]},{name:'B',key:'b',position:'WR',games:[{week:1,points:15,team:'DET',rushAtt:0,targets:15}]}]};assert.equal(S.teamShares(src,'DET')[0].targetShare,25);assert.equal(S.teamShares(src,'DET')[0].carryShare,100);assert.equal(S.teamShares(src,'DET')[0].redZone,null);
 const inj={players:[{key:'a',games:[{week:1,team:'DET',points:10,targets:10,rushAtt:0}]},{key:'b',games:[{week:1,team:'DET',points:5,targets:5,rushAtt:0},{week:2,team:'DET',points:10,targets:10,rushAtt:0}]}]};assert.equal(S.splits(inj,inj.players[0],'DET',18,[2]).rows[0].delta,5);assert.equal(S.splits(inj,inj.players[0],'DET',18,[]).rows[0].delta,null);
-console.log('PASS: nulls, zero/negative games, rolling averages, quantiles, QB thresholds, defensive game denominators, no future leakage, shares and absence splits.');
+const oppDs={players:[
+ {key:'rb1',name:'Back One',position:'RB',games:[{week:1,team:'DET',points:10,rushAtt:10,targets:2,snaps:35,teamSnaps:70},{week:2,team:'DET',points:10,rushAtt:5,targets:5,snaps:40,teamSnaps:80}]},
+ {key:'rb2',name:'Back Two',position:'RB',games:[{week:1,team:'DET',points:10,rushAtt:18,targets:0,snaps:21,teamSnaps:70},{week:2,team:'DET',points:10,rushAtt:0,targets:2,snapRate:20}]},
+ {key:'wr',name:'Wideout',position:'WR',games:[{week:1,team:'DET',points:10,rushAtt:0,targets:5,snaps:50,teamSnaps:70}]},
+ {key:'other',name:'Other Team',position:'RB',games:[{week:1,team:'GB',points:10,rushAtt:30,targets:0,snaps:50,teamSnaps:70}]}
+]};
+const shares=S.positionOpportunityShares(oppDs,'DET',2);
+assert.equal(shares.RB.length,2);assert.equal(shares.TE.length,0);
+assert.equal(shares.RB[0].opportunities,22);assert.equal(shares.RB[0].positionOpportunities,42);
+assert.ok(Math.abs(shares.RB[0].opportunityShare-100*22/42)<1e-10);
+assert.equal(shares.RB[0].snapShare,50);assert.equal(shares.WR[0].opportunityShare,100);
+const firstWeek=S.positionOpportunityShares(oppDs,'DET',2,1);
+assert.equal(firstWeek.RB[0].player.key,'rb2');assert.equal(firstWeek.RB[0].opportunityShare,60);
+assert.equal(S.positionOpportunityShares(oppDs,'DET',2,3).RB.length,0);
+console.log('PASS: nulls, zero/negative games, rolling averages, quantiles, QB thresholds, defensive game denominators, no future leakage, shares, positional snap/opportunity shares and absence splits.');

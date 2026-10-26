@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   if (window.ShuaStudioLoader) return;
-  const version = '20261026-heatradar-routes1';
+  const version = '20261026-usage-sort2';
   const base = new URL('.', document.currentScript.src);
   const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js', 'analytics/ui.js'];
   const tests = [() => window.ShuaStudio?.aggregate, () => window.ShuaStudio?.Data,

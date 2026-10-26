@@ -25,6 +25,10 @@ css.textContent=`
 #shuaRankedUsage .sru-cell strong{display:block;margin-top:5px;font-size:1.13rem;color:#eef6ff;font-variant-numeric:tabular-nums}
 #shuaRankedUsage .sru-cell.unavailable strong{color:#627992}
 #shuaRankedUsage .sru-note{margin:7px 2px 0;color:#8399b2;font-size:.62rem;line-height:1.35}
+.phone-mode #shuaRankedUsage .sru-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.phone-mode #shuaRankedUsage .sru-cell{padding:7px 8px}
+.phone-mode #shuaRankedUsage .sru-cell strong{font-size:1rem}
+.phone-mode #shuaRankedUsage .sru-title span{font-size:.61rem}
 @media(max-width:670px){#shuaRankedUsage .sru-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}#shuaRankedUsage .sru-cell{padding:7px 8px}#shuaRankedUsage .sru-cell strong{font-size:1rem}#shuaRankedUsage .sru-title span{font-size:.61rem}}
 `;
 document.head.append(css);

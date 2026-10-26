@@ -734,3 +734,49 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-rank{font-weight:900;text-align:center;color:#94acc2;font-size:12px}
 #shuaAnalyticsSection[data-active-view="teams"] .st-table-wrap .st-face{border-radius:50%!important;object-fit:cover!important}
 @media(max-width:700px){#shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-row{grid-template-columns:17px minmax(130px,1.5fr) minmax(48px,1fr) 42px!important}}
+
+/* Reference-inspired week-by-week stacked target share, below Team Opportunity. */
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-heading{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:15px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-team-logo{width:42px;height:42px;object-fit:contain;flex:0 0 42px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-heading>div{flex:1;min-width:160px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-heading strong{font-size:15px;font-weight:950;letter-spacing:.025em;color:#f6fbff}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-heading small{display:block;color:#9bb6cc;font-size:11px;margin-top:3px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-team-select{flex:0 1 220px;min-width:150px;font-size:11px;font-weight:800;color:#b2cada}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-team-select select{display:block;width:100%;min-height:38px;padding:6px 10px;margin-top:4px;border:1px solid #39627c;border-radius:8px;background:#09263b;color:#fff}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-legend{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:0 0 12px;align-items:start}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-legend-player{min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-portrait{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;border:3px solid var(--st-tss-color);overflow:hidden;background:#0b3046;flex:0 0 auto}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-face{height:100%!important;width:100%!important;border-radius:50%!important;object-fit:cover;object-position:center top}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-legend-player button{border:0;background:transparent;color:#f7fbff;font-size:11px;font-weight:800;padding:2px 0;max-width:100%;line-height:1.2;overflow-wrap:anywhere;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-legend-player button:hover{color:#49e4b0}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-other-dot{font-size:9px;font-weight:900;color:#dcecf6}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-other>span:last-child{font-size:11px;font-weight:800;color:#abc2d3}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-weeks{display:flex;flex-direction:column;gap:7px}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-week-row{display:grid;grid-template-columns:38px minmax(0,1fr) 56px;gap:8px;align-items:center;min-width:0}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-week-row>b{font-size:12px;text-align:right;font-variant-numeric:tabular-nums;color:#d8eaf8}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-track{display:flex;width:100%;height:34px;overflow:hidden;border-radius:6px;border:1px solid #506477;background:#142c42}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-piece{display:flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:0;height:100%;overflow:hidden;white-space:nowrap;border-right:1px solid #14243580;color:#fff;font-weight:900;font-size:11px;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px #0007}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-piece.st-tss-dark-text{color:#1c2b38;text-shadow:none}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-count{font-size:10px;font-weight:800;color:#a8c3d8;font-variant-numeric:tabular-nums;white-space:nowrap}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-empty{background:#142b40;color:#91aabd;border:1px dashed #365875;border-radius:6px;padding:9px;text-align:center;font-size:11px;font-weight:750}
+#shuaAnalyticsSection[data-active-view="teams"] .st-tss-footnote{margin:11px 0 0;color:#91b1c7;font-size:10px;line-height:1.45}
+@media(max-width:700px){
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-heading{gap:7px;margin-bottom:12px}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-team-logo{width:34px;height:34px;flex-basis:34px}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-heading strong{font-size:12px}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-team-select{flex:1 1 100%;max-width:none}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-legend{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 4px}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-portrait{width:37px;height:37px}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-legend-player button,#shuaAnalyticsSection[data-active-view="teams"] .st-tss-other>span:last-child{font-size:10px}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-week-row{grid-template-columns:28px minmax(0,1fr) 38px;gap:4px}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-week-row>b{font-size:10px}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-track{height:30px}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-piece{font-size:9px}
+ #shuaAnalyticsSection[data-active-view="teams"] .st-tss-count{font-size:9px}
+}
+body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-tss-legend{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 4px}
+body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-tss-heading{gap:7px;margin-bottom:12px}
+body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-tss-team-select{flex:1 1 100%;max-width:none}
+body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-tss-portrait{width:37px;height:37px}
+body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-tss-week-row{grid-template-columns:28px minmax(0,1fr) 38px;gap:4px}
+body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-tss-track{height:30px}

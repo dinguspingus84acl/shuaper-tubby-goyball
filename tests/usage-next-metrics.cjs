@@ -13,7 +13,8 @@ const fields=['expectedFantasyPointsTrend','expectedTouchdowns','endZoneTargets'
 const counts=Object.fromEntries(fields.map(f=>[f,0]));
 assert.equal(fields.length,12);
 assert.equal(usage.rankedPlayers,Object.keys(usage.players).length);
-assert.equal(usage.rankedPlayers,332);
+assert.equal(usage.rankedPlayers,require('./ranked-player-count.cjs')(),
+ 'Ranked pool must match the current Big Board and ROS rankings');
 for(const [id,p] of Object.entries(usage.players)){
  for(const field of fields){
   assert.ok(Object.hasOwn(p,field),id+' missing '+field);

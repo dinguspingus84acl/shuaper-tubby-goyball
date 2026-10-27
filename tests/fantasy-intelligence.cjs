@@ -22,7 +22,8 @@ const ds={...season,rankData:{position:ranks},espnRatings:matchup,
  latestWeek:Math.max(...season.players.flatMap(p=>p.games.map(g=>g.week))),
  players:season.players.map(p=>({...p,key:canonical(p.name),games:p.games.map(g=>({...g,points:g.totalPoints}))}))};
 const byKey=new Map(ds.players.map(p=>[p.key,p]));
-assert.equal(usage.rankedPlayers,332);
+assert.equal(usage.rankedPlayers,require('./ranked-player-count.cjs')(),
+ 'Ranked pool must match the current Big Board and ROS rankings');
 assert.equal(expectedWeekly.schema,1);
 assert.equal(expectedWeekly.season,2026);
 assert.equal(expectedWeekly.throughWeek,usage.throughWeek);

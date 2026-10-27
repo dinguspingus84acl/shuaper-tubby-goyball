@@ -10,7 +10,7 @@ on:
       - 'big-board.json'
       - 'ros-rankings.json'
       - 'index.html'
-      - 'tests/trade-chart.*'
+      - 'tests/trade-chart*'
       - '.github/workflows/trade-chart-verify.yml'
 permissions:
   contents: read

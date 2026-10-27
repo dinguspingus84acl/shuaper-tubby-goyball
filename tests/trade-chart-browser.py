@@ -21,9 +21,13 @@ def check(browser,engine,mobile):
     errors=[]
     page.on('pageerror',lambda error:errors.append(str(error)))
     page.goto(URL,wait_until='domcontentloaded')
-    page.locator('.positions [data-pos="TRADE"]').wait_for(timeout=45000)
-    # Nav may live behind the phone hamburger; this is the same button's click handler.
-    page.locator('.positions [data-pos="TRADE"]').evaluate('(el)=>el.click()')
+    page.locator('.positions [data-pos="TRADE"]').wait_for(state='attached',timeout=45000)
+    if mobile:
+        # Use the actual phone hamburger menu rather than an invisible desktop tab.
+        page.locator('#phoneMenuButton').click()
+        page.locator('#phoneMenuItems [data-target="TRADE"]').click()
+    else:
+        page.locator('.positions [data-pos="TRADE"]').click()
     page.locator('[data-tcc-view="chart"]').click()
     paper=page.locator('#tradeChartContent .tcc-paper')
     paper.wait_for(timeout=45000)

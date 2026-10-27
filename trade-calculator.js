@@ -9,6 +9,8 @@ const TEAM_SLUGS={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CI
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
 const state={left:[],right:[]};
 let tradeMode='PRESEASON',tradePlayers=[],preseasonPlayers=[],rosPlayers=[];
+// Share the existing calculator's numbers with the chart; one source of truth.
+window.ShuaTradeChartSource=()=>({mode:tradeMode,players:tradePlayers});
 
 const style=document.createElement('style');
 style.id='tradeCalculatorStyles';
@@ -133,6 +135,7 @@ function setTradeMode(mode){
   syncSelectedToMode();
   renderSide('left');renderSide('right');
   ['left','right'].forEach(side=>showMatches(side));
+  window.dispatchEvent(new Event('shua:trade-data-updated'));
 }
 function tradeHeadshot(p){
   try{
@@ -310,8 +313,8 @@ function showTrade(){
   document.getElementById('mockSection').hidden=true;
   document.getElementById('depthSection').hidden=true;
   section.hidden=false;
-  document.getElementById('title').textContent='Trade Calculator';
-  document.getElementById('sub').textContent='Powered by your Big Board';
+  document.getElementById('title').textContent=window.ShuaTradeChartUI?.isChart?'Trade Chart':'Trade Calculator';
+  document.getElementById('sub').textContent=window.ShuaTradeChartUI?.isChart?'Based on your published rankings and values':'Powered by your Big Board';
   
   
 }
@@ -384,7 +387,7 @@ Promise.all([
   ['QB','RB','WR','TE'].forEach((pos,i)=>{
     (data[i+1].players||[]).forEach(p=>{
       const k=norm(p.name);
-      if(!meta.has(k))meta.set(k,{team:p.team||'—',position:pos});
+      if(!meta.has(k))meta.set(k,{team:p.team||'—',position:pos,tag:p.tag||''});
       positionLists[pos].push(p);
     });
   });
@@ -401,7 +404,7 @@ Promise.all([
     const x=meta.get(k)||{team:'—',position:'—'};
     const posList=positionLists[x.position]||[];
     const posIndex=posList.findIndex(p=>norm(p.name)===k);
-    return {name,rank:i+1,positionRank:posIndex>=0?posIndex+1:null,team:x.team,position:x.position,value:playerValue(i+1)};
+    return {name,rank:i+1,positionRank:posIndex>=0?posIndex+1:null,team:x.team,position:x.position,tag:x.tag||'',value:playerValue(i+1)};
   }).filter(Boolean);
 
   // ROS: move each player into the value slot belonging to that ROS positional rank.
@@ -424,6 +427,7 @@ Promise.all([
         positionRank:+r.rank,
         team:info.team,
         position:pos,
+        tag:info.tag||'',
         value:slot.value
       });
     });

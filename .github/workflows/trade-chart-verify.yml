@@ -1,0 +1,38 @@
+name: Verify SHUA Trade Chart
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'trade-chart.js'
+      - 'trade-chart.css'
+      - 'trade-calculator.js'
+      - 'big-board.json'
+      - 'ros-rankings.json'
+      - 'index.html'
+      - 'tests/trade-chart.*'
+      - '.github/workflows/trade-chart-verify.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify rank values and trade-chart structure
+        run: |
+          node --check trade-calculator.js
+          node --check trade-chart.js
+          node tests/trade-chart.cjs
+      - name: Install desktop and mobile test browsers
+        run: |
+          python -m pip install --disable-pip-version-check playwright==1.57.0
+          python -m playwright install --with-deps chromium webkit
+      - name: Test calculator and trade chart (desktop + phone)
+        run: python tests/trade-chart-browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shua-trade-chart-browser-shots
+          path: tests/trade-chart-verification/

@@ -37,7 +37,7 @@ jobs:
       - name: Merge verified routes into ranked-player usage
         run: node scripts/enrich-ranked-heatradar-routes.cjs
       - name: Install expected-points data reader
-        run: python -m pip install --disable-pip-version-check pyreadr
+        run: python -m pip install --disable-pip-version-check pyreadr pandas
       - name: Merge ten source-backed advanced Usage statistics
         run: python -u scripts/enrich-ranked-advanced-usage.py
       - name: Merge twelve further verified Usage statistics

@@ -2,13 +2,15 @@
 (function () {
   'use strict';
   if (window.ShuaStudioLoader) return;
-  const version = '20261026-fantasy-intelligence9';
+  const version = '20261026-receiver-efficiency32-v1';
   const base = new URL('.', document.currentScript.src);
   const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js',
-    'analytics/intelligence.js', 'analytics/intelligence-view.js', 'analytics/ui.js'];
+    'analytics/intelligence.js', 'analytics/intelligence-view.js',
+    'analytics/receiver-efficiency.js', 'analytics/ui.js'];
   const tests = [() => window.ShuaStudio?.aggregate, () => window.ShuaStudio?.Data,
     () => window.ShuaStudio?.Chart, () => window.ShuaStudio?.Intelligence,
-    () => window.ShuaStudio?.IntelligenceView, () => window.ShuaStudio?.UI];
+    () => window.ShuaStudio?.IntelligenceView,
+    () => window.ShuaStudio?.ReceiverEfficiency, () => window.ShuaStudio?.UI];
   const nav = document.querySelector('.positions');
   let button = nav?.querySelector('[data-pos="ANALYTICS"]');
   if (nav && !button) {

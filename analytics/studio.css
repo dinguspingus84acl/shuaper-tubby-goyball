@@ -941,3 +941,58 @@ body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-osp-heading{
  #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-weights{grid-template-columns:repeat(2,minmax(0,1fr));padding:9px}
  #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-select{max-width:none}
 }
+
+
+/* Team Shares: source-backed team receiver efficiency heatmap. */
+#stReceiverEfficiencyMount{margin:16px 0 28px;min-width:0}
+.re-loading,.re-error{padding:20px;color:#d1dce8;border:1px solid #34455f;border-radius:12px}
+.re-heatmap{width:100%;max-width:100%;min-width:0}
+.re-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px;color:#e5edf8;font-size:12px}
+.re-toolbar label{display:flex;align-items:center;gap:10px;font-weight:800}
+.re-toolbar select{min-height:40px;max-width:min(380px,75vw);border:1px solid #52617c;border-radius:8px;background:#132238;color:#fff;padding:6px 10px;font:inherit}
+.re-toolbar small{font-size:11px;color:#a9b9ce}
+.re-paper{background:#fff;color:#1a1a1a;border-radius:10px;padding:22px 20px 13px;overflow:hidden;box-shadow:0 8px 28px #00000018}
+.re-title{display:flex;align-items:center;gap:11px;margin-bottom:4px;min-width:0}
+.re-title img{width:42px;height:42px;object-fit:contain;flex:0 0 auto}
+.re-title h3{margin:0;font:italic 1000 clamp(21px,3vw,36px)/1.04 system-ui,-apple-system,BlinkMacSystemFont,"Arial Black",sans-serif;letter-spacing:-.055em;text-transform:uppercase;color:#151515}
+.re-title h3 em{color:#c52b31;font-style:inherit}
+.re-subtitle{color:#636363;font:500 11px/1.5 system-ui,sans-serif;margin:9px 0 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.re-key{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.re-chip{display:inline-block;width:12px;height:9px}
+.re-table-scroll{max-width:100%;width:100%;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.re-table{table-layout:fixed;width:100%;min-width:955px;border-collapse:separate;border-spacing:3px 4px;font:800 12px/1.15 system-ui,Arial,sans-serif;font-variant-numeric:tabular-nums}
+.re-table thead th{border-top:3px solid #c52b31;border-bottom:1px solid #444;padding:8px 3px 7px;color:#111;vertical-align:bottom;text-align:center;font:900 10px/1.2 system-ui,Arial,sans-serif}
+.re-table thead th.re-player-th{width:178px;text-align:left;position:sticky;left:0;background:#fff;z-index:3}
+.re-table thead button{border:0;background:none;color:inherit;font:inherit;text-align:center;cursor:pointer;padding:0 2px;min-height:26px;max-width:100%}
+.re-table thead .re-player-th button{text-align:left}
+.re-colhead{display:flex;align-items:center;justify-content:center;gap:4px}
+.re-info{color:#656565;font-size:12px;font-weight:700;cursor:help;outline-offset:1px;white-space:nowrap}
+.re-table tbody th.re-player{position:sticky;left:0;z-index:2;background:#fff;text-align:left;vertical-align:middle;padding:6px 5px;box-shadow:2px 0 0 #ffffffcc}
+.re-player strong{display:block;font-size:12px;color:#1d1d1d;line-height:1.2;white-space:normal}
+.re-player small{display:block;color:#888;font-size:9px;margin-top:4px;font-weight:600;white-space:normal}
+.re-cell{height:58px;text-align:center;vertical-align:middle;border-radius:3px;padding:7px 2px;color:#222}
+.re-cell b{display:block;font-size:15px;letter-spacing:-.035em;line-height:1.25;font-style:italic;font-weight:1000;white-space:nowrap}
+.re-cell small{display:block;font-size:8px;font-weight:850;margin-top:3px}
+.re-cell.best,.re-chip.best{background:#269c55;color:#fff}
+.re-cell.good,.re-chip.good{background:#82c99d;color:#064329}
+.re-cell.neutral,.re-chip.neutral{background:#e6e6e6;color:#222}
+.re-cell.poor,.re-chip.poor{background:#eda1a4;color:#68272c}
+.re-cell.worst,.re-chip.worst{background:#d73539;color:#fff}
+.re-cell.missing{background:#eeeeee;color:#8b8b8b}
+.re-table tfoot th,.re-table tfoot td{border-top:1px solid #454545;padding:9px 3px;text-align:center;font-size:12px;font-style:italic;font-weight:850;color:#484848}
+.re-table tfoot th{position:sticky;left:0;text-align:left;background:#fff;z-index:2;font-size:11px;font-style:normal}
+.re-table tfoot small{display:block;color:#8a8a8a;font-size:9px;font-weight:500;margin-top:3px}
+.re-footnote{margin:10px 0 0;color:#777;font:500 10px/1.45 system-ui,Arial,sans-serif}
+@media(max-width:700px){
+ .re-paper{padding:13px 7px 12px;border-radius:9px}
+ .re-title{gap:6px;margin:0 4px}
+ .re-title img{width:31px;height:31px}
+ .re-title h3{font-size:clamp(17px,5.1vw,25px);letter-spacing:-.04em}
+ .re-subtitle{margin:7px 4px;font-size:9px;gap:4px}
+ .re-table{min-width:865px;border-spacing:2px 3px}
+ .re-table thead th.re-player-th{width:128px}
+ .re-player strong{font-size:11px}
+ .re-cell b{font-size:13px}
+ .re-footnote{margin:7px 4px 0}
+ .re-toolbar small{display:none}
+}

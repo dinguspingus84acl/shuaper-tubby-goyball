@@ -5,7 +5,7 @@ on:
     - cron: '17 */6 * * *'
   push:
     branches: [main]
-    paths: ['big-board.json', 'ros-rankings.json']
+    paths: ['big-board.json', 'ros-rankings.json', '.github/workflows/analytics-studio-data.yml']
 permissions:
   contents: write
   pages: write
@@ -42,12 +42,15 @@ jobs:
         run: python -u scripts/enrich-ranked-advanced-usage.py
       - name: Merge twelve further verified Usage statistics
         run: python -u scripts/enrich-ranked-next-usage.py
+      - name: Rebuild 32-team source-verified receiver efficiency heatmaps
+        run: python -u scripts/build-receiver-efficiency.py
       - name: Validate advanced usage calculations
         run: |
           node tests/usage-extra-metrics.cjs
           node tests/usage-advanced-metrics.cjs
           node tests/usage-next-metrics.cjs
           node tests/fantasy-intelligence.cjs
+          node tests/receiver-efficiency.cjs
       - name: Publish data snapshots only
         id: save
         run: |

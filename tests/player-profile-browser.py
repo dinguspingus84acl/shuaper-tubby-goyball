@@ -48,6 +48,16 @@ def check_browser(browser,phone):
     performance.wait_for(state='visible',timeout=10000)
     assert '3-game average' not in performance.inner_text().lower()
     assert '5-game average' not in performance.inner_text().lower()
+    page.locator('[data-profile-tab="gamelog"]').click()
+    table=page.locator('#unifiedGameLogPanel .espn-game-log-table')
+    table.wait_for(state='visible',timeout=25000)
+    headings=table.locator('thead th').all_inner_texts()
+    for column in ['SNAP %','REC','TGT','REC YDS','REC TD','RUSH ATT','RUSH YDS']:
+        assert column in headings,('Missing game log column '+column,headings)
+    assert page.locator('#unifiedGameLogPanel [data-gl-mode]').count()==0
+    if phone:
+        dims=page.locator('#unifiedGameLogPanel .espn-game-log-table-wrap').evaluate('(el)=>({total:el.scrollWidth,visible:el.clientWidth})')
+        assert dims['total']>dims['visible'],('Game log must swipe horizontally',dims)
     page.locator('#close').evaluate('(e)=>e.click()')
     open_search(page,phone)
     page.locator('[data-search-mode="historical"]').click()

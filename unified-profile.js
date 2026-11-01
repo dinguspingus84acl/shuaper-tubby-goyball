@@ -221,6 +221,31 @@ style.textContent=`
 }
 .featured-player-card.featured-name-long .featured-last{font-size:2.12rem;letter-spacing:-.04em}
 .featured-player-card.featured-name-xlong .featured-last{font-size:1.78rem;letter-spacing:-.035em}
+/* Keep uniform numbers in their own corner, never over the player name. */
+.featured-player-card .featured-right{position:relative}
+.featured-player-card .featured-name{max-width:100%;min-width:0;padding-right:0!important}
+.featured-player-card .featured-first{padding-right:40px}
+.featured-player-card .featured-last-row{display:block;min-width:0;max-width:100%}
+.featured-player-card .featured-last{white-space:normal;overflow-wrap:anywhere;word-break:normal;max-width:100%;line-height:1.01}
+.featured-player-card .featured-jersey-number{
+ position:absolute;top:11px;right:11px;z-index:5;
+ padding:3px 6px!important;border-radius:6px;
+ background:#07111de8;border:1px solid color-mix(in srgb,var(--featured-accent) 40%,#ffffff25);
+ color:var(--featured-accent);font-size:clamp(.65rem,.95vw,.9rem);line-height:1.1;
+ text-align:center;white-space:nowrap;pointer-events:none
+}
+.featured-player-card .featured-jersey-number:empty{display:none}
+@media(max-width:760px){
+ .featured-player-card .featured-first{padding-right:29px}
+ .featured-player-card .featured-jersey-number{top:7px;right:7px;font-size:.66rem;padding:2px 4px!important}
+ .featured-player-card .featured-last{font-size:clamp(.88rem,3.7vw,1.28rem);line-height:1.05}
+}
+.phone-mode .featured-player-card .featured-first{padding-right:38px}
+.phone-mode .featured-player-card .featured-jersey-number{top:12px;right:10px;font-size:.8rem}
+.phone-mode .featured-player-card .featured-last{font-size:clamp(1.18rem,5.3vw,1.9rem);white-space:normal;overflow-wrap:anywhere;line-height:1.02}
+.phone-mode .featured-player-card.featured-name-long .featured-last{font-size:clamp(1.08rem,4.5vw,1.55rem)}
+.phone-mode .featured-player-card.featured-name-xlong .featured-last{font-size:clamp(.95rem,4vw,1.3rem)}
+
 .featured-player-card .featured-bio{
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px
 }
@@ -795,7 +820,8 @@ function applyFeaturedProfile(name,seed=null){
       '</div>'+
     '</div>'+
     '<div class="featured-right">'+
-      '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span><span class="featured-jersey-number"></span></span></h2>'+
+      '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span></span></h2>'+ 
+       '<span class="featured-jersey-number" aria-label="Jersey number"></span>'+
       '<div class="featured-bio">'+
         (defense?stat('POSITION','D/ST')+stat('TEAM',team)+stat('SEASON','2026')+stat('TYPE','DEFENSE')
           :historical

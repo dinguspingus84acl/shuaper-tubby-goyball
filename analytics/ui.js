@@ -1025,7 +1025,7 @@ S.UI={open,close,navigate,openSchedule,get state(){return state;},get dataset(){
     '<p class="st-intel-source">Expected values represent modeled opportunity quality for recorded games, not future projections. Missing values are not zero.</p>';
   }
  }
- target.innerHTML=C.line({title:'Weekly scoring',labels:gs.map(g=>'W'+g.week),series:[{name:'PPR',values:gs.map(g=>g.points)},{name:'3-game average',values:S.rolling(gs.map(g=>g.points),3)},{name:'5-game average',values:S.rolling(gs.map(g=>g.points),5)}]})+
+ target.innerHTML=C.line({title:'Weekly scoring',labels:gs.map(g=>'W'+g.week),series:[{name:'PPR',values:gs.map(g=>g.points)}]})+
   actualVsExpected+'<button type="button" class="st-boom-link" data-st-open-boom>Boom Bust ↗</button>'+`<div class="st-grid4">${c.rates.map((r,i)=>C.ring(r.percent,r.threshold+'+',r.count+'/'+c.n+' games',C.colors[i])).join('')}</div>`;
 }};
 const depth=document.getElementById('depthSection');if(depth&&!document.getElementById('stDepthLink')){const div=document.createElement('div');div.id='stDepthLink';div.style.margin='10px 0';div.innerHTML='<button type="button" class="st-button">View team opportunity charts ↗</button>';div.querySelector('button').onclick=()=>{state.team=S.canonicalTeam(document.getElementById('depthTeam')?.value||'DET');state.view='teams';state.week=0;open();};depth.prepend(div);}

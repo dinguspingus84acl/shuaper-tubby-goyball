@@ -392,6 +392,19 @@ body.phone-mode .espn-game-log-table th:nth-child(2),body.phone-mode .espn-game-
   .espn-game-log-year-select{font-size:.7rem;min-height:36px}
 }
 `;
+
+style.textContent += `
+.espn-game-log-swipe-hint{padding:5px 4px 10px;color:#9eb8d0;font:750 11px system-ui,sans-serif}
+#unifiedGameLogPanel .espn-game-log-table-wrap,.espn-profile-gamelog-panel .espn-game-log-table-wrap{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain}
+#unifiedGameLogPanel .espn-game-log-table,.espn-profile-gamelog-panel .espn-game-log-table{display:table!important;table-layout:auto!important;width:max-content!important;min-width:100%!important;max-width:none!important}
+#unifiedGameLogPanel .espn-game-log-table th,#unifiedGameLogPanel .espn-game-log-table td,
+.espn-profile-gamelog-panel .espn-game-log-table th,.espn-profile-gamelog-panel .espn-game-log-table td{box-sizing:border-box!important;min-width:77px!important;width:auto!important;padding:9px 9px!important;white-space:nowrap!important}
+#unifiedGameLogPanel .espn-game-log-table th:first-child,#unifiedGameLogPanel .espn-game-log-table td:first-child,
+.espn-profile-gamelog-panel .espn-game-log-table th:first-child,.espn-profile-gamelog-panel .espn-game-log-table td:first-child{position:sticky!important;left:0!important;z-index:3!important;width:44px!important;min-width:44px!important;background:#061522!important}
+#unifiedGameLogPanel .espn-game-log-table th:nth-child(2),#unifiedGameLogPanel .espn-game-log-table td:nth-child(2),
+.espn-profile-gamelog-panel .espn-game-log-table th:nth-child(2),.espn-profile-gamelog-panel .espn-game-log-table td:nth-child(2){position:sticky!important;left:44px!important;z-index:3!important;width:100px!important;min-width:100px!important;max-width:100px!important;background:#061522!important;box-shadow:5px 0 9px #0008}
+@media(max-width:700px){#unifiedGameLogPanel .espn-game-log-table th,#unifiedGameLogPanel .espn-game-log-table td{font-size:12px!important;padding:9px 7px!important}}
+`;
 document.head.appendChild(style);
 
 const section=document.createElement('section');
@@ -795,7 +808,7 @@ function historicalGameLogHtml(player,career,year){
   const yearSelect='<div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" data-hist-gl-year>'+
     years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+
     '</select></div>';
-  const tabs='<div class="espn-game-log-tabs">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" data-hist-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
+  const tabs='<div class="espn-game-log-swipe-hint">Swipe across the table to view receiving, rushing and snap stats →</div>';
   const title='<div class="espn-game-log-title"><strong>'+seasonRow.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
   const games=Array.isArray(seasonRow.games)?seasonRow.games:[];
   const histGp=Number(seasonRow.gamesPlayed)||games.filter(g=>g?.hasStats).length;
@@ -831,7 +844,8 @@ function bindHistoricalGameLog(panel,player,career,year){
       panel.innerHTML='<div class="espn-game-log-empty">Loading '+nextYear+' game log…</div>';
       const hydrated=await hydrateHistoricalCareerYear(career,player.name,nextYear);
       const nextPlayer=hydrated.find(x=>Number(x.year)===nextYear)||player;
-      panel.innerHTML=historicalGameLogHtml(nextPlayer,hydrated,nextYear);
+      await attachGameLogSnapRates(nextPlayer,nextYear,nextPlayer?.games||[]);
+       panel.innerHTML=historicalGameLogHtml(nextPlayer,hydrated,nextYear);
       bindHistoricalGameLog(panel,nextPlayer,hydrated,nextYear);
     };
   }
@@ -842,7 +856,8 @@ async function renderHistoricalGameLog(name,target,preferredYear){
   const year=Number(preferredYear)||Number(career[0].year);
   career=await hydrateHistoricalCareerYear(career,name,year);
   const player=career.find(x=>Number(x.year)===year)||career[0];
-  target.innerHTML=historicalGameLogHtml(player,career,year);
+  await attachGameLogSnapRates(player,year,player?.games||[]);
+   target.innerHTML=historicalGameLogHtml(player,career,year);
   bindHistoricalGameLog(target,player,career,year);
   return true;
 }
@@ -984,6 +999,36 @@ function deepStats(entry){
   return p?.stats||pool?.stats||entry?.stats||[];
 }
 function gameLogCacheKey(player,year){return String(player.id)+':'+year}
+
+let currentSeasonSnapPromise=null;
+async function attachGameLogSnapRates(player,year,games){
+ if(!Array.isArray(games)||!games.length)return games;
+ let matches=[];
+ if(Number(year)===SEASON){
+  if(!currentSeasonSnapPromise)currentSeasonSnapPromise=
+    fetch('analytics/data/season-2026.json',{cache:'force-cache'})
+     .then(r=>{if(!r.ok)throw Error('No weekly snap source');return r.json()}).catch(()=>null);
+  const ds=await currentSeasonSnapPromise;
+  const id=String(player?.id||''),normalized=nameKey(player?.name||'');
+  const season=ds?.players?.find(p=>id&&String(p.id)===id)||
+    ds?.players?.find(p=>nameKey(p.name)===normalized);
+  matches=(season?.games||[]).filter(g=>g.hasStats!==false);
+ }else if(Number(year)>=2013&&window.ShuaPlayerHistory?.getWeeklySnapRates){
+  matches=await window.ShuaPlayerHistory.getWeeklySnapRates(player?.name,year,player?.position).catch(()=>[]);
+ }
+ const lookup=new Map(matches.map(g=>[Number(g.week),g]));
+ for(const game of games){
+  const r=lookup.get(Number(game.week));
+  const raw=r?.snapRate??r?.snapPct;
+  const n=raw===null||raw===undefined||raw===''?null:Number(raw);
+  const snaps=r?.snaps??r?.offenseSnaps,teamSnaps=r?.teamSnaps;
+  let percent=n!==null&&Number.isFinite(n)?(n<=1.5?n*100:n):null;
+  if(percent===null&&snaps!=null&&teamSnaps>0)percent=100*Number(snaps)/Number(teamSnaps);
+  game.snapRate=Number.isFinite(percent)?Math.max(0,Math.min(100,percent)):null;
+ }
+ return games;
+}
+
 function availableGameLogYears(player){
   const cached=careerYearsCache.get(String(player.id));
   if(cached?.length)return cached;
@@ -1060,7 +1105,8 @@ async function fetchGameLog(player,year=SEASON){
       if(historical&&Array.isArray(historical.games)&&historical.games.length){
         const localRows=historical.games.map(g=>({...g,hasStats:true}));
         const localKey=gameLogCacheKey(player,year);
-        gameLogCache.set(localKey,{ts:Date.now(),rows:localRows,source:'local'});
+        await attachGameLogSnapRates(player,year,localRows);
+         gameLogCache.set(localKey,{ts:Date.now(),rows:localRows,source:'local'});
         return localRows;
       }
     }catch(e){}
@@ -1140,7 +1186,8 @@ async function fetchGameLog(player,year=SEASON){
   }else{
     log=[...byWeek.entries()].sort((a,b)=>a[0]-b[0]).map(([week,s])=>makeRow(week,s));
   }
-  gameLogCache.set(cacheKey,{ts:Date.now(),rows:log});
+  await attachGameLogSnapRates(player,year,log);
+   gameLogCache.set(cacheKey,{ts:Date.now(),rows:log});
   return log;
 }
 function gameLogModesFor(position){
@@ -1156,25 +1203,14 @@ function categoryPoints(g,mode,position){
   return Number(g.totalPoints)||0;
 }
 function gameLogColumns(mode,position){
-  if(mode==='pass')return [
-    {label:'PTS',key:'pts'},
-    {label:'YDS',key:'passYds'},
-    {label:'TD',key:'passTD'},
-    {label:'INT/FUM',key:'turnovers'}
-  ];
-  if(mode==='rush')return [
-    {label:'PTS',key:'pts'},
-    {label:'ATT',key:'rushAtt'},
-    {label:'YDS',key:'rushYds'},
-    {label:'TD',key:'rushTD'}
-  ];
-  return [
-    {label:'PTS',key:'pts'},
-    {label:'REC',key:'receptions'},
-    {label:'TGT',key:'targets'},
-    {label:'YDS',key:'recYds'},
-    {label:'TD',key:'recTD'}
-  ];
+ // Show all available receiving, rushing, and (for QBs) passing stats in one swipeable table.
+ const cols=[{label:'PTS',key:'pts'},{label:'SNAP %',key:'snapRate'}];
+ if(position==='QB')cols.push({label:'CMP',key:'completions'},{label:'ATT',key:'passAtt'},
+  {label:'PASS YDS',key:'passYds'},{label:'PASS TD',key:'passTD'},{label:'INT/FUM',key:'turnovers'});
+ cols.push({label:'RUSH ATT',key:'rushAtt'},{label:'RUSH YDS',key:'rushYds'},
+  {label:'RUSH TD',key:'rushTD'},{label:'REC',key:'receptions'},{label:'TGT',key:'targets'},
+  {label:'REC YDS',key:'recYds'},{label:'REC TD',key:'recTD'});
+ return cols;
 }
 function cleanGameLogOpponent(value){
   return String(value??'')
@@ -1302,9 +1338,12 @@ function gameLogCell(g,key,mode,position){
     const pts=categoryPoints(g,mode,position);
     return pts===null?'—':Number(pts).toFixed(1);
   }
-  if(key==='turnovers')return Number(g.interceptions||0)+'/'+Number(g.fumblesLost||0);
-  const v=Number(g[key]||0);
-  return Number.isInteger(v)?String(v):v.toFixed(1);
+  if(key==='snapRate')return g.snapRate===null||g.snapRate===undefined||!Number.isFinite(Number(g.snapRate))?'—':Number(g.snapRate).toFixed(1)+'%';
+   if(key==='turnovers')return Number(g.interceptions||0)+'/'+Number(g.fumblesLost||0);
+  const raw=g[key];
+  if(raw===null||raw===undefined||raw==='')return '—';
+  const v=Number(raw);
+  return Number.isFinite(v)?(Number.isInteger(v)?String(v):v.toFixed(1)):'—';
 }
 function gameLogHtml(player,opts={}){
   const years=availableGameLogYears(player);
@@ -1319,7 +1358,7 @@ function gameLogHtml(player,opts={}){
   const yearSelect=showYearSelect?'<div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" data-gl-year-select>'+
     years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+
     '</select></div>':'';
-  const tabs='<div class="espn-game-log-tabs">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" data-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
+  const tabs='<div class="espn-game-log-swipe-hint">Swipe across the table to view receiving, rushing and snap stats →</div>';
   const title='<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
   const controls='<div class="espn-game-log-controls">'+yearSelect+tabs+'</div>';
   if(!cached)return title+controls+'<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
@@ -1955,7 +1994,9 @@ window.ShuaEspnLive={
       bindGameLogModeButtons(target,current);
       discoverGameLogYears(current).then(()=>{
         if(gameLogYears.get(String(current.id))===year){
+          const swipeX=target.querySelector('.espn-game-log-table-wrap')?.scrollLeft||0;
           target.innerHTML=gameLogHtml(current);
+          const table=target.querySelector('.espn-game-log-table-wrap');if(table)table.scrollLeft=swipeX;
           bindGameLogModeButtons(target,current);
         }
       }).catch(()=>{});
@@ -1973,7 +2014,8 @@ window.ShuaEspnLive={
         if(hist.some(x=>Number(x.year)===Number(year))){
           hist=await hydrateHistoricalCareerYear(hist,name,Number(year));
           const row=hist.find(x=>Number(x.year)===Number(year));
-          target.innerHTML=historicalGameLogHtml(row,hist,Number(year));
+          await attachGameLogSnapRates(row,Number(year),row?.games||[]);
+           target.innerHTML=historicalGameLogHtml(row,hist,Number(year));
           bindHistoricalGameLog(target,row,hist,Number(year));
           return;
         }

@@ -1,0 +1,35 @@
+name: Verify player cards, game logs, search and rosters
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'unified-profile.js'
+      - 'espn-live.js'
+      - 'player-history.js'
+      - 'player-search.js'
+      - 'player-search.css'
+      - 'my-teams-live.js'
+      - 'analytics/ui.js'
+      - 'index.html'
+      - 'tests/player-profile-updates.cjs'
+      - 'tests/player-profile-browser.py'
+      - '.github/workflows/player-profile-verify.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JS syntax, data-source integrity, and performance chart
+        run: |
+          node tests/player-profile-updates.cjs
+          for file in unified-profile.js espn-live.js player-history.js player-search.js my-teams-live.js analytics/ui.js; do node --check "$file"; done
+      - name: Install browser verification engines
+        run: |
+          python -m pip install --disable-pip-version-check playwright==1.57.0
+          python -m playwright install --with-deps chromium webkit
+      - name: Test desktop, phone, archived search and roster updates
+        run: python tests/player-profile-browser.py

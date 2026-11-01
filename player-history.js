@@ -397,6 +397,7 @@ function parseCsvLine(line){
   return out;
 }
 function snapPctNumber(v){
+  if(v===null||v===undefined||String(v).trim()==='')return null;
   const n=Number(v);
   if(!Number.isFinite(n))return null;
   return n<=1.5?n*100:n;
@@ -441,7 +442,7 @@ async function fetchPlayerSnaps(row){
   return pool.sort((a,b)=>a.week-b.week);
 }
 function formatSnapPct(v){
-  return Number.isFinite(Number(v))?Number(v).toFixed(1)+'%':'—';
+  return v!==null&&v!==undefined&&String(v).trim()!==''&&Number.isFinite(Number(v))?Number(v).toFixed(1)+'%':'—';
 }
 
 async function fetchPlayerWeeks(row){
@@ -707,5 +708,11 @@ async function render(name,target){
   }
 }
 
-window.ShuaPlayerHistory={render};
+window.ShuaPlayerHistory={render,
+ async getWeeklySnapRates(name,year,position){
+  const rows=await fetchPlayerSnaps({name,year:Number(year),position:String(position||'').toUpperCase()});
+  return rows.filter(x=>Number.isFinite(x.snapPct)&&x.offenseSnaps>0)
+   .map(x=>({week:x.week,snapRate:x.snapPct,offenseSnaps:x.offenseSnaps}));
+ }
+};
 })();

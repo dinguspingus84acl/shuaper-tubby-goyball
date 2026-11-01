@@ -1073,3 +1073,27 @@ body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-osp-heading{
   margin-right:64px!important;
  }
 }
+
+
+/* Recognizable headshot inside the Analytics search input after typing a name. */
+#shuaAnalyticsSection .st-global-search-icon[hidden],
+#shuaAnalyticsSection .st-global-leading-avatar[hidden]{display:none!important}
+#shuaAnalyticsSection .st-global-leading-avatar{
+ display:grid;place-items:center;overflow:hidden;flex:0 0 35px;
+ height:35px;width:35px;border:1px solid #5e8da6;border-radius:50%;
+ background:linear-gradient(140deg,#24495e,#0b293e);
+}
+#shuaAnalyticsSection .st-global-leading-image{
+ display:block;width:100%!important;height:100%!important;
+ flex:0 0 100%!important;border:0!important;border-radius:50%!important;
+ object-fit:cover!important;object-position:center 15%!important;
+ font:900 11px/33px system-ui,sans-serif;color:#eaffff;text-align:center;
+}
+#shuaAnalyticsSection .st-global-leading-image.st-avatar-fallback{
+ display:grid;place-items:center;line-height:1;
+}
+#shuaAnalyticsSection .st-global-search-inputrow{gap:11px}
+@media(max-width:700px){
+ #shuaAnalyticsSection .st-global-leading-avatar{width:32px;height:32px;flex-basis:32px}
+ #shuaAnalyticsSection .st-global-search-inputrow{gap:8px}
+}

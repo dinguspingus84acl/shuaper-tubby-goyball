@@ -33,7 +33,10 @@ def check_browser(browser,phone):
     current.wait_for(state='visible',timeout=12000)
     assert 'Bijan Robinson' in current.inner_text()
     assert current.locator('.shua-search-avatar').count()==1
+    assert page.locator('#shuaSearchInputFace').is_visible(),'Input itself should show best-matching player'
+    assert page.locator('#shuaSearchInputFace .shua-search-avatar').count()==1
     page.wait_for_function("document.querySelector('.shua-search-result .shua-search-avatar img')!==null",timeout=22000)
+    page.wait_for_function("document.querySelector('#shuaSearchInputFace img')!==null",timeout=22000)
     current.click()
     hero=page.locator('#modal.open #featuredPlayerCard')
     hero.wait_for(state='visible',timeout=18000)
@@ -72,6 +75,17 @@ def check_browser(browser,phone):
     if phone:
         dims=page.locator('#unifiedGameLogPanel .espn-game-log-table-wrap').evaluate('(el)=>({total:el.scrollWidth,visible:el.clientWidth})')
         assert dims['total']>dims['visible'],('Game log must swipe horizontally',dims)
+    # A surname long enough to wrap on smaller phones must still leave #11 to its right.
+    page.evaluate("window.openUnifiedPlayerProfileByName('Jaxon Smith-Njigba')")
+    page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Smith-Njigba')",timeout=18000)
+    longname=page.locator('#featuredPlayerCard')
+    longname.locator('.featured-jersey-number').evaluate("(el)=>{el.textContent='#11'}")
+    namebox=longname.locator('.featured-last').bounding_box()
+    numberbox=longname.locator('.featured-jersey-number').bounding_box()
+    rowbox=longname.locator('.featured-last-row').bounding_box()
+    assert namebox and numberbox and rowbox
+    assert numberbox['x']>=namebox['x']+namebox['width']-3,('Long surname must not overlap #11',namebox,numberbox)
+    assert numberbox['x']+numberbox['width']<=rowbox['x']+rowbox['width']+4,('Number clipped off name row',numberbox,rowbox)
     page.locator('#close').evaluate('(e)=>e.click()')
     open_search(page,phone)
     page.locator('[data-search-mode="historical"]').click()
@@ -97,9 +111,14 @@ def check_browser(browser,phone):
     suggestions.first.wait_for(state='visible',timeout=12000)
     assert 'Bijan' in suggestions.first.inner_text()
     assert suggestions.first.locator('.st-global-player-face').count()==1
+    assert page.locator('#stGlobalLeadingAvatar').is_visible(),'Analytics input needs the matching face'
+    assert page.locator('#stGlobalLeadingAvatar .st-global-leading-image').count()==1
+    assert page.locator('.st-global-search-icon').is_hidden()
     assert page.locator('[data-st-clear-search]').is_visible()
     page.locator('[data-st-clear-search]').click()
     assert analytic.input_value()==''
+    assert page.locator('#stGlobalLeadingAvatar').is_hidden()
+    assert page.locator('.st-global-search-icon').is_visible()
     analytic.fill('Bijan')
     suggestions=page.locator('#stGlobalPlayerMatches [data-st-open]')
     suggestions.first.wait_for(state='visible',timeout=12000)

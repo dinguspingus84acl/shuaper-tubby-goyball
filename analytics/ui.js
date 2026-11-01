@@ -720,27 +720,39 @@ function intelligence(){
 }
 const renderers={trends,matchup,opportunity,usage,intelligence,consistency,teams,schedule,injury,startsit,weekly};
 
+function setAnalyticsLeadingAvatar(player){
+ const leading=section.querySelector('#stGlobalLeadingAvatar'),magnifier=section.querySelector('.st-global-search-icon');
+ if(!leading||!magnifier)return;
+ leading.hidden=!player;magnifier.hidden=!!player;
+ leading.innerHTML=player?face(player,'st-global-leading-image'):'';
+}
 function showAnalyticsPlayerMatches(query){
  const box=section.querySelector('#stGlobalPlayerMatches'),input=section.querySelector('#stGlobalSearch');
  if(!box||!input||!dataset){return;}
  const q=String(query||'').toLowerCase().trim(),namekey=q.replace(/[^a-z0-9]/g,'');
- if(q.length<2){box.hidden=true;box.innerHTML='';input.setAttribute('aria-expanded','false');return;}
+ if(q.length<2){setAnalyticsLeadingAvatar(null);box.hidden=true;box.innerHTML='';input.setAttribute('aria-expanded','false');return;}
  const options=dataset.players.filter(p=>p.name.toLowerCase().includes(q)||key(p.name).includes(namekey))
   .sort((a,b)=>{const an=a.name.toLowerCase(),bn=b.name.toLowerCase(),ax=an.startsWith(q)?0:1,bx=bn.startsWith(q)?0:1;return ax-bx||an.localeCompare(bn);}).slice(0,9);
+ setAnalyticsLeadingAvatar(options[0]||null);
  box.innerHTML=options.length?options.map(p=>'<button type="button" role="option" class="st-global-player-match" data-st-open="'+E(p.key)+'">'+face(p,'st-global-player-face')+
   '<span class="st-global-player-match-label"><b>'+E(p.name)+'</b><small>'+E(p.position)+' · '+E(p.team)+'</small></span><span class="st-global-player-chevron" aria-hidden="true">›</span></button>').join(''):
   '<div class="st-global-search-empty">No matching players</div>';
  box.hidden=false;input.setAttribute('aria-expanded','true');
 }
+section.addEventListener('error',event=>{
+ const img=event.target;if(!img?.matches?.('.st-global-leading-image'))return;
+ const backup=document.createElement('span');backup.className='st-global-leading-image st-avatar-fallback';
+ backup.textContent=img.dataset.stInitials||'?';img.replaceWith(backup);
+},true);
 function applyStudioSearch(){
  if(state.view==='weekly')return;
  const q=(state.studioSearch||'').trim().toLowerCase();
  section.querySelectorAll('#stContent .st-rank-row,#stContent .st-injury-item,#stContent .st-team-snap-row,#stContent .st-hit-rate-table tbody tr,#stContent .st-usage-table tbody tr,#stContent .st-table-wrap tbody tr,#stContent .st-schedule-best-row').forEach(el=>{el.hidden=!!q&&!el.textContent.toLowerCase().includes(q);});
 }
-function shell(){section.innerHTML=`<div class="st-global-search" ${['schedule','startsit'].includes(state.view)?'hidden':''}><div class="st-global-search-inputrow"><svg class="st-global-search-icon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg><input id="stGlobalSearch" type="search" autocomplete="off" aria-label="Search analytics players" aria-controls="stGlobalPlayerMatches" aria-autocomplete="list" placeholder="Search players in Analytics…" value="${E(state.studioSearch||'')}"><button type="button" class="st-global-search-clear" aria-label="Clear search" data-st-clear-search ${state.studioSearch?'':'hidden'}>×</button></div><div class="st-global-player-matches" id="stGlobalPlayerMatches" role="listbox" aria-label="Matching players" hidden></div></div><label class="st-dashboard-picker" for="stDashboard"><span class="st-label">Choose analytics chart</span><select id="stDashboard" aria-label="Choose analytics chart">${pages.map((p,i)=>`<option value="${p[0]}" ${state.view===p[0]?'selected':''}>${E(p[1])}</option>`).join('')}</select></label><div class="st-layout"><nav class="st-navigation" role="tablist" aria-label="Analytics dashboards">${pages.map((p,i)=>`<button class="st-tab" id="st-tab-${p[0]}" type="button" role="tab" data-st-view="${p[0]}" aria-controls="stWorkspace" aria-selected="${state.view===p[0]}"><span>${String(i+1).padStart(2,'0')}</span>${shortNames[i]}</button>`).join('')}</nav><div class="st-workspace" id="stWorkspace" role="tabpanel" aria-labelledby="st-tab-${state.view}">${['schedule','consistency','weekly','usage','intelligence','teams','injury','startsit'].includes(state.view)?'':`<header class="st-heading"><div><span class="st-eyebrow">${E(dataset?.year||state.year)} · ${dataset?.year<2026?'Historical archive':'Season analytics'}</span><h2>${E(pages.find(p=>p[0]===state.view)[1])}</h2><p>${E(pages.find(p=>p[0]===state.view)[2])}</p></div></header>`}<div id="stContent"></div><footer id="stSource" class="st-footnote"></footer></div></div>`;}
+function shell(){section.innerHTML=`<div class="st-global-search" ${['schedule','startsit'].includes(state.view)?'hidden':''}><div class="st-global-search-inputrow"><svg class="st-global-search-icon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg><span id="stGlobalLeadingAvatar" class="st-global-leading-avatar" aria-hidden="true" hidden></span><input id="stGlobalSearch" type="search" autocomplete="off" aria-label="Search analytics players" aria-controls="stGlobalPlayerMatches" aria-autocomplete="list" placeholder="Search players in Analytics…" value="${E(state.studioSearch||'')}"><button type="button" class="st-global-search-clear" aria-label="Clear search" data-st-clear-search ${state.studioSearch?'':'hidden'}>×</button></div><div class="st-global-player-matches" id="stGlobalPlayerMatches" role="listbox" aria-label="Matching players" hidden></div></div><label class="st-dashboard-picker" for="stDashboard"><span class="st-label">Choose analytics chart</span><select id="stDashboard" aria-label="Choose analytics chart">${pages.map((p,i)=>`<option value="${p[0]}" ${state.view===p[0]?'selected':''}>${E(p[1])}</option>`).join('')}</select></label><div class="st-layout"><nav class="st-navigation" role="tablist" aria-label="Analytics dashboards">${pages.map((p,i)=>`<button class="st-tab" id="st-tab-${p[0]}" type="button" role="tab" data-st-view="${p[0]}" aria-controls="stWorkspace" aria-selected="${state.view===p[0]}"><span>${String(i+1).padStart(2,'0')}</span>${shortNames[i]}</button>`).join('')}</nav><div class="st-workspace" id="stWorkspace" role="tabpanel" aria-labelledby="st-tab-${state.view}">${['schedule','consistency','weekly','usage','intelligence','teams','injury','startsit'].includes(state.view)?'':`<header class="st-heading"><div><span class="st-eyebrow">${E(dataset?.year||state.year)} · ${dataset?.year<2026?'Historical archive':'Season analytics'}</span><h2>${E(pages.find(p=>p[0]===state.view)[1])}</h2><p>${E(pages.find(p=>p[0]===state.view)[2])}</p></div></header>`}<div id="stContent"></div><footer id="stSource" class="st-footnote"></footer></div></div>`;}
 function persist(){updateLink();try{localStorage.setItem('shuaStudioStateV1',JSON.stringify({...state,outWeeks:null}));}catch(e){}}
 function render(){hideUsageTooltip();if(!visible||!dataset)return;const id=++renderId;C.reset();section.dataset.activeView=state.view;shell();const host=document.getElementById('stContent');try{if(state.view==='rankings')rankings(id);else host.innerHTML=renderers[state.view]();}catch(e){host.innerHTML=note('This dashboard could not render. '+E(e.message),true);console.error('SHUA Studio render',e);}
- const footer=document.getElementById('stSource');if(footer)footer.hidden=['consistency','weekly','injury','teams'].includes(state.view);if(footer)footer.textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');if(state.view==='teams'&&S.ReceiverEfficiency)S.ReceiverEfficiency.mount(state.team);applyStudioSearch();persist();section.dataset.ready='true';}
+ const footer=document.getElementById('stSource');if(footer)footer.hidden=['consistency','weekly','injury','teams'].includes(state.view);if(footer)footer.textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');if(state.view==='teams'&&S.ReceiverEfficiency)S.ReceiverEfficiency.mount(state.team);applyStudioSearch();if(state.studioSearch){const term=String(state.studioSearch).trim().toLowerCase();setAnalyticsLeadingAvatar(dataset.players.find(p=>p.name.toLowerCase().includes(term))||null);}persist();section.dataset.ready='true';}
 function rerenderUsage(){
  hideUsageTooltip();
  const host=section.querySelector('#stContent');
@@ -788,7 +800,7 @@ window.addEventListener('resize',hideUsageTooltip);
 window.addEventListener('scroll',hideUsageTooltip,true);
 section.addEventListener('click',e=>{
  const clearSearch=e.target.closest('[data-st-clear-search]');
- if(clearSearch){state.studioSearch='';const input=section.querySelector('#stGlobalSearch');if(input){input.value='';input.setAttribute('aria-expanded','false');input.focus();}const results=section.querySelector('#stGlobalPlayerMatches');if(results){results.hidden=true;results.innerHTML='';}applyStudioSearch();return;}
+ if(clearSearch){state.studioSearch='';const input=section.querySelector('#stGlobalSearch');if(input){input.value='';input.setAttribute('aria-expanded','false');input.focus();}const results=section.querySelector('#stGlobalPlayerMatches');if(results){results.hidden=true;results.innerHTML='';}setAnalyticsLeadingAvatar(null);applyStudioSearch();return;}
  const intelView=e.target.closest('[data-st-intel-view]');if(intelView&&state.view==='intelligence'){state.intelView=intelView.dataset.stIntelView;render();return;}
  const intelPos=e.target.closest('[data-st-intel-position]');if(intelPos&&state.view==='intelligence'){state.intelPosition=intelPos.dataset.stIntelPosition;render();return;}
  const intelTrade=e.target.closest('[data-st-intel-trade]');if(intelTrade&&state.view==='intelligence'){state.intelTradeMode=intelTrade.dataset.stIntelTrade;render();return;}

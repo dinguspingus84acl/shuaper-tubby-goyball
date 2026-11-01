@@ -41,12 +41,13 @@ async function loadHeadshots(){
 const overlay=document.createElement('div');overlay.id='shuaExpandedSearch';overlay.hidden=true;
 overlay.innerHTML='<div class="shua-search-dimmer" data-search-close></div><section class="shua-search-dialog" role="dialog" aria-modal="true" aria-labelledby="shuaSearchTitle">'+
 '<div class="shua-search-header"><h2 id="shuaSearchTitle">Find a player</h2><button type="button" class="shua-search-close" data-search-close aria-label="Close search">×</button></div>'+
-'<label class="shua-search-field"><span>Search player names</span><input id="shuaSearchQuery" type="search" autocomplete="off" inputmode="search" placeholder="Search NFL players…"></label>'+
+'<label class="shua-search-field"><span>Search player names</span><span class="shua-search-field-shell"><span class="shua-search-input-icon" aria-hidden="true">⌕</span><span class="shua-search-input-avatar" id="shuaSearchInputFace" aria-hidden="true" hidden></span><input id="shuaSearchQuery" type="search" autocomplete="off" inputmode="search" placeholder="Search NFL players…"></span></label>'+
 '<div class="shua-search-modes" role="group" aria-label="Player era"><button type="button" data-search-mode="current" aria-pressed="true">Current Players</button><button type="button" data-search-mode="historical" aria-pressed="false">Retired / Historical</button></div>'+
 '<p id="shuaSearchStatus" class="shua-search-status" role="status"></p><div class="shua-search-results" id="shuaSearchResults"></div></section>';
 document.body.append(overlay);
 const input=overlay.querySelector('input'),results=overlay.querySelector('#shuaSearchResults'),status=overlay.querySelector('#shuaSearchStatus');
-results.addEventListener('error',event=>{
+const leadingAvatar=overlay.querySelector('#shuaSearchInputFace'),leadingIcon=overlay.querySelector('.shua-search-input-icon');
+overlay.addEventListener('error',event=>{
  const img=event.target;if(!img?.classList?.contains('shua-search-face'))return;
  img.hidden=true;const initials=img.parentElement?.querySelector('.shua-search-initials');
  if(initials)initials.hidden=false;
@@ -76,9 +77,17 @@ async function loadArchive(){
  }).catch(e=>{historicalPromise=null;throw e;});
  return historicalPromise;
 }
+function syncInputAvatar(player){
+ const show=!!player&&key(input.value).length>=2;
+ leadingAvatar.hidden=!show;
+ leadingIcon.hidden=show;
+ if(show)leadingAvatar.innerHTML=faceHtml(player);
+ else leadingAvatar.replaceChildren();
+}
 function render(){
  if(!visible)return;
  if(mode==='historical'&&!historical){
+  syncInputAvatar(null);
   status.textContent='Loading historical player directory…';results.innerHTML='<p class="shua-search-empty">Loading archived seasons…</p>';return;
  }
  const q=key(input.value),pool=mode==='current'?current():historical;
@@ -86,6 +95,7 @@ function render(){
   const x=key(a.name),y=key(b.name),ax=q?(x===q?0:x.startsWith(q)?1:2):0,ay=q?(y===q?0:y.startsWith(q)?1:2):0;
   return ax-ay||(mode==='current'?((a.rank||9999)-(b.rank||9999)):(b.lastYear||0)-(a.lastYear||0))||a.name.localeCompare(b.name);
  }).slice(0,35);
+ syncInputAvatar(found[0]);
  shown=found;
  status.textContent=(mode==='historical'?'Archived NFL players (1999–2025)':'Current ranked players')+' · '+found.length+' results shown';
  results.innerHTML=found.length?found.map((p,i)=>
@@ -111,7 +121,7 @@ function open(){
  render();void loadHeadshots();requestAnimationFrame(()=>input.focus({preventScroll:true}));
 }
 function close(){
- if(!visible)return;visible=false;overlay.hidden=true;delete document.body.dataset.shuaSearchOpen;
+ if(!visible)return;visible=false;overlay.hidden=true;syncInputAvatar(null);delete document.body.dataset.shuaSearchOpen;
  const original=document.getElementById('search');if(original)original.value='';
 }
 async function choose(i){

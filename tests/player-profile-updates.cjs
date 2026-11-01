@@ -47,7 +47,7 @@ assert.ok(studio.includes("face(p,'st-global-player-face')"),'Analytics suggesti
 assert.ok(studioCss.includes('st-global-search-inputrow')&&studioCss.includes('st-global-player-matches'),'Analytics search styling required');
 assert.ok(html.includes('unified-profile.js?v=20261101-inline-jersey2')&&html.includes('player-search.js?v=20261101-faces2'));
 assert.ok(html.includes('espn-live.js?v=20261101-gamelog-categories2')&&html.includes('analytics-dashboard.js?v=20261101-analytics-search3'));
-assert.ok(loader.includes("const version = '20261101-analytics-search2'"));
+assert.ok(loader.includes("const version = '20261101-analytics-search3'"));
 assert.ok(live.includes("credentials:'omit'")&&live.includes('view=mTeam&view=mRoster&view=mStatus'));
 assert.ok(live.includes('visibilitychange')&&live.includes('lastSuccess'));
 console.log('PASS: inline jersey, restored game-log category buttons, snap %, face search, clean Analytics search, and unchanged private-roster safeguards.');

@@ -48,10 +48,11 @@ assert.ok(studio.includes('stGlobalPlayerMatches')&&studio.includes('showAnalyti
 assert.ok(studio.includes("face(p,'st-global-player-face')"),'Analytics suggestions must include player faces');
 assert.ok(studioCss.includes('st-global-search-inputrow')&&studioCss.includes('st-global-player-matches'),'Analytics search styling required');
 assert.ok(studio.includes('stGlobalLeadingAvatar')&&studio.includes('setAnalyticsLeadingAvatar(options[0]||null)'),'Analytics input needs a face preview');
+assert.ok(studio.includes("magnifier.toggleAttribute('hidden',!!player)"),'Analytics magnifier must actually hide as an SVG attribute');
 assert.ok(studioCss.includes('.st-global-leading-avatar'),'Analytics leading face styling required');
-assert.ok(html.includes('unified-profile.js?v=20261101-inline-jersey4')&&html.includes('player-search.js?v=20261101-input-face4'));
-assert.ok(html.includes('espn-live.js?v=20261101-gamelog-categories4')&&html.includes('analytics-dashboard.js?v=20261101-input-face4'));
-assert.ok(loader.includes("const version = '20261101-input-face4'"));
+assert.ok(html.includes('unified-profile.js?v=20261101-inline-jersey4')&&html.includes('player-search.js?v=20261101-input-face5'));
+assert.ok(html.includes('espn-live.js?v=20261101-gamelog-categories4')&&html.includes('analytics-dashboard.js?v=20261101-input-face5'));
+assert.ok(loader.includes("const version = '20261101-input-face5'"));
 assert.ok(live.includes("credentials:'omit'")&&live.includes('view=mTeam&view=mRoster&view=mStatus'));
 assert.ok(live.includes('visibilitychange')&&live.includes('lastSuccess'));
 console.log('PASS: inline jersey, restored game-log category buttons, snap %, face search, clean Analytics search, and unchanged private-roster safeguards.');

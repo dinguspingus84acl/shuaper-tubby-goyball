@@ -723,7 +723,7 @@ const renderers={trends,matchup,opportunity,usage,intelligence,consistency,teams
 function setAnalyticsLeadingAvatar(player){
  const leading=section.querySelector('#stGlobalLeadingAvatar'),magnifier=section.querySelector('.st-global-search-icon');
  if(!leading||!magnifier)return;
- leading.hidden=!player;magnifier.hidden=!!player;
+ leading.hidden=!player;magnifier.toggleAttribute('hidden',!!player);
  leading.innerHTML=player?face(player,'st-global-leading-image'):'';
 }
 function showAnalyticsPlayerMatches(query){

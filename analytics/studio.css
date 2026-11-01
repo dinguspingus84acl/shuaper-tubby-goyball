@@ -1062,3 +1062,14 @@ body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-osp-heading{
  #shuaAnalyticsSection #stGlobalSearch{height:47px!important;font-size:16px!important}
  #shuaAnalyticsSection .st-global-player-match{min-height:57px}
 }
+
+
+/* Keep the Analytics search completely clear of the fixed phone hamburger. */
+@media(max-width:700px){
+ .phone-mode #shuaAnalyticsSection .st-global-search,
+ #shuaAnalyticsSection .st-global-search{
+  width:calc(100% - 64px)!important;
+  max-width:calc(100% - 64px)!important;
+  margin-right:64px!important;
+ }
+}

@@ -35,7 +35,9 @@ def check_browser(browser,phone):
     current.click()
     hero=page.locator('#modal.open #featuredPlayerCard')
     hero.wait_for(state='visible',timeout=18000)
-    assert 'Robinson' in hero.locator('.featured-last').inner_text()
+    values=page.evaluate("({selected:document.querySelector('#modal')?.dataset?.unifiedName,plain:document.querySelector('#pn')?.textContent,first:document.querySelector('#featuredPlayerCard .featured-first')?.textContent,last:document.querySelector('#featuredPlayerCard .featured-last')?.textContent})")
+    print('PROFILE TRACE',values,flush=True)
+    page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Robinson')",timeout=12000)
     a=hero.locator('.featured-last').bounding_box()
     b=hero.locator('.featured-jersey-number').bounding_box()
     if a and b:

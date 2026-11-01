@@ -57,7 +57,7 @@ def check_browser(browser,phone):
     assert 'Tom Brady' in old.inner_text()
     old.click()
     page.locator('#modal.open #featuredPlayerCard').wait_for(state='visible',timeout=25000)
-    assert 'Brady' in page.locator('#featuredPlayerCard .featured-last').inner_text()
+    page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Brady')",timeout=18000)
     print('PASS',browser.browser_type.name,'phone' if phone else 'desktop',
           'fullscreen search, direct cards, jersey layout, Performance, retired search',flush=True)
     ctx.close()

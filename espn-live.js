@@ -1022,7 +1022,7 @@ async function attachGameLogSnapRates(player,year,games){
   const raw=r?.snapRate??r?.snapPct;
   const n=raw===null||raw===undefined||raw===''?null:Number(raw);
   const snaps=r?.snaps??r?.offenseSnaps,teamSnaps=r?.teamSnaps;
-  let percent=n!==null&&Number.isFinite(n)?(n<=1.5?n*100:n):null;
+  let percent=n!==null&&Number.isFinite(n)?(r?.snapRate===null||r?.snapRate===undefined?(n<=1.5?n*100:n):n):null;
   if(percent===null&&snaps!=null&&teamSnaps>0)percent=100*Number(snaps)/Number(teamSnaps);
   game.snapRate=Number.isFinite(percent)?Math.max(0,Math.min(100,percent)):null;
  }

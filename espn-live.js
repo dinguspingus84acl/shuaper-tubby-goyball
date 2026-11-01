@@ -405,6 +405,7 @@ style.textContent += `
 .espn-profile-gamelog-panel .espn-game-log-table th:nth-child(2),.espn-profile-gamelog-panel .espn-game-log-table td:nth-child(2){position:sticky!important;left:44px!important;z-index:3!important;width:100px!important;min-width:100px!important;max-width:100px!important;background:#061522!important;box-shadow:5px 0 9px #0008}
 @media(max-width:700px){#unifiedGameLogPanel .espn-game-log-table th,#unifiedGameLogPanel .espn-game-log-table td{font-size:12px!important;padding:9px 7px!important}}
 `;
+style.textContent += "\n.espn-game-log-tabs{\n display:flex!important;flex-wrap:nowrap!important;gap:5px!important;\n overflow-x:auto!important;width:100%!important;padding:4px 0 10px!important;\n scrollbar-width:none;-webkit-overflow-scrolling:touch;\n}\n.espn-game-log-tabs::-webkit-scrollbar{display:none}\n.espn-game-log-tabs .espn-game-log-tab{\n flex:0 0 auto;min-height:37px!important;padding:7px 13px!important;\n border-radius:9px!important;border:1px solid #38536b!important;\n background:#11283d!important;color:#a9bfd2!important;\n font-size:12px!important;font-weight:900!important;cursor:pointer;\n}\n.espn-game-log-tabs .espn-game-log-tab.active,\n.espn-game-log-tabs .espn-game-log-tab[aria-pressed=\"true\"]{\n background:#235f87!important;color:#fff!important;\n border-color:#6eaccd!important;box-shadow:inset 0 1px 0 #ffffff1c!important;\n}\n.espn-game-log-tabs .espn-game-log-tab:focus-visible{outline:2px solid #35d07f;outline-offset:2px}\n";
 document.head.appendChild(style);
 
 const section=document.createElement('section');
@@ -808,7 +809,7 @@ function historicalGameLogHtml(player,career,year){
   const yearSelect='<div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" data-hist-gl-year>'+
     years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+
     '</select></div>';
-  const tabs='<div class="espn-game-log-swipe-hint">Swipe across the table to view receiving, rushing and snap stats →</div>';
+  const tabs='<div class="espn-game-log-tabs" role="group" aria-label="Game log category">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" aria-pressed="'+(x.key===mode)+'" data-hist-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
   const title='<div class="espn-game-log-title"><strong>'+seasonRow.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
   const games=Array.isArray(seasonRow.games)?seasonRow.games:[];
   const histGp=Number(seasonRow.gamesPlayed)||games.filter(g=>g?.hasStats).length;
@@ -1191,9 +1192,9 @@ async function fetchGameLog(player,year=SEASON){
   return log;
 }
 function gameLogModesFor(position){
-  if(position==='RB')return [{key:'rush',label:'Rushing'},{key:'rec',label:'Receiving'}];
   if(position==='QB')return [{key:'pass',label:'Passing'},{key:'rush',label:'Rushing'}];
-  return [{key:'rec',label:'Receiving'}];
+  // Players with both rushing and receiving usage can switch between the two views.
+  return [{key:'rush',label:'Rushing'},{key:'rec',label:'Receiving'}];
 }
 function defaultGameLogMode(position){
   return position==='QB'?'pass':position==='RB'?'rush':'rec';
@@ -1203,14 +1204,20 @@ function categoryPoints(g,mode,position){
   return Number(g.totalPoints)||0;
 }
 function gameLogColumns(mode,position){
- // Show all available receiving, rushing, and (for QBs) passing stats in one swipeable table.
  const cols=[{label:'PTS',key:'pts'},{label:'SNAP %',key:'snapRate'}];
- if(position==='QB')cols.push({label:'CMP',key:'completions'},{label:'ATT',key:'passAtt'},
-  {label:'PASS YDS',key:'passYds'},{label:'PASS TD',key:'passTD'},{label:'INT/FUM',key:'turnovers'});
- cols.push({label:'RUSH ATT',key:'rushAtt'},{label:'RUSH YDS',key:'rushYds'},
-  {label:'RUSH TD',key:'rushTD'},{label:'REC',key:'receptions'},{label:'TGT',key:'targets'},
-  {label:'REC YDS',key:'recYds'},{label:'REC TD',key:'recTD'});
- return cols;
+ if(mode==='pass')return cols.concat([
+  {label:'CMP',key:'completions'},{label:'ATT',key:'passAtt'},
+  {label:'YDS',key:'passYds'},{label:'TD',key:'passTD'},
+  {label:'INT/FUM',key:'turnovers'}
+ ]);
+ if(mode==='rush')return cols.concat([
+  {label:'ATT',key:'rushAtt'},{label:'YDS',key:'rushYds'},
+  {label:'TD',key:'rushTD'}
+ ]);
+ return cols.concat([
+  {label:'REC',key:'receptions'},{label:'TGT',key:'targets'},
+  {label:'YDS',key:'recYds'},{label:'TD',key:'recTD'}
+ ]);
 }
 function cleanGameLogOpponent(value){
   return String(value??'')
@@ -1358,7 +1365,7 @@ function gameLogHtml(player,opts={}){
   const yearSelect=showYearSelect?'<div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" data-gl-year-select>'+
     years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+
     '</select></div>':'';
-  const tabs='<div class="espn-game-log-swipe-hint">Swipe across the table to view receiving, rushing and snap stats →</div>';
+  const tabs='<div class="espn-game-log-tabs" role="group" aria-label="Game log category">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" aria-pressed="'+(x.key===mode)+'" data-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
   const title='<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
   const controls='<div class="espn-game-log-controls">'+yearSelect+tabs+'</div>';
   if(!cached)return title+controls+'<div class="espn-game-log-empty">Loading '+year+' game log…</div>';

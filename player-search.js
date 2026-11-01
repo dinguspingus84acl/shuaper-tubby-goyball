@@ -5,6 +5,39 @@ if(window.ShuaPlayerSearch||!document.getElementById('search'))return;
 const key=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let mode='current',historical=null,historicalPromise=null,visible=false,shown=[],version=0;
+let headshots=null,headshotsPromise=null;
+const pictureUrl=value=>{
+ const url=String(value||'').trim();
+ return /^https:\/\/(?:a\.espncdn\.com|sleepercdn\.com|www\.sleepercdn\.com|cdn\.espn\.com)\//i.test(url)?url:'';
+};
+const initials=name=>String(name||'?').trim().split(/\s+/).filter(Boolean).map(part=>part[0]).slice(0,2).join('').toUpperCase();
+function faceUrl(player){
+ const name=player.name||'',id=key(name);
+ const sources=[player.headshot,headshots?.[id]?.[0],headshots?.[id]];
+ if(mode==='current'){
+  try{
+   const sleeper=typeof playerPhotoId==='function'?String(playerPhotoId(name,player.team||'',player.position||'')||''):'';
+   if(/^[a-zA-Z0-9_-]+$/.test(sleeper))sources.push('https://sleepercdn.com/content/nfl/players/thumb/'+sleeper+'.jpg');
+  }catch(_){}
+  const espn=window.ShuaEspnLive?.getPlayerByName?.(name);
+  if(/^\d{5,10}$/.test(String(espn?.id||'')))sources.push('https://a.espncdn.com/i/headshots/nfl/players/full/'+espn.id+'.png');
+ }
+ return sources.map(pictureUrl).find(Boolean)||'';
+}
+function faceHtml(p){
+ const src=faceUrl(p),abbr=esc(initials(p.name));
+ return '<span class="shua-search-avatar">'+
+  (src?'<img class="shua-search-face" alt="" src="'+esc(src)+'" loading="lazy" decoding="async">':'')+
+  '<span class="shua-search-initials"'+(src?' hidden':'')+'>'+abbr+'</span></span>';
+}
+async function loadHeadshots(){
+ if(headshots)return headshots;
+ if(!headshotsPromise)headshotsPromise=fetch('legacy-stats/headshots.json?v=20261101-face1',{cache:'force-cache'})
+  .then(r=>{if(!r.ok)throw Error('No headshot index');return r.json();})
+  .then(d=>{headshots=d?.headshots||{};if(visible)render();return headshots;})
+  .catch(()=>{headshotsPromise=null;return null;});
+ return headshotsPromise;
+}
 const overlay=document.createElement('div');overlay.id='shuaExpandedSearch';overlay.hidden=true;
 overlay.innerHTML='<div class="shua-search-dimmer" data-search-close></div><section class="shua-search-dialog" role="dialog" aria-modal="true" aria-labelledby="shuaSearchTitle">'+
 '<div class="shua-search-header"><h2 id="shuaSearchTitle">Find a player</h2><button type="button" class="shua-search-close" data-search-close aria-label="Close search">×</button></div>'+
@@ -13,11 +46,16 @@ overlay.innerHTML='<div class="shua-search-dimmer" data-search-close></div><sect
 '<p id="shuaSearchStatus" class="shua-search-status" role="status"></p><div class="shua-search-results" id="shuaSearchResults"></div></section>';
 document.body.append(overlay);
 const input=overlay.querySelector('input'),results=overlay.querySelector('#shuaSearchResults'),status=overlay.querySelector('#shuaSearchStatus');
+results.addEventListener('error',event=>{
+ const img=event.target;if(!img?.classList?.contains('shua-search-face'))return;
+ img.hidden=true;const initials=img.parentElement?.querySelector('.shua-search-initials');
+ if(initials)initials.hidden=false;
+},true);
 function current(){
  const all=[];try{if(typeof board!=='undefined')all.push(...board)}catch(_){}
  try{if(typeof players!=='undefined')all.push(...players)}catch(_){}
  const seen=new Set(),out=[];
- for(const p of all){const name=String(p?.name||'').trim(),id=key(name);if(!name||seen.has(id))continue;seen.add(id);out.push({name,position:p.position||'',team:p.team||'',rank:p.overallRank||p.positionRank||null});}
+ for(const p of all){const name=String(p?.name||'').trim(),id=key(name);if(!name||seen.has(id))continue;seen.add(id);out.push({name,position:p.position||'',team:p.team||'',rank:p.overallRank||p.positionRank||null,headshot:pictureUrl(p.headshot||p.headshotUrl)});}
  return out;
 }
 async function loadArchive(){
@@ -32,7 +70,7 @@ async function loadArchive(){
    if(!name||active.has(id)||seen.has(id))continue;
    seen.add(id);
    const years=(meta.years||meta.history?.map(x=>x.year)||[]).map(Number).filter(Number.isFinite);
-   historical.push({name,position:meta.position||meta.history?.[0]?.position||'',lastYear:years.length?Math.max(...years):null});
+   historical.push({name,position:meta.position||meta.history?.[0]?.position||'',lastYear:years.length?Math.max(...years):null,headshot:pictureUrl(meta.headshot||meta.headshots?.[0])});
   }
   return historical;
  }).catch(e=>{historicalPromise=null;throw e;});
@@ -51,9 +89,9 @@ function render(){
  shown=found;
  status.textContent=(mode==='historical'?'Archived NFL players (1999–2025)':'Current ranked players')+' · '+found.length+' results shown';
  results.innerHTML=found.length?found.map((p,i)=>
-  '<button type="button" class="shua-search-result" data-search-player="'+i+'"><span><strong>'+esc(p.name)+'</strong><small>'+
+  '<button type="button" class="shua-search-result" data-search-player="'+i+'">'+faceHtml(p)+'<span class="shua-search-result-copy"><strong>'+esc(p.name)+'</strong><small>'+
   esc(p.position||'')+(p.team?' · '+esc(p.team):'')+(p.rank?' · Rank #'+p.rank:'')+(p.lastYear?' · Last indexed season '+p.lastYear:'')+
-  '</small></span><span aria-hidden="true">›</span></button>').join(''):
+  '</small></span><span class="shua-search-chevron" aria-hidden="true">›</span></button>').join(''):
   '<p class="shua-search-empty">No players found in this list.</p>';
 }
 async function changeMode(next){
@@ -70,7 +108,7 @@ function open(){
  document.body.classList.remove('mobile-menu-open');
  document.body.dataset.shuaSearchOpen='1';
  const suggestions=document.getElementById('suggestions');if(suggestions)suggestions.style.display='none';
- render();requestAnimationFrame(()=>input.focus({preventScroll:true}));
+ render();void loadHeadshots();requestAnimationFrame(()=>input.focus({preventScroll:true}));
 }
 function close(){
  if(!visible)return;visible=false;overlay.hidden=true;delete document.body.dataset.shuaSearchOpen;

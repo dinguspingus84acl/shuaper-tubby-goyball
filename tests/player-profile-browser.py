@@ -32,6 +32,8 @@ def check_browser(browser,phone):
     current=page.locator('[data-search-player]').first
     current.wait_for(state='visible',timeout=12000)
     assert 'Bijan Robinson' in current.inner_text()
+    assert current.locator('.shua-search-avatar').count()==1
+    page.wait_for_function("document.querySelector('.shua-search-result .shua-search-avatar img')!==null",timeout=22000)
     current.click()
     hero=page.locator('#modal.open #featuredPlayerCard')
     hero.wait_for(state='visible',timeout=18000)
@@ -41,8 +43,9 @@ def check_browser(browser,phone):
     a=hero.locator('.featured-last').bounding_box()
     b=hero.locator('.featured-jersey-number').bounding_box()
     if a and b:
-        assert a['y']+a['height']<=b['y']+2 or b['y']+b['height']<=a['y']+2 or \
-            a['x']+a['width']<=b['x']+2 or b['x']+b['width']<=a['x']+2,'Jersey overlaps name'
+        assert b['x']>=a['x']+a['width']-3,('Jersey must be right of surname',a,b)
+        assert abs((b['y']+b['height'])-(a['y']+a['height']))<=13,('Jersey should align with surname',a,b)
+        assert not (a['x']+a['width']>b['x']+3 and a['y']+a['height']>b['y']),'Jersey overlaps name'
     page.locator('[data-profile-tab="performance"]').click()
     performance=page.locator('#unifiedPerformancePanel')
     performance.wait_for(state='visible',timeout=10000)
@@ -51,10 +54,21 @@ def check_browser(browser,phone):
     page.locator('[data-profile-tab="gamelog"]').click()
     table=page.locator('#unifiedGameLogPanel .espn-game-log-table')
     table.wait_for(state='visible',timeout=25000)
-    headings=table.locator('thead th').all_inner_texts()
-    for column in ['SNAP %','REC','TGT','REC YDS','REC TD','RUSH ATT','RUSH YDS']:
-        assert column in headings,('Missing game log column '+column,headings)
-    assert page.locator('#unifiedGameLogPanel [data-gl-mode]').count()==0
+    tabs=page.locator('#unifiedGameLogPanel [data-gl-mode]')
+    assert tabs.count()==2,'Missing Rushing/Receiving controls'
+    assert [x.inner_text() for x in tabs.all()]==['Rushing','Receiving']
+    assert page.locator('#unifiedGameLogPanel [data-gl-mode="rush"]').get_attribute('aria-pressed')=='true'
+    rush_columns=table.locator('thead th').all_inner_texts()
+    for column in ['PTS','SNAP %','ATT','YDS','TD']:
+        assert column in rush_columns,('Missing rushing field '+column,rush_columns)
+    assert 'REC' not in rush_columns,'Rushing tab should not show receiving fields'
+    page.locator('#unifiedGameLogPanel [data-gl-mode="rec"]').click()
+    table=page.locator('#unifiedGameLogPanel .espn-game-log-table')
+    receive_columns=table.locator('thead th').all_inner_texts()
+    for column in ['PTS','SNAP %','REC','TGT','YDS','TD']:
+        assert column in receive_columns,('Missing receiving field '+column,receive_columns)
+    assert 'ATT' not in receive_columns,'Receiving tab should not show rushing attempts'
+    assert page.locator('#unifiedGameLogPanel [data-gl-mode="rec"]').get_attribute('aria-pressed')=='true'
     if phone:
         dims=page.locator('#unifiedGameLogPanel .espn-game-log-table-wrap').evaluate('(el)=>({total:el.scrollWidth,visible:el.clientWidth})')
         assert dims['total']>dims['visible'],('Game log must swipe horizontally',dims)
@@ -68,8 +82,31 @@ def check_browser(browser,phone):
     old.click()
     page.locator('#modal.open #featuredPlayerCard').wait_for(state='visible',timeout=25000)
     page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Brady')",timeout=18000)
+    page.locator('#close').evaluate('(e)=>e.click()')
+    if phone:
+        page.locator('#phoneMenuButton').click()
+        page.locator('#phoneMenuItems [data-target="ANALYTICS"]').click()
+    else:page.locator('.positions [data-pos="ANALYTICS"]').click()
+    page.wait_for_function('window.ShuaStudio?.UI?.navigate !== undefined',timeout=25000)
+    page.evaluate("window.ShuaStudio.UI.navigate('consistency')")
+    analytic=page.locator('#stGlobalSearch')
+    analytic.wait_for(state='visible',timeout=30000)
+    assert page.locator('.st-global-search-inputrow .st-global-search-icon').is_visible()
+    analytic.fill('Bijan')
+    suggestions=page.locator('#stGlobalPlayerMatches [data-st-open]')
+    suggestions.first.wait_for(state='visible',timeout=12000)
+    assert 'Bijan' in suggestions.first.inner_text()
+    assert suggestions.first.locator('.st-global-player-face').count()==1
+    assert page.locator('[data-st-clear-search]').is_visible()
+    page.locator('[data-st-clear-search]').click()
+    assert analytic.input_value()==''
+    analytic.fill('Bijan')
+    suggestions=page.locator('#stGlobalPlayerMatches [data-st-open]')
+    suggestions.first.wait_for(state='visible',timeout=12000)
+    suggestions.first.click()
+    page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Robinson')",timeout=18000)
     print('PASS',browser.browser_type.name,'phone' if phone else 'desktop',
-          'fullscreen search, direct cards, jersey layout, Performance, retired search',flush=True)
+          'inline number, rushing/receiving tabs, headshot search and clean Analytics search',flush=True)
     ctx.close()
 
 def check_rosters(browser):

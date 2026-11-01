@@ -411,6 +411,7 @@ style.textContent=`
   .unified-stat-item{flex:0 0 92px}
 }
 `;
+style.textContent += "/* Jersey number sits next to the surname, without overlaying any text. */\n.featured-player-card .featured-name{max-width:100%;min-width:0;padding-right:0!important}\n.featured-player-card .featured-first{padding-right:0!important}\n.featured-player-card .featured-last-row{\n display:flex!important;flex-flow:row nowrap!important;align-items:flex-end!important;\n width:fit-content;max-width:100%;min-width:0;gap:clamp(4px,1vw,10px)!important;\n}\n.featured-player-card .featured-last{\n flex:0 1 auto;min-width:0;max-width:100%;white-space:normal!important;\n overflow-wrap:anywhere!important;word-break:normal!important;line-height:1.03;\n}\n.featured-player-card .featured-last-row .featured-jersey-number{\n position:static!important;inset:auto!important;display:inline-block!important;\n flex:0 0 auto!important;align-self:flex-end!important;\n background:transparent!important;border:0!important;border-radius:0!important;\n padding:0 0 2px!important;line-height:1.05!important;\n font-size:clamp(.8rem,1.2vw,1.05rem)!important;\n color:var(--featured-accent)!important;white-space:nowrap!important;pointer-events:none\n}\n.featured-player-card .featured-jersey-number:empty{display:none!important}\n@media(max-width:760px){\n .featured-player-card .featured-last-row{gap:5px!important}\n .featured-player-card .featured-last-row .featured-jersey-number{font-size:.7rem!important;padding-bottom:1px!important}\n}\n.phone-mode .featured-player-card .featured-last-row{gap:6px!important;max-width:100%}\n.phone-mode .featured-player-card .featured-last-row .featured-jersey-number{font-size:.86rem!important;padding-bottom:2px!important}\n";
 document.head.appendChild(style);
 
 function playerByName(name){
@@ -820,8 +821,7 @@ function applyFeaturedProfile(name,seed=null){
       '</div>'+
     '</div>'+
     '<div class="featured-right">'+
-      '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span></span></h2>'+ 
-       '<span class="featured-jersey-number" aria-label="Jersey number"></span>'+
+      '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span><span class="featured-jersey-number" aria-label="Jersey number"></span></span></h2>'+
       '<div class="featured-bio">'+
         (defense?stat('POSITION','D/ST')+stat('TEAM',team)+stat('SEASON','2026')+stat('TYPE','DEFENSE')
           :historical

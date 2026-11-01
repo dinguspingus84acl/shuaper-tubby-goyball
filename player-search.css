@@ -27,3 +27,28 @@
 #shuaExpandedSearch #shuaSearchQuery{height:51px;font-size:18px}
 .shua-search-desktop-launch{display:none!important}
 }
+
+
+/* Search results now use the player's verified headshot, with initials if absent. */
+#shuaExpandedSearch .shua-search-result{justify-content:flex-start;gap:11px;padding:9px 12px}
+#shuaExpandedSearch .shua-search-avatar{
+ position:relative;display:flex;align-items:center;justify-content:center;
+ flex:0 0 41px;width:41px;height:41px;overflow:hidden;
+ border:1px solid #51748f;border-radius:50%;background:linear-gradient(145deg,#214962,#0a263c);
+}
+#shuaExpandedSearch .shua-search-avatar .shua-search-face{
+ display:block;width:100%;height:100%;object-fit:cover;object-position:center 16%;border-radius:50%;
+}
+#shuaExpandedSearch .shua-search-avatar .shua-search-initials{
+ display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+ color:#e7f2f9;font:950 12px/1 system-ui,sans-serif;letter-spacing:.015em;
+}
+#shuaExpandedSearch .shua-search-avatar [hidden]{display:none!important}
+#shuaExpandedSearch .shua-search-result-copy{display:flex;flex:1 1 auto;min-width:0;flex-direction:column;align-items:flex-start}
+#shuaExpandedSearch .shua-search-result-copy strong{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#shuaExpandedSearch .shua-search-result-copy small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#shuaExpandedSearch .shua-search-chevron{flex:0 0 auto;margin-left:auto;color:#76cbab;font-size:23px}
+@media(max-width:700px){
+ #shuaExpandedSearch .shua-search-avatar{flex-basis:38px;width:38px;height:38px}
+ #shuaExpandedSearch .shua-search-result{gap:9px;padding:9px 10px}
+}

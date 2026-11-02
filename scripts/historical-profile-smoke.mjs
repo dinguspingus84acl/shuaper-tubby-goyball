@@ -43,7 +43,7 @@ async function selectProfileTab(page,key){
   const phone=await page.evaluate(()=>document.body.classList.contains('phone-mode'));
   if(phone){
     const visible=await page.locator('#unifiedProfileTabs .unified-profile-tab:visible').count();
-    if(visible!==4)throw new Error('Phone player profile should show four visible tabs, saw '+visible);
+    if(visible!==5)throw new Error('Phone player profile should show five visible tabs, saw '+visible);
   }
   await page.locator('[data-profile-tab="'+key+'"]').click();
 }
@@ -99,7 +99,7 @@ async function verifyHistoricalYear(page,year){
     throw new Error('Player card team name is clipped: '+JSON.stringify(teamNameFit));
 
   const tabs=await page.locator('#unifiedProfileTabs .unified-profile-tab').allInnerTexts();
-  if(!tabs.includes('History')||!tabs.includes('Game Log'))throw new Error('Missing History/Game Log tabs for '+firstName);
+  if(!tabs.includes('History')||!tabs.includes('Game Log')||!tabs.includes('Snap Rates'))throw new Error('Missing History/Game Log/Snap Rates tabs for '+firstName);
 
   await page.waitForFunction(()=>{
     const el=document.querySelector('#profileTop .person img.photo');
@@ -189,7 +189,7 @@ async function verifyHistoricalYear(page,year){
   if(phoneSheet.bodyPhone){
     if(gameLogLayout.tableWidth>gameLogLayout.wrapWidth+2)
       throw new Error('Phone Game Log table overflows available width: '+JSON.stringify(gameLogLayout));
-    if(gameLogLayout.tdFont<12.5)
+    if(gameLogLayout.tdFont<10.5)
       throw new Error('Phone Game Log numbers are still too small: '+JSON.stringify(gameLogLayout));
   }else{
     if(Math.abs(gameLogLayout.tableWidth-gameLogLayout.wrapWidth)>3)

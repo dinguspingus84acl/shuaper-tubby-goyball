@@ -29,16 +29,20 @@ for(const pos of ['RB','WR','TE','QB']){
  assert.equal(Array.from(modes(pos),x=>x.key).join(','),expected.join(','),'Wrong mode buttons for '+pos);
  for(const mode of expected){
   const keys=Array.from(columns(mode,pos),x=>x.key);
-  assert.equal(keys[0],'pts');assert.equal(keys[1],'snapRate');
-  if(mode==='rush')assert.equal(keys.join(','),'pts,snapRate,rushAtt,rushYds,rushTD');
-  if(mode==='rec')assert.equal(keys.join(','),'pts,snapRate,receptions,targets,recYds,recTD');
-  if(mode==='pass')assert.equal(keys.join(','),'pts,snapRate,completions,passAtt,passYds,passTD,turnovers');
+  assert.equal(keys[0],'pts');assert.ok(!keys.includes('snapRate'),'Snap rate belongs in its own tab');
+  if(mode==='rush')assert.equal(keys.join(','),'pts,rushAtt,rushYds,rushTD');
+  if(mode==='rec')assert.equal(keys.join(','),'pts,receptions,targets,recYds,recTD');
+  if(mode==='pass')assert.equal(keys.join(','),'pts,completions,passAtt,passYds,passTD,turnovers');
  }
 }
 assert.ok(espn.includes('data-gl-mode=')&&espn.includes('data-hist-gl-mode='),'Both current and historical game logs need controls');
 assert.ok(espn.includes('attachGameLogSnapRates')&&history.includes('getWeeklySnapRates'),'Keep verified snap rates');
 assert.ok(espn.includes("g.snapRate===null||g.snapRate===undefined"),'Missing snaps must not be shown as zero');
-assert.ok(espn.includes('width:max-content!important'),'Keep swipeable tables');
+assert.ok(profile.includes("['snaps','Snap Rates']")&&profile.includes('id="unifiedSnapsPanel"'),'Snap rates need their own profile tab');
+assert.ok(espn.includes('async function renderSnapRatesData')&&espn.includes('data-snap-year'),'Snap Rates tab needs weekly data and season selection');
+assert.ok(espn.includes('overflow-x:hidden!important')&&espn.includes('table-layout:fixed!important'),'Game log should fit without sideways scrolling');
+assert.ok(profile.includes('ensurePlayerSwipePreview(target)')&&profile.includes("translate3d('+shift+'px,0,0)"),'Swipe must move with the finger and preview next player');
+assert.ok(profile.includes('featured-name-ladd'),'Ladd surname must stay on one line');
 assert.ok(search.includes('faceHtml(p)')&&search.includes('legacy-stats/headshots.json'),'Search must use player photos');
 assert.ok(search.includes('shua-search-initials')&&search.includes('shua-search-face'),'Initials fallback required');
 assert.ok(searchCss.includes('.shua-search-avatar')&&searchCss.includes('[hidden]{display:none!important}'),'Search avatar styling');
@@ -50,9 +54,9 @@ assert.ok(studioCss.includes('st-global-search-inputrow')&&studioCss.includes('s
 assert.ok(studio.includes('stGlobalLeadingAvatar')&&studio.includes('setAnalyticsLeadingAvatar(options[0]||null)'),'Analytics input needs a face preview');
 assert.ok(studio.includes("magnifier.toggleAttribute('hidden',!!player)"),'Analytics magnifier must actually hide as an SVG attribute');
 assert.ok(studioCss.includes('.st-global-leading-avatar'),'Analytics leading face styling required');
-assert.ok(html.includes('unified-profile.js?v=20261101-inline-jersey4')&&html.includes('player-search.js?v=20261101-input-face5'));
-assert.ok(html.includes('espn-live.js?v=20261101-gamelog-categories4')&&html.includes('analytics-dashboard.js?v=20261101-input-face5'));
+assert.ok(html.includes('unified-profile.js?v=20261101-drag-player-card1')&&html.includes('player-search.js?v=20261101-input-face5'));
+assert.ok(html.includes('espn-live.js?v=20261101-snap-tab-fixed-log1')&&html.includes('analytics-dashboard.js?v=20261101-input-face5'));
 assert.ok(loader.includes("const version = '20261101-input-face5'"));
 assert.ok(live.includes("credentials:'omit'")&&live.includes('view=mTeam&view=mRoster&view=mStatus'));
 assert.ok(live.includes('visibilitychange')&&live.includes('lastSuccess'));
-console.log('PASS: inline jersey, restored game-log category buttons, snap %, face search, clean Analytics search, and unchanged private-roster safeguards.');
+console.log('PASS: inline jersey, two-line Ladd name, fixed game-log category tables, separate Snap Rates tab, interactive swipe, and existing search/roster safeguards.');

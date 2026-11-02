@@ -62,19 +62,25 @@ def check_browser(browser,phone):
     assert [x.inner_text() for x in tabs.all()]==['Rushing','Receiving']
     assert page.locator('#unifiedGameLogPanel [data-gl-mode="rush"]').get_attribute('aria-pressed')=='true'
     rush_columns=table.locator('thead th').all_inner_texts()
-    for column in ['PTS','SNAP %','ATT','YDS','TD']:
+    for column in ['PTS','ATT','YDS','TD']:
         assert column in rush_columns,('Missing rushing field '+column,rush_columns)
+    assert 'SNAP %' not in rush_columns,'Snap rate must be on its own tab'
     assert 'REC' not in rush_columns,'Rushing tab should not show receiving fields'
     page.locator('#unifiedGameLogPanel [data-gl-mode="rec"]').click()
     table=page.locator('#unifiedGameLogPanel .espn-game-log-table')
     receive_columns=table.locator('thead th').all_inner_texts()
-    for column in ['PTS','SNAP %','REC','TGT','YDS','TD']:
+    for column in ['PTS','REC','TGT','YDS','TD']:
         assert column in receive_columns,('Missing receiving field '+column,receive_columns)
     assert 'ATT' not in receive_columns,'Receiving tab should not show rushing attempts'
     assert page.locator('#unifiedGameLogPanel [data-gl-mode="rec"]').get_attribute('aria-pressed')=='true'
     if phone:
         dims=page.locator('#unifiedGameLogPanel .espn-game-log-table-wrap').evaluate('(el)=>({total:el.scrollWidth,visible:el.clientWidth})')
-        assert dims['total']>dims['visible'],('Game log must swipe horizontally',dims)
+        assert dims['total']<=dims['visible']+2,('Game log should fit without horizontal swiping',dims)
+    page.locator('[data-profile-tab="snaps"]').click()
+    snap=page.locator('#unifiedSnapsPanel')
+    snap.locator('.espn-snap-table').wait_for(state='visible',timeout=30000)
+    assert 'SNAP %' in snap.locator('thead th').all_inner_texts(),'Snap rate column missing on Snap Rates tab'
+    assert snap.locator('tbody tr').count()>0,'Snap Rates tab has no weekly records'
     # A surname long enough to wrap on smaller phones must still leave #11 to its right.
     page.evaluate("window.openUnifiedPlayerProfileByName('Jaxon Smith-Njigba')")
     page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Smith-Njigba')",timeout=18000)

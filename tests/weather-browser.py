@@ -36,9 +36,17 @@ def open_weather(page, phone, url):
 def check_weather(page, phone, url):
     open_weather(page, phone, url)
     weather = page.locator("#shuaWeatherSection")
+    assert weather.locator("#wxFreshness").is_visible()
+    assert "automatically checks" in weather.locator("#wxFreshness").inner_text()
     weather.locator('[data-wx-filter="ready"]').click()
     assert weather.locator(".wx-game").count() == AVAILABLE
     if AVAILABLE:
+        preview = weather.locator(".wx-game .wx-hour-preview").first
+        assert preview.is_visible(), "Hours and emojis should be visible without expanding anything"
+        assert preview.locator(".wx-preview-hour").count() >= 1
+        assert ":" in preview.locator(".wx-preview-hour strong").first.inner_text()
+        assert preview.locator(".wx-preview-hour small").first.inner_text() in ("AM", "PM")
+        assert preview.locator('.wx-preview-sky[role="img"]').count() >= 1
         weather.locator(".wx-game .wx-details summary").first.click()
         assert weather.get_by_text("NWS hourly forecast").first.is_visible()
         nws = weather.locator(".wx-hourly-block").first

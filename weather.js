@@ -27,7 +27,7 @@
   const safeLogo=url=>/^https:\/\/a\.espncdn\.com\/i\/teamlogos\/nfl\//.test(url||'')?url:'';
   const logo=team=>safeLogo(team.logo)?'<img class="wx-team-logo" src="'+escape(safeLogo(team.logo))+'" alt="" loading="lazy">':'';
   const filters=[['all','All games'],['watch','Weather watch'],['ready','Forecasts'],['pending','Pending']];
-  let snapshot=null,loading=false,visible=false,filter='all',search='',error='';
+  let snapshot=null,loading=false,visible=false,filter='all',search='',error='',lastFetchedAt=0,refreshTimer=null;
 
   // Independent fantasy-football guidance. These thresholds are OUR heuristic,
   // not a forecast or a betting recommendation from MySportsWeather/Kevin Roth.
@@ -110,6 +110,19 @@
     const width=hours.length>5?' style="min-width:'+(80+hours.length*61)+'px"':'';
     return '<div class="wx-hourly-block"><div class="wx-hourly-block-heading"><h4>'+escape(title)+'</h4><span>Hour by hour · ET</span></div><div class="wx-hourly-scroll"><table class="wx-hourly-table"'+width+'><thead><tr><th scope="col" class="wx-hour-label">HOUR<br>ET</th>'+headings+'</tr></thead><tbody>'+fields.filter(([key])=>hours.some(h=>h[key]!==undefined&&h[key]!==null)).map(([key,label,suffix])=>'<tr><th scope="row">'+label+'</th>'+hours.map(h=>'<td class="'+(h.inGame?'wx-in-game':'')+'">'+(h[key]===undefined||h[key]===null?'—':escape(String(h[key]))+suffix)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div></div>';
   }
+  function hourlyPreview(f){
+    const hours=(f.hourly||[]).slice(0,5);
+    if(!hours.length)return '';
+    return '<div class="wx-hour-preview" aria-label="Hourly forecast at a glance">'+
+      '<div class="wx-preview-label"><strong>HOURLY FORECAST</strong><span>Eastern time · Tap below for details</span></div>'+
+      '<div class="wx-preview-hours">'+hours.map(h=>{
+        const time=hourClock(h.time),sky=skyConditions[String(h.sky||'').toLowerCase()];
+        return '<div class="wx-preview-hour '+(h.inGame?'wx-preview-playing':'')+'" aria-label="'+escape(time.spoken+(sky?' · '+sky.label:'')+(number(h.tempF)!==null?' · '+h.tempF+' degrees Fahrenheit':''))+'">'+
+          '<strong>'+escape(time.clock)+'</strong><small>'+escape(time.period)+'</small>'+
+          '<span class="wx-preview-sky" role="img" aria-label="'+escape(sky?.label||'Condition unavailable')+'">'+(sky?.emoji||'—')+'</span>'+
+          '<b>'+display(h.tempF,'°')+'</b></div>';
+      }).join('')+'</div></div>';
+  }
 
   function gameCard(game){
     const f=game.forecast,r=risk(game),isPending=!f;
@@ -121,12 +134,12 @@
         [f.precipType==='Snow'?'Snow chance':'Rain chance',display(f.precipPct,'%'),'rain']
       ].map(([label,value,klass])=>'<div class="wx-metric wx-'+klass+'"><span>'+escape(label)+'</span><strong>'+escape(value)+'</strong></div>').join('')+'</div>';
     const skyByTime=new Map((f?.hourly||[]).filter(h=>h.sky).map(h=>[h.time,h.sky]));
-    const details=f&&(f.hourly?.length||f.nbmHourly?.length)?'<details class="wx-details"><summary>Hourly game forecast <span aria-hidden="true">⌄</span></summary>'+hourTable(f.hourly,'NWS hourly forecast',skyByTime)+hourTable(f.nbmHourly,'NBM higher-resolution forecast',skyByTime)+'</details>':'';
+    const details=f&&(f.hourly?.length||f.nbmHourly?.length)?'<details class="wx-details"><summary>Full hourly weather data <span aria-hidden="true">⌄</span></summary>'+hourTable(f.hourly,'NWS hourly forecast',skyByTime)+hourTable(f.nbmHourly,'NBM higher-resolution forecast',skyByTime)+'</details>':'';
     return '<article class="wx-game" data-weather-game="'+escape(game.id)+'">'+
       '<div class="wx-game-top"><div class="wx-kick">Week '+escape(game.week??'—')+' <span>·</span> '+escape(formatDate(game.kickoffUtc))+'</div><span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div>'+
       '<div class="wx-matchup"><div class="wx-team">'+logo(game.away)+'<span><b>'+escape(game.away.abbr)+'</b><small>'+escape(game.away.name)+'</small></span></div><span class="wx-versus">AT</span><div class="wx-team">'+logo(game.home)+'<span><b>'+escape(game.home.abbr)+'</b><small>'+escape(game.home.name)+'</small></span></div></div>'+
       '<div class="wx-venue">'+escape(game.venue||'Venue TBA')+(game.city?' · '+escape(game.city):'')+(game.indoor?' <span class="wx-dome">Indoor / roof venue</span>':'')+'</div>'+
-      summary+'<div class="wx-analysis"><span>FANTASY WEATHER ANALYSIS</span><p>'+escape(analysis(game))+'</p>'+(f&&trend(f)?'<small>'+escape(trend(f))+'</small>':'')+'</div>'+details+
+      summary+(f?hourlyPreview(f):'')+'<div class="wx-analysis"><span>FANTASY WEATHER ANALYSIS</span><p>'+escape(analysis(game))+'</p>'+(f&&trend(f)?'<small>'+escape(trend(f))+'</small>':'')+'</div>'+details+
       '<a class="wx-source-link" href="'+escape(safeLink(f?.sourceUrl))+'" target="_blank" rel="noopener noreferrer">'+(f?'View forecast':'Check forecast')+' on MySportsWeather <span aria-hidden="true">↗</span></a>'+
       '</article>';
   }
@@ -137,6 +150,7 @@
     const ready=all.filter(game=>game.forecast),watch=all.filter(game=>['watch','high'].includes(risk(game).level));
     const stats=section.querySelector('#wxOverview');
     stats.innerHTML=[['Upcoming games',all.length],['Forecasts available',ready.length],['Weather watch',watch.length],['Awaiting forecast',all.length-ready.length]].map(([label,n])=>'<div class="wx-stat"><strong>'+n+'</strong><span>'+label+'</span></div>').join('');
+    section.querySelector('#wxFreshness').innerHTML='<strong>'+ready.length+' published forecast'+(ready.length===1?'':'s')+' currently available</strong><span>Last checked '+escape(formatUpdated(snapshot.generatedAt))+' · '+(all.length-ready.length)+' games awaiting MySportsWeather predictions. The tab automatically checks for updates while open.</span>';
     const buttons=section.querySelector('#wxFilters');
     buttons.innerHTML=filters.map(([value,label])=>'<button type="button" data-wx-filter="'+value+'" aria-pressed="'+(filter===value)+'">'+label+'</button>').join('');
     const query=search.trim().toLowerCase();
@@ -155,6 +169,7 @@
     section.innerHTML='<div class="wx-container">'+
       '<header class="wx-hero"><div><p class="wx-eyebrow">NFL · GAME DAY CONDITIONS</p><h2>Weather</h2><p class="wx-sub">Game-by-game weather impact for fantasy football, based on MySportsWeather forecasts.</p></div><button type="button" class="wx-refresh" id="wxRefresh">↻ Refresh</button></header>'+
       '<div class="wx-overview" id="wxOverview"></div>'+
+      '<div class="wx-freshness" id="wxFreshness" role="status"></div>'+
       '<div class="wx-controls"><label class="wx-search"><span aria-hidden="true">⌕</span><input id="wxSearch" type="search" placeholder="Search team or stadium" aria-label="Search NFL matchups" autocomplete="off"></label><div class="wx-filters" id="wxFilters"></div></div>'+
       '<div class="wx-game-count" id="wxResultCount"></div><div class="wx-games" id="wxGames"></div>'+
       '<footer class="wx-footer"><p><strong>Forecast source:</strong> <a href="https://mysportsweather.com/nfl" target="_blank" rel="noopener noreferrer">MySportsWeather by Kevin Roth</a>, including its NWS and NBM hourly data. <strong>Schedule:</strong> ESPN. Fantasy impact labels and analysis are our own weather-based estimates, not Kevin Roth’s recommendations.</p><p id="wxUpdated"></p><p>Forecasts change as kickoff approaches. Pending games have no MySportsWeather prediction yet—no weather conditions are assumed for them.</p></footer></div>';
@@ -175,7 +190,7 @@
       if(!response.ok)throw new Error('Forecast data request failed ('+response.status+')');
       const data=await response.json();
       if(!Array.isArray(data.games))throw new Error('Invalid NFL weather data');
-      snapshot=data;error='';
+      snapshot=data;error='';lastFetchedAt=Date.now();
       renderList();
       section.querySelector('#wxUpdated').textContent='Weather data updated '+formatUpdated(data.generatedAt)+'. The source is scheduled to be checked about every two hours.';
     }catch(err){
@@ -195,9 +210,22 @@
     section.hidden=false;
     nav.querySelectorAll('.pos').forEach(b=>b.classList.toggle('active',b===button));
     if(!section.querySelector('#wxGames'))renderShell();
-    if(snapshot)renderList();else load();
+    if(snapshot)renderList();
+    if(!snapshot||Date.now()-lastFetchedAt>120000)void load();
+    if(!refreshTimer)refreshTimer=setInterval(()=>{
+      if(visible&&document.visibilityState==='visible'&&Date.now()-lastFetchedAt>300000)void load();
+    },60000);
   }
-  function hide(){visible=false;document.body.classList.remove('shua-weather-open');section.hidden=true;button.classList.remove('active');}
+  function hide(){
+    visible=false;
+    document.body.classList.remove('shua-weather-open');
+    section.hidden=true;
+    button.classList.remove('active');
+    if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null;}
+  }
+  document.addEventListener('visibilitychange',()=>{
+    if(visible&&document.visibilityState==='visible'&&Date.now()-lastFetchedAt>120000)void load();
+  });
   document.addEventListener('click',event=>{
     const target=event.target.closest?.('.positions [data-pos],#phoneMenuItems [data-target]');
     if(!target||!visible)return;

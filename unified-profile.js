@@ -684,6 +684,7 @@ function featuredFaceHtml(player){
     return url?'<img class="featured-photo featured-defense-logo" src="'+url+'" alt="'+String(player?.team||'')+' defense logo">':'<span class="featured-photo fallback">D/ST</span>';
   }
   const urls=[];
+  urls.push(...(window.ShuaPlayerFaces?.urls(player?.name||'')||[]));
   try{
     if(typeof playerPhotoId==='function'){
       const sid=playerPhotoId(player?.name||'',player?.team||'',player?.position||'');

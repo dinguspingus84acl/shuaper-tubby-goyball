@@ -501,6 +501,7 @@ function faceUrlList(value){
 }
 function playerFaceCandidates(player){
   const urls=[];
+  urls.push(...(window.ShuaPlayerFaces?.urls(player?.name||'')||[]));
   urls.push(...faceUrlList(player?.headshots));
   urls.push(...faceUrlList(player?.headshot));
   try{

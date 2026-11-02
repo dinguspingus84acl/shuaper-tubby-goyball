@@ -13,7 +13,7 @@ const pictureUrl=value=>{
 const initials=name=>String(name||'?').trim().split(/\s+/).filter(Boolean).map(part=>part[0]).slice(0,2).join('').toUpperCase();
 function faceUrl(player){
  const name=player.name||'',id=key(name);
- const sources=[player.headshot,headshots?.[id]?.[0],headshots?.[id]];
+ const sources=[window.ShuaPlayerFaces?.url(name),player.headshot,headshots?.[id]?.[0],headshots?.[id]];
  if(mode==='current'){
   try{
    const sleeper=typeof playerPhotoId==='function'?String(playerPhotoId(name,player.team||'',player.position||'')||''):'';

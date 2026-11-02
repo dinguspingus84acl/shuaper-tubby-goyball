@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   if (window.ShuaStudioLoader) return;
-  const version = '20261101-input-face5';
+  const version = '20261102-facefix1';
   const base = new URL('.', document.currentScript.src);
   const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js',
     'analytics/intelligence.js', 'analytics/intelligence-view.js',

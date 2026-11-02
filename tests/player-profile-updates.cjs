@@ -62,10 +62,26 @@ assert.ok(studioCss.includes('st-global-search-inputrow')&&studioCss.includes('s
 assert.ok(studio.includes('stGlobalLeadingAvatar')&&studio.includes('setAnalyticsLeadingAvatar(options[0]||null)'),'Analytics input needs a face preview');
 assert.ok(studio.includes("magnifier.toggleAttribute('hidden',!!player)"),'Analytics magnifier must actually hide as an SVG attribute');
 assert.ok(studioCss.includes('.st-global-leading-avatar'),'Analytics leading face styling required');
-assert.ok(html.includes('unified-profile.js?v=20261101-two-line-names2')&&html.includes('player-search.js?v=20261101-search-all-tabs3'));
-assert.ok(html.includes('espn-live.js?v=20261101-snap-log-format3')&&html.includes('analytics-dashboard.js?v=20261101-input-face5'));
-assert.ok(html.includes('player-search.js?v=20261101-search-all-tabs3')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
-assert.ok(loader.includes("const version = '20261101-input-face5'"));
+assert.ok(html.includes('unified-profile.js?v=20261102-facefix1')&&html.includes('player-search.js?v=20261102-facefix1'));
+assert.ok(html.includes('espn-live.js?v=20261102-facefix1')&&html.includes('analytics-dashboard.js?v=20261102-facefix1'));
+assert.ok(html.includes('player-search.js?v=20261102-facefix1')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
+assert.ok(loader.includes("const version = '20261102-facefix1'"));
+const faces=read('player-face-fix.js');
+new vm.Script(faces,{filename:'player-face-fix.js'});
+for(const id of ['4685278','3126486','4870653','4723820','4686658','4685307'])
+ assert.ok(faces.includes(id),'Missing a verified 2026 ESPN portrait ID: '+id);
+const faceContext={window:{},document:{body:null},fetch:()=>Promise.reject(Error('offline'))};
+vm.runInNewContext(faces,faceContext);
+for(const [name,id] of [['Luther Burden','4685278'],['Luther Burden III','4685278'],
+ ['Deebo Samuel','3126486'],['Deebo Samuel Sr.','3126486'],
+ ['Omar Cooper','4723820'],['Kevin Coleman','4685307'],
+ ['Chigoziem Okonkwo','4360635'],['KC Concepcion','4870653']])
+ assert.equal(faceContext.window.ShuaPlayerFaces.verifiedUrl(name),
+  'https://a.espncdn.com/i/headshots/nfl/players/full/'+id+'.png',
+  'Suffix-safe official portrait resolution failed for '+name);
+assert.ok(html.includes('player-face-fix.js?v=20261102-face1'),'Global face repair must be loaded');
+assert.ok(profile.includes('window.ShuaPlayerFaces?.urls')&&espn.includes('window.ShuaPlayerFaces?.urls'),'Player cards must use verified portraits');
+assert.ok(search.includes('window.ShuaPlayerFaces?.url'),'Search must use verified portraits');
 assert.ok(live.includes("credentials:'omit'")&&live.includes('view=mTeam&view=mRoster&view=mStatus'));
 assert.ok(live.includes('visibilitychange')&&live.includes('lastSuccess'));
 console.log('PASS: inline jersey, all two-line names, larger fixed game-log tables, rushing-style Snap Rates, global search on every tab, interactive swipe, and existing search/roster safeguards.');

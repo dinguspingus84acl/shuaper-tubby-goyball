@@ -261,7 +261,7 @@ style.textContent=`
   margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
 .featured-player-profile .unified-profile-tabs{
-  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;
   margin-top:0;padding:6px;border:1px solid #ffffff18;border-top:0;
   border-radius:0 0 12px 12px;background:#07111de8
 }
@@ -337,7 +337,7 @@ style.textContent=`
   grid-template-columns:43% 57%;border-radius:15px 15px 0 0
 }
 .phone-mode #modal .player-swipe-preview .unified-profile-tabs{
-  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;
   margin:0 8px;padding:5px;border:1px solid #ffffff18;border-top:0;
   border-radius:0 0 11px 11px;background:#07111de8
 }
@@ -390,14 +390,14 @@ style.textContent=`
 .phone-mode .featured-player-card .featured-bio-value{font-size:.9rem;margin-top:4px}
 .phone-mode .featured-player-profile .unified-profile-tabs{
   position:sticky;top:var(--sticky-player-name-height,0px);z-index:20;
-  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important;
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;
   width:calc(100% - 16px);margin:0 8px!important;padding:5px!important;
   border-radius:0 0 11px 11px!important;
   box-shadow:0 8px 18px #0007
 }
 .phone-mode .featured-player-profile .unified-profile-tab{
   display:block!important;width:100%!important;min-width:0!important;min-height:36px!important;
-  padding:7px 1px!important;font-size:.49rem!important;white-space:nowrap!important
+  padding:7px 1px!important;font-size:.63rem!important;white-space:nowrap!important
 }
 .phone-mode .featured-player-profile #unifiedProfilePanels{
   min-height:calc(100dvh - 316px);
@@ -430,8 +430,12 @@ style.textContent=`
 `;
 style.textContent += "/* Jersey number sits next to the surname, without overlaying any text. */\n.featured-player-card .featured-name{max-width:100%;min-width:0;padding-right:0!important}\n.featured-player-card .featured-first{padding-right:0!important}\n.featured-player-card .featured-last-row{\n display:flex!important;flex-flow:row nowrap!important;align-items:flex-end!important;\n width:fit-content;max-width:100%;min-width:0;gap:clamp(4px,1vw,10px)!important;\n}\n.featured-player-card .featured-last{\n flex:0 1 auto;min-width:0;max-width:100%;white-space:normal!important;\n overflow-wrap:anywhere!important;word-break:normal!important;line-height:1.03;\n}\n.featured-player-card .featured-last-row .featured-jersey-number{\n position:static!important;inset:auto!important;display:inline-block!important;\n flex:0 0 auto!important;align-self:flex-end!important;\n background:transparent!important;border:0!important;border-radius:0!important;\n padding:0 0 2px!important;line-height:1.05!important;\n font-size:clamp(.8rem,1.2vw,1.05rem)!important;\n color:var(--featured-accent)!important;white-space:nowrap!important;pointer-events:none\n}\n.featured-player-card .featured-jersey-number:empty{display:none!important}\n@media(max-width:760px){\n .featured-player-card .featured-last-row{gap:5px!important}\n .featured-player-card .featured-last-row .featured-jersey-number{font-size:.7rem!important;padding-bottom:1px!important}\n}\n.phone-mode .featured-player-card .featured-last-row{gap:6px!important;max-width:100%}\n.phone-mode .featured-player-card .featured-last-row .featured-jersey-number{font-size:.86rem!important;padding-bottom:2px!important}\n";
 style.textContent += `
-/* Ladd's surname and jersey number share the second row on small phones. */
-.featured-player-card.featured-name-ladd .featured-last{white-space:nowrap!important;overflow-wrap:normal!important;letter-spacing:-.045em}
+/* One row for given name and one for the entire surname, with the jersey beside it. */
+.featured-player-card .featured-first,.featured-player-card .featured-last{
+ white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important
+}
+.featured-player-card .featured-last-row{max-width:100%!important}
+.featured-player-card.featured-name-ladd .featured-last{letter-spacing:-.045em}
 .phone-mode .featured-player-card.featured-name-ladd .featured-last{font-size:clamp(1rem,4.15vw,1.42rem)!important;letter-spacing:-.055em}
 @media(max-width:760px){.featured-player-card.featured-name-ladd .featured-last{font-size:clamp(1rem,4vw,1.4rem)!important}}
 `;
@@ -701,6 +705,33 @@ function featuredNameParts(name){
   const parts=String(name||'').trim().split(/\s+/);
   return {first:parts.shift()||'',last:parts.join(' ')};
 }
+function fitFeaturedName(card){
+  if(!card?.isConnected)return;
+  const name=card.querySelector('.featured-name');
+  const first=card.querySelector('.featured-first');
+  const last=card.querySelector('.featured-last');
+  const jersey=card.querySelector('.featured-jersey-number');
+  if(!name||!first||!last)return;
+  // Use the rendered width, since the phone card's portrait and text columns vary by viewport.
+  const available=name.clientWidth;
+  if(available<=0)return;
+  const fit=(node,maxWidth)=>{
+    node.style.removeProperty('font-size');
+    const base=parseFloat(getComputedStyle(node).fontSize)||20;
+    const range=document.createRange();
+    range.selectNodeContents(node);
+    const measured=range.getBoundingClientRect().width;
+    range.detach?.();
+    if(measured>maxWidth){
+      const size=Math.max(8,Math.floor(base*maxWidth/measured*9.7)/10);
+      node.style.setProperty('font-size',size+'px','important');
+    }
+  };
+  fit(first,available);
+  const jerseyWidth=jersey?.textContent.trim()?jersey.getBoundingClientRect().width:0;
+  fit(last,Math.max(12,available-jerseyWidth-(jerseyWidth?8:0)));
+}
+window.addEventListener('resize',()=>requestAnimationFrame(()=>fitFeaturedName(document.getElementById('featuredPlayerCard'))));
 function clearFeaturedProfile(){
   const box=document.querySelector('#modal .profile');
   if(!box)return;
@@ -798,6 +829,7 @@ function fillFeaturedBio(player,seed,bio){
   if(meta)meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong> · '+canonicalTeam(player?.team||bio?.team||'—');
   const jersey=card.querySelector('.featured-jersey-number');
   if(jersey)jersey.textContent=number!==null&&number!==undefined&&String(number)!==''?'#'+number:'';
+  fitFeaturedName(card);
 }
 function applyFeaturedProfile(name,seed=null){
   clearFeaturedProfile();
@@ -855,6 +887,9 @@ function applyFeaturedProfile(name,seed=null){
     '</div>';
 
   tabs.insertAdjacentElement('beforebegin',hero);
+  fitFeaturedName(hero);
+  requestAnimationFrame(()=>fitFeaturedName(hero));
+  document.fonts?.ready?.then(()=>fitFeaturedName(hero)).catch(()=>{});
 
   if(defense){
     // NFL team defenses have no age, height, weight, or individual Sleeper bio.
@@ -1068,7 +1103,6 @@ function ensureUi(){
   tabs.innerHTML=[
     ['overview','Overview'],
     ['gamelog','Game Log'],
-    ['snaps','Snap Rates'],
     ['history','History'],
     ['performance','Performance']
   ].map(([k,l])=>'<button type="button" class="unified-profile-tab" data-profile-tab="'+k+'">'+l+'</button>').join('');
@@ -1078,7 +1112,6 @@ function ensureUi(){
   panels.innerHTML=
     '<div id="unifiedOverviewPanel" class="unified-profile-panel" data-profile-panel="overview"></div>'+
     '<div id="unifiedGameLogPanel" class="unified-profile-panel" data-profile-panel="gamelog" hidden></div>'+ 
-    '<div id="unifiedSnapsPanel" class="unified-profile-panel" data-profile-panel="snaps" hidden></div>'+
     '<div id="unifiedHistoryPanel" class="unified-profile-panel" data-profile-panel="history" hidden></div>'+ 
     '<div id="unifiedPerformancePanel" class="unified-profile-panel" data-profile-panel="performance" hidden></div>';
 
@@ -1100,7 +1133,8 @@ function ensureUi(){
 }
 function activateTab(key){
   if(key==='notes')key='overview';
-  if(!['overview','gamelog','snaps','history','performance'].includes(key))key='overview';
+  if(key==='snaps')key='gamelog'; // Migrate previously saved Snap Rates tab choices.
+  if(!['overview','gamelog','history','performance'].includes(key))key='overview';
   preferredProfileTab=key;
   try{sessionStorage.setItem('shuaProfileTab',key)}catch(e){}
   const tabs=document.querySelectorAll('[data-profile-tab]');
@@ -1114,7 +1148,6 @@ function activateTab(key){
     return;
   }
   if(key==='gamelog')loadGameLog(name);
-  if(key==='snaps')loadSnapRates(name);
   if(key==='history')loadHistory(name);
   if(key==='performance')document.getElementById('modal')?.dispatchEvent(new CustomEvent('shuaPerformanceTabActive',{detail:{name}}));
 }
@@ -1202,22 +1235,6 @@ async function loadGameLog(name){
     panel.innerHTML='<div class="unified-profile-loading">Game log is unavailable right now.</div>';
   }
 }
-async function loadSnapRates(name){
-  const panel=document.getElementById('unifiedSnapsPanel');
-  if(!panel)return;
-  if(panel.dataset.loadedFor===norm(name)&&panel.dataset.ready==='1')return;
-  panel.dataset.loadedFor=norm(name);
-  panel.dataset.ready='0';
-  panel.innerHTML='<div class="unified-profile-loading">Loading snap rates…</div>';
-  if(['K','D/ST'].includes(activeSeed?.position)){
-    panel.innerHTML='<div class="unified-profile-loading">Offensive snap rates are not available for kickers or team defenses.</div>';
-  }else if(window.ShuaEspnLive?.renderSnapRates){
-    await window.ShuaEspnLive.renderSnapRates(name,panel,seedYear(activeSeed)||null);
-  }else{
-    panel.innerHTML='<div class="unified-profile-loading">Snap rates are unavailable right now.</div>';
-  }
-  if(document.getElementById('modal')?.dataset.unifiedName===name)panel.dataset.ready='1';
-}
 function isPhoneProfileSheet(){
   const modal=document.getElementById('modal');
   const profile=modal?.querySelector('.profile');
@@ -1268,6 +1285,7 @@ function ensurePlayerSwipePreview(targetId){
   if(jersey)jersey.textContent='';
   copy.querySelectorAll('.featured-bio-value').forEach(el=>el.textContent='—');
   preview.replaceChildren(copy);
+  fitFeaturedName(copy);
   const tabs=document.getElementById('unifiedProfileTabs')?.cloneNode(true);
   if(tabs){tabs.removeAttribute('id');tabs.setAttribute('aria-hidden','true');preview.appendChild(tabs)}
   return preview;
@@ -1396,8 +1414,6 @@ function prepareUnified(name,seed=null){
   if(currentId){markSelectedRankingRow(currentId);paintPlayerNav(currentId)}else document.getElementById('rankingPlayerNav')?.setAttribute('hidden','');
   const gp=document.getElementById('unifiedGameLogPanel');
   if(gp){gp.dataset.loadedFor='';gp.dataset.ready='0';gp.innerHTML=''}
-  const sp=document.getElementById('unifiedSnapsPanel');
-  if(sp){sp.dataset.loadedFor='';sp.dataset.ready='0';sp.innerHTML='';sp.dataset.snapRenderToken=''}
   const hp=document.getElementById('unifiedHistoryPanel');
   if(hp){hp.dataset.loadedFor='';hp.dataset.ready='0';hp.innerHTML=''}
   activateTab(['K','D/ST'].includes(seed?.position)?'overview':preferredProfileTab||'overview');

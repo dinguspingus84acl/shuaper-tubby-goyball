@@ -425,6 +425,15 @@ style.textContent += `
  body.phone-mode .espn-game-log-table .gl-col-turnovers{width:auto!important}
  .espn-snap-table th,.espn-snap-table td{padding:9px 2px;font-size:.76rem}
 }
+/* Every weekly amount uses the same larger type, including PTS, instead of tiny mobile values. */
+.espn-game-log-table tbody td,.espn-game-log-table tbody td.gl-stat,.espn-game-log-table tbody td.gl-pts,
+.espn-snap-table tbody td{font-size:1.04rem!important;font-weight:950!important;line-height:1.08;font-variant-numeric:tabular-nums}
+@media(max-width:700px){
+ body.phone-mode .espn-game-log-table tbody td,body.phone-mode .espn-game-log-table tbody td.gl-stat,
+ body.phone-mode .espn-game-log-table tbody td.gl-pts,body.phone-mode .espn-snap-table tbody td{
+  font-size:clamp(.9rem,4vw,1.02rem)!important;padding:10px 1px!important
+ }
+}
 `;
 style.textContent += "\n.espn-game-log-tabs{\n display:flex!important;flex-wrap:nowrap!important;gap:5px!important;\n overflow-x:auto!important;width:100%!important;padding:4px 0 10px!important;\n scrollbar-width:none;-webkit-overflow-scrolling:touch;\n}\n.espn-game-log-tabs::-webkit-scrollbar{display:none}\n.espn-game-log-tabs .espn-game-log-tab{\n flex:0 0 auto;min-height:37px!important;padding:7px 13px!important;\n border-radius:9px!important;border:1px solid #38536b!important;\n background:#11283d!important;color:#a9bfd2!important;\n font-size:12px!important;font-weight:900!important;cursor:pointer;\n}\n.espn-game-log-tabs .espn-game-log-tab.active,\n.espn-game-log-tabs .espn-game-log-tab[aria-pressed=\"true\"]{\n background:#235f87!important;color:#fff!important;\n border-color:#6eaccd!important;box-shadow:inset 0 1px 0 #ffffff1c!important;\n}\n.espn-game-log-tabs .espn-game-log-tab:focus-visible{outline:2px solid #35d07f;outline-offset:2px}\n";
 document.head.appendChild(style);
@@ -838,6 +847,7 @@ function historicalGameLogHtml(player,career,year){
   const histPpg=Number.isFinite(Number(seasonRow.average))?Number(seasonRow.average):(Number.isFinite(Number(seasonRow.ppg))?Number(seasonRow.ppg):(histGp?histPts/histGp:null));
   const summary=gameLogSummaryHtml(year,histPts,histPpg,histGp,seasonRow.position,seasonRow.rank);
   const controls='<div class="espn-game-log-controls">'+yearSelect+tabs+'</div>';
+  if(mode==='snaps')return title+controls+'<div class="espn-game-log-snap-view" data-embedded-snap-rates></div>';
   if(!games.length)return title+summary+controls+'<div class="espn-game-log-empty">No game stats found for '+year+'.</div>';
   const cols=gameLogColumns(mode,seasonRow.position);
   return title+summary+controls+
@@ -851,6 +861,8 @@ function historicalGameLogHtml(player,career,year){
 }
 function bindHistoricalGameLog(panel,player,career,year){
   colorGameLogMatchups(panel,year,player?.position||career?.find(x=>Number(x.year)===Number(year))?.position);
+  const snapTarget=panel.querySelector('[data-embedded-snap-rates]');
+  if(snapTarget)void renderSnapRatesData(player.name,snapTarget,year,{embedded:true});
   panel.querySelectorAll('[data-hist-gl-mode]').forEach(btn=>{
     btn.onclick=e=>{
       e.preventDefault();e.stopPropagation();
@@ -1218,9 +1230,9 @@ async function fetchGameLog(player,year=SEASON){
   return log;
 }
 function gameLogModesFor(position){
-  if(position==='QB')return [{key:'pass',label:'Passing'},{key:'rush',label:'Rushing'}];
+  if(position==='QB')return [{key:'pass',label:'Passing'},{key:'rush',label:'Rushing'},{key:'snaps',label:'Snap Rates'}];
   // Players with both rushing and receiving usage can switch between the two views.
-  return [{key:'rush',label:'Rushing'},{key:'rec',label:'Receiving'}];
+  return [{key:'rush',label:'Rushing'},{key:'rec',label:'Receiving'},{key:'snaps',label:'Snap Rates'}];
 }
 function defaultGameLogMode(position){
   return position==='QB'?'pass':position==='RB'?'rush':'rec';
@@ -1378,7 +1390,7 @@ function gameLogCell(g,key,mode,position){
   const v=Number(raw);
   return Number.isFinite(v)?(Number.isInteger(v)?String(v):v.toFixed(1)):'—';
 }
-function snapRateHtml(name,year,years,games){
+function snapRateHtml(name,year,years,games,{embedded=false}={}){
  const known=games.filter(g=>Number.isFinite(Number(g.snapRate))&&g.snapRate!==null&&g.snapRate!==undefined);
  const counted=games.filter(g=>Number.isFinite(Number(g.snapCount))&&g.snapCount!==null&&g.snapCount!==undefined);
  const avg=known.length?known.reduce((s,g)=>s+Number(g.snapRate),0)/known.length:null;
@@ -1391,16 +1403,17 @@ function snapRateHtml(name,year,years,games){
   '<div><span>WEEKS TRACKED</span><strong>'+known.length+'</strong></div></div>';
  const title='<div class="espn-game-log-title"><strong>'+name+' Snap Rates</strong><span>'+year+' Season</span></div>';
  const info='<p class="espn-game-log-empty">Snap rate = offensive snaps played ÷ team offensive snaps. Missing data is shown as —.</p>';
- if(!games.length)return title+selector+'<div class="espn-game-log-empty">No weekly snap data found for '+year+'.</div>';
+ const heading=embedded?'':title+selector;
+ if(!games.length)return heading+'<div class="espn-game-log-empty">No weekly snap data found for '+year+'.</div>';
  const table='<div class="espn-game-log-table-wrap"><table class="espn-snap-table"><thead><tr><th>WK</th><th>OPP</th><th>SNAPS</th><th>SNAP %</th></tr></thead><tbody>'+
   games.map(g=>'<tr><td>'+g.week+'</td><td>'+gameLogOpponentHtml(g.opponent)+'</td><td>'+
    (g.snapCount===null||g.snapCount===undefined?'—':Math.round(g.snapCount))+'</td><td class="gl-snap-rate">'+
    (g.snapRate===null||g.snapRate===undefined?'—':Number(g.snapRate).toFixed(1)+'%')+'</td></tr>').join('')+
   '</tbody></table></div>';
- return title+selector+summary+(known.length?'':'<div class="espn-game-log-empty">Snap percentages are unavailable for this season.</div>')+table+info;
+ return heading+summary+(known.length?'':'<div class="espn-game-log-empty">Snap percentages are unavailable for this season.</div>')+table+info;
 }
 let snapRenderCounter=0;
-async function renderSnapRatesData(name,target,explicitYear=null){
+async function renderSnapRatesData(name,target,explicitYear=null,{embedded=false}={}){
  if(!target)return;
  const token=String(++snapRenderCounter);
  target.dataset.snapRenderToken=token;
@@ -1434,7 +1447,7 @@ async function renderSnapRatesData(name,target,explicitYear=null){
    }
   }
   if(target.dataset.snapRenderToken!==token)return;
-  target.innerHTML=snapRateHtml(name,year,years,games);
+  target.innerHTML=snapRateHtml(name,year,years,games,{embedded});
   const select=target.querySelector('[data-snap-year]');
   if(select)select.onchange=()=>{const chosen=Number(select.value);snapRateYears.set(key,chosen);void renderSnapRatesData(name,target,chosen)};
  }catch(e){
@@ -1457,6 +1470,7 @@ function gameLogHtml(player,opts={}){
   const tabs='<div class="espn-game-log-tabs" role="group" aria-label="Game log category">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" aria-pressed="'+(x.key===mode)+'" data-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
   const title='<div class="espn-game-log-title"><strong>'+player.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
   const controls='<div class="espn-game-log-controls">'+yearSelect+tabs+'</div>';
+  if(mode==='snaps')return title+controls+'<div class="espn-game-log-snap-view" data-embedded-snap-rates></div>';
   if(!cached)return title+controls+'<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
   if(cached.error)return title+controls+'<div class="espn-game-log-empty espn-error">Could not load '+year+' game log.</div>';
   if(!cached.rows.length)return title+controls+'<div class="espn-game-log-empty">No game stats found for '+year+'.</div>';
@@ -1478,6 +1492,8 @@ function gameLogHtml(player,opts={}){
 function bindGameLogModeButtons(panel,player,opts={}){
   const matchupYear=Number(opts.year)||gameLogYears.get(String(player.id))||SEASON;
   colorGameLogMatchups(panel,matchupYear,player.position);
+  const snapTarget=panel.querySelector('[data-embedded-snap-rates]');
+  if(snapTarget)void renderSnapRatesData(player.name,snapTarget,matchupYear,{embedded:true});
   panel.querySelectorAll('[data-gl-mode]').forEach(btn=>{
     btn.onclick=e=>{
       e.preventDefault();e.stopPropagation();
@@ -1494,6 +1510,7 @@ function bindGameLogModeButtons(panel,player,opts={}){
       const nextOpts={...opts,year};
       panel.innerHTML=gameLogHtml(player,nextOpts);
       bindGameLogModeButtons(panel,player,nextOpts);
+      if(gameLogModes.get(String(player.id))==='snaps')return;
       try{
         await Promise.all([fetchGameLog(player,year),ensureGameLogFinish(player,year)]);
       }catch(err){

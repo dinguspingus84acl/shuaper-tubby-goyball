@@ -58,13 +58,14 @@ def check_browser(browser,phone):
     table=page.locator('#unifiedGameLogPanel .espn-game-log-table')
     table.wait_for(state='visible',timeout=25000)
     tabs=page.locator('#unifiedGameLogPanel [data-gl-mode]')
-    assert tabs.count()==2,'Missing Rushing/Receiving controls'
-    assert [x.inner_text() for x in tabs.all()]==['Rushing','Receiving']
+    assert tabs.count()==3,'Missing Rushing/Receiving/Snap Rates controls'
+    assert [x.inner_text() for x in tabs.all()]==['Rushing','Receiving','Snap Rates']
+    assert page.locator('[data-profile-tab="snaps"]').count()==0,'Snap Rates must be inside Game Log'
     assert page.locator('#unifiedGameLogPanel [data-gl-mode="rush"]').get_attribute('aria-pressed')=='true'
     rush_columns=table.locator('thead th').all_inner_texts()
     for column in ['PTS','ATT','YDS','TD']:
         assert column in rush_columns,('Missing rushing field '+column,rush_columns)
-    assert 'SNAP %' not in rush_columns,'Snap rate must be on its own tab'
+    assert 'SNAP %' not in rush_columns,'Snap rate must have its own Game Log button'
     assert 'REC' not in rush_columns,'Rushing tab should not show receiving fields'
     page.locator('#unifiedGameLogPanel [data-gl-mode="rec"]').click()
     table=page.locator('#unifiedGameLogPanel .espn-game-log-table')
@@ -73,25 +74,40 @@ def check_browser(browser,phone):
         assert column in receive_columns,('Missing receiving field '+column,receive_columns)
     assert 'ATT' not in receive_columns,'Receiving tab should not show rushing attempts'
     assert page.locator('#unifiedGameLogPanel [data-gl-mode="rec"]').get_attribute('aria-pressed')=='true'
+    font_sizes=page.locator('#unifiedGameLogPanel .espn-game-log-table').evaluate('''el=>{
+        const pts=el.querySelector('tbody td.gl-pts');
+        const stat=el.querySelector('tbody td.gl-stat');
+        return [parseFloat(getComputedStyle(pts).fontSize),parseFloat(getComputedStyle(stat).fontSize)];
+    }''')
+    assert abs(font_sizes[0]-font_sizes[1])<.1,('All numbers should have the same size',font_sizes)
+    assert min(font_sizes)>=14,('Game Log numbers are too small',font_sizes)
     if phone:
         dims=page.locator('#unifiedGameLogPanel .espn-game-log-table-wrap').evaluate('(el)=>({total:el.scrollWidth,visible:el.clientWidth})')
         assert dims['total']<=dims['visible']+2,('Game log should fit without horizontal swiping',dims)
-    page.locator('[data-profile-tab="snaps"]').click()
-    snap=page.locator('#unifiedSnapsPanel')
+    page.locator('#unifiedGameLogPanel [data-gl-mode="snaps"]').click()
+    snap=page.locator('#unifiedGameLogPanel [data-embedded-snap-rates]')
     snap.locator('.espn-snap-table').wait_for(state='visible',timeout=30000)
-    assert 'SNAP %' in snap.locator('thead th').all_inner_texts(),'Snap rate column missing on Snap Rates tab'
-    assert snap.locator('tbody tr').count()>0,'Snap Rates tab has no weekly records'
-    # A surname long enough to wrap on smaller phones must still leave #11 to its right.
-    page.evaluate("window.openUnifiedPlayerProfileByName('Jaxon Smith-Njigba')")
-    page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Smith-Njigba')",timeout=18000)
-    longname=page.locator('#featuredPlayerCard')
-    longname.locator('.featured-jersey-number').evaluate("(el)=>{el.textContent='#11'}")
-    namebox=longname.locator('.featured-last').bounding_box()
-    numberbox=longname.locator('.featured-jersey-number').bounding_box()
-    rowbox=longname.locator('.featured-last-row').bounding_box()
-    assert namebox and numberbox and rowbox
-    assert numberbox['x']>=namebox['x']+namebox['width']-3,('Long surname must not overlap #11',namebox,numberbox)
-    assert numberbox['x']+numberbox['width']<=rowbox['x']+rowbox['width']+4,('Number clipped off name row',numberbox,rowbox)
+    assert 'SNAP %' in snap.locator('thead th').all_inner_texts(),'Snap rate column missing from Game Log Snap Rates button'
+    assert snap.locator('tbody tr').count()>0,'Snap Rates button has no weekly records'
+    # Short and long surnames must all occupy one line beneath the given name.
+    for full_name,last_piece in [('Ladd McConkey','McConkey'),('Jaxon Smith-Njigba','Smith-Njigba'),('Amon-Ra St. Brown','St. Brown')]:
+        page.evaluate('(name)=>window.openUnifiedPlayerProfileByName(name)',full_name)
+        page.wait_for_function('last=>document.querySelector("#modal.open #featuredPlayerCard .featured-last")?.textContent?.includes(last)',arg=last_piece,timeout=18000)
+        longname=page.locator('#featuredPlayerCard')
+        longname.locator('.featured-jersey-number').evaluate("(el)=>{el.textContent='#11'}")
+        page.evaluate("window.dispatchEvent(new Event('resize'))")
+        page.wait_for_timeout(100)
+        fit=longname.locator('.featured-last').evaluate('''el=>{
+            const r=document.createRange();r.selectNodeContents(el);
+            const rects=[...r.getClientRects()].filter(x=>x.width>0);
+            const row=el.closest('.featured-last-row').getBoundingClientRect();
+            const number=el.closest('.featured-last-row').querySelector('.featured-jersey-number').getBoundingClientRect();
+            return {lines:rects.length,textRight:Math.max(...rects.map(x=>x.right)),numberLeft:number.left,
+                    numberRight:number.right,rowRight:row.right};
+        }''')
+        assert fit['lines']==1,('Surname wrapped onto a third row',full_name,fit)
+        assert fit['textRight']<=fit['numberLeft']+2,('Surname and jersey overlap',full_name,fit)
+        assert fit['numberRight']<=fit['rowRight']+4,('Jersey clipped off name row',full_name,fit)
     page.locator('#close').evaluate('(e)=>e.click()')
     open_search(page,phone)
     page.locator('[data-search-mode="historical"]').click()
@@ -131,7 +147,7 @@ def check_browser(browser,phone):
     suggestions.first.click()
     page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Robinson')",timeout=18000)
     print('PASS',browser.browser_type.name,'phone' if phone else 'desktop',
-          'inline number, rushing/receiving tabs, headshot search and clean Analytics search',flush=True)
+          'two-line names, uniform game-log amounts, inline snap rates, headshot search and clean Analytics search',flush=True)
     ctx.close()
 
 def check_rosters(browser):

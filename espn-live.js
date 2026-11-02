@@ -99,6 +99,7 @@ const proSchedules=new Map();
 const gameLogCache=new Map();
 const gameLogModes=new Map();
 const gameLogYears=new Map();
+const snapRateYears=new Map();
 const gameLogFinishCache=new Map();
 const careerYearsCache=new Map();
 const historicalSeasonCache=new Map();
@@ -394,16 +395,36 @@ body.phone-mode .espn-game-log-table th:nth-child(2),body.phone-mode .espn-game-
 `;
 
 style.textContent += `
-.espn-game-log-swipe-hint{padding:5px 4px 10px;color:#9eb8d0;font:750 11px system-ui,sans-serif}
-#unifiedGameLogPanel .espn-game-log-table-wrap,.espn-profile-gamelog-panel .espn-game-log-table-wrap{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain}
-#unifiedGameLogPanel .espn-game-log-table,.espn-profile-gamelog-panel .espn-game-log-table{display:table!important;table-layout:auto!important;width:max-content!important;min-width:100%!important;max-width:none!important}
-#unifiedGameLogPanel .espn-game-log-table th,#unifiedGameLogPanel .espn-game-log-table td,
-.espn-profile-gamelog-panel .espn-game-log-table th,.espn-profile-gamelog-panel .espn-game-log-table td{box-sizing:border-box!important;min-width:77px!important;width:auto!important;padding:9px 9px!important;white-space:nowrap!important}
-#unifiedGameLogPanel .espn-game-log-table th:first-child,#unifiedGameLogPanel .espn-game-log-table td:first-child,
-.espn-profile-gamelog-panel .espn-game-log-table th:first-child,.espn-profile-gamelog-panel .espn-game-log-table td:first-child{position:sticky!important;left:0!important;z-index:3!important;width:44px!important;min-width:44px!important;background:#061522!important}
-#unifiedGameLogPanel .espn-game-log-table th:nth-child(2),#unifiedGameLogPanel .espn-game-log-table td:nth-child(2),
-.espn-profile-gamelog-panel .espn-game-log-table th:nth-child(2),.espn-profile-gamelog-panel .espn-game-log-table td:nth-child(2){position:sticky!important;left:44px!important;z-index:3!important;width:100px!important;min-width:100px!important;max-width:100px!important;background:#061522!important;box-shadow:5px 0 9px #0008}
-@media(max-width:700px){#unifiedGameLogPanel .espn-game-log-table th,#unifiedGameLogPanel .espn-game-log-table td{font-size:12px!important;padding:9px 7px!important}}
+/* Game logs are category tables again: all columns fit; no sideways scrolling. */
+.espn-game-log-table-wrap{width:100%!important;max-width:100%!important;overflow-x:hidden!important;touch-action:pan-y}
+.espn-game-log-table{display:table!important;width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important}
+.espn-game-log-table th,.espn-game-log-table td{box-sizing:border-box!important;min-width:0!important;width:auto!important;padding:8px 3px!important;white-space:nowrap!important}
+.espn-game-log-table th:first-child,.espn-game-log-table td:first-child{position:static!important;width:9%!important;min-width:0!important;background:transparent!important}
+.espn-game-log-table th:nth-child(2),.espn-game-log-table td:nth-child(2){position:static!important;left:auto!important;width:23%!important;min-width:0!important;max-width:none!important;padding-left:2px!important;background:transparent!important;box-shadow:none!important}
+.espn-game-log-table .espn-game-log-opponent{width:100%;max-width:100%;min-width:0;padding:2px 1px;gap:3px;font-size:inherit}
+.espn-game-log-table .espn-game-log-opponent-logo{width:15px;height:15px;flex-basis:15px}
+.espn-game-log-table .espn-game-log-opponent>span{min-width:0;overflow:hidden;text-overflow:clip}
+.espn-snap-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:9px 0 11px}
+.espn-snap-summary>div{padding:10px 8px;border:1px solid #ffffff18;border-radius:9px;background:#0a2136;text-align:center}
+.espn-snap-summary span{display:block;color:#94a9bd;font-size:.58rem;font-weight:850}
+.espn-snap-summary strong{display:block;margin-top:5px;font-size:1rem;color:#eaf5ff}
+.espn-snap-table{width:100%;table-layout:fixed;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.espn-snap-table th,.espn-snap-table td{padding:9px 5px;border-top:1px solid #ffffff15;text-align:center;font-size:.79rem}
+.espn-snap-table th{font-size:.63rem;color:#8ca4bd;text-transform:uppercase}
+.espn-snap-table th:nth-child(1){width:12%}.espn-snap-table th:nth-child(2){width:32%}
+.espn-snap-table td:nth-child(2){text-align:left}
+.espn-snap-table .gl-snap-rate{color:#69dca2;font-weight:1000}
+@media(max-width:700px){
+ body.phone-mode .espn-game-log-table-wrap{overflow-x:hidden!important}
+ body.phone-mode .espn-game-log-table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important}
+ body.phone-mode .espn-game-log-table th,body.phone-mode .espn-game-log-table td{font-size:clamp(.63rem,2.7vw,.78rem)!important;padding:8px 1px!important;min-width:0!important}
+ body.phone-mode .espn-game-log-table th{font-size:clamp(.49rem,2.15vw,.58rem)!important;letter-spacing:0!important}
+ body.phone-mode .espn-game-log-table th:first-child,body.phone-mode .espn-game-log-table td:first-child{width:9%!important}
+ body.phone-mode .espn-game-log-table th:nth-child(2),body.phone-mode .espn-game-log-table td:nth-child(2){width:23%!important;min-width:0!important;max-width:none!important}
+ .espn-game-log-table .espn-game-log-opponent-logo{width:13px;height:13px;flex-basis:13px}
+ body.phone-mode .espn-game-log-table .gl-col-turnovers{width:auto!important}
+ .espn-snap-table th,.espn-snap-table td{padding:9px 2px;font-size:.76rem}
+}
 `;
 style.textContent += "\n.espn-game-log-tabs{\n display:flex!important;flex-wrap:nowrap!important;gap:5px!important;\n overflow-x:auto!important;width:100%!important;padding:4px 0 10px!important;\n scrollbar-width:none;-webkit-overflow-scrolling:touch;\n}\n.espn-game-log-tabs::-webkit-scrollbar{display:none}\n.espn-game-log-tabs .espn-game-log-tab{\n flex:0 0 auto;min-height:37px!important;padding:7px 13px!important;\n border-radius:9px!important;border:1px solid #38536b!important;\n background:#11283d!important;color:#a9bfd2!important;\n font-size:12px!important;font-weight:900!important;cursor:pointer;\n}\n.espn-game-log-tabs .espn-game-log-tab.active,\n.espn-game-log-tabs .espn-game-log-tab[aria-pressed=\"true\"]{\n background:#235f87!important;color:#fff!important;\n border-color:#6eaccd!important;box-shadow:inset 0 1px 0 #ffffff1c!important;\n}\n.espn-game-log-tabs .espn-game-log-tab:focus-visible{outline:2px solid #35d07f;outline-offset:2px}\n";
 document.head.appendChild(style);
@@ -1002,14 +1023,17 @@ function deepStats(entry){
 function gameLogCacheKey(player,year){return String(player.id)+':'+year}
 
 let currentSeasonSnapPromise=null;
+function getCurrentSeasonSnapDataset(){
+ if(!currentSeasonSnapPromise)currentSeasonSnapPromise=
+  fetch('analytics/data/season-2026.json',{cache:'force-cache'})
+   .then(r=>{if(!r.ok)throw Error('No weekly snap source');return r.json()}).catch(()=>null);
+ return currentSeasonSnapPromise;
+}
 async function attachGameLogSnapRates(player,year,games){
  if(!Array.isArray(games)||!games.length)return games;
  let matches=[];
  if(Number(year)===SEASON){
-  if(!currentSeasonSnapPromise)currentSeasonSnapPromise=
-    fetch('analytics/data/season-2026.json',{cache:'force-cache'})
-     .then(r=>{if(!r.ok)throw Error('No weekly snap source');return r.json()}).catch(()=>null);
-  const ds=await currentSeasonSnapPromise;
+  const ds=await getCurrentSeasonSnapDataset();
   const id=String(player?.id||''),normalized=nameKey(player?.name||'');
   const season=ds?.players?.find(p=>id&&String(p.id)===id)||
     ds?.players?.find(p=>nameKey(p.name)===normalized);
@@ -1026,6 +1050,8 @@ async function attachGameLogSnapRates(player,year,games){
   let percent=n!==null&&Number.isFinite(n)?(r?.snapRate===null||r?.snapRate===undefined?(n<=1.5?n*100:n):n):null;
   if(percent===null&&snaps!=null&&teamSnaps>0)percent=100*Number(snaps)/Number(teamSnaps);
   game.snapRate=Number.isFinite(percent)?Math.max(0,Math.min(100,percent)):null;
+  game.snapCount=snaps!==null&&snaps!==undefined&&Number.isFinite(Number(snaps))?Number(snaps):null;
+  game.teamSnapCount=teamSnaps!==null&&teamSnaps!==undefined&&Number.isFinite(Number(teamSnaps))?Number(teamSnaps):null;
  }
  return games;
 }
@@ -1204,7 +1230,7 @@ function categoryPoints(g,mode,position){
   return Number(g.totalPoints)||0;
 }
 function gameLogColumns(mode,position){
- const cols=[{label:'PTS',key:'pts'},{label:'SNAP %',key:'snapRate'}];
+ const cols=[{label:'PTS',key:'pts'}];
  if(mode==='pass')return cols.concat([
   {label:'CMP',key:'completions'},{label:'ATT',key:'passAtt'},
   {label:'YDS',key:'passYds'},{label:'TD',key:'passTD'},
@@ -1351,6 +1377,69 @@ function gameLogCell(g,key,mode,position){
   if(raw===null||raw===undefined||raw==='')return '—';
   const v=Number(raw);
   return Number.isFinite(v)?(Number.isInteger(v)?String(v):v.toFixed(1)):'—';
+}
+function snapRateHtml(name,year,years,games){
+ const known=games.filter(g=>Number.isFinite(Number(g.snapRate))&&g.snapRate!==null&&g.snapRate!==undefined);
+ const counted=games.filter(g=>Number.isFinite(Number(g.snapCount))&&g.snapCount!==null&&g.snapCount!==undefined);
+ const avg=known.length?known.reduce((s,g)=>s+Number(g.snapRate),0)/known.length:null;
+ const total=counted.length?counted.reduce((s,g)=>s+Number(g.snapCount),0):null;
+ const selector='<div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" data-snap-year aria-label="Snap rate season">'+
+  years.map(y=>'<option value="'+y+'"'+(Number(y)===Number(year)?' selected':'')+'>'+y+'</option>').join('')+'</select></div>';
+ const summary='<div class="espn-snap-summary">'+
+  '<div><span>AVG SNAP RATE</span><strong>'+(avg===null?'—':avg.toFixed(1)+'%')+'</strong></div>'+
+  '<div><span>OFFENSIVE SNAPS</span><strong>'+(total===null?'—':Math.round(total))+'</strong></div>'+
+  '<div><span>WEEKS TRACKED</span><strong>'+known.length+'</strong></div></div>';
+ const title='<div class="espn-game-log-title"><strong>'+name+' Snap Rates</strong><span>'+year+' Season</span></div>';
+ const info='<p class="espn-game-log-empty">Snap rate = offensive snaps played ÷ team offensive snaps. Missing data is shown as —.</p>';
+ if(!games.length)return title+selector+'<div class="espn-game-log-empty">No weekly snap data found for '+year+'.</div>';
+ const table='<div class="espn-game-log-table-wrap"><table class="espn-snap-table"><thead><tr><th>WK</th><th>OPP</th><th>SNAPS</th><th>SNAP %</th></tr></thead><tbody>'+
+  games.map(g=>'<tr><td>'+g.week+'</td><td>'+gameLogOpponentHtml(g.opponent)+'</td><td>'+
+   (g.snapCount===null||g.snapCount===undefined?'—':Math.round(g.snapCount))+'</td><td class="gl-snap-rate">'+
+   (g.snapRate===null||g.snapRate===undefined?'—':Number(g.snapRate).toFixed(1)+'%')+'</td></tr>').join('')+
+  '</tbody></table></div>';
+ return title+selector+summary+(known.length?'':'<div class="espn-game-log-empty">Snap percentages are unavailable for this season.</div>')+table+info;
+}
+let snapRenderCounter=0;
+async function renderSnapRatesData(name,target,explicitYear=null){
+ if(!target)return;
+ const token=String(++snapRenderCounter);
+ target.dataset.snapRenderToken=token;
+ target.innerHTML='<div class="espn-game-log-empty">Loading snap rates…</div>';
+ const key=nameKey(name);
+ try{
+  const player=rows.find(p=>nameKey(p.name)===key)||statsRows.find(p=>nameKey(p.name)===key)||{id:'',name};
+  const career=await getHistoricalCareer(name).catch(()=>[]);
+  const years=[...new Set([...availableGameLogYears(player),...career.map(p=>Number(p.year))])].filter(y=>Number.isInteger(y)&&y>=1999&&y<=SEASON).sort((a,b)=>b-a);
+  let year=Number(explicitYear)||snapRateYears.get(key)||SEASON;
+  if(!years.includes(year))year=years[0]||SEASON;
+  snapRateYears.set(key,year);
+  let games=[];
+  if(year===SEASON){
+   const ds=await getCurrentSeasonSnapDataset();
+   const season=ds?.players?.find(p=>player.id&&String(p.id)===String(player.id))||ds?.players?.find(p=>nameKey(p.name)===key);
+   if(season?.games?.length){
+    games=season.games.map(g=>({...g}));
+    await attachGameLogSnapRates(season,year,games);
+   }
+  }
+  if(!games.length){
+   const historical=career.find(p=>Number(p.year)===year);
+   if(historical){
+    const hydrated=await hydrateHistoricalCareerYear(career,name,year);
+    const row=hydrated.find(p=>Number(p.year)===year)||historical;
+    games=Array.isArray(row.games)?row.games.map(g=>({...g})):[];
+    await attachGameLogSnapRates(row,year,games);
+   }else if(player.id){
+    games=await fetchGameLog(player,year).catch(()=>[]);
+   }
+  }
+  if(target.dataset.snapRenderToken!==token)return;
+  target.innerHTML=snapRateHtml(name,year,years,games);
+  const select=target.querySelector('[data-snap-year]');
+  if(select)select.onchange=()=>{const chosen=Number(select.value);snapRateYears.set(key,chosen);void renderSnapRatesData(name,target,chosen)};
+ }catch(e){
+  if(target.dataset.snapRenderToken===token)target.innerHTML='<div class="espn-game-log-empty espn-error">Could not load snap rates right now.</div>';
+ }
 }
 function gameLogHtml(player,opts={}){
   const years=availableGameLogYears(player);
@@ -1978,6 +2067,9 @@ window.ShuaEspnLive={
     }catch(e){
       target.innerHTML='<div class="espn-game-log-empty espn-error">Could not load ESPN data right now.</div>';
     }
+  },
+  async renderSnapRates(name,target,year=null){
+    await renderSnapRatesData(name,target,year);
   },
   async renderGameLog(name,target){
     if(!target)return;

@@ -261,7 +261,7 @@ style.textContent=`
   margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
 .featured-player-profile .unified-profile-tabs{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;
   margin-top:0;padding:6px;border:1px solid #ffffff18;border-top:0;
   border-radius:0 0 12px 12px;background:#07111de8
 }
@@ -327,6 +327,23 @@ style.textContent=`
   touch-action:pan-y;
   will-change:transform
 }
+.phone-mode #modal .profile.featured-player-profile{z-index:2}
+.phone-mode #modal .player-swipe-preview{
+  position:fixed;inset:0;z-index:1;overflow:hidden;pointer-events:none;
+  background:#06111f;will-change:transform
+}
+.phone-mode #modal .player-swipe-preview .featured-player-card{
+  width:calc(100% - 16px);height:254px;margin:8px 8px 0;
+  grid-template-columns:43% 57%;border-radius:15px 15px 0 0
+}
+.phone-mode #modal .player-swipe-preview .unified-profile-tabs{
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;
+  margin:0 8px;padding:5px;border:1px solid #ffffff18;border-top:0;
+  border-radius:0 0 11px 11px;background:#07111de8
+}
+.phone-mode #modal .player-swipe-preview .unified-profile-tab{
+  min-width:0;padding:7px 2px;font-size:.5rem;white-space:nowrap
+}
 .phone-mode #modal .profile.featured-player-profile::-webkit-scrollbar{display:none}
 .phone-mode .featured-player-profile .closem{display:none!important}
 .phone-mode .featured-player-profile:before{
@@ -373,14 +390,14 @@ style.textContent=`
 .phone-mode .featured-player-card .featured-bio-value{font-size:.9rem;margin-top:4px}
 .phone-mode .featured-player-profile .unified-profile-tabs{
   position:sticky;top:var(--sticky-player-name-height,0px);z-index:20;
-  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important;
   width:calc(100% - 16px);margin:0 8px!important;padding:5px!important;
   border-radius:0 0 11px 11px!important;
   box-shadow:0 8px 18px #0007
 }
 .phone-mode .featured-player-profile .unified-profile-tab{
   display:block!important;width:100%!important;min-width:0!important;min-height:36px!important;
-  padding:7px 2px!important;font-size:.54rem!important;white-space:nowrap!important
+  padding:7px 1px!important;font-size:.49rem!important;white-space:nowrap!important
 }
 .phone-mode .featured-player-profile #unifiedProfilePanels{
   min-height:calc(100dvh - 316px);
@@ -412,6 +429,12 @@ style.textContent=`
 }
 `;
 style.textContent += "/* Jersey number sits next to the surname, without overlaying any text. */\n.featured-player-card .featured-name{max-width:100%;min-width:0;padding-right:0!important}\n.featured-player-card .featured-first{padding-right:0!important}\n.featured-player-card .featured-last-row{\n display:flex!important;flex-flow:row nowrap!important;align-items:flex-end!important;\n width:fit-content;max-width:100%;min-width:0;gap:clamp(4px,1vw,10px)!important;\n}\n.featured-player-card .featured-last{\n flex:0 1 auto;min-width:0;max-width:100%;white-space:normal!important;\n overflow-wrap:anywhere!important;word-break:normal!important;line-height:1.03;\n}\n.featured-player-card .featured-last-row .featured-jersey-number{\n position:static!important;inset:auto!important;display:inline-block!important;\n flex:0 0 auto!important;align-self:flex-end!important;\n background:transparent!important;border:0!important;border-radius:0!important;\n padding:0 0 2px!important;line-height:1.05!important;\n font-size:clamp(.8rem,1.2vw,1.05rem)!important;\n color:var(--featured-accent)!important;white-space:nowrap!important;pointer-events:none\n}\n.featured-player-card .featured-jersey-number:empty{display:none!important}\n@media(max-width:760px){\n .featured-player-card .featured-last-row{gap:5px!important}\n .featured-player-card .featured-last-row .featured-jersey-number{font-size:.7rem!important;padding-bottom:1px!important}\n}\n.phone-mode .featured-player-card .featured-last-row{gap:6px!important;max-width:100%}\n.phone-mode .featured-player-card .featured-last-row .featured-jersey-number{font-size:.86rem!important;padding-bottom:2px!important}\n";
+style.textContent += `
+/* Ladd's surname and jersey number share the second row on small phones. */
+.featured-player-card.featured-name-ladd .featured-last{white-space:nowrap!important;overflow-wrap:normal!important;letter-spacing:-.045em}
+.phone-mode .featured-player-card.featured-name-ladd .featured-last{font-size:clamp(1rem,4.15vw,1.42rem)!important;letter-spacing:-.055em}
+@media(max-width:760px){.featured-player-card.featured-name-ladd .featured-last{font-size:clamp(1rem,4vw,1.4rem)!important}}
+`;
 document.head.appendChild(style);
 
 function playerByName(name){
@@ -801,6 +824,7 @@ function applyFeaturedProfile(name,seed=null){
   const nameLength=String(player.name||name).replace(/\s+/g,'').length;
   if(nameLength>=18)hero.classList.add('featured-name-xlong');
   else if(nameLength>=14)hero.classList.add('featured-name-long');
+  if(norm(player.name||name)==='laddmcconkey')hero.classList.add('featured-name-ladd');
   if(teamName.length>=9)hero.classList.add('featured-team-long');
   hero.style.setProperty('--featured-accent',accent);
 
@@ -1044,6 +1068,7 @@ function ensureUi(){
   tabs.innerHTML=[
     ['overview','Overview'],
     ['gamelog','Game Log'],
+    ['snaps','Snap Rates'],
     ['history','History'],
     ['performance','Performance']
   ].map(([k,l])=>'<button type="button" class="unified-profile-tab" data-profile-tab="'+k+'">'+l+'</button>').join('');
@@ -1053,6 +1078,7 @@ function ensureUi(){
   panels.innerHTML=
     '<div id="unifiedOverviewPanel" class="unified-profile-panel" data-profile-panel="overview"></div>'+
     '<div id="unifiedGameLogPanel" class="unified-profile-panel" data-profile-panel="gamelog" hidden></div>'+ 
+    '<div id="unifiedSnapsPanel" class="unified-profile-panel" data-profile-panel="snaps" hidden></div>'+
     '<div id="unifiedHistoryPanel" class="unified-profile-panel" data-profile-panel="history" hidden></div>'+ 
     '<div id="unifiedPerformancePanel" class="unified-profile-panel" data-profile-panel="performance" hidden></div>';
 
@@ -1074,7 +1100,7 @@ function ensureUi(){
 }
 function activateTab(key){
   if(key==='notes')key='overview';
-  if(!['overview','gamelog','history','performance'].includes(key))key='overview';
+  if(!['overview','gamelog','snaps','history','performance'].includes(key))key='overview';
   preferredProfileTab=key;
   try{sessionStorage.setItem('shuaProfileTab',key)}catch(e){}
   const tabs=document.querySelectorAll('[data-profile-tab]');
@@ -1088,6 +1114,7 @@ function activateTab(key){
     return;
   }
   if(key==='gamelog')loadGameLog(name);
+  if(key==='snaps')loadSnapRates(name);
   if(key==='history')loadHistory(name);
   if(key==='performance')document.getElementById('modal')?.dispatchEvent(new CustomEvent('shuaPerformanceTabActive',{detail:{name}}));
 }
@@ -1175,10 +1202,75 @@ async function loadGameLog(name){
     panel.innerHTML='<div class="unified-profile-loading">Game log is unavailable right now.</div>';
   }
 }
+async function loadSnapRates(name){
+  const panel=document.getElementById('unifiedSnapsPanel');
+  if(!panel)return;
+  if(panel.dataset.loadedFor===norm(name)&&panel.dataset.ready==='1')return;
+  panel.dataset.loadedFor=norm(name);
+  panel.dataset.ready='0';
+  panel.innerHTML='<div class="unified-profile-loading">Loading snap rates…</div>';
+  if(['K','D/ST'].includes(activeSeed?.position)){
+    panel.innerHTML='<div class="unified-profile-loading">Offensive snap rates are not available for kickers or team defenses.</div>';
+  }else if(window.ShuaEspnLive?.renderSnapRates){
+    await window.ShuaEspnLive.renderSnapRates(name,panel,seedYear(activeSeed)||null);
+  }else{
+    panel.innerHTML='<div class="unified-profile-loading">Snap rates are unavailable right now.</div>';
+  }
+  if(document.getElementById('modal')?.dataset.unifiedName===name)panel.dataset.ready='1';
+}
 function isPhoneProfileSheet(){
   const modal=document.getElementById('modal');
   const profile=modal?.querySelector('.profile');
   return !!(document.body.classList.contains('phone-mode')&&modal?.classList.contains('open')&&profile?.classList.contains('featured-player-profile'));
+}
+function clearPlayerSwipePreview(){
+  document.getElementById('playerSwipePreview')?.remove();
+}
+function ensurePlayerSwipePreview(targetId){
+  const modal=document.getElementById('modal');
+  const hero=document.getElementById('featuredPlayerCard');
+  if(!modal||!hero||!targetId)return null;
+  let preview=document.getElementById('playerSwipePreview');
+  if(preview?.dataset.targetId===String(targetId))return preview;
+  const next=visibleRankingSequence().find(x=>String(x.id)===String(targetId));
+  const p=playerById(targetId)||playerByName(next?.name)||window.ShuaEspnLive?.getPlayerByName?.(next?.name)||next;
+  if(!p)return null;
+  if(!preview){
+    preview=document.createElement('div');
+    preview.id='playerSwipePreview';preview.className='player-swipe-preview';
+    modal.insertBefore(preview,modal.querySelector('.profile'));
+  }
+  preview.dataset.targetId=String(targetId);
+  const copy=hero.cloneNode(true);
+  copy.id='previewFeaturedPlayerCard';
+  copy.className='featured-player-card';
+  const nameLength=String(p.name||'').replace(/\s+/g,'').length;
+  if(nameLength>=18)copy.classList.add('featured-name-xlong');
+  else if(nameLength>=14)copy.classList.add('featured-name-long');
+  if(norm(p.name)==='laddmcconkey')copy.classList.add('featured-name-ladd');
+  const team=String(p.team||'').toUpperCase();
+  const logo=featuredLogoUrl(team),teamName=featuredTeamName(team);
+  const accent=TEAM_ACCENTS[canonicalTeam(team)]||'#3d8cff';
+  copy.style.setProperty('--featured-accent',accent);
+  if(teamName.length>=9)copy.classList.add('featured-team-long');
+  if(p.position==='D/ST')copy.classList.add('featured-defense-profile');
+  const face=copy.querySelector('.featured-portrait-box');
+  if(face)face.innerHTML=(logo&&p.position!=='D/ST'?'<img class="featured-bg-logo" src="'+logo+'" alt="">':'')+featuredFaceHtml(p);
+  const strip=copy.querySelector('.featured-team-strip');
+  if(strip)strip.innerHTML=(p.position==='D/ST'?'':logo?'<img class="featured-mini-logo" src="'+logo+'" alt="">':'<span></span>')+
+    (p.position==='D/ST'?'':'<span class="featured-divider"></span>')+
+    '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div><div class="featured-team-meta"><strong>'+String(p.position||'—')+'</strong> · '+canonicalTeam(team)+'</div></div>';
+  const parts=featuredNameParts(p.name);
+  const first=copy.querySelector('.featured-first'),last=copy.querySelector('.featured-last');
+  if(first)first.textContent=parts.first;
+  if(last)last.textContent=parts.last;
+  const jersey=copy.querySelector('.featured-jersey-number');
+  if(jersey)jersey.textContent='';
+  copy.querySelectorAll('.featured-bio-value').forEach(el=>el.textContent='—');
+  preview.replaceChildren(copy);
+  const tabs=document.getElementById('unifiedProfileTabs')?.cloneNode(true);
+  if(tabs){tabs.removeAttribute('id');tabs.setAttribute('aria-hidden','true');preview.appendChild(tabs)}
+  return preview;
 }
 function resetPhoneProfileSheet(){
   const modal=document.getElementById('modal');
@@ -1189,6 +1281,7 @@ function resetPhoneProfileSheet(){
     profile.style.opacity='';
   }
   if(modal)modal.style.background='';
+  clearPlayerSwipePreview();
 }
 function dismissPhoneProfile(){
   const modal=document.getElementById('modal');
@@ -1203,12 +1296,26 @@ function dismissPhoneProfile(){
 }
 function installPhoneSwipeDismiss(){
  const sheet=document.querySelector('#modal .profile');
- if(!sheet||sheet.dataset.phoneSwipeDismiss==='3')return;
- sheet.dataset.phoneSwipeDismiss='3';
- let gesture=null;
- const ignore='button,input,select,textarea,a,svg,.st-chart,.espn-game-log-table-wrap,.st-table-wrap,[data-st-chart-host]';
+ if(!sheet||sheet.dataset.phoneSwipeDismiss==='4')return;
+ sheet.dataset.phoneSwipeDismiss='4';
+ let gesture=null,settling=false;
+ const ignore='button,input,select,textarea,a,svg,.st-chart,.st-table-wrap,[data-st-chart-host]';
+ const width=()=>sheet.clientWidth||window.innerWidth||375;
+ const restoreHorizontal=dx=>{
+  sheet.style.transition='transform .2s ease-out';
+  sheet.style.transform='translate3d(0,0,0)';
+  const preview=document.getElementById('playerSwipePreview');
+  if(preview){
+   preview.style.transition='transform .2s ease-out';
+   preview.style.transform='translate3d('+(dx>0?-width():width())+'px,0,0)';
+  }
+  setTimeout(()=>{
+   if(sheet.isConnected){sheet.style.transition='';sheet.style.transform='';}
+   clearPlayerSwipePreview();
+  },205);
+ };
  sheet.addEventListener('touchstart',e=>{
-  if(!isPhoneProfileSheet()||e.touches.length!==1)return;
+  if(settling||!isPhoneProfileSheet()||e.touches.length!==1)return;
   const t=e.touches[0];
   gesture={x:t.clientX,y:t.clientY,lastX:t.clientX,lastY:t.clientY,started:performance.now(),mode:null,
     blocked:!!e.target.closest(ignore)};
@@ -1223,21 +1330,53 @@ function installPhoneSwipeDismiss(){
    else if(dy>0&&sheet.scrollTop<=1&&Math.abs(dy)>Math.abs(dx)*1.25)gesture.mode='vertical';
    else{gesture=null;return;}
   }
-  if(gesture.mode==='horizontal'){e.preventDefault();return;}
-  if(gesture.mode==='vertical'){e.preventDefault();sheet.style.transform='translateY('+Math.min(170,dy*.55)+'px)';}
+  if(gesture.mode==='horizontal'){
+   if(e.cancelable)e.preventDefault();
+   const dir=dx<0?'next':'prev';
+   const id=document.getElementById('modal')?.dataset.id||'';
+   const target=adjacentPlayerId(id,dir);
+   const shift=Math.max(-width()*.98,Math.min(width()*.98,target?dx:dx*.12));
+   sheet.style.transition='none';
+   sheet.style.transform='translate3d('+shift+'px,0,0)';
+   const preview=target?ensurePlayerSwipePreview(target):null;
+   if(preview){
+    preview.style.transition='none';
+    preview.style.transform='translate3d('+(shift+(shift>0?-width():width()))+'px,0,0)';
+   }else clearPlayerSwipePreview();
+   return;
+  }
+  if(gesture.mode==='vertical'){if(e.cancelable)e.preventDefault();sheet.style.transform='translateY('+Math.min(170,dy*.55)+'px)';}
  },{passive:false});
  sheet.addEventListener('touchend',()=>{
   const g=gesture;gesture=null;if(!g)return;
-  sheet.style.transform='';
   const dx=g.lastX-g.x,dy=g.lastY-g.y,dt=Math.max(1,performance.now()-g.started);
-  if(g.mode==='horizontal'&&Math.abs(dx)>=55&&Math.abs(dx)>Math.abs(dy)*1.25){
+  if(g.mode==='horizontal'){
    const id=document.getElementById('modal')?.dataset.id||'';
    const dir=dx<0?'next':'prev';
    const target=adjacentPlayerId(id,dir);
-   if(target)openAdjacentPlayer(target,dir,true);
-  }else if(g.mode==='vertical'&&(dy>=100||(dy>=60&&dy/dt>.5)))dismissPhoneProfile();
+   if(target&&Math.abs(dx)>=55&&Math.abs(dx)>Math.abs(dy)*1.25){
+    settling=true;
+    const edge=dir==='next'?-width():width();
+    sheet.style.transition='transform .17s ease-out';
+    sheet.style.transform='translate3d('+edge+'px,0,0)';
+    const preview=document.getElementById('playerSwipePreview');
+    if(preview){preview.style.transition='transform .17s ease-out';preview.style.transform='translate3d(0,0,0)'}
+    setTimeout(()=>{
+     clearPlayerSwipePreview();
+     if(isPhoneProfileSheet())openAdjacentPlayer(target,dir,false);
+     settling=false;
+    },180);
+   }else restoreHorizontal(dx);
+  }else if(g.mode==='vertical'){
+   sheet.style.transform='';
+   if(dy>=100||(dy>=60&&dy/dt>.5))dismissPhoneProfile();
+  }
  },{passive:true});
- sheet.addEventListener('touchcancel',()=>{gesture=null;sheet.style.transform='';},{passive:true});
+ sheet.addEventListener('touchcancel',()=>{
+  const g=gesture;gesture=null;
+  if(g?.mode==='horizontal')restoreHorizontal(g.lastX-g.x);
+  else sheet.style.transform='';
+ },{passive:true});
 }
 
 function prepareUnified(name,seed=null){
@@ -1257,6 +1396,8 @@ function prepareUnified(name,seed=null){
   if(currentId){markSelectedRankingRow(currentId);paintPlayerNav(currentId)}else document.getElementById('rankingPlayerNav')?.setAttribute('hidden','');
   const gp=document.getElementById('unifiedGameLogPanel');
   if(gp){gp.dataset.loadedFor='';gp.dataset.ready='0';gp.innerHTML=''}
+  const sp=document.getElementById('unifiedSnapsPanel');
+  if(sp){sp.dataset.loadedFor='';sp.dataset.ready='0';sp.innerHTML='';sp.dataset.snapRenderToken=''}
   const hp=document.getElementById('unifiedHistoryPanel');
   if(hp){hp.dataset.loadedFor='';hp.dataset.ready='0';hp.innerHTML=''}
   activateTab(['K','D/ST'].includes(seed?.position)?'overview':preferredProfileTab||'overview');

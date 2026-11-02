@@ -1,0 +1,414 @@
+{
+  "season": 2026,
+  "generatedAt": "2026-11-02T22:41:17Z",
+  "weatherSource": "https://mysportsweather.com/nfl",
+  "scheduleSource": "ESPN",
+  "games": [
+    {
+      "id": "401873036",
+      "week": 8,
+      "kickoffUtc": "2026-11-03T01:15:00Z",
+      "away": {
+        "abbr": "CHI",
+        "name": "Chicago Bears",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/chi.png"
+      },
+      "home": {
+        "abbr": "SEA",
+        "name": "Seattle Seahawks",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/sea.png"
+      },
+      "venue": "Lumen Field",
+      "city": "Seattle, WA",
+      "indoor": false,
+      "forecast": {
+        "tempF": 51,
+        "precipPct": 2,
+        "precipType": "Rain",
+        "windMph": 1,
+        "gustMph": 2,
+        "windDirection": "S",
+        "hourly": [
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "precipPct": 1,
+            "tempF": 51,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "W"
+          },
+          {
+            "time": "8 PM",
+            "inGame": true,
+            "precipPct": 2,
+            "tempF": 51,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "S"
+          },
+          {
+            "time": "9 PM",
+            "inGame": true,
+            "precipPct": 2,
+            "tempF": 50,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "SE"
+          },
+          {
+            "time": "10 PM",
+            "inGame": true,
+            "precipPct": 2,
+            "tempF": 49,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "SSE"
+          },
+          {
+            "time": "11 PM",
+            "inGame": false,
+            "precipPct": 2,
+            "tempF": 49,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "SE"
+          }
+        ],
+        "nbmHourly": [
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "precipPct": 0,
+            "tempF": 51,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "W"
+          },
+          {
+            "time": "8 PM",
+            "inGame": true,
+            "precipPct": 2,
+            "tempF": 50,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "W"
+          },
+          {
+            "time": "9 PM",
+            "inGame": true,
+            "precipPct": 2,
+            "tempF": 50,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "SE"
+          },
+          {
+            "time": "10 PM",
+            "inGame": true,
+            "precipPct": 1,
+            "tempF": 50,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "ESE"
+          },
+          {
+            "time": "11 PM",
+            "inGame": false,
+            "precipPct": 2,
+            "tempF": 50,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "E"
+          }
+        ],
+        "sourceUrl": "https://mysportsweather.com/nfl/2026-11-02/chi-sea"
+      }
+    },
+    {
+      "id": "401873037",
+      "week": 9,
+      "kickoffUtc": "2026-11-06T01:15:00Z",
+      "away": {
+        "abbr": "JAX",
+        "name": "Jacksonville Jaguars",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/jax.png"
+      },
+      "home": {
+        "abbr": "BAL",
+        "name": "Baltimore Ravens",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/bal.png"
+      },
+      "venue": "M&T Bank Stadium",
+      "city": "Baltimore, MD",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873038",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T14:30:00Z",
+      "away": {
+        "abbr": "CIN",
+        "name": "Cincinnati Bengals",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/cin.png"
+      },
+      "home": {
+        "abbr": "ATL",
+        "name": "Atlanta Falcons",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/atl.png"
+      },
+      "venue": "Santiago Bernabéu",
+      "city": "Madrid, Spain",
+      "indoor": true,
+      "forecast": null
+    },
+    {
+      "id": "401873039",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T18:00:00Z",
+      "away": {
+        "abbr": "CLE",
+        "name": "Cleveland Browns",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/cle.png"
+      },
+      "home": {
+        "abbr": "NO",
+        "name": "New Orleans Saints",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/no.png"
+      },
+      "venue": "Caesars Superdome",
+      "city": "New Orleans, LA",
+      "indoor": true,
+      "forecast": null
+    },
+    {
+      "id": "401873040",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T18:00:00Z",
+      "away": {
+        "abbr": "DAL",
+        "name": "Dallas Cowboys",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/dal.png"
+      },
+      "home": {
+        "abbr": "IND",
+        "name": "Indianapolis Colts",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ind.png"
+      },
+      "venue": "Lucas Oil Stadium",
+      "city": "Indianapolis, IN",
+      "indoor": true,
+      "forecast": null
+    },
+    {
+      "id": "401873041",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T18:00:00Z",
+      "away": {
+        "abbr": "DEN",
+        "name": "Denver Broncos",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/den.png"
+      },
+      "home": {
+        "abbr": "CAR",
+        "name": "Carolina Panthers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/car.png"
+      },
+      "venue": "Bank of America Stadium",
+      "city": "Charlotte, NC",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873042",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T18:00:00Z",
+      "away": {
+        "abbr": "DET",
+        "name": "Detroit Lions",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/det.png"
+      },
+      "home": {
+        "abbr": "MIA",
+        "name": "Miami Dolphins",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/mia.png"
+      },
+      "venue": "Hard Rock Stadium",
+      "city": "Miami Gardens, FL",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873043",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T18:00:00Z",
+      "away": {
+        "abbr": "LAR",
+        "name": "Los Angeles Rams",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/lar.png"
+      },
+      "home": {
+        "abbr": "WAS",
+        "name": "Washington Commanders",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/wsh.png"
+      },
+      "venue": "Northwest Stadium",
+      "city": "Landover, MD",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873044",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T18:00:00Z",
+      "away": {
+        "abbr": "NYG",
+        "name": "New York Giants",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/nyg.png"
+      },
+      "home": {
+        "abbr": "PHI",
+        "name": "Philadelphia Eagles",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/phi.png"
+      },
+      "venue": "Lincoln Financial Field",
+      "city": "Philadelphia, PA",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873045",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T18:00:00Z",
+      "away": {
+        "abbr": "NYJ",
+        "name": "New York Jets",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/nyj.png"
+      },
+      "home": {
+        "abbr": "KC",
+        "name": "Kansas City Chiefs",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/kc.png"
+      },
+      "venue": "Arrowhead Stadium",
+      "city": "Kansas City, MO",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873046",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T21:05:00Z",
+      "away": {
+        "abbr": "HOU",
+        "name": "Houston Texans",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/hou.png"
+      },
+      "home": {
+        "abbr": "LAC",
+        "name": "Los Angeles Chargers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/lac.png"
+      },
+      "venue": "SoFi Stadium",
+      "city": "Inglewood, CA",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873047",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T21:25:00Z",
+      "away": {
+        "abbr": "LV",
+        "name": "Las Vegas Raiders",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/lv.png"
+      },
+      "home": {
+        "abbr": "SF",
+        "name": "San Francisco 49ers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/sf.png"
+      },
+      "venue": "Levi's Stadium",
+      "city": "Santa Clara, CA",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873048",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T21:25:00Z",
+      "away": {
+        "abbr": "ARI",
+        "name": "Arizona Cardinals",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ari.png"
+      },
+      "home": {
+        "abbr": "SEA",
+        "name": "Seattle Seahawks",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/sea.png"
+      },
+      "venue": "Lumen Field",
+      "city": "Seattle, WA",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873049",
+      "week": 9,
+      "kickoffUtc": "2026-11-08T21:25:00Z",
+      "away": {
+        "abbr": "GB",
+        "name": "Green Bay Packers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/gb.png"
+      },
+      "home": {
+        "abbr": "NE",
+        "name": "New England Patriots",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ne.png"
+      },
+      "venue": "Gillette Stadium",
+      "city": "Foxborough, MA",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873050",
+      "week": 9,
+      "kickoffUtc": "2026-11-09T01:20:00Z",
+      "away": {
+        "abbr": "TB",
+        "name": "Tampa Bay Buccaneers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/tb.png"
+      },
+      "home": {
+        "abbr": "CHI",
+        "name": "Chicago Bears",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/chi.png"
+      },
+      "venue": "Soldier Field",
+      "city": "Chicago, IL",
+      "indoor": false,
+      "forecast": null
+    },
+    {
+      "id": "401873051",
+      "week": 9,
+      "kickoffUtc": "2026-11-10T01:15:00Z",
+      "away": {
+        "abbr": "BUF",
+        "name": "Buffalo Bills",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/buf.png"
+      },
+      "home": {
+        "abbr": "MIN",
+        "name": "Minnesota Vikings",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/min.png"
+      },
+      "venue": "U.S. Bank Stadium",
+      "city": "Minneapolis, MN",
+      "indoor": true,
+      "forecast": null
+    }
+  ]
+}

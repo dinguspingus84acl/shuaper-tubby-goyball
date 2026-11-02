@@ -1,0 +1,116 @@
+/* The Weather tab is isolated from the ranking and analytics page layouts. */
+body.shua-weather-open main>*:not(#shuaWeatherSection){display:none!important}
+body.shua-weather-open #shuaWeatherSection{display:block!important}
+body.shua-weather-open .positions [data-pos="WEATHER"]{background:#105642!important;border-color:#29dba0!important;color:#ecfff5!important}
+#shuaWeatherSection{color:#ebf4fc;min-width:0}
+#shuaWeatherSection *{box-sizing:border-box}
+#shuaWeatherSection .wx-container{max-width:1250px;margin:0 auto;padding:8px 0 48px}
+#shuaWeatherSection .wx-hero{display:flex;align-items:center;justify-content:space-between;gap:20px;max-width:none;padding:5px 0 19px;border-bottom:1px solid #28485d;margin:0 0 19px}
+#shuaWeatherSection .wx-eyebrow{font-size:10px;letter-spacing:.19em;color:#42e7ac;font-weight:900;margin:0 0 8px}
+#shuaWeatherSection .wx-hero h2{font-size:clamp(30px,4vw,44px);font-weight:950;line-height:1;margin:0 0 10px;color:#fff}
+#shuaWeatherSection .wx-sub{font-size:13px;line-height:1.5;color:#a4bdd2;margin:0;max-width:650px}
+#shuaWeatherSection .wx-refresh{border:1px solid #3e667b;background:#122e43;color:#d5eefc;padding:11px 17px;border-radius:11px;font-size:12px;font-weight:900;flex:0 0 auto;min-height:41px}
+#shuaWeatherSection .wx-refresh:disabled{opacity:.55;cursor:wait}
+#shuaWeatherSection .wx-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
+#shuaWeatherSection .wx-stat{background:linear-gradient(140deg,#102d44,#0b2237);border:1px solid #28516c;border-radius:13px;padding:13px 15px;min-width:0}
+#shuaWeatherSection .wx-stat strong{font-size:29px;font-weight:950;font-variant-numeric:tabular-nums;display:block;line-height:1.15;color:#f8fdff}
+#shuaWeatherSection .wx-stat span{color:#a1bed1;font-size:11px;font-weight:800;display:block;margin-top:3px}
+#shuaWeatherSection .wx-controls{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:0 0 12px}
+#shuaWeatherSection .wx-search{height:43px;flex:1 1 260px;max-width:380px;display:flex;align-items:center;gap:8px;border:1px solid #375c76;border-radius:10px;background:#0d263d;padding:0 11px;color:#a2bdd2}
+#shuaWeatherSection .wx-search>span{font-size:24px;line-height:1}
+#shuaWeatherSection .wx-search input{min-width:0;width:100%;border:0;outline:none;background:transparent;color:#eff8ff;font-size:14px;height:100%;padding:0}
+#shuaWeatherSection .wx-search input::placeholder{color:#87a2b7}
+#shuaWeatherSection .wx-search:focus-within{border-color:#3fe0a8;box-shadow:0 0 0 2px #27c99520}
+#shuaWeatherSection .wx-filters{display:flex;gap:6px;max-width:100%;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+#shuaWeatherSection .wx-filters button{background:#0c263b;color:#b2cbdc;border:1px solid #31546a;border-radius:9px;padding:10px 12px;white-space:nowrap;font-weight:850;font-size:11px;min-height:39px}
+#shuaWeatherSection .wx-filters button[aria-pressed="true"]{background:#13634c;color:#fff;border-color:#2de0a4}
+#shuaWeatherSection .wx-game-count{font-size:11px;color:#8fb0c6;font-weight:850;margin:5px 1px 11px}
+#shuaWeatherSection .wx-games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+#shuaWeatherSection .wx-game{min-width:0;overflow:hidden;background:linear-gradient(155deg,#102c44,#0a1e31 70%);border:1px solid #29495e;border-radius:15px;padding:16px;box-shadow:0 8px 24px #00000018}
+#shuaWeatherSection .wx-game-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+#shuaWeatherSection .wx-kick{color:#aac9d9;font-weight:800;font-size:11px;line-height:1.4}
+#shuaWeatherSection .wx-kick span{color:#466780;padding:0 3px}
+#shuaWeatherSection .wx-impact{border-radius:20px;padding:6px 10px;font-size:10px;line-height:1.2;font-weight:900;white-space:nowrap;border:1px solid transparent}
+#shuaWeatherSection .wx-impact-low{color:#9cf7c9;background:#0f493d;border-color:#277455}
+#shuaWeatherSection .wx-impact-watch{color:#ffe7a3;background:#54421e;border-color:#aa7c37}
+#shuaWeatherSection .wx-impact-high{color:#ffc4c5;background:#622d36;border-color:#c05a67}
+#shuaWeatherSection .wx-impact-pending{color:#b5cede;background:#1d374d;border-color:#3c5b70}
+#shuaWeatherSection .wx-impact-indoor{color:#c4d4ff;background:#27385d;border-color:#506ba5}
+#shuaWeatherSection .wx-matchup{display:grid;grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);gap:8px;align-items:center}
+#shuaWeatherSection .wx-team{display:flex;align-items:center;gap:9px;min-width:0}
+#shuaWeatherSection .wx-team-logo{width:43px;height:43px;flex:0 0 43px;object-fit:contain}
+#shuaWeatherSection .wx-team span{display:flex;flex-direction:column;min-width:0;gap:2px}
+#shuaWeatherSection .wx-team b{font-size:19px;letter-spacing:.01em;font-weight:950;line-height:1.1}
+#shuaWeatherSection .wx-team small{font-size:10px;color:#a9c0d0;line-height:1.2;font-weight:750;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#shuaWeatherSection .wx-versus{font-size:10px;color:#6d95aa;text-align:center;font-weight:900}
+#shuaWeatherSection .wx-venue{font-size:11px;line-height:1.4;color:#9bb9cf;margin:11px 0 14px}
+#shuaWeatherSection .wx-dome{display:inline-block;color:#a3b8f1;background:#1d2c50;border-radius:5px;padding:2px 5px;font-size:9px;margin-left:3px}
+#shuaWeatherSection .wx-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 13px}
+#shuaWeatherSection .wx-metric{min-width:0;background:#091e30;border:1px solid #243f55;padding:10px 6px;border-radius:9px;text-align:center}
+#shuaWeatherSection .wx-metric span{font-size:9px;color:#9db6c9;font-weight:780;line-height:1.3;display:block;margin-bottom:6px}
+#shuaWeatherSection .wx-metric strong{font-size:17px;line-height:1.2;font-weight:950;white-space:nowrap;font-variant-numeric:tabular-nums;color:#e9f6ff}
+#shuaWeatherSection .wx-metric.wx-rain strong{color:#88c6ff}
+#shuaWeatherSection .wx-pending{border:1px dashed #406279;background:#0a2034;border-radius:9px;padding:14px;color:#bdcddd;font-size:12px;margin-bottom:13px}
+#shuaWeatherSection .wx-analysis{background:#0a2034;border-left:3px solid #21b586;padding:11px 12px;border-radius:0 9px 9px 0;margin-bottom:12px}
+#shuaWeatherSection .wx-analysis>span{font-size:9px;letter-spacing:.12em;font-weight:950;color:#4ce1ae}
+#shuaWeatherSection .wx-analysis p{font-size:12px;color:#e2eff7;line-height:1.55;margin:5px 0 0}
+#shuaWeatherSection .wx-analysis small{font-size:11px;line-height:1.5;color:#91b7d0;display:block;margin-top:7px}
+#shuaWeatherSection .wx-details{border:1px solid #33556a;border-radius:10px;background:#0a2238;margin-bottom:11px;overflow:hidden}
+#shuaWeatherSection .wx-details summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px;font-size:12px;font-weight:850;cursor:pointer;color:#d7f2ff}
+#shuaWeatherSection .wx-details summary::-webkit-details-marker{display:none}
+#shuaWeatherSection .wx-details[open] summary{border-bottom:1px solid #345469}
+#shuaWeatherSection .wx-details summary span{font-size:17px;transition:transform .15s}
+#shuaWeatherSection .wx-details[open] summary span{transform:rotate(180deg)}
+#shuaWeatherSection .wx-hourly-block{padding:0 11px 12px}
+#shuaWeatherSection .wx-hourly-block h4{font-size:11px;color:#a8ccdc;margin:13px 1px 7px}
+#shuaWeatherSection .wx-hourly-scroll{width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+#shuaWeatherSection .wx-hourly-table{border-collapse:separate;border-spacing:0;min-width:430px;width:100%;font-variant-numeric:tabular-nums}
+#shuaWeatherSection .wx-hourly-table th,#shuaWeatherSection .wx-hourly-table td{border:0;border-bottom:1px solid #1c3a50;padding:7px 9px;font-size:11px;text-align:center;white-space:nowrap;color:#d7e8f4}
+#shuaWeatherSection .wx-hourly-table th:first-child{text-align:left;position:sticky;left:0;background:#0a2238;z-index:1}
+#shuaWeatherSection .wx-hourly-table thead th{color:#a6c1d6;font-weight:900}
+#shuaWeatherSection .wx-hourly-table td.wx-in-game,#shuaWeatherSection .wx-hourly-table thead .wx-in-game{background:#19473b;color:#d6ffe9}
+#shuaWeatherSection .wx-source-link{font-weight:850;font-size:11px;color:#56dda9;text-decoration:none;display:inline-block}
+#shuaWeatherSection .wx-source-link:hover{text-decoration:underline}
+#shuaWeatherSection .wx-source-link span{margin-left:3px}
+#shuaWeatherSection .wx-footer{margin-top:18px;color:#8cabbf;font-size:11px;line-height:1.6;border-top:1px solid #26445b;padding-top:9px}
+#shuaWeatherSection .wx-footer p{margin:8px 0}
+#shuaWeatherSection .wx-footer a{color:#75dbb4}
+#shuaWeatherSection .wx-empty{grid-column:1/-1;background:#0d283e;border:1px solid #345469;border-radius:12px;text-align:center;padding:24px 15px;color:#bbd1dd;font-size:13px;line-height:1.5}
+#shuaWeatherSection .wx-empty a{color:#53ddaa}
+@media(max-width:1000px){#shuaWeatherSection .wx-games{grid-template-columns:1fr}#shuaWeatherSection .wx-game{max-width:800px;width:100%;margin:auto}}
+@media(max-width:750px){
+ body.shua-weather-open main{padding:9px 8px 64px!important}
+ #shuaWeatherSection .wx-container{padding:0 0 55px}
+ #shuaWeatherSection .wx-hero{padding:9px 3px 13px;gap:9px;margin-bottom:12px}
+ #shuaWeatherSection .wx-hero h2{font-size:30px;margin-bottom:6px}
+ #shuaWeatherSection .wx-eyebrow{font-size:9px;letter-spacing:.12em;margin-bottom:5px}
+ #shuaWeatherSection .wx-sub{font-size:11px;max-width:290px}
+ #shuaWeatherSection .wx-refresh{font-size:11px;padding:9px;min-height:35px}
+ #shuaWeatherSection .wx-overview{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-bottom:12px}
+ #shuaWeatherSection .wx-stat{padding:9px 6px;border-radius:10px}
+ #shuaWeatherSection .wx-stat strong{font-size:22px}
+ #shuaWeatherSection .wx-stat span{font-size:9px;line-height:1.2}
+ #shuaWeatherSection .wx-controls{display:block;margin-bottom:10px}
+ #shuaWeatherSection .wx-search{width:100%;max-width:none;height:41px;margin-bottom:8px}
+ #shuaWeatherSection .wx-filters button{font-size:10px;min-height:34px;padding:8px 9px}
+ #shuaWeatherSection .wx-games{gap:9px}
+ #shuaWeatherSection .wx-game{padding:12px;border-radius:12px}
+ #shuaWeatherSection .wx-game-top{margin-bottom:10px}
+ #shuaWeatherSection .wx-kick{font-size:10px}
+ #shuaWeatherSection .wx-impact{font-size:9px;padding:6px 8px}
+ #shuaWeatherSection .wx-team{gap:5px}
+ #shuaWeatherSection .wx-team-logo{width:36px;height:36px;flex-basis:36px}
+ #shuaWeatherSection .wx-team b{font-size:17px}
+ #shuaWeatherSection .wx-team small{font-size:9px}
+ #shuaWeatherSection .wx-venue{font-size:10px;margin:8px 0 10px}
+ #shuaWeatherSection .wx-metrics{gap:4px;margin-bottom:10px}
+ #shuaWeatherSection .wx-metric{padding:8px 3px}
+ #shuaWeatherSection .wx-metric span{font-size:9px;margin-bottom:3px}
+ #shuaWeatherSection .wx-metric strong{font-size:15px}
+ #shuaWeatherSection .wx-analysis{padding:9px 10px;margin-bottom:10px}
+ #shuaWeatherSection .wx-analysis p{font-size:12px}
+}
+body.phone-mode.shua-weather-open main{padding:9px 8px 64px!important}
+body.phone-mode.shua-weather-open #shuaWeatherSection .wx-games{grid-template-columns:1fr}
+body.phone-mode.shua-weather-open #shuaWeatherSection .wx-controls{display:block}
+body.phone-mode.shua-weather-open #shuaWeatherSection .wx-search{max-width:none;margin-bottom:8px}

@@ -1,0 +1,36 @@
+name: Verify NFL weather tab
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'weather.js'
+      - 'weather.css'
+      - 'weather/data/nfl.json'
+      - 'scripts/refresh-nfl-weather.py'
+      - 'tests/nfl-weather-refresh.py'
+      - 'tests/weather-browser.py'
+      - '.github/workflows/verify-nfl-weather.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check snapshot parser, data and JavaScript
+        run: |
+          python -m pip install --disable-pip-version-check lxml==6.0.2
+          python tests/nfl-weather-refresh.py
+          node --check weather.js
+      - name: Install desktop and phone browser engines
+        run: |
+          python -m pip install --disable-pip-version-check playwright==1.57.0
+          python -m playwright install --with-deps chromium webkit
+      - name: Verify Weather on desktop and phone
+        run: python tests/weather-browser.py

@@ -168,8 +168,10 @@
   }
   function hide(){visible=false;document.body.classList.remove('shua-weather-open');section.hidden=true;button.classList.remove('active');}
   document.addEventListener('click',event=>{
-    const target=event.target.closest?.('.positions [data-pos]');
-    if(target&&target!==button&&visible)hide();
+    const target=event.target.closest?.('.positions [data-pos],#phoneMenuItems [data-target]');
+    if(!target||!visible)return;
+    const destination=target.dataset.pos||target.dataset.target;
+    if(destination!=='WEATHER')hide();
   },true);
   nav.addEventListener('click',event=>{
     const target=event.target.closest('[data-pos]');

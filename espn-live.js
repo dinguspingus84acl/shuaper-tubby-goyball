@@ -404,16 +404,9 @@ style.textContent += `
 .espn-game-log-table .espn-game-log-opponent{width:100%;max-width:100%;min-width:0;padding:2px 1px;gap:3px;font-size:inherit}
 .espn-game-log-table .espn-game-log-opponent-logo{width:15px;height:15px;flex-basis:15px}
 .espn-game-log-table .espn-game-log-opponent>span{min-width:0;overflow:hidden;text-overflow:clip}
-.espn-snap-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:9px 0 11px}
-.espn-snap-summary>div{padding:10px 8px;border:1px solid #ffffff18;border-radius:9px;background:#0a2136;text-align:center}
-.espn-snap-summary span{display:block;color:#94a9bd;font-size:.58rem;font-weight:850}
-.espn-snap-summary strong{display:block;margin-top:5px;font-size:1rem;color:#eaf5ff}
-.espn-snap-table{width:100%;table-layout:fixed;border-collapse:collapse;font-variant-numeric:tabular-nums}
-.espn-snap-table th,.espn-snap-table td{padding:9px 5px;border-top:1px solid #ffffff15;text-align:center;font-size:.79rem}
-.espn-snap-table th{font-size:.63rem;color:#8ca4bd;text-transform:uppercase}
-.espn-snap-table th:nth-child(1){width:12%}.espn-snap-table th:nth-child(2){width:32%}
-.espn-snap-table td:nth-child(2){text-align:left}
-.espn-snap-table .gl-snap-rate{color:#69dca2;font-weight:1000}
+.espn-game-log-snap-view .espn-game-log-summary{margin:2px 0 9px}
+.espn-snap-game-log .gl-snap-rate{color:#69dca2!important;font-weight:1000!important}
+.espn-snap-note{padding:9px 3px;color:#8fa6bc;font-size:.64rem;line-height:1.35}
 @media(max-width:700px){
  body.phone-mode .espn-game-log-table-wrap{overflow-x:hidden!important}
  body.phone-mode .espn-game-log-table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important}
@@ -423,14 +416,13 @@ style.textContent += `
  body.phone-mode .espn-game-log-table th:nth-child(2),body.phone-mode .espn-game-log-table td:nth-child(2){width:23%!important;min-width:0!important;max-width:none!important}
  .espn-game-log-table .espn-game-log-opponent-logo{width:13px;height:13px;flex-basis:13px}
  body.phone-mode .espn-game-log-table .gl-col-turnovers{width:auto!important}
- .espn-snap-table th,.espn-snap-table td{padding:9px 2px;font-size:.76rem}
 }
 /* Every weekly amount uses the same larger type, including PTS, instead of tiny mobile values. */
 .espn-game-log-table tbody td,.espn-game-log-table tbody td.gl-stat,.espn-game-log-table tbody td.gl-pts,
-.espn-snap-table tbody td{font-size:1.04rem!important;font-weight:950!important;line-height:1.08;font-variant-numeric:tabular-nums}
+.espn-snap-game-log tbody td{font-size:1.04rem!important;font-weight:950!important;line-height:1.08;font-variant-numeric:tabular-nums}
 @media(max-width:700px){
  body.phone-mode .espn-game-log-table tbody td,body.phone-mode .espn-game-log-table tbody td.gl-stat,
- body.phone-mode .espn-game-log-table tbody td.gl-pts,body.phone-mode .espn-snap-table tbody td{
+ body.phone-mode .espn-game-log-table tbody td.gl-pts,body.phone-mode .espn-snap-game-log tbody td{
   font-size:clamp(.9rem,4vw,1.02rem)!important;padding:10px 1px!important
  }
 }
@@ -1397,17 +1389,16 @@ function snapRateHtml(name,year,years,games,{embedded=false}={}){
  const total=counted.length?counted.reduce((s,g)=>s+Number(g.snapCount),0):null;
  const selector='<div class="espn-game-log-year-row"><span class="espn-game-log-year-label">Years</span><select class="espn-game-log-year-select" data-snap-year aria-label="Snap rate season">'+
   years.map(y=>'<option value="'+y+'"'+(Number(y)===Number(year)?' selected':'')+'>'+y+'</option>').join('')+'</select></div>';
- const summary='<div class="espn-snap-summary">'+
-  '<div><span>AVG SNAP RATE</span><strong>'+(avg===null?'—':avg.toFixed(1)+'%')+'</strong></div>'+
-  '<div><span>OFFENSIVE SNAPS</span><strong>'+(total===null?'—':Math.round(total))+'</strong></div>'+
-  '<div><span>WEEKS TRACKED</span><strong>'+known.length+'</strong></div></div>';
+ const summary='<div class="espn-game-log-summary"><strong>'+year+' Season</strong><span>'+
+  (avg===null?'—':avg.toFixed(1)+'%')+' Avg Snap Rate · '+
+  (total===null?'—':Math.round(total))+' Offensive Snaps · '+known.length+' Weeks Tracked</span></div>';
  const title='<div class="espn-game-log-title"><strong>'+name+' Snap Rates</strong><span>'+year+' Season</span></div>';
- const info='<p class="espn-game-log-empty">Snap rate = offensive snaps played ÷ team offensive snaps. Missing data is shown as —.</p>';
+ const info='<p class="espn-snap-note">Snap % = offensive snaps played ÷ team offensive snaps. Unavailable weeks show —.</p>';
  const heading=embedded?'':title+selector;
  if(!games.length)return heading+'<div class="espn-game-log-empty">No weekly snap data found for '+year+'.</div>';
- const table='<div class="espn-game-log-table-wrap"><table class="espn-snap-table"><thead><tr><th>WK</th><th>OPP</th><th>SNAPS</th><th>SNAP %</th></tr></thead><tbody>'+
-  games.map(g=>'<tr><td>'+g.week+'</td><td>'+gameLogOpponentHtml(g.opponent)+'</td><td>'+
-   (g.snapCount===null||g.snapCount===undefined?'—':Math.round(g.snapCount))+'</td><td class="gl-snap-rate">'+
+ const table='<div class="espn-game-log-table-wrap"><table class="espn-game-log-table espn-snap-game-log"><thead><tr><th>WK</th><th>OPP</th><th>SNAPS</th><th>SNAP %</th></tr></thead><tbody>'+
+  [...games].sort((a,b)=>Number(a.week)-Number(b.week)).map(g=>'<tr><td>'+g.week+'</td><td>'+gameLogOpponentHtml(g.opponent)+'</td><td class="gl-stat">'+
+   (g.snapCount===null||g.snapCount===undefined?'—':Math.round(g.snapCount))+'</td><td class="gl-stat gl-snap-rate">'+
    (g.snapRate===null||g.snapRate===undefined?'—':Number(g.snapRate).toFixed(1)+'%')+'</td></tr>').join('')+
   '</tbody></table></div>';
  return heading+summary+(known.length?'':'<div class="espn-game-log-empty">Snap percentages are unavailable for this season.</div>')+table+info;
@@ -1448,6 +1439,7 @@ async function renderSnapRatesData(name,target,explicitYear=null,{embedded=false
   }
   if(target.dataset.snapRenderToken!==token)return;
   target.innerHTML=snapRateHtml(name,year,years,games,{embedded});
+  colorGameLogMatchups(target,year,player.position);
   const select=target.querySelector('[data-snap-year]');
   if(select)select.onchange=()=>{const chosen=Number(select.value);snapRateYears.set(key,chosen);void renderSnapRatesData(name,target,chosen)};
  }catch(e){

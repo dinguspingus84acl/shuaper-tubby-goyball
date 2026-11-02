@@ -153,7 +153,17 @@ input.addEventListener('keydown',event=>{
 document.addEventListener('keydown',event=>{if(visible&&event.key==='Escape'){event.preventDefault();close();}},true);
 const original=document.getElementById('search');
 original.addEventListener('focus',open);original.addEventListener('click',open);
-const nav=document.querySelector('.positions');
-if(nav){const launch=document.createElement('button');launch.type='button';launch.className='shua-search-desktop-launch';launch.textContent='Search players';launch.onclick=open;nav.append(launch);}
+// One consistent search entry point is visible above every site section, even when
+// Analytics/Stats/Trades hide the other <main> children or phone mode hides navigation.
+const globalSearch=document.createElement('div');
+globalSearch.id='shuaGlobalSearchBar';
+globalSearch.setAttribute('role','search');
+globalSearch.innerHTML='<button type="button" class="shua-global-search-launch" aria-label="Search NFL players">'+
+ '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.7" cy="10.7" r="6.5"></circle><path d="m16 16 5 5"></path></svg>'+
+ '<span>Search players…</span><span class="shua-global-search-hint">Current &amp; historical</span></button>';
+const sticky=document.querySelector('.sticky');
+if(sticky)sticky.insertAdjacentElement('afterend',globalSearch);
+else document.body.prepend(globalSearch);
+globalSearch.querySelector('button').addEventListener('click',open);
 window.ShuaPlayerSearch={open,close,get mode(){return mode;}};
 })();

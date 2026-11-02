@@ -13,10 +13,8 @@ Thread(target=srv.serve_forever,daemon=True).start()
 base='http://127.0.0.1:%d/'%srv.server_address[1]
 
 def open_search(page,phone):
-    if phone:
-        page.locator('#phoneMenuButton').click()
-        page.locator('#phoneMenuSearchWrap #search').click()
-    else:page.locator('.shua-search-desktop-launch').click()
+    assert page.locator('#shuaGlobalSearchBar .shua-global-search-launch').is_visible(), 'Search bar must be visible on every site tab'
+    page.locator('#shuaGlobalSearchBar .shua-global-search-launch').click()
     page.locator('#shuaExpandedSearch .shua-search-dialog').wait_for(state='visible',timeout=18000)
 
 def check_browser(browser,phone):
@@ -86,9 +84,13 @@ def check_browser(browser,phone):
         assert dims['total']<=dims['visible']+2,('Game log should fit without horizontal swiping',dims)
     page.locator('#unifiedGameLogPanel [data-gl-mode="snaps"]').click()
     snap=page.locator('#unifiedGameLogPanel [data-embedded-snap-rates]')
-    snap.locator('.espn-snap-table').wait_for(state='visible',timeout=30000)
+    snap.locator('.espn-game-log-table.espn-snap-game-log').wait_for(state='visible',timeout=30000)
+    assert snap.locator('.espn-game-log-summary').is_visible(),'Snap Rates should use the same season-summary layout as Rushing'
     assert 'SNAP %' in snap.locator('thead th').all_inner_texts(),'Snap rate column missing from Game Log Snap Rates button'
     assert snap.locator('tbody tr').count()>0,'Snap Rates button has no weekly records'
+    if phone:
+        snap_width=snap.locator('.espn-game-log-table-wrap').evaluate('(el)=>({total:el.scrollWidth,visible:el.clientWidth})')
+        assert snap_width['total']<=snap_width['visible']+2,('Snap Rates should not swipe horizontally',snap_width)
     # Short and long surnames must all occupy one line beneath the given name.
     for full_name,last_piece in [('Ladd McConkey','McConkey'),('Jaxon Smith-Njigba','Smith-Njigba'),('Amon-Ra St. Brown','St. Brown')]:
         page.evaluate('(name)=>window.openUnifiedPlayerProfileByName(name)',full_name)
@@ -123,6 +125,7 @@ def check_browser(browser,phone):
         page.locator('#phoneMenuButton').click()
         page.locator('#phoneMenuItems [data-target="ANALYTICS"]').click()
     else:page.locator('.positions [data-pos="ANALYTICS"]').click()
+    assert page.locator('#shuaGlobalSearchBar .shua-global-search-launch').is_visible(),'Analytics tab needs global search'
     page.wait_for_function('window.ShuaStudio?.UI?.navigate !== undefined',timeout=25000)
     page.evaluate("window.ShuaStudio.UI.navigate('consistency')")
     analytic=page.locator('#stGlobalSearch')
@@ -146,6 +149,9 @@ def check_browser(browser,phone):
     suggestions.first.wait_for(state='visible',timeout=12000)
     suggestions.first.click()
     page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Robinson')",timeout=18000)
+    page.locator('#close').evaluate('(e)=>e.click()')
+    open_search(page,phone)
+    page.locator('#shuaExpandedSearch .shua-search-close').click()
     print('PASS',browser.browser_type.name,'phone' if phone else 'desktop',
           'two-line names, uniform game-log amounts, inline snap rates, headshot search and clean Analytics search',flush=True)
     ctx.close()

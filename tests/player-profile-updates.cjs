@@ -54,6 +54,7 @@ assert.ok(search.includes('shuaSearchInputFace')&&search.includes('syncInputAvat
 assert.ok(searchCss.includes('.shua-search-field-shell')&&searchCss.includes('.shua-search-input-avatar'),'Face-preview input styling');
 assert.ok(search.includes('shuaGlobalSearchBar')&&search.includes("sticky.insertAdjacentElement('afterend',globalSearch)"),'Search must stay visible across site tabs outside main content');
 assert.ok(searchCss.includes('#shuaGlobalSearchBar .shua-global-search-launch')&&searchCss.includes('body.phone-mode #shuaGlobalSearchBar'),'Desktop and phone need a visible global search bar');
+assert.ok(searchCss.includes('pointer-events:none')&&searchCss.includes('pointer-events:auto'),'Search bar must not cover navigation with an invisible hitbox');
 assert.ok(studio.includes('stGlobalPlayerMatches')&&studio.includes('showAnalyticsPlayerMatches'),'Analytics suggestions required');
 assert.ok(studio.includes("face(p,'st-global-player-face')"),'Analytics suggestions must include player faces');
 assert.ok(studioCss.includes('st-global-search-inputrow')&&studioCss.includes('st-global-player-matches'),'Analytics search styling required');
@@ -62,7 +63,7 @@ assert.ok(studio.includes("magnifier.toggleAttribute('hidden',!!player)"),'Analy
 assert.ok(studioCss.includes('.st-global-leading-avatar'),'Analytics leading face styling required');
 assert.ok(html.includes('unified-profile.js?v=20261101-two-line-names2')&&html.includes('player-search.js?v=20261101-search-all-tabs3'));
 assert.ok(html.includes('espn-live.js?v=20261101-snap-log-format3')&&html.includes('analytics-dashboard.js?v=20261101-input-face5'));
-assert.ok(html.includes('player-search.js?v=20261101-search-all-tabs3')&&html.includes('player-search.css?v=20261101-search-all-tabs3'));
+assert.ok(html.includes('player-search.js?v=20261101-search-all-tabs3')&&html.includes('player-search.css?v=20261101-search-all-tabs4'));
 assert.ok(loader.includes("const version = '20261101-input-face5'"));
 assert.ok(live.includes("credentials:'omit'")&&live.includes('view=mTeam&view=mRoster&view=mStatus'));
 assert.ok(live.includes('visibilitychange')&&live.includes('lastSuccess'));

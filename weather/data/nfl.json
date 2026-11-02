@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-02T22:41:17Z",
+  "generatedAt": "2026-11-02T23:04:26Z",
   "weatherSource": "https://mysportsweather.com/nfl",
   "scheduleSource": "ESPN",
   "games": [
@@ -32,6 +32,7 @@
           {
             "time": "7 PM",
             "inGame": false,
+            "sky": "sun",
             "precipPct": 1,
             "tempF": 51,
             "windMph": 1,
@@ -41,6 +42,7 @@
           {
             "time": "8 PM",
             "inGame": true,
+            "sky": "sun",
             "precipPct": 2,
             "tempF": 51,
             "windMph": 1,
@@ -50,6 +52,7 @@
           {
             "time": "9 PM",
             "inGame": true,
+            "sky": "sun",
             "precipPct": 2,
             "tempF": 50,
             "windMph": 1,
@@ -59,6 +62,7 @@
           {
             "time": "10 PM",
             "inGame": true,
+            "sky": "sun",
             "precipPct": 2,
             "tempF": 49,
             "windMph": 1,
@@ -68,6 +72,7 @@
           {
             "time": "11 PM",
             "inGame": false,
+            "sky": "sun",
             "precipPct": 2,
             "tempF": 49,
             "windMph": 1,
@@ -79,20 +84,20 @@
           {
             "time": "7 PM",
             "inGame": false,
-            "precipPct": 0,
+            "precipPct": 1,
             "tempF": 51,
             "windMph": 1,
             "gustMph": 2,
-            "windDirection": "W"
+            "windDirection": "WNW"
           },
           {
             "time": "8 PM",
             "inGame": true,
-            "precipPct": 2,
+            "precipPct": 1,
             "tempF": 50,
             "windMph": 1,
             "gustMph": 2,
-            "windDirection": "W"
+            "windDirection": "WNW"
           },
           {
             "time": "9 PM",
@@ -101,7 +106,7 @@
             "tempF": 50,
             "windMph": 1,
             "gustMph": 2,
-            "windDirection": "SE"
+            "windDirection": "W"
           },
           {
             "time": "10 PM",
@@ -110,7 +115,7 @@
             "tempF": 50,
             "windMph": 1,
             "gustMph": 2,
-            "windDirection": "ESE"
+            "windDirection": "NE"
           },
           {
             "time": "11 PM",

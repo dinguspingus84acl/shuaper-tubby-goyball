@@ -74,7 +74,14 @@ def parse_hourly(table) -> list[dict]:
         label = first(head, f'.//*[ {contains_class("hourly__time")} ]') or clean(" ".join(head.itertext()))
         if not label:
             continue
-        result.append({"time": label, "inGame": "is-game-hour" in head.get("class", "").split()})
+        hour = {"time": label, "inGame": "is-game-hour" in head.get("class", "").split()}
+        # MySportsWeather's NWS header contains a real sky-condition SVG.
+        # Keep that source condition instead of guessing from precipitation %.
+        icon_classes = " ".join(head.xpath(".//*[@class]/@class"))
+        icon = re.search(r"(?:^|\s)wx-icon--([a-z0-9-]+)(?:\s|$)", icon_classes)
+        if icon:
+            hour["sky"] = icon.group(1)
+        result.append(hour)
     for row in rows:
         metric = first(row, f'./td[{contains_class("hourly__label")}]').lower()
         field = {"precip": "precipPct", "temp": "tempF", "wind": "windMph", "gusts": "gustMph", "wind dir": "windDirection"}.get(metric)

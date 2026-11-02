@@ -25,7 +25,7 @@ FIXTURE = """
     <div class="game-summary__cell"><span class="game-summary__primary-value">1 mph</span><span class="game-summary__primary-label">Wind</span></div>
   </div>
   <table class="hourly__table">
-    <thead><tr><th></th><th class="hourly__hour-col">7 PM</th><th class="hourly__hour-col is-game-hour"><div class="hourly__time">8 PM</div></th><th class="hourly__hour-col is-game-hour"><div class="hourly__time">9 PM</div></th></tr></thead>
+    <thead><tr><th></th><th class="hourly__hour-col"><svg class="wx-icon wx-icon--sun"></svg><div class="hourly__time">7 PM</div></th><th class="hourly__hour-col is-game-hour"><svg class="wx-icon wx-icon--partly"></svg><div class="hourly__time">8 PM</div></th><th class="hourly__hour-col is-game-hour"><svg class="wx-icon wx-icon--rain"></svg><div class="hourly__time">9 PM</div></th></tr></thead>
     <tbody>
       <tr><td class="hourly__label">Precip</td><td class="hourly__cell">1%</td><td class="hourly__cell">2%</td><td class="hourly__cell">3%</td></tr>
       <tr><td class="hourly__label">Temp</td><td class="hourly__cell">52°</td><td class="hourly__cell">51°</td><td class="hourly__cell">49°</td></tr>
@@ -67,7 +67,9 @@ class TestWeather(unittest.TestCase):
         self.assertEqual(chi["hourly"][0]["time"], "7 PM")
         self.assertEqual(chi["hourly"][1]["windDirection"], "S")
         self.assertTrue(chi["hourly"][1]["inGame"])
+        self.assertEqual([hour.get("sky") for hour in chi["hourly"]], ["sun", "partly", "rain"])
         self.assertEqual(chi["nbmHourly"][0]["tempF"], 50)
+        self.assertNotIn("sky", chi["nbmHourly"][0])
 
     def test_pending_and_source_link_and_timezone(self):
         forecasts = weather.parse_forecasts(FIXTURE)

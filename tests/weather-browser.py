@@ -41,6 +41,19 @@ def check_weather(page, phone, url):
     if AVAILABLE:
         weather.locator(".wx-game .wx-details summary").first.click()
         assert weather.get_by_text("NWS hourly forecast").first.is_visible()
+        nws = weather.locator(".wx-hourly-block").first
+        assert nws.locator(".wx-hour-col").count() >= 1
+        assert ":" in nws.locator(".wx-hour-clock").first.inner_text()
+        assert nws.locator(".wx-hour-period").first.inner_text() in ("AM", "PM")
+        first_forecast = next(game["forecast"] for game in GAMES if game["forecast"])
+        if any(hour.get("sky") for hour in first_forecast["hourly"]):
+            assert nws.locator('.wx-hour-emoji[role="img"]').count() >= 1
+            if first_forecast["nbmHourly"]:
+                nbm = weather.locator(".wx-hourly-block").nth(1)
+                assert nbm.locator('.wx-hour-emoji[role="img"]').count() >= 1
+        if phone and len(first_forecast["hourly"]) <= 5:
+            widths = nws.locator(".wx-hourly-scroll").evaluate("el => ({total: el.scrollWidth, visible: el.clientWidth})")
+            assert widths["total"] <= widths["visible"] + 2, f"Hourly columns should fit phone width: {widths}"
     weather.locator('[data-wx-filter="all"]').click()
     weather.locator("#wxSearch").fill("jax")
     assert weather.locator(".wx-game").count() == 1

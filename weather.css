@@ -62,12 +62,20 @@ body.shua-weather-open .positions [data-pos="WEATHER"]{background:#105642!import
 #shuaWeatherSection .wx-details summary span{font-size:17px;transition:transform .15s}
 #shuaWeatherSection .wx-details[open] summary span{transform:rotate(180deg)}
 #shuaWeatherSection .wx-hourly-block{padding:0 11px 12px}
-#shuaWeatherSection .wx-hourly-block h4{font-size:11px;color:#a8ccdc;margin:13px 1px 7px}
+#shuaWeatherSection .wx-hourly-block-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:13px 1px 8px}
+#shuaWeatherSection .wx-hourly-block h4{font-size:11px;color:#a8ccdc;margin:0}
+#shuaWeatherSection .wx-hourly-block-heading>span{font-size:10px;color:#83b29e;font-weight:850;white-space:nowrap}
 #shuaWeatherSection .wx-hourly-scroll{width:100%;overflow-x:auto;overscroll-behavior-x:contain}
-#shuaWeatherSection .wx-hourly-table{border-collapse:separate;border-spacing:0;min-width:430px;width:100%;font-variant-numeric:tabular-nums}
+#shuaWeatherSection .wx-hourly-table{border-collapse:separate;border-spacing:0;min-width:0;width:100%;table-layout:fixed;font-variant-numeric:tabular-nums}
 #shuaWeatherSection .wx-hourly-table th,#shuaWeatherSection .wx-hourly-table td{border:0;border-bottom:1px solid #1c3a50;padding:7px 9px;font-size:11px;text-align:center;white-space:nowrap;color:#d7e8f4}
-#shuaWeatherSection .wx-hourly-table th:first-child{text-align:left;position:sticky;left:0;background:#0a2238;z-index:1}
+#shuaWeatherSection .wx-hourly-table th:first-child{text-align:left;position:sticky;left:0;background:#0a2238;z-index:1;width:78px}
 #shuaWeatherSection .wx-hourly-table thead th{color:#a6c1d6;font-weight:900}
+#shuaWeatherSection .wx-hourly-table .wx-hour-label{font-size:10px;line-height:1.4;letter-spacing:.06em}
+#shuaWeatherSection .wx-hour-head{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:0}
+#shuaWeatherSection .wx-hour-emoji{display:block;font-size:25px;line-height:1.35;min-height:31px}
+#shuaWeatherSection .wx-hour-unknown{color:#7697aa;font-size:15px;padding-top:6px}
+#shuaWeatherSection .wx-hour-clock{display:block;font-size:12px;line-height:1.15;color:#f3fff8;font-weight:950}
+#shuaWeatherSection .wx-hour-period{display:block;font-size:10px;line-height:1.2;font-weight:900;color:#a6c9d5;letter-spacing:.03em}
 #shuaWeatherSection .wx-hourly-table td.wx-in-game,#shuaWeatherSection .wx-hourly-table thead .wx-in-game{background:#19473b;color:#d6ffe9}
 #shuaWeatherSection .wx-source-link{font-weight:850;font-size:11px;color:#56dda9;text-decoration:none;display:inline-block}
 #shuaWeatherSection .wx-source-link:hover{text-decoration:underline}
@@ -109,8 +117,19 @@ body.shua-weather-open .positions [data-pos="WEATHER"]{background:#105642!import
  #shuaWeatherSection .wx-metric strong{font-size:15px}
  #shuaWeatherSection .wx-analysis{padding:9px 10px;margin-bottom:10px}
  #shuaWeatherSection .wx-analysis p{font-size:12px}
+ #shuaWeatherSection .wx-hourly-block{padding:0 5px 10px}
+ #shuaWeatherSection .wx-hourly-table th,#shuaWeatherSection .wx-hourly-table td{padding:7px 2px;font-size:10px}
+ #shuaWeatherSection .wx-hourly-table th:first-child{width:64px}
+ #shuaWeatherSection .wx-hourly-table .wx-hour-label{font-size:9px}
+ #shuaWeatherSection .wx-hour-emoji{font-size:21px;min-height:27px}
+ #shuaWeatherSection .wx-hour-clock{font-size:11px}
+ #shuaWeatherSection .wx-hour-period{font-size:9px}
 }
 body.phone-mode.shua-weather-open main{padding:9px 8px 64px!important}
 body.phone-mode.shua-weather-open #shuaWeatherSection .wx-games{grid-template-columns:1fr}
 body.phone-mode.shua-weather-open #shuaWeatherSection .wx-controls{display:block}
 body.phone-mode.shua-weather-open #shuaWeatherSection .wx-search{max-width:none;margin-bottom:8px}
+body.phone-mode #shuaWeatherSection .wx-hourly-block{padding:0 5px 10px}
+body.phone-mode #shuaWeatherSection .wx-hourly-table th,body.phone-mode #shuaWeatherSection .wx-hourly-table td{padding:7px 2px;font-size:10px}
+body.phone-mode #shuaWeatherSection .wx-hourly-table th:first-child{width:64px}
+body.phone-mode #shuaWeatherSection .wx-hour-emoji{font-size:21px;min-height:27px}

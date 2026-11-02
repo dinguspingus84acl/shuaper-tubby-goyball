@@ -75,10 +75,40 @@
     return parts.length?parts.join('; ')+'.':'The published game-hour forecast stays relatively steady.';
   }
 
-  function hourTable(hours,title){
+  const skyConditions={
+    sun:{emoji:'☀️',label:'Clear / sunny'},
+    clear:{emoji:'☀️',label:'Clear skies'},
+    partly:{emoji:'⛅',label:'Partly cloudy'},
+    'partly-cloudy':{emoji:'⛅',label:'Partly cloudy'},
+    cloud:{emoji:'☁️',label:'Cloudy'},
+    cloudy:{emoji:'☁️',label:'Cloudy'},
+    overcast:{emoji:'☁️',label:'Overcast'},
+    rain:{emoji:'🌧️',label:'Rain'},
+    showers:{emoji:'🌦️',label:'Showers'},
+    storm:{emoji:'⛈️',label:'Thunderstorms'},
+    thunder:{emoji:'⛈️',label:'Thunderstorms'},
+    snow:{emoji:'🌨️',label:'Snow'},
+    sleet:{emoji:'🌨️',label:'Sleet'},
+    fog:{emoji:'🌫️',label:'Fog'},
+    wind:{emoji:'💨',label:'Windy'},
+  };
+  function hourClock(value){
+    const raw=String(value||'').trim();
+    const match=raw.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
+    if(!match)return {clock:raw,period:'',spoken:raw};
+    const clock=match[1]+':'+(match[2]||'00'),period=match[3].toUpperCase();
+    return {clock,period,spoken:clock+' '+period};
+  }
+  function hourTable(hours,title,skyByTime){
     if(!hours||!hours.length)return '';
     const fields=[['tempF','Temp','°'],['precipPct','Precip','%'],['windMph','Wind',' mph'],['gustMph','Gusts',' mph'],['windDirection','Direction','']];
-    return '<div class="wx-hourly-block"><h4>'+escape(title)+'</h4><div class="wx-hourly-scroll"><table class="wx-hourly-table"><thead><tr><th scope="col">Metric</th>'+hours.map(h=>'<th scope="col" class="'+(h.inGame?'wx-in-game':'')+'">'+escape(h.time)+'</th>').join('')+'</tr></thead><tbody>'+fields.filter(([key])=>hours.some(h=>h[key]!==undefined&&h[key]!==null)).map(([key,label,suffix])=>'<tr><th scope="row">'+label+'</th>'+hours.map(h=>'<td class="'+(h.inGame?'wx-in-game':'')+'">'+(h[key]===undefined||h[key]===null?'—':escape(String(h[key]))+suffix)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div></div>';
+    const headings=hours.map(h=>{
+      const time=hourClock(h.time),sky=skyConditions[String(h.sky||skyByTime?.get(h.time)||'').toLowerCase()];
+      const icon=sky?'<span class="wx-hour-emoji" role="img" aria-label="'+escape(sky.label)+'">'+sky.emoji+'</span>':'<span class="wx-hour-emoji wx-hour-unknown" aria-label="Sky condition unavailable">—</span>';
+      return '<th scope="col" class="wx-hour-col '+(h.inGame?'wx-in-game':'')+'" aria-label="'+escape(time.spoken+(sky?' · '+sky.label:''))+'"><div class="wx-hour-head">'+icon+'<strong class="wx-hour-clock">'+escape(time.clock)+'</strong><span class="wx-hour-period">'+escape(time.period)+'</span></div></th>';
+    }).join('');
+    const width=hours.length>5?' style="min-width:'+(80+hours.length*61)+'px"':'';
+    return '<div class="wx-hourly-block"><div class="wx-hourly-block-heading"><h4>'+escape(title)+'</h4><span>Hour by hour · ET</span></div><div class="wx-hourly-scroll"><table class="wx-hourly-table"'+width+'><thead><tr><th scope="col" class="wx-hour-label">HOUR<br>ET</th>'+headings+'</tr></thead><tbody>'+fields.filter(([key])=>hours.some(h=>h[key]!==undefined&&h[key]!==null)).map(([key,label,suffix])=>'<tr><th scope="row">'+label+'</th>'+hours.map(h=>'<td class="'+(h.inGame?'wx-in-game':'')+'">'+(h[key]===undefined||h[key]===null?'—':escape(String(h[key]))+suffix)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div></div>';
   }
 
   function gameCard(game){
@@ -90,7 +120,8 @@
         ['Gusts',display(f.gustMph,' mph'),'gust'],
         [f.precipType==='Snow'?'Snow chance':'Rain chance',display(f.precipPct,'%'),'rain']
       ].map(([label,value,klass])=>'<div class="wx-metric wx-'+klass+'"><span>'+escape(label)+'</span><strong>'+escape(value)+'</strong></div>').join('')+'</div>';
-    const details=f&&(f.hourly?.length||f.nbmHourly?.length)?'<details class="wx-details"><summary>Hourly game forecast <span aria-hidden="true">⌄</span></summary>'+hourTable(f.hourly,'NWS hourly forecast')+hourTable(f.nbmHourly,'NBM higher-resolution forecast')+'</details>':'';
+    const skyByTime=new Map((f?.hourly||[]).filter(h=>h.sky).map(h=>[h.time,h.sky]));
+    const details=f&&(f.hourly?.length||f.nbmHourly?.length)?'<details class="wx-details"><summary>Hourly game forecast <span aria-hidden="true">⌄</span></summary>'+hourTable(f.hourly,'NWS hourly forecast',skyByTime)+hourTable(f.nbmHourly,'NBM higher-resolution forecast',skyByTime)+'</details>':'';
     return '<article class="wx-game" data-weather-game="'+escape(game.id)+'">'+
       '<div class="wx-game-top"><div class="wx-kick">Week '+escape(game.week??'—')+' <span>·</span> '+escape(formatDate(game.kickoffUtc))+'</div><span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div>'+
       '<div class="wx-matchup"><div class="wx-team">'+logo(game.away)+'<span><b>'+escape(game.away.abbr)+'</b><small>'+escape(game.away.name)+'</small></span></div><span class="wx-versus">AT</span><div class="wx-team">'+logo(game.home)+'<span><b>'+escape(game.home.abbr)+'</b><small>'+escape(game.home.name)+'</small></span></div></div>'+

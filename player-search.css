@@ -38,7 +38,7 @@
 #shuaGlobalSearchBar .shua-global-search-hint{color:#8ca9bd;font-size:10px;font-weight:700;white-space:nowrap}
 #shuaGlobalSearchBar .shua-global-search-launch:hover{border-color:#71b6db;background:#123b57}
 #shuaGlobalSearchBar .shua-global-search-launch:focus-visible{outline:2px solid #35d07f;outline-offset:3px}
-body.fantasy-home-mode #shuaGlobalSearchBar{position:fixed;top:70px;left:0;right:0;z-index:19}
+body.fantasy-home-mode #shuaGlobalSearchBar{position:fixed;top:70px;left:0;right:0;z-index:35}
 @media(max-width:700px){
 #shuaExpandedSearch{padding:max(5px,env(safe-area-inset-top)) 5px max(5px,env(safe-area-inset-bottom))}
 #shuaExpandedSearch .shua-search-dialog{height:calc(100dvh - 10px);max-height:calc(100dvh - 10px);padding:12px 10px;gap:9px;border-radius:11px}

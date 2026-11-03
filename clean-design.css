@@ -97,10 +97,16 @@ body.shua-clean #shuaAnalyticsSection .st-tab[aria-selected="true"]{background:#
 body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-navigation{display:none!important}
 body.shua-clean #shuaAnalyticsSection .st-global-search{margin:0 0 9px!important;padding:0!important}
 body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow{min-height:37px!important;max-width:430px;border-radius:9px!important}
-/* Analytics has its own player search/filter; show only that one there.
-   The global launcher remains available on all views without that field. */
-body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaGlobalSearchBar .shua-global-search-launch{display:none!important}
+/* Analytics keeps its chart-search field. The all-players search remains
+   reachable as a small icon, including for retired/historical players. */
+body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaGlobalSearchBar .shua-global-search-launch{display:flex!important;flex:0 0 38px;width:38px;min-width:38px;min-height:36px;padding:8px;order:2}
+body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaGlobalSearchBar .shua-global-search-launch>span{display:none!important}
 body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaGlobalSearchBar{min-height:0;padding-top:3px;padding-bottom:0;justify-content:flex-end}
+@media(min-width:701px){
+ body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaGlobalSearchBar{height:0;min-height:0;padding:0;position:relative;overflow:visible;z-index:75}
+ body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaGlobalSearchBar .shua-global-search-launch{position:absolute;right:147px;top:8px}
+ body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaDesignSwitch{position:absolute;right:20px;top:8px;margin:0}
+}
 body.shua-clean #shuaAnalyticsSection .st-topline{margin-bottom:12px}
 body.shua-clean #shuaAnalyticsSection .st-heading{margin-bottom:12px}
 body.shua-clean #shuaAnalyticsSection .st-controls{gap:7px;margin-bottom:10px}

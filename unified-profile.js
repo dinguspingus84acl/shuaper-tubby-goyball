@@ -439,6 +439,27 @@ style.textContent += `
 .phone-mode .featured-player-card.featured-name-ladd .featured-last{font-size:clamp(1rem,4.15vw,1.42rem)!important;letter-spacing:-.055em}
 @media(max-width:760px){.featured-player-card.featured-name-ladd .featured-last{font-size:clamp(1rem,4vw,1.4rem)!important}}
 `;
+style.textContent += `
+/* Team navigation is part of the player card, separate from its four data tabs. */
+.featured-player-profile .player-depth-action{
+ display:flex;padding:6px 9px;background:#07111de8;
+ border-left:1px solid #ffffff18;border-right:1px solid #ffffff18
+}
+.featured-player-profile .player-depth-chart-button{
+ display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:36px;
+ padding:8px 12px;border-radius:8px;border:1px solid color-mix(in srgb,var(--profile-accent,#3d8cff) 43%,#ffffff30);
+ background:color-mix(in srgb,var(--profile-accent,#3d8cff) 15%,#091928);
+ color:#eff9ff;font-size:.73rem;font-weight:850;letter-spacing:.015em;cursor:pointer
+}
+.featured-player-profile .player-depth-chart-button:hover,.featured-player-profile .player-depth-chart-button:focus-visible{
+ border-color:var(--profile-accent,#3d8cff);background:color-mix(in srgb,var(--profile-accent,#3d8cff) 24%,#091928)
+}
+.featured-player-profile .player-depth-chart-team{opacity:.68;font-size:.68rem}
+@media(max-width:760px){
+ .featured-player-profile .player-depth-action{padding:5px 6px}
+ .featured-player-profile .player-depth-chart-button{min-height:35px;font-size:.7rem;padding:7px 9px}
+}
+`;
 document.head.appendChild(style);
 
 function playerByName(name){
@@ -739,6 +760,22 @@ function clearFeaturedProfile(){
   box.classList.remove('featured-player-profile','featured-profile-gibbs','featured-profile-bijan','featured-profile-walker');
   box.style.removeProperty('--profile-accent');
   document.getElementById('featuredPlayerCard')?.remove();
+  document.getElementById('playerDepthAction')?.remove();
+}
+function openTeamDepthChart(team){
+  const nav=document.querySelector('.positions .pos[data-pos="DEPTH"]');
+  const select=document.getElementById('depthTeam');
+  if(!nav||!select)return;
+  // Do not show a stale "Back to Schedule" link for player-card navigation.
+  window.shuaScheduleDepthReturn=null;
+  document.getElementById('close')?.click();
+  nav.click();
+  const target=[...select.options].find(option=>canonicalTeam(option.value)===canonicalTeam(team));
+  if(target){
+    select.value=target.value;
+    select.dispatchEvent(new Event('change',{bubbles:true}));
+  }
+  requestAnimationFrame(()=>document.getElementById('depthSection')?.scrollIntoView({behavior:'smooth',block:'start'}));
 }
 function heightLabel(value){
   if(value===null||value===undefined||value==='')return '—';
@@ -888,6 +925,21 @@ function applyFeaturedProfile(name,seed=null){
     '</div>';
 
   tabs.insertAdjacentElement('beforebegin',hero);
+  if(TEAM_NAMES[canonicalTeam(team)]){
+    const action=document.createElement('div');
+    action.id='playerDepthAction';
+    action.className='player-depth-action';
+    const button=document.createElement('button');
+    button.id='playerDepthChartButton';
+    button.className='player-depth-chart-button';
+    button.type='button';
+    button.setAttribute('aria-label','View '+featuredTeamName(team)+' depth chart');
+    button.innerHTML='<span>Team Depth Chart</span><span class="player-depth-chart-team"></span><span aria-hidden="true">→</span>';
+    button.querySelector('.player-depth-chart-team').textContent=canonicalTeam(team);
+    button.addEventListener('click',()=>openTeamDepthChart(team));
+    action.appendChild(button);
+    tabs.insertAdjacentElement('beforebegin',action);
+  }
   fitFeaturedName(hero);
   requestAnimationFrame(()=>fitFeaturedName(hero));
   document.fonts?.ready?.then(()=>fitFeaturedName(hero)).catch(()=>{});
@@ -1105,7 +1157,7 @@ function ensureUi(){
     ['overview','Overview'],
     ['gamelog','Game Log'],
     ['history','History'],
-    ['performance','Performance']
+    ['performance','Analytics']
   ].map(([k,l])=>'<button type="button" class="unified-profile-tab" data-profile-tab="'+k+'">'+l+'</button>').join('');
 
   const panels=document.createElement('div');

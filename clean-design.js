@@ -1,17 +1,17 @@
-/* Optional 2026 design refresh. The original markup and styles are retained.
-   Visitors can switch back to Classic at any time; the choice persists locally. */
+/* The refreshed design is standard. The original markup and styles remain
+   recoverable from the project's preserved Classic GitHub backup branch. */
 (()=>{
   'use strict';
 
   const nav=document.querySelector('.positions');
   const tools=document.querySelector('.sticky .tools');
-  const globalSearch=document.getElementById('shuaGlobalSearchBar');
-  if(!nav||!tools||!globalSearch)return;
+  if(!nav||!tools)return;
 
   const storageKey='shuaDesignMode';
   const requested=new URLSearchParams(location.search).get('design');
-  const originalPreference=(()=>{try{return localStorage.getItem(storageKey);}catch(_){return null;}})();
-  let mode=['clean','classic'].includes(requested)?requested:originalPreference==='classic'?'classic':'clean';
+  // Ignore old saved Classic selections: without a toggle, nobody should be
+  // stranded on the previous layout. ?design=classic remains a manual fallback.
+  let mode=requested==='classic'?'classic':'clean';
   const groups=[
     {id:'rankings',label:'Rankings',items:['HOME','ALL','QB','RB','WR','TE','MYGUYS','DND']},
     {id:'analytics',label:'Analytics',items:['ANALYTICS','ESPN','COMPARE']},
@@ -29,12 +29,6 @@
         '<div class="shua-clean-popup" id="shua-menu-'+group.id+'" hidden></div></div>'
     ).join('')+'</div>';
   tools.prepend(cleanNav);
-
-  const switcher=document.createElement('button');
-  switcher.id='shuaDesignSwitch';
-  switcher.type='button';
-  switcher.title='Switch between the refreshed layout and the original site design';
-  globalSearch.append(switcher);
 
   function closeMenus(except=null){
     cleanNav.querySelectorAll('.shua-clean-group').forEach(group=>{
@@ -176,14 +170,10 @@
     mode=next==='classic'?'classic':'clean';
     document.body.classList.toggle('shua-clean',mode==='clean');
     try{localStorage.setItem(storageKey,mode);}catch(_){}
-    switcher.textContent=mode==='clean'?'Use Classic design':'Use Clean design';
-    switcher.setAttribute('aria-label',switcher.textContent);
-    switcher.setAttribute('aria-pressed',String(mode==='clean'));
     if(mode==='clean'){populate();decorateNotes();watchWeather();}
     else{closeMenus();restoreNotes();}
     refreshWeatherOrder();
   }
-  switcher.addEventListener('click',()=>apply(mode==='clean'?'classic':'clean'));
   populate();
   apply(mode);
   window.ShuaDesign={get mode(){return mode;},setMode:apply};

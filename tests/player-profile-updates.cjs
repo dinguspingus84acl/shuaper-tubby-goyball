@@ -62,7 +62,13 @@ assert.ok(studioCss.includes('st-global-search-inputrow')&&studioCss.includes('s
 assert.ok(studio.includes('stGlobalLeadingAvatar')&&studio.includes('setAnalyticsLeadingAvatar(options[0]||null)'),'Analytics input needs a face preview');
 assert.ok(studio.includes("magnifier.toggleAttribute('hidden',!!player)"),'Analytics magnifier must actually hide as an SVG attribute');
 assert.ok(studioCss.includes('.st-global-leading-avatar'),'Analytics leading face styling required');
-assert.ok(html.includes('unified-profile.js?v=20261102-facefix1')&&html.includes('player-search.js?v=20261102-facefix1'));
+assert.ok(/unified-profile\.js\?v=20261103-depth1/.test(html)&&html.includes('player-search.js?v=20261102-facefix1'));
+assert.ok(profile.includes("['performance','Analytics']"),'Player card Performance tab must read Analytics');
+assert.ok(profile.includes('playerDepthChartButton')&&profile.includes('openTeamDepthChart(team)'),'Player card needs its team depth-chart button');
+assert.ok(profile.includes('canonicalTeam(option.value)===canonicalTeam(team)'),'Team depth chart navigation must resolve league abbreviation aliases');
+const cleanDesign=read('clean-design.js');
+assert.ok(!cleanDesign.includes("switcher.id='shuaDesignSwitch'"),'Remove the Classic toggle without removing the clean theme');
+assert.ok(cleanDesign.includes("requested==='classic'?'classic':'clean'"),'Previously saved Classic selection must not trap visitors on the old UI');
 assert.ok(html.includes('espn-live.js?v=20261102-facefix1')&&html.includes('analytics-dashboard.js?v=20261102-facefix1'));
 assert.ok(html.includes('player-search.js?v=20261102-facefix1')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
 assert.ok(loader.includes("const version = '20261102-facefix1'"));

@@ -1,0 +1,136 @@
+/* Second-pass refinement. This is an additive layer; the pre-polish Clean UI
+   is saved at backup/clean-ui-before-refinements-2026-11-03. */
+body.shua-clean{
+  --shua-polish-line:rgba(157,188,209,.13);
+}
+
+/* 1. Display-mode controls live in Tools, not over the content. */
+body.shua-clean #viewModeToggle{display:none!important}
+#shuaCleanNav #shuaDisplayModeButton{
+  border-top:1px solid #355367!important;border-radius:0!important;
+  margin-top:7px!important;padding-top:13px!important;color:#b8e5d7!important
+}
+
+/* 2. The navigation takes less vertical space as visitors scroll. */
+body.shua-clean.shua-polish-scrolled:not(.shua-polish-phone) .sticky>.tools{padding-top:5px!important;padding-bottom:5px!important}
+body.shua-clean.shua-polish-scrolled #shuaCleanNav .shua-clean-trigger{min-height:35px;padding-top:5px;padding-bottom:5px}
+body.shua-clean.shua-polish-scrolled #shuaGlobalSearchBar{padding-top:3px;padding-bottom:2px}
+body.shua-clean.shua-polish-scrolled #shuaGlobalSearchBar .shua-global-search-launch{min-height:35px}
+body.shua-clean.shua-polish-phone.shua-polish-scrolled #shuaCleanNav{min-height:56px}
+body.shua-clean.shua-polish-phone.shua-polish-scrolled #shuaCleanNav .shua-clean-trigger{min-height:42px}
+
+/* 3. Condensed headings and a consistent one-line source/status treatment. */
+body.shua-clean main>.head{margin-bottom:8px;gap:8px}
+body.shua-clean main>.head h2{font-size:19px;line-height:1.1;letter-spacing:-.025em}
+body.shua-clean main>.head #sub:empty{display:none}
+body.shua-clean #shuaWeatherSection .wx-hero{margin-bottom:8px}
+body.shua-clean #shuaWeatherSection .wx-hero h2{font-size:24px}
+body.shua-clean #shuaMyTeams .myteams-header{margin-bottom:9px!important;padding-bottom:8px!important}
+
+/* 4. Secondary Analytics filters collapse without removing any option. */
+body.shua-clean #shuaAnalyticsSection .shua-filter-controls{align-items:flex-end;gap:7px}
+body.shua-clean #shuaAnalyticsSection .shua-filter-toggle{
+  flex:0 0 auto;align-self:flex-end;min-height:37px;
+  border:1px solid #39637b;border-radius:8px;background:#10364b;
+  padding:7px 11px;color:#bcebdc;font-size:11px;font-weight:850;cursor:pointer
+}
+body.shua-clean #shuaAnalyticsSection .shua-filter-toggle:hover,
+body.shua-clean #shuaAnalyticsSection .shua-filter-toggle:focus-visible{background:#164b56;border-color:#43bda2}
+body.shua-clean:not(.shua-polish-phone) #shuaAnalyticsSection .shua-filter-toggle{display:none!important}
+body.shua-clean.shua-polish-phone #shuaAnalyticsSection .shua-filter-controls:not(.shua-filters-open)>label:not(:first-child){display:none!important}
+body.shua-clean.shua-polish-phone #shuaAnalyticsSection .shua-filter-controls.shua-filters-open{flex-wrap:wrap}
+
+/* 5. Hide Big Board options under a single accessible mobile control. */
+#shuaBoardOptions{display:none}
+body.shua-clean.shua-polish-phone:has(.positions .pos.active[data-pos="ALL"]) #shuaBoardOptions{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;
+  border:1px solid #386479;border-radius:8px;background:#102e43;padding:7px 10px;
+  color:#e0f8f1;font-size:11px;font-weight:850;cursor:pointer
+}
+body.shua-clean.shua-polish-phone:not(.shua-board-options-open):has(.positions .pos.active[data-pos="ALL"]) #teamControls,
+body.shua-clean.shua-polish-phone:not(.shua-board-options-open):has(.positions .pos.active[data-pos="ALL"]) #overallToggle{display:none!important}
+body.shua-clean.shua-polish-phone.shua-board-options-open main>.head{flex-wrap:wrap}
+body.shua-clean.shua-polish-phone.shua-board-options-open #teamControls{
+  display:flex!important;flex:1 1 100%;order:3;justify-content:flex-start;gap:5px
+}
+body.shua-clean.shua-polish-phone.shua-board-options-open #overallToggle{display:flex!important;margin:4px 0 10px}
+
+/* 6. Keep large names and ranks; align the secondary columns consistently. */
+body.shua-clean #shuaAnalyticsSection .st-rank-row{min-height:54px;gap:9px;border-bottom:1px solid var(--shua-polish-line)}
+body.shua-clean #shuaAnalyticsSection .st-rank-row:last-child{border-bottom:0}
+body.shua-clean #shuaAnalyticsSection .st-rank-num,
+body.shua-clean #shuaAnalyticsSection .st-score,
+body.shua-clean #shuaMyTeams .myteams-roster-row>strong,
+body.shua-clean #shuaMyTeams .myteams-standing-rank{font-variant-numeric:tabular-nums}
+body.shua-clean #shuaMyTeams .myteams-roster-row{min-height:50px;border-color:var(--shua-polish-line);gap:8px}
+
+/* 7. A contextual way back after entering Depth Charts from a player card. */
+body.shua-clean #depthPlayerBack{
+  display:inline-flex;align-items:center;gap:7px;margin:5px 0 11px;
+  padding:8px 12px;border:1px solid #2b8066;border-radius:9px;
+  background:#123f37;color:#e4fff4;font-size:12px;font-weight:850;cursor:pointer
+}
+body.shua-clean #depthPlayerBack[hidden]{display:none!important}
+
+/* 8. Game Log separates weeks while keeping the current fixed-width layout. */
+body.shua-clean .espn-game-log-table tbody tr:nth-child(2n){background:rgba(68,119,141,.075)!important}
+body.shua-clean .espn-game-log-table tbody tr td{border-bottom:1px solid var(--shua-polish-line)}
+body.shua-clean .espn-game-log-table tbody tr:hover{background:rgba(54,135,124,.14)!important}
+body.shua-clean .espn-game-log-tab.active{box-shadow:inset 0 -2px 0 #58ddb0}
+
+/* Analytics panel explanations remain available by tapping the small i. */
+body.shua-clean #shuaAnalyticsSection .st-panel-head{overflow:visible}
+body.shua-clean #shuaAnalyticsSection .shua-chart-info{position:relative;flex:0 0 auto;margin-left:auto;z-index:10}
+body.shua-clean #shuaAnalyticsSection .shua-chart-info summary{
+  display:grid;place-items:center;width:30px;height:30px;list-style:none;
+  border:1px solid #3d667d;border-radius:50%;background:#102f42;
+  color:#8dddc1;font:900 14px Georgia,serif;cursor:pointer
+}
+body.shua-clean #shuaAnalyticsSection .shua-chart-info summary::-webkit-details-marker{display:none}
+body.shua-clean #shuaAnalyticsSection .shua-chart-info[open] summary{background:#155044;color:#fff}
+body.shua-clean #shuaAnalyticsSection .shua-chart-info p{
+  position:absolute;right:0;top:calc(100% + 7px);z-index:12;
+  width:min(290px,75vw);margin:0;padding:12px 13px;
+  background:#0a2a3c;border:1px solid #42816e;border-radius:10px;
+  color:#d3e7ee;font-size:12px;line-height:1.45;font-weight:500;
+  box-shadow:0 12px 27px #000a
+}
+
+/* 9. Weather: matchup and risk are concise, exact labelled hours expand. */
+body.shua-clean #shuaWeatherSection .wx-game{padding:12px}
+body.shua-clean #shuaWeatherSection .wx-game-top{gap:7px}
+body.shua-clean #shuaWeatherSection .shua-wx-summary-sky{font-size:23px;line-height:1;flex:0 0 auto;margin-left:auto}
+body.shua-clean #shuaWeatherSection .wx-matchup[role="button"]{cursor:pointer;border-radius:7px}
+body.shua-clean #shuaWeatherSection .wx-matchup[role="button"]:focus-visible{outline:2px solid #4ad7ab;outline-offset:3px}
+body.shua-clean #shuaWeatherSection .shua-wx-game-details{margin:8px 0;border-top:1px solid var(--shua-polish-line)}
+body.shua-clean #shuaWeatherSection .shua-wx-game-details summary{
+  padding:11px 3px 6px;list-style:none;color:#a4e6d2;font-size:11px;font-weight:900;cursor:pointer
+}
+body.shua-clean #shuaWeatherSection .shua-wx-game-details summary::-webkit-details-marker{display:none}
+body.shua-clean #shuaWeatherSection .shua-wx-game-details summary:after{content:'⌄';float:right;font-size:16px;line-height:1}
+body.shua-clean #shuaWeatherSection .shua-wx-game-details[open] summary:after{content:'⌃'}
+body.shua-clean #shuaWeatherSection .shua-wx-game-details .wx-analysis{margin:4px 0 5px}
+body.shua-clean #shuaWeatherSection .wx-hour-preview{margin-bottom:6px}
+
+/* 10. My Teams sub-navigation becomes a single scrollable row on mobile. */
+body.shua-clean.shua-polish-phone #shuaMyTeams .myteams-subnav{
+  display:flex!important;grid-template-columns:none!important;flex-wrap:nowrap!important;
+  overflow-x:auto!important;overflow-y:hidden!important;gap:5px!important;
+  padding:4px 1px 9px!important;scrollbar-width:thin;-webkit-overflow-scrolling:touch
+}
+body.shua-clean.shua-polish-phone #shuaMyTeams .myteams-subnav button{
+  flex:0 0 auto!important;min-width:90px;min-height:38px;
+  padding:8px 10px!important;font-size:11px!important;white-space:nowrap
+}
+
+/* Subtle, consistent loading and freshness treatments across sections. */
+body.shua-clean :is(.wx-empty,.pc-empty,.st-empty,.unified-profile-loading,.myteams-empty){
+  background:#0d2638;border:1px dashed var(--shua-polish-line);border-radius:10px;
+  color:#b2c8d5;padding:15px
+}
+body.shua-clean #shuaWeatherSection .wx-freshness,
+body.shua-clean #shuaMyTeams .myteams-live-status{font-size:10px;color:#91aebb}
+
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean.shua-polish-scrolled .sticky,body.shua-clean .shua-filter-toggle{transition:none!important}
+}

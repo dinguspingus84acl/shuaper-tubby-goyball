@@ -112,6 +112,12 @@ body.shua-clean #shuaAnalyticsSection .st-rank-num{color:#b9dedb;font-weight:900
 body.shua-clean #shuaAnalyticsSection .st-panel-head{margin-bottom:11px}
 body.shua-clean #shuaAnalyticsSection .st-rank-row{padding:9px 0}
 
+/* My Teams: remove the inherited red header rule and match the card system. */
+body.shua-clean #shuaMyTeams .myteams-header{padding:8px 0 14px!important;margin:2px 0 14px!important;border-bottom:1px solid var(--shua-border)!important}
+body.shua-clean #shuaMyTeams .myteams-card{background:#0b2336;border:1px solid var(--shua-border);box-shadow:none;border-radius:12px}
+body.shua-clean #shuaMyTeams .myteams-subnav button{border-color:transparent;border-radius:8px}
+body.shua-clean #shuaMyTeams .myteams-subnav button[aria-selected="true"]{border-color:#2e8769}
+
 /* Weather cards show game, forecast, and hours as one coherent unit. */
 body.shua-clean #shuaWeatherSection .wx-container{padding:3px 0 60px}
 body.shua-clean #shuaWeatherSection .wx-hero{margin-bottom:12px;padding-bottom:12px}

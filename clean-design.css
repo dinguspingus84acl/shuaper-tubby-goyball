@@ -105,7 +105,7 @@ body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not
 @media(min-width:701px){
  body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaGlobalSearchBar{height:0;min-height:0;padding:0;position:relative;overflow:visible;z-index:75}
  body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaGlobalSearchBar .shua-global-search-launch{position:absolute;right:147px;top:8px}
- body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaDesignSwitch{position:absolute;right:20px;top:8px;margin:0}
+ body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaDesignSwitch{position:absolute;left:auto;bottom:auto;right:20px;top:8px;width:auto;margin:0}
 }
 body.shua-clean #shuaAnalyticsSection .st-topline{margin-bottom:12px}
 body.shua-clean #shuaAnalyticsSection .st-heading{margin-bottom:12px}

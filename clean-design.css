@@ -97,6 +97,10 @@ body.shua-clean #shuaAnalyticsSection .st-tab[aria-selected="true"]{background:#
 body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-navigation{display:none!important}
 body.shua-clean #shuaAnalyticsSection .st-global-search{margin:0 0 9px!important;padding:0!important}
 body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow{min-height:37px!important;max-width:430px;border-radius:9px!important}
+/* Analytics has its own player search/filter; show only that one there.
+   The global launcher remains available on all views without that field. */
+body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaGlobalSearchBar .shua-global-search-launch{display:none!important}
+body.shua-clean.shua-studio-open:has(#shuaAnalyticsSection .st-global-search:not([hidden])) #shuaGlobalSearchBar{min-height:0;padding-top:3px;padding-bottom:0;justify-content:flex-end}
 body.shua-clean #shuaAnalyticsSection .st-topline{margin-bottom:12px}
 body.shua-clean #shuaAnalyticsSection .st-heading{margin-bottom:12px}
 body.shua-clean #shuaAnalyticsSection .st-controls{gap:7px;margin-bottom:10px}
@@ -121,8 +125,10 @@ body.shua-clean #shuaWeatherSection .wx-search{height:39px;max-width:350px;backg
 body.shua-clean #shuaWeatherSection .wx-game-count{margin-bottom:11px}
 body.shua-clean #shuaWeatherSection .wx-games{gap:11px}
 body.shua-clean #shuaWeatherSection .wx-game{background:#0b2336;border:1px solid var(--shua-border);border-radius:12px;padding:15px;box-shadow:none}
+body.shua-clean #shuaWeatherSection .wx-games>.wx-game:first-child:has(+ .shua-wx-heading){grid-column:1/-1;width:min(900px,100%);justify-self:center}
 body.shua-clean #shuaWeatherSection .wx-game:has(.wx-impact-pending){background:#091d2d;border-color:rgba(155,187,203,.09)}
 body.shua-clean #shuaWeatherSection .wx-game:has(.wx-impact-pending) .wx-pending{background:transparent;border:0;border-top:1px dashed var(--shua-border);padding:10px 0}
+body.shua-clean #shuaWeatherSection .wx-game:has(.wx-impact-pending) .wx-analysis{display:none!important}
 body.shua-clean #shuaWeatherSection .shua-wx-heading{grid-column:1/-1;display:block;margin:12px 0 0;color:#a7bdcc;font-size:13px;letter-spacing:.01em;font-weight:900;border-top:1px solid var(--shua-border);padding-top:17px}
 body.shua-clean #shuaWeatherSection .wx-game-top{margin-bottom:10px}
 body.shua-clean #shuaWeatherSection .wx-venue{margin:9px 0 12px}

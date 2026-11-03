@@ -142,7 +142,6 @@
   const depth=document.getElementById('depthSection');
   if(depth){
     let priorPlayer=null;
-    let playerNavigationInProgress=false;
     const back=document.createElement('button');
     back.id='depthPlayerBack';
     back.type='button';
@@ -160,10 +159,11 @@
         const team=document.querySelector('#playerDepthChartButton .player-depth-chart-team')?.textContent?.trim();
         const position=document.querySelector('#featuredPlayerCard .featured-team-meta strong')?.textContent?.trim();
         priorPlayer=name?{name,team:team||'',position:position||''}:null;
-        playerNavigationInProgress=true;
-        queueMicrotask(()=>{playerNavigationInProgress=false;syncBack();});
+        queueMicrotask(syncBack);
       }else if(target.closest?.('#shuaCleanNav [data-shua-target="DEPTH"]')||
-        (target.closest?.('.positions .pos[data-pos="DEPTH"]')&&!playerNavigationInProgress)){
+        target.closest?.('.positions .pos:not([data-pos="DEPTH"])')){
+        // The player shortcut itself clicks the hidden Depth nav item.
+        // Only an unrelated navigation should clear its return context.
         priorPlayer=null;syncBack();
       }
     },true);

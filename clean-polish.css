@@ -23,6 +23,11 @@ body.shua-clean.shua-polish-phone.shua-polish-scrolled #shuaCleanNav .shua-clean
 body.shua-clean main>.head{margin-bottom:8px;gap:8px}
 body.shua-clean main>.head h2{font-size:19px;line-height:1.1;letter-spacing:-.025em}
 body.shua-clean main>.head #sub:empty{display:none}
+/* The legacy Phone stylesheet hides .head wholesale; the new Board Settings
+   action must stay available on the Overall ranking screen. */
+body.shua-clean.shua-polish-phone:has(.positions .pos.active[data-pos="ALL"]) main>.head{
+  display:flex!important;align-items:center;justify-content:space-between
+}
 body.shua-clean #shuaWeatherSection .wx-hero{margin-bottom:8px}
 body.shua-clean #shuaWeatherSection .wx-hero h2{font-size:24px}
 body.shua-clean #shuaMyTeams .myteams-header{margin-bottom:9px!important;padding-bottom:8px!important}

@@ -9,7 +9,7 @@ const js=read('clean-polish.js'),css=read('clean-polish.css'),html=read('index.h
 new vm.Script(js,{filename:'clean-polish.js'});
 
 assert.ok(html.includes('clean-design.js?v=20261103-ui6'),'Preserve the existing Clean UI layer');
-assert.ok(html.includes('clean-polish.css?v=20261103-10clean1')&&html.includes('clean-polish.js?v=20261103-10clean1'),'Load the second-pass improvements after Clean');
+assert.ok(html.includes('clean-polish.css?v=20261103-10clean2')&&html.includes('clean-polish.js?v=20261103-10clean2'),'Load the second-pass improvements after Clean');
 assert.ok(css.includes('body.shua-clean #viewModeToggle{display:none!important}')&&js.includes('originalViewToggle.querySelector'),'Display settings are in Tools, but the manual override still works');
 assert.ok(js.includes('shua-polish-scrolled')&&css.includes('shua-polish-scrolled'),'Header should compact while scrolling');
 assert.ok(css.includes('main>.head h2')&&css.includes('#sub:empty'),'Remove redundant header height');
@@ -18,6 +18,7 @@ assert.ok(js.includes('shua-chart-info')&&js.includes('disclosure.append(summary
 assert.ok(js.includes('shuaBoardOptions')&&css.includes('#teamControls')&&css.includes('#overallToggle'),'Compact Board Settings must keep the underlying controls');
 assert.ok(css.includes('.st-rank-row')&&css.includes('.myteams-roster-row>strong'),'Consistent rows and numeric alignment');
 assert.ok(js.includes('depthPlayerBack')&&js.includes('window.openUnifiedPlayerProfileByName'),'Depth chart should return to the original player');
+assert.ok(!js.includes('playerNavigationInProgress')&&js.includes('.positions .pos:not([data-pos="DEPTH"])'),'Player depth navigation must not erase the return button');
 assert.ok(css.includes('.espn-game-log-table tbody tr:nth-child(2n)')&&!/espn-game-log[^\n{]*\{[^}]*overflow-x:auto/i.test(css),'Game Log rows get shading, not sideways swipe');
 assert.ok(js.includes('shua-wx-game-details')&&js.includes('wx-hour-preview')&&js.includes('wx-details')&&js.includes('wx-preview-sky'),'Compact Weather must retain precise hourly weather, emoji, and full details');
 assert.ok(js.includes('matchup.addEventListener(\'click\',toggle)'),'Tapping the matchup must expand forecast');

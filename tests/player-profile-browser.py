@@ -17,37 +17,39 @@ def open_search(page,phone):
     page.locator('#shuaGlobalSearchBar .shua-global-search-launch').click()
     page.locator('#shuaExpandedSearch .shua-search-dialog').wait_for(state='visible',timeout=18000)
 
-def check_rb_rankings(page,phone):
-    if phone:
-        page.locator('#phoneMenuButton').click()
-        page.locator('#phoneMenuItems [data-target="RB"]').click()
-    else:
-        page.locator('.positions [data-pos="RB"]').click()
-    page.locator('#rows tr').first.wait_for(state='visible',timeout=18000)
-    check=page.locator('#rows').evaluate('''root=>{
-      const rows=[...root.querySelectorAll('tr')];
-      const invalidRanks=[],clippedNames=[],narrowRanks=[];
-      for(const row of rows){
-        const rank=row.querySelector('td.rank');
-        const name=row.querySelector('.photo-cell b');
-        if(!/^#\\d+$/.test(rank?.textContent?.trim()||''))invalidRanks.push(name?.textContent);
-        if(!name)continue;
-        if(document.body.classList.contains('phone-mode')){
-          const box=name.getBoundingClientRect();
-          const range=document.createRange();range.selectNodeContents(name);
-          const textRects=[...range.getClientRects()].filter(r=>r.width>0);
-          if(getComputedStyle(name).whiteSpace!=='normal'||
-             textRects.some(r=>r.left<box.left-2||r.right>box.right+2||r.bottom>box.bottom+2))
-            clippedNames.push(name.textContent);
-          if(rank.getBoundingClientRect().width<50)narrowRanks.push(rank.textContent);
-        }
-      }
-      return {count:rows.length,invalidRanks,clippedNames,narrowRanks};
-    }''')
-    assert check['count']>=100,('Missing running back ranking rows',check)
-    assert not check['invalidRanks'],('Running back ranks must all be numeric',check)
-    assert not check['clippedNames'],('Running back full names must fit',check)
-    assert not check['narrowRanks'],('Three-digit running back ranks need their own column',check)
+def check_position_rankings(page,phone):
+    for pos in ('QB','RB','WR','TE'):
+        if phone:
+            page.locator('#phoneMenuButton').click()
+            page.locator(f'#phoneMenuItems [data-target="{pos}"]').click()
+        else:
+            page.locator(f'.positions [data-pos="{pos}"]').click()
+        page.locator('#rows tr').first.wait_for(state='visible',timeout=18000)
+        assert page.locator('.positions .pos.active').first.get_attribute('data-pos')==pos
+        check=page.locator('#rows').evaluate('''root=>{
+          const rows=[...root.querySelectorAll('tr')];
+          const invalidRanks=[],clippedNames=[],narrowRanks=[];
+          for(const row of rows){
+            const rank=row.querySelector('td.rank');
+            const name=row.querySelector('.photo-cell b');
+            if(!/^#\\d+$/.test(rank?.textContent?.trim()||''))invalidRanks.push(name?.textContent);
+            if(!name)continue;
+            if(document.body.classList.contains('phone-mode')){
+              const box=name.getBoundingClientRect();
+              const range=document.createRange();range.selectNodeContents(name);
+              const textRects=[...range.getClientRects()].filter(r=>r.width>0);
+              if(getComputedStyle(name).whiteSpace!=='normal'||
+                 textRects.some(r=>r.left<box.left-2||r.right>box.right+2||r.bottom>box.bottom+2))
+                clippedNames.push(name.textContent);
+              if(rank.getBoundingClientRect().width<50)narrowRanks.push(rank.textContent);
+            }
+          }
+          return {count:rows.length,invalidRanks,clippedNames,narrowRanks};
+        }''')
+        assert check['count']>=25,('Missing '+pos+' ranking rows',check)
+        assert not check['invalidRanks'],('Every '+pos+' rank must be numeric',check)
+        assert not check['clippedNames'],('Full '+pos+' names must fit',check)
+        assert not check['narrowRanks'],('Three-digit '+pos+' ranks need their own column',check)
 
 def check_browser(browser,phone):
     ctx=browser.new_context(viewport={'width':390 if phone else 1365,'height':844 if phone else 900},
@@ -55,7 +57,7 @@ def check_browser(browser,phone):
     page=ctx.new_page()
     page.goto(base,wait_until='domcontentloaded')
     page.locator('#shuaExpandedSearch').wait_for(state='attached',timeout=25000)
-    check_rb_rankings(page,phone)
+    check_position_rankings(page,phone)
     open_search(page,phone)
     query=page.locator('#shuaSearchQuery')
     assert query.is_visible()

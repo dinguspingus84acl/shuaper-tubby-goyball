@@ -1,0 +1,47 @@
+/* Keep every running back's full name and position rank legible on phones.
+   This is scoped to the RB ranking view; other positions retain their layout. */
+body.phone-mode:has(.positions .pos[data-pos="RB"].active) #tableCard tbody tr{
+  grid-template-columns:54px minmax(0,1fr)!important;
+  min-height:64px!important;
+}
+body.phone-mode:has(.positions .pos[data-pos="RB"].active) #tableCard tbody td.rank{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:8px 3px!important;
+  min-width:0!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  white-space:nowrap!important;
+  font-size:clamp(13px,3.6vw,15px)!important;
+  font-weight:950!important;
+  font-variant-numeric:tabular-nums!important;
+}
+body.phone-mode:has(.positions .pos[data-pos="RB"].active) #tableCard tbody td:nth-child(2){
+  min-width:0!important;
+  padding:8px 6px!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  white-space:normal!important;
+}
+body.phone-mode:has(.positions .pos[data-pos="RB"].active) #tableCard .photo-cell{
+  align-items:center!important;
+  gap:8px!important;
+  min-width:0!important;
+}
+body.phone-mode:has(.positions .pos[data-pos="RB"].active) #tableCard .rank-player-copy{
+  min-width:0!important;
+  width:100%!important;
+}
+body.phone-mode:has(.positions .pos[data-pos="RB"].active) #tableCard .photo-cell b{
+  display:block!important;
+  min-width:0!important;
+  max-width:100%!important;
+  font-size:clamp(.9rem,3.9vw,1rem)!important;
+  line-height:1.2!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  overflow-wrap:break-word!important;
+  word-break:normal!important;
+}

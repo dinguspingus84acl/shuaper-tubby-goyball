@@ -82,6 +82,11 @@ for(const [name,id] of [['Luther Burden','4685278'],['Luther Burden III','468527
 assert.ok(html.includes('player-face-fix.js?v=20261102-face1'),'Global face repair must be loaded');
 assert.ok(profile.includes('window.ShuaPlayerFaces?.urls')&&espn.includes('window.ShuaPlayerFaces?.urls'),'Player cards must use verified portraits');
 assert.ok(search.includes('window.ShuaPlayerFaces?.url'),'Search must use verified portraits');
+const rbCss=read('rb-rankings.css');
+assert.ok(html.includes('rb-rankings.css?v=20261103-1'),'RB layout stylesheet must be loaded');
+assert.ok(rbCss.includes('.pos[data-pos="RB"].active'),'Ranked RB styling must not change other positions');
+assert.ok(rbCss.includes('grid-template-columns:54px minmax(0,1fr)'),'Show every one-, two- and three-digit RB rank');
+assert.ok(rbCss.includes('white-space:normal!important')&&rbCss.includes('overflow:visible!important'),'Allow full RB names to wrap instead of ellipsis');
 assert.ok(live.includes("credentials:'omit'")&&live.includes('view=mTeam&view=mRoster&view=mStatus'));
 assert.ok(live.includes('visibilitychange')&&live.includes('lastSuccess'));
 console.log('PASS: inline jersey, all two-line names, larger fixed game-log tables, rushing-style Snap Rates, global search on every tab, interactive swipe, and existing search/roster safeguards.');

@@ -1,0 +1,189 @@
+/* An additive, opt-out visual layer. Classic styles stay untouched underneath. */
+body.shua-clean{
+  --shua-accent:#49d7ad;
+  --shua-border:rgba(151,184,205,.16);
+  --shua-surface:#0a2033;
+  --shua-muted:#a0b6c9;
+  --l:rgba(151,184,205,.16);
+  --m:#a0b6c9;
+  background:#071827;
+  color:#edf5fb;
+}
+body.shua-clean .sticky{z-index:65;background:rgba(6,19,32,.97);border-bottom:1px solid var(--shua-border);box-shadow:0 6px 20px #0002}
+body.shua-clean .sticky>.tools{max-width:1500px;display:flex;align-items:center;gap:0;padding:10px 20px!important}
+body.shua-clean .sticky .positions{display:none!important}
+body.shua-clean #phoneMenuButton{display:none!important}
+#shuaCleanNav{display:none}
+body.shua-clean #shuaCleanNav{display:flex;align-items:center;gap:28px;width:100%;min-width:0}
+#shuaCleanNav .shua-clean-brand{flex:0 0 auto;color:#f5fbff;font-size:15px;font-weight:950;letter-spacing:.055em}
+#shuaCleanNav .shua-brand-dot{color:#4ae0b0;font-size:23px}
+#shuaCleanNav .shua-clean-groups{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex:1 1 auto;min-width:0}
+#shuaCleanNav .shua-clean-group{position:relative;min-width:0}
+#shuaCleanNav .shua-clean-trigger{display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:8px 18px;border:1px solid transparent;border-radius:10px;background:transparent;color:#b7c8d7;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+#shuaCleanNav .shua-clean-trigger:hover,#shuaCleanNav .shua-clean-group.is-open>.shua-clean-trigger{color:#f4fff9;background:#123348;border-color:#254e62}
+#shuaCleanNav .shua-clean-group.is-active>.shua-clean-trigger{color:#dbfff1;background:#124837;border-color:#267458}
+#shuaCleanNav .shua-clean-group-name{font-size:13px;font-weight:850;white-space:nowrap}
+#shuaCleanNav .shua-clean-current{display:none}
+#shuaCleanNav .shua-clean-popup{position:absolute;top:calc(100% + 9px);left:0;width:218px;max-height:min(70vh,460px);overflow-y:auto;z-index:151;padding:7px;background:#0b2338;border:1px solid #355b70;border-radius:12px;box-shadow:0 18px 45px #0009}
+#shuaCleanNav .shua-clean-group:last-child .shua-clean-popup{right:0;left:auto}
+#shuaCleanNav .shua-clean-popup button{display:block;width:100%;min-height:40px;margin:1px 0;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:#d7e5ee;font-size:12px;font-weight:750;text-align:left}
+#shuaCleanNav .shua-clean-popup button:hover,#shuaCleanNav .shua-clean-popup button:focus-visible{background:#193e55;color:#fff;outline:none}
+#shuaCleanNav .shua-clean-popup button.is-selected{background:#164d3c;color:#beffe5}
+body.shua-clean #shuaGlobalSearchBar{padding:9px 20px 5px;gap:12px;max-width:1500px;align-items:center}
+body.shua-clean #shuaGlobalSearchBar .shua-global-search-launch{min-height:40px;width:min(390px,100%);border:1px solid #335367;background:#0b2539;border-radius:10px;box-shadow:none;font-size:12px}
+body.shua-clean #shuaGlobalSearchBar .shua-global-search-launch:hover{background:#123347;border-color:#4c937e}
+body.shua-clean #shuaGlobalSearchBar .shua-global-search-launch>svg{color:var(--shua-accent)}
+#shuaDesignSwitch{position:fixed;left:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:149;pointer-events:auto;min-height:34px;border:1px solid #3b6980;border-radius:9px;padding:6px 10px;color:#d9f5eb;background:#0b2f3d;box-shadow:0 6px 22px #0007;font:800 11px system-ui,sans-serif;white-space:nowrap;cursor:pointer}
+body.shua-clean #shuaDesignSwitch{position:static;margin-left:auto;border:1px solid var(--shua-border);background:transparent;box-shadow:none;color:#a9c6d2}
+body.shua-clean #shuaDesignSwitch:hover{border-color:#4ad0a3;color:#eafff6}
+body.shua-clean #shuaGlobalSearchBar .shua-global-search-hint{font-size:10px}
+body.shua-clean main{padding:13px 20px 90px}
+body.shua-clean .head{margin:0 0 11px;align-items:center}
+body.shua-clean .head h2{font-size:21px;letter-spacing:-.035em;line-height:1.2;font-weight:880}
+body.shua-clean .head small{color:var(--shua-muted)}
+body.shua-clean .view-toggle{gap:5px;margin:8px 0 12px}
+body.shua-clean .view-toggle button,body.shua-clean .team-btn,body.shua-clean .mock-btn{background:#102a3c;border:1px solid transparent;border-radius:9px;color:#b0c4d1;font-size:12px;padding:8px 12px;min-height:36px}
+body.shua-clean .view-toggle button.active,body.shua-clean .team-btn.active,body.shua-clean .mock-btn.primary{background:#13503f!important;border-color:#286b59!important;color:#e2fff4!important}
+
+/* Ranking rows: full two-line names, consistent rank and portrait alignment. */
+body.shua-clean #tableCard{background:#091d2f;border:1px solid var(--shua-border);border-radius:12px;box-shadow:none}
+body.shua-clean #tableCard th{background:#0a2135;color:#91adc0;letter-spacing:.08em;font-size:10px;font-weight:850;padding:11px 13px}
+body.shua-clean #tableCard td{padding:11px 13px;border-color:rgba(160,188,209,.1);vertical-align:middle;line-height:1.35}
+body.shua-clean #tableCard tr{transition:background .14s ease}
+body.shua-clean #tableCard td.rank{width:65px;color:#cce6e4!important;text-align:center;font-size:14px;font-weight:900;white-space:nowrap;font-variant-numeric:tabular-nums}
+body.shua-clean #tableCard .photo-cell{gap:11px;align-items:center;min-width:0}
+body.shua-clean #tableCard .photo{width:39px;height:39px;flex:0 0 39px;border:1.5px solid #6188a0}
+body.shua-clean #tableCard .rank-player-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+body.shua-clean #tableCard .rank-player-copy>b,body.shua-clean #tableCard .tagged-player-copy>b{color:#f0f7fa!important;font-size:14px;line-height:1.22;white-space:normal!important;overflow-wrap:break-word}
+body.shua-clean #tableCard .rank-player-copy>.phone-rank-meta{display:flex;font-size:10px;gap:5px;color:#8faabd}
+body.shua-clean #tableCard .phone-rank-meta .lineup-team-logo{width:15px;height:15px;flex:0 0 15px}
+body.shua-clean #tableCard .draft-name::after{content:'  •';color:#4cdda8;font-weight:900}
+body.shua-clean #tableCard .do-not-draft-name::after{content:'  •';color:#f17e94;font-weight:900}
+body.shua-clean #tableCard .badge{background:#14354c;color:#b9d9e8;border-radius:6px;padding:4px 7px;font-size:11px}
+body.shua-clean #tableCard td.notes{width:31%;max-width:350px;color:#aebfcd;font-size:12px;line-height:1.45}
+body.shua-clean #tableCard .shua-note-excerpt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;word-break:normal;overflow-wrap:break-word}
+body.shua-clean #tableCard td.notes.is-expanded .shua-note-excerpt{-webkit-line-clamp:unset;line-clamp:unset;display:block}
+body.shua-clean #tableCard .shua-note-toggle{display:inline-block;margin-top:4px;padding:3px 0;border:0;background:transparent;color:#64dcaf;font-size:10px;font-weight:850;text-align:left}
+body.shua-clean #tableCard .shua-note-toggle:hover{text-decoration:underline}
+body.shua-clean:has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard th:nth-child(3),
+body.shua-clean:has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard td:nth-child(3),
+body.shua-clean:has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard th:nth-child(4),
+body.shua-clean:has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard td:nth-child(4){display:none!important}
+body.shua-clean .pool-rank,body.shua-clean .rank{color:#cce6e4}
+
+/* Player card: strong hierarchy and larger, evenly aligned numbers. */
+body.shua-clean .modal .profile{background:#081d30;border:1px solid #34556a;border-radius:16px;box-shadow:0 24px 80px #0009}
+body.shua-clean .profile-top{margin-bottom:14px}
+body.shua-clean .profile .stat,body.shua-clean .profile .note-box,body.shua-clean .unified-stat-item{background:#0e2a3d;border:1px solid rgba(164,201,221,.12);border-radius:10px}
+body.shua-clean .stat b,body.shua-clean .unified-stat-item b{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums;color:#f5fdff}
+body.shua-clean .stat span,body.shua-clean .unified-stat-item span{font-size:11px;color:#9ab4c6}
+body.shua-clean .unified-profile-tabs{gap:5px;border-bottom:1px solid var(--shua-border);margin-top:10px}
+body.shua-clean .unified-profile-tab{border:1px solid transparent;background:transparent;color:#aac0cf;min-height:35px;border-radius:8px;font-size:11px;font-weight:850}
+body.shua-clean .unified-profile-tab.active{background:#164a3c!important;border-color:#2c8064!important;color:#e9fff7!important}
+body.shua-clean .espn-game-log{background:transparent;border-color:var(--shua-border)}
+body.shua-clean .espn-game-log-summary{background:#0d293b;border:0;padding:8px 11px}
+body.shua-clean .espn-game-log-summary strong{font-size:14px;font-variant-numeric:tabular-nums}
+body.shua-clean .espn-game-log-table td{font-size:14px;font-variant-numeric:tabular-nums}
+body.shua-clean .espn-game-log-tab{min-height:34px;border:1px solid transparent;border-radius:8px;background:#112d40;color:#bfd0dc}
+body.shua-clean .espn-game-log-tab.active{background:#164a3c;color:#e1fff3;border-color:#2e8068}
+
+/* Analytics: one compact navigation strip and fewer nested borders. */
+body.shua-clean #shuaAnalyticsSection{padding:12px 2px 78px}
+body.shua-clean #shuaAnalyticsSection .st-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:11px}
+body.shua-clean #shuaAnalyticsSection .st-navigation{display:flex!important;position:static!important;gap:4px;align-items:center;width:100%;overflow-x:auto;padding:3px;background:#0a2235;border:1px solid var(--shua-border);border-radius:11px;margin:0}
+body.shua-clean #shuaAnalyticsSection .st-tab{flex:0 0 auto;white-space:nowrap;min-height:37px;padding:7px 11px;font-size:11px;border:1px solid transparent}
+body.shua-clean #shuaAnalyticsSection .st-tab span{display:none!important}
+body.shua-clean #shuaAnalyticsSection .st-tab[aria-selected="true"]{background:#13503f!important;border-color:#227257!important;color:#e1fff3!important}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-navigation{display:none!important}
+body.shua-clean #shuaAnalyticsSection .st-global-search{margin:0 0 9px!important;padding:0!important}
+body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow{min-height:37px!important;max-width:430px;border-radius:9px!important}
+body.shua-clean #shuaAnalyticsSection .st-topline{margin-bottom:12px}
+body.shua-clean #shuaAnalyticsSection .st-heading{margin-bottom:12px}
+body.shua-clean #shuaAnalyticsSection .st-controls{gap:7px;margin-bottom:10px}
+body.shua-clean #shuaAnalyticsSection select{height:37px;min-height:37px;border-radius:8px;font-size:12px}
+body.shua-clean #shuaAnalyticsSection .st-panel{background:#0a2033;border:1px solid var(--shua-border);box-shadow:none;border-radius:12px;padding:13px;margin-bottom:11px}
+body.shua-clean #shuaAnalyticsSection .st-metric{background:#0c293b;border:1px solid rgba(160,188,209,.12);border-radius:9px;padding:9px}
+body.shua-clean #shuaAnalyticsSection .st-position{background:#0a2132;border:1px solid var(--shua-border);padding:3px}
+body.shua-clean #shuaAnalyticsSection .st-rank-num{color:#b9dedb;font-weight:900;font-variant-numeric:tabular-nums}
+body.shua-clean #shuaAnalyticsSection .st-panel-head{margin-bottom:11px}
+body.shua-clean #shuaAnalyticsSection .st-rank-row{padding:9px 0}
+
+/* Weather cards show game, forecast, and hours as one coherent unit. */
+body.shua-clean #shuaWeatherSection .wx-container{padding:3px 0 60px}
+body.shua-clean #shuaWeatherSection .wx-hero{margin-bottom:12px;padding-bottom:12px}
+body.shua-clean #shuaWeatherSection .wx-hero h2{font-size:29px}
+body.shua-clean #shuaWeatherSection .wx-overview{gap:6px;margin-bottom:11px}
+body.shua-clean #shuaWeatherSection .wx-stat{background:#0e2a3b;border:1px solid var(--shua-border);border-radius:9px;padding:10px}
+body.shua-clean #shuaWeatherSection .wx-stat strong{font-size:23px}
+body.shua-clean #shuaWeatherSection .wx-freshness{background:transparent;border:0;padding:0;margin:0 0 11px}
+body.shua-clean #shuaWeatherSection .wx-controls{margin-bottom:8px;gap:8px}
+body.shua-clean #shuaWeatherSection .wx-search{height:39px;max-width:350px;background:#0b283b;border-color:#304f61}
+body.shua-clean #shuaWeatherSection .wx-game-count{margin-bottom:11px}
+body.shua-clean #shuaWeatherSection .wx-games{gap:11px}
+body.shua-clean #shuaWeatherSection .wx-game{background:#0b2336;border:1px solid var(--shua-border);border-radius:12px;padding:15px;box-shadow:none}
+body.shua-clean #shuaWeatherSection .wx-game:has(.wx-impact-pending){background:#091d2d;border-color:rgba(155,187,203,.09)}
+body.shua-clean #shuaWeatherSection .wx-game:has(.wx-impact-pending) .wx-pending{background:transparent;border:0;border-top:1px dashed var(--shua-border);padding:10px 0}
+body.shua-clean #shuaWeatherSection .shua-wx-heading{grid-column:1/-1;display:block;margin:12px 0 0;color:#a7bdcc;font-size:13px;letter-spacing:.01em;font-weight:900;border-top:1px solid var(--shua-border);padding-top:17px}
+body.shua-clean #shuaWeatherSection .wx-game-top{margin-bottom:10px}
+body.shua-clean #shuaWeatherSection .wx-venue{margin:9px 0 12px}
+body.shua-clean #shuaWeatherSection .wx-metrics{gap:0;border:1px solid var(--shua-border);border-radius:9px;overflow:hidden;background:#0a1d2e}
+body.shua-clean #shuaWeatherSection .wx-metric{border:0;border-right:1px solid var(--shua-border);border-radius:0;background:transparent;padding:9px 4px}
+body.shua-clean #shuaWeatherSection .wx-metric:last-child{border-right:0}
+body.shua-clean #shuaWeatherSection .wx-metric strong{font-variant-numeric:tabular-nums}
+body.shua-clean #shuaWeatherSection .wx-hour-preview{background:transparent;border:0;border-top:1px solid var(--shua-border);border-radius:0;padding:9px 0 2px}
+body.shua-clean #shuaWeatherSection .wx-preview-hour{background:#0f2a3d;border:1px solid rgba(173,201,222,.10);border-radius:8px;padding:7px 2px}
+body.shua-clean #shuaWeatherSection .wx-preview-sky{font-size:24px}
+body.shua-clean #shuaWeatherSection .wx-analysis{background:transparent;border-left:2px solid #3dbe94;margin:8px 0 11px;padding:7px 10px}
+body.shua-clean #shuaWeatherSection .wx-details{background:#0b293b;border:1px solid var(--shua-border)}
+
+/* Touch layout retains a full two-line name and every numbered ranking. */
+@media(max-width:1000px){
+  body.shua-clean #shuaAnalyticsSection .st-navigation{display:none!important}
+  body.shua-clean #shuaAnalyticsSection .st-dashboard-picker{display:flex!important}
+}
+@media(max-width:700px){
+  body.shua-clean #shuaCleanNav{position:fixed;left:0;right:0;bottom:0;z-index:145;min-height:62px;padding:5px 6px max(5px,env(safe-area-inset-bottom));background:#061724;border-top:1px solid #355463;box-shadow:0 -8px 25px #0007}
+  body.shua-clean #shuaCleanNav .shua-clean-brand{display:none}
+  body.shua-clean #shuaCleanNav .shua-clean-groups{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+  body.shua-clean #shuaCleanNav .shua-clean-trigger{width:100%;min-height:47px;flex-direction:column;gap:2px;padding:5px 2px;border-radius:8px}
+  body.shua-clean #shuaCleanNav .shua-clean-group-name{font-size:11px}
+  body.shua-clean #shuaCleanNav .shua-clean-current{display:block;min-width:0;max-width:100%;font-size:9px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#8faabb}
+  body.shua-clean #shuaCleanNav .shua-clean-group.is-active .shua-clean-current{color:#92e7c4}
+  body.shua-clean #shuaCleanNav .shua-clean-popup{position:absolute;top:auto;bottom:calc(100% + 9px);left:0;width:min(270px,calc(100vw - 14px));max-height:min(62dvh,450px)}
+  body.shua-clean #shuaCleanNav .shua-clean-group:nth-child(n+3) .shua-clean-popup{right:0;left:auto}
+  body.shua-clean #shuaGlobalSearchBar{padding:7px 9px 3px;gap:6px;min-height:50px}
+  body.shua-clean #shuaGlobalSearchBar .shua-global-search-launch{flex:1;min-width:0;width:auto;min-height:40px}
+  body.shua-clean #shuaDesignSwitch{flex:0 0 auto;max-width:109px;font-size:10px;white-space:normal;line-height:1.15;text-align:center;min-height:36px;padding:4px 7px}
+  body.shua-clean main{padding-bottom:100px!important}
+  body.shua-clean #viewModeToggle{bottom:max(76px,calc(76px + env(safe-area-inset-bottom)))!important;transform:scale(.88);transform-origin:bottom right}
+  body.shua-clean #tableCard td.rank{width:54px}
+  body.shua-clean #tableCard .photo-cell{gap:7px}
+  body.shua-clean #tableCard .photo{width:36px;height:36px;flex-basis:36px}
+  body.shua-clean #tableCard .rank-player-copy>b{font-size:clamp(14px,3.9vw,16px)!important;line-height:1.17!important}
+  body.shua-clean #tableCard .rank-player-copy>.phone-rank-meta{font-size:10px}
+  body.shua-clean .espn-game-log-table td{font-size:14px}
+  body.shua-clean #shuaWeatherSection .wx-stat{padding:8px 5px}
+  body.shua-clean #shuaWeatherSection .wx-stat strong{font-size:19px}
+  body.shua-clean #shuaWeatherSection .wx-games{grid-template-columns:minmax(0,1fr)}
+  body.shua-clean #shuaWeatherSection .wx-game{padding:12px}
+  body.shua-clean #shuaAnalyticsSection .st-panel{padding:10px}
+}
+/* The site's explicit Phone toggle can also simulate the compact view on desktop. */
+body.shua-clean.phone-mode .sticky>.tools{display:block!important;min-height:0!important;height:0!important;padding:0!important;overflow:visible!important}
+body.shua-clean.phone-mode.fantasy-home-mode .sticky>.tools{display:block!important}
+body.shua-clean.phone-mode #shuaCleanNav{position:fixed;left:0;right:0;bottom:0;z-index:145;min-height:62px;padding:5px 6px max(5px,env(safe-area-inset-bottom));background:#061724;border-top:1px solid #355463;box-shadow:0 -8px 25px #0007}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-brand{display:none}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-groups{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-trigger{width:100%;min-height:47px;flex-direction:column;gap:2px;padding:5px 2px;border-radius:8px}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-group-name{font-size:11px}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-current{display:block;max-width:100%;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#8faabb}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-popup{top:auto;bottom:calc(100% + 9px);left:0;width:min(270px,calc(100vw - 14px));max-height:min(62dvh,450px)}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-group:nth-child(n+3) .shua-clean-popup{right:0;left:auto}
+body.shua-clean.phone-mode #shuaGlobalSearchBar{padding:7px 9px 3px;gap:6px;min-height:50px}
+body.shua-clean.phone-mode #shuaGlobalSearchBar .shua-global-search-launch{flex:1;min-width:0;width:auto;min-height:40px}
+body.shua-clean.phone-mode #shuaDesignSwitch{flex:0 0 auto;max-width:109px;font-size:10px;white-space:normal;line-height:1.15;text-align:center;min-height:36px;padding:4px 7px}
+body.shua-clean.phone-mode main{padding-bottom:100px!important}
+body.shua-clean.phone-mode #viewModeToggle{bottom:max(76px,calc(76px + env(safe-area-inset-bottom)))!important}
+body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation{display:none!important}
+body.shua-clean.phone-mode #shuaAnalyticsSection .st-dashboard-picker{display:flex!important}
+@media(prefers-reduced-motion:reduce){#shuaCleanNav *,body.shua-clean #tableCard tr{transition:none!important}}

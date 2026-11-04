@@ -208,7 +208,7 @@ def check_rosters(browser):
     page.wait_for_function('window.ShuaMyTeamsLive && window.ShuaMyTeamsLive.lastSuccess > 0',timeout=35000)
     names=page.evaluate('window.ShuaMyTeamsUI.rosterSnapshots[0].roster.map(p=>p.name)')
     assert names==['Joe Burrow'],names
-    assert 'Live ESPN' in page.locator('#myTeamsLiveStatus').inner_text()
+    assert page.locator('#myTeamsLiveStatus [data-myteams-sync-compact]').inner_text().startswith('Live ')
     print('PASS chromium: public ESPN roster response updates My Teams',flush=True)
     ctx.close()
 

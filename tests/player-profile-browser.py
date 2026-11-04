@@ -76,6 +76,19 @@ def check_browser(browser,phone):
     values=page.evaluate("({selected:document.querySelector('#modal')?.dataset?.unifiedName,plain:document.querySelector('#pn')?.textContent,first:document.querySelector('#featuredPlayerCard .featured-first')?.textContent,last:document.querySelector('#featuredPlayerCard .featured-last')?.textContent})")
     print('PROFILE TRACE',values,flush=True)
     page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Robinson')",timeout=12000)
+    if phone:
+        # Use the longest plausible weight label even if offline bio fetching
+        # leaves a placeholder; its entire text must fit inside its tile.
+        weight_box=hero.locator('.featured-bio-item').nth(2)
+        fit=weight_box.evaluate('''box=>{
+          const value=box.querySelector('.featured-bio-value'),old=value.textContent;
+          value.textContent='299 lbs';
+          const range=document.createRange();range.selectNodeContents(value);
+          const text=range.getBoundingClientRect(),tile=box.getBoundingClientRect();
+          value.textContent=old;
+          return {textRight:text.right,tileRight:tile.right,textWidth:text.width,tileWidth:tile.width};
+        }''')
+        assert fit['textRight']<=fit['tileRight']-1,('Weight must fit without clipping on phone',fit)
     a=hero.locator('.featured-last').bounding_box()
     b=hero.locator('.featured-jersey-number').bounding_box()
     if a and b:

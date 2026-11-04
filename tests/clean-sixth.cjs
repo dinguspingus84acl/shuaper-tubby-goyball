@@ -9,14 +9,15 @@ const profile=source('unified-profile.js'),stock=source('stock.js'),weather=sour
 
 for(const name of ['clean-sixth.js','unified-profile.js','stock.js','weather.js'])new vm.Script(source(name),{filename:name});
 for(const name of ['clean-sixth.css','clean-sixth.js','weather.js','stock.js','unified-profile.js']){
- const version={'clean-sixth.css':'20261104-bio1','weather.js':'20261104-source1'}[name]||(['stock.js','unified-profile.js'].includes(name)?'20261104-sixth10b':'20261104-sixth10');
+ const version={'clean-sixth.css':'20261104-weight2','weather.js':'20261104-indoor2'}[name]||(['stock.js','unified-profile.js'].includes(name)?'20261104-sixth10b':'20261104-sixth10');
  assert.ok(html.includes(name+'?v='+version),name+' must load with a new cache key');
 }
-assert.ok(html.includes('clean-fifth.css?v=20261104-fifth9b'),'Previous design layer must remain intact');
+assert.ok(html.includes('clean-fifth.css?v=20261104-indoor2'),'Previous design layer must remain intact');
 
 // 1. Portrait and all four bio fields are retained as the card height falls.
 assert.match(css,/#featuredPlayerCard\{height:206px\}/);
 assert.match(css,/\.featured-bio\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+assert.ok(css.includes('phone-mode .featured-player-card .featured-bio{grid-template-columns:repeat(2,minmax(0,1fr))'),'Phone bio needs wide enough columns to show weight');
 assert.ok(css.includes('.featured-portrait-box')&&css.includes('phone-mode'));
 // 2. Player arrows still invoke the existing adjacent-player callback.
 assert.ok(profile.includes('ranking-nav-arrow')&&profile.includes('btn.hidden=!item'));

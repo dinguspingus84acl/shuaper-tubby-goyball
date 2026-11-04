@@ -13,6 +13,7 @@ from playwright.sync_api import sync_playwright
 ROOT = Path(__file__).resolve().parents[1]
 GAMES = json.loads((ROOT / "weather/data/nfl.json").read_text(encoding="utf-8"))["games"]
 AVAILABLE = sum(bool(game["forecast"]) for game in GAMES)
+PENDING = sum(not game["forecast"] and not game["indoor"] for game in GAMES)
 
 
 class QuietHandler(SimpleHTTPRequestHandler):
@@ -41,6 +42,16 @@ def check_weather(page, phone, url):
     weather = page.locator("#shuaWeatherSection")
     assert weather.locator("#wxFreshness").is_visible()
     assert "Source checked" in weather.locator("#wxFreshness").inner_text()
+    assert weather.locator('.wx-game .wx-source-link, .wx-game .wx-pending-link').count() == 0, \
+        'Game cards should not show per-game forecast links'
+    for game in GAMES:
+        if game['indoor'] and not game['forecast']:
+            indoor = weather.locator(f'[data-weather-game="{game["id"]}"]')
+            assert indoor.locator('.wx-matchup').count() == 1, \
+                f'Indoor {game["home"]["name"]} must use a full weather card'
+            assert indoor.locator('.wx-impact-indoor').count() == 1
+            assert indoor.locator('.wx-metrics').count() == 1
+            assert 'Forecast pending' not in indoor.inner_text()
     weather.locator('[data-wx-filter="ready"]').click()
     assert weather.locator(".wx-game").count() == AVAILABLE
     if AVAILABLE:
@@ -81,7 +92,7 @@ def check_weather(page, phone, url):
     assert "Jacksonville" in weather.locator(".wx-game").inner_text()
     weather.locator("#wxSearch").fill("")
     weather.locator('[data-wx-filter="pending"]').click()
-    assert weather.locator(".wx-game").count() == len(GAMES) - AVAILABLE
+    assert weather.locator(".wx-game").count() == PENDING
     weather.locator('[data-wx-filter="all"]').click()
     assert weather.locator(".wx-game").count() == len(GAMES)
 

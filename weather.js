@@ -23,7 +23,6 @@
   const display=(n,suffix)=>number(n)===null?'—':String(n)+suffix;
   const formatDate=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(iso));
   const formatUpdated=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(iso));
-  const safeLink=url=>/^https:\/\/mysportsweather\.com\/nfl(?:[\/#]|$)/.test(url||'')?url:'https://mysportsweather.com/nfl';
   const safeLogo=url=>/^https:\/\/a\.espncdn\.com\/i\/teamlogos\/nfl\//.test(url||'')?url:'';
   const logo=team=>safeLogo(team.logo)?'<img class="wx-team-logo" src="'+escape(safeLogo(team.logo))+'" alt="" loading="lazy">':'';
   const filters=[['all','All games'],['watch','Weather watch'],['ready','Forecasts'],['pending','Pending']];
@@ -33,8 +32,8 @@
   // not a forecast or a betting recommendation from MySportsWeather/Kevin Roth.
   function risk(game){
     const f=game.forecast;
-    if(!f)return {level:'pending',label:'Forecast pending'};
     if(game.indoor)return {level:'indoor',label:'Roof / indoor'};
+    if(!f)return {level:'pending',label:'Forecast pending'};
     const hours=(f.hourly||[]).filter(h=>h.inGame);
     const max=key=>Math.max(-Infinity,...[f[key],...hours.map(h=>h[key])].filter(v=>number(v)!==null));
     const wind=max('windMph'),gust=max('gustMph'),precip=max('precipPct');
@@ -46,8 +45,11 @@
 
   function analysis(game){
     const f=game.forecast;
+    if(game.indoor){
+      if(/Caesars Superdome|U\.S\. Bank Stadium/i.test(game.venue||''))return 'Fixed-roof indoor stadium. Wind, rain and outdoor temperature should not affect gameplay.';
+      return 'Indoor or roof-capable venue. Outdoor weather has little effect when the roof is closed; verify roof status closer to kickoff.';
+    }
     if(!f)return 'MySportsWeather has not published a forecast for this matchup yet. The game will update automatically when its forecast appears.';
-    if(game.indoor)return 'Indoor or roof-capable venue. Outdoor conditions have little effect if the roof is closed; roof status has not been verified. Check the forecast and roof decision closer to kickoff.';
     const wind=number(f.windMph),gust=number(f.gustMph),rain=number(f.precipPct),temp=number(f.tempF);
     const detail=[];
     if(wind!==null&&wind>=20||gust!==null&&gust>=30)detail.push('Strong wind could make deep throws, long field goals and some punts less reliable.');
@@ -163,20 +165,20 @@
   }
 
   function gameCard(game){
-    const f=game.forecast,r=risk(game),isPending=!f;
-    // Pending games have no weather to analyse. Keep them as compact fixtures
-    // rather than implying an unissued forecast through a full-size card.
+    const f=game.forecast,r=risk(game),isPending=!f&&!game.indoor;
+    // Outdoor games without forecasts remain compact. Indoor games receive the
+    // same full card as other roof venues, without inventing weather readings.
     if(isPending)return '<article class="wx-game wx-pending-game" data-weather-game="'+escape(game.id)+'" aria-label="'+escape(game.away.name+' at '+game.home.name+', forecast pending')+'">'+
       '<div class="wx-pending-fixture"><div class="wx-pending-matchup">'+logo(game.away)+'<strong>'+escape(game.away.abbr)+'</strong><span class="wx-pending-at">at</span>'+logo(game.home)+'<strong>'+escape(game.home.abbr)+'</strong></div>'+
       '<div class="wx-pending-context"><strong>Week '+escape(game.week??'—')+' · '+escape(formatDate(game.kickoffUtc))+'</strong><small>'+escape(game.venue||'Venue TBA')+'</small></div></div>'+
-      '<span class="wx-impact wx-impact-pending">Forecast pending</span>'+
-      '<a class="wx-pending-link" href="https://mysportsweather.com/nfl" target="_blank" rel="noopener noreferrer" aria-label="Check weather for '+escape(game.away.abbr+' at '+game.home.abbr)+' on MySportsWeather">Check ↗</a></article>';
-    const summary='<div class="wx-metrics">'+[
-        ['Temperature',display(f.tempF,'°F'),'temp'],
-        ['Wind',display(f.windMph,' mph'),'wind'],
-        ['Gusts',display(f.gustMph,' mph'),'gust'],
-        [f.precipType==='Snow'?'Snow chance':'Rain chance',display(f.precipPct,'%'),'rain']
-      ].map(([label,value,klass])=>'<div class="wx-metric wx-'+klass+'"><span>'+escape(label)+'</span><strong>'+escape(value)+'</strong></div>').join('')+'</div>';
+      '<span class="wx-impact wx-impact-pending">Forecast pending</span></article>';
+    const conditions=f?[
+      ['Temperature',display(f.tempF,'°F'),'temp'],
+      ['Wind',display(f.windMph,' mph'),'wind'],
+      ['Gusts',display(f.gustMph,' mph'),'gust'],
+      [f.precipType==='Snow'?'Snow chance':'Rain chance',display(f.precipPct,'%'),'rain']
+    ]:[['Venue','Indoor','indoor'],['Wind','N/A','wind'],['Gusts','N/A','gust'],['Rain chance','N/A','rain']];
+    const summary='<div class="wx-metrics">'+conditions.map(([label,value,klass])=>'<div class="wx-metric wx-'+klass+'"><span>'+escape(label)+'</span><strong>'+escape(value)+'</strong></div>').join('')+'</div>';
     const skyByTime=new Map((f?.hourly||[]).filter(h=>h.sky).map(h=>[h.time,h.sky]));
     const details=f&&(f.hourly?.length||f.nbmHourly?.length)?'<details class="wx-details"><summary>Full hourly weather data <span aria-hidden="true">⌄</span></summary>'+hourTable(f.hourly,'NWS hourly forecast',skyByTime,game)+hourTable(f.nbmHourly,'NBM higher-resolution forecast',skyByTime,game)+'</details>':'';
     return '<article class="wx-game" data-weather-game="'+escape(game.id)+'">'+
@@ -184,7 +186,6 @@
       '<div class="wx-matchup"><div class="wx-team">'+logo(game.away)+'<span><b>'+escape(game.away.abbr)+'</b><small>'+escape(game.away.name)+'</small></span></div><span class="wx-versus">AT</span><div class="wx-team">'+logo(game.home)+'<span><b>'+escape(game.home.abbr)+'</b><small>'+escape(game.home.name)+'</small></span></div></div>'+
       '<div class="wx-venue">'+escape(game.venue||'Venue TBA')+(game.city?' · '+escape(game.city):'')+(game.indoor?' <span class="wx-dome">Indoor / roof venue</span>':'')+'</div>'+
       summary+(f?hourlyPreview(f,game):'')+'<div class="wx-analysis"><span>FANTASY WEATHER ANALYSIS</span><p>'+escape(analysis(game))+'</p>'+(f&&trend(f)?'<small>'+escape(trend(f))+'</small>':'')+'</div>'+details+
-      '<a class="wx-source-link" href="'+escape(safeLink(f?.sourceUrl))+'" target="_blank" rel="noopener noreferrer">'+(f?'View forecast':'Check forecast')+' on MySportsWeather <span aria-hidden="true">↗</span></a>'+
       '</article>';
   }
 
@@ -221,9 +222,11 @@
   function renderList(){
     if(!snapshot)return;
     const all=snapshot.games||[];
-    const ready=all.filter(game=>game.forecast),watch=all.filter(game=>['watch','high'].includes(risk(game).level));
+    const ready=all.filter(game=>game.forecast),indoor=all.filter(game=>game.indoor);
+    const pending=all.filter(game=>!game.forecast&&!game.indoor);
+    const watch=all.filter(game=>['watch','high'].includes(risk(game).level));
     const stats=section.querySelector('#wxOverview');
-    stats.innerHTML=[['Games',all.length],[ready.length===1?'Forecast available':'Forecasts available',ready.length],['Pending',all.length-ready.length],...(watch.length?[['Weather watch',watch.length]]:[])].map(([label,n])=>'<span class="wx-status-item"><strong>'+n+'</strong> '+escape(label)+'</span>').join('<span class="wx-status-divider" aria-hidden="true">·</span>');
+    stats.innerHTML=[['Games',all.length],[ready.length===1?'Forecast available':'Forecasts available',ready.length],['Indoor',indoor.length],['Pending',pending.length],...(watch.length?[['Weather watch',watch.length]]:[])].map(([label,n])=>'<span class="wx-status-item"><strong>'+n+'</strong> '+escape(label)+'</span>').join('<span class="wx-status-divider" aria-hidden="true">·</span>');
     const hoursOld=(Date.now()-Date.parse(snapshot.generatedAt))/3600000;
     section.querySelector('#wxFreshness').innerHTML='<span>MySportsWeather · Source checked '+escape(formatUpdated(snapshot.generatedAt))+(hoursOld>6?' · Forecast snapshot overdue for refresh':' · Scheduled updates approximately every two hours')+'</span>';
     const buttons=section.querySelector('#wxFilters');
@@ -232,7 +235,7 @@
     const matches=all.filter(game=>{
       if(filter==='watch'&&!['watch','high'].includes(risk(game).level))return false;
       if(filter==='ready'&&!game.forecast)return false;
-      if(filter==='pending'&&game.forecast)return false;
+      if(filter==='pending'&&(game.forecast||game.indoor))return false;
       if(!query)return true;
       return [game.away.name,game.away.abbr,game.home.name,game.home.abbr,game.venue,game.city].some(value=>String(value||'').toLowerCase().includes(query));
     });

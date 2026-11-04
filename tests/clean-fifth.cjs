@@ -13,7 +13,7 @@ const live=source('espn-live.js');
 
 new vm.Script(js,{filename:'clean-fifth.js'});
 new vm.Script(weather,{filename:'weather.js'});
-assert.ok(html.includes('clean-fifth.css?v=20261104-fifth9b')&&html.includes('clean-fifth.js?v=20261104-fifth9b'),'The new stylesheet/script must load');
+assert.ok(html.includes('clean-fifth.css?v=20261104-indoor2')&&html.includes('clean-fifth.js?v=20261104-fifth9b'),'The new stylesheet/script must load');
 assert.ok(html.includes('clean-fourth.css?v=20261104-fourth10')&&html.includes('clean-polish.css?v=20261103-10clean2'),'Old design layers remain recoverable');
 
 // 1. Notes retain the full text and a keyboard-accessible expander.
@@ -39,7 +39,7 @@ assert.ok(css.includes('myteams-card-trigger{min-height:51px')&&css.includes('my
 // 8. Retain position badges in All while hiding them in one-position Stock.
 assert.ok(css.includes('[data-stock-filter]:not([data-stock-filter="ALL"]) .stock-meta .shua-row-pos'));
 // 9. Weather totals remain derived directly from the loaded snapshot.
-assert.ok(weather.includes("['Games',all.length]")&&weather.includes("['Pending',all.length-ready.length]")&&weather.includes('Forecast available'));
+assert.ok(weather.includes("['Games',all.length]")&&weather.includes("['Indoor',indoor.length]")&&weather.includes("['Pending',pending.length]")&&weather.includes('Forecast available'));
 assert.ok(css.includes('wx-status-item')&&css.includes('wx-overview'));
 // 10. Pending games are truthful fixtures, not imaginary forecasts.
 assert.ok(weather.includes('if(isPending)return')&&weather.includes('wx-pending-fixture'));

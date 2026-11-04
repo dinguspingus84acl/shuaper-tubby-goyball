@@ -91,9 +91,6 @@ body.shua-weather-open .positions [data-pos="WEATHER"]{background:#105642!import
 #shuaWeatherSection .wx-hour-clock{display:block;font-size:12px;line-height:1.15;color:#f3fff8;font-weight:950}
 #shuaWeatherSection .wx-hour-period{display:block;font-size:10px;line-height:1.2;font-weight:900;color:#a6c9d5;letter-spacing:.03em}
 #shuaWeatherSection .wx-hourly-table td.wx-in-game,#shuaWeatherSection .wx-hourly-table thead .wx-in-game{background:#19473b;color:#d6ffe9}
-#shuaWeatherSection .wx-source-link{font-weight:850;font-size:11px;color:#56dda9;text-decoration:none;display:inline-block}
-#shuaWeatherSection .wx-source-link:hover{text-decoration:underline}
-#shuaWeatherSection .wx-source-link span{margin-left:3px}
 #shuaWeatherSection .wx-footer{margin-top:18px;color:#8cabbf;font-size:11px;line-height:1.6;border-top:1px solid #26445b;padding-top:9px}
 #shuaWeatherSection .wx-footer p{margin:8px 0}
 #shuaWeatherSection .wx-footer a{color:#75dbb4}

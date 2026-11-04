@@ -141,12 +141,6 @@ style.textContent=`
 body.stats-mode .espn-sticky-controls{position:sticky;top:var(--shua-ranking-sticky-top,68px);z-index:31;background:#061522;padding-bottom:5px}
 .phone-mode.stats-mode .espn-sticky-controls{top:0}
 .espn-live-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.espn-metric-strip{display:flex;align-items:center;gap:6px;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding:5px 1px 8px;-webkit-overflow-scrolling:touch}
-.espn-metric-strip::-webkit-scrollbar{display:none}
-.espn-metric-btn{flex:0 0 auto;min-height:35px;white-space:nowrap;border:1px solid #36546d;border-radius:8px;background:#0b263c;color:#d9e9f6;padding:7px 11px;font:800 .75rem system-ui,sans-serif;cursor:pointer}
-.espn-metric-btn[aria-pressed="true"]{background:#1c5b68;border-color:#67d8b5;color:#fff;box-shadow:inset 0 -2px 0 #67d8b5}
-.espn-metric-btn:focus-visible{outline:2px solid #8eeccf;outline-offset:2px}
-@media(max-width:760px){.espn-metric-strip{margin:0 -3px;padding:4px 3px 8px}.espn-metric-btn{min-height:39px;padding:8px 11px;font-size:.73rem}}
 body.stats-mode #positionToggle{display:none!important}
 body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-live-filters,.espn-stat-filters{display:flex;gap:6px;flex-wrap:wrap}
@@ -173,6 +167,8 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
 .espn-stat-label{color:#7f93aa;font-size:.62rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
 .espn-stat-btn,.espn-view-btn{padding:6px 9px;font-size:.65rem}
 .espn-live-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--m);font-size:.68rem}
+.espn-chart-sort{display:flex;align-items:center;justify-content:flex-end;gap:7px;padding:7px 12px;background:#07182a}
+.espn-chart-sort .espn-column-stat-select{max-width:220px}
 .espn-live-card{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#091c30e8}
 .espn-live-head,.espn-live-row{display:grid;grid-template-columns:48px minmax(230px,1.8fr) 58px 68px 82px 215px;gap:8px;align-items:center}
 .espn-live-head{padding:8px 10px;color:var(--m);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#07182a}
@@ -189,6 +185,7 @@ body:not(.phone-mode) .positions .espn-live-btn{display:inline-flex!important}
   white-space:nowrap;text-align:right;text-align-last:right;
 }
 .espn-column-stat-select:focus{border-color:#6aaee5}
+.espn-chart-sort label{color:#9aafc4;font-size:.68rem;font-weight:900;white-space:nowrap;margin-right:7px}
 .phone-mode .espn-column-stat-select{
   width:100%!important;height:40px!important;
   min-width:0!important;padding:0 24px 0 8px!important;
@@ -486,10 +483,9 @@ section.innerHTML=`
           
         </div>
       </div>
-      <div id="espnMetricFilters" class="espn-metric-strip" role="group" aria-label="Choose a stat to rank players by"></div>
     </div>
     <div class="espn-live-card">
-      <div class="espn-chart-sort"><select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Sort players by stat"></select></div>
+      <div class="espn-chart-sort"><label for="espnColumnStatSelect">Rank by</label><select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Sort players by stat"></select></div>
     <div class="espn-live-head">
         <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div>PPR Pts</div><div class="espn-selected-stat-head-spacer" aria-hidden="true"></div>
       </div>
@@ -1671,14 +1667,8 @@ function renderTeamFilter(){
 }
 function renderStatFilters(){
   const select=document.getElementById('espnColumnStatSelect');
-  const buttons=document.getElementById('espnMetricFilters');
   const cfg=configForFilter().filter(x=>statView!=='PERGAME'||x.key!=='average');
   if(!cfg.some(x=>x.key===activeStat))activeStat='points';
-  if(buttons){
-    const scroll=buttons.scrollLeft;
-    buttons.innerHTML=cfg.map(x=>'<button class="espn-metric-btn" type="button" data-espn-stat="'+x.key+'" aria-pressed="'+(x.key===activeStat)+'">'+fullStatLabel(x.key)+(statView==='PERGAME'&&x.key!=='average'?' / G':'')+'</button>').join('');
-    buttons.scrollLeft=scroll;
-  }
   if(select){
     select.innerHTML=cfg.map(x=>'<option value="'+x.key+'">'+fullStatLabel(x.key)+'</option>').join('');
     select.value=activeStat;
@@ -1691,15 +1681,6 @@ function renderStatFilters(){
     };
   }
 }
-document.getElementById('espnMetricFilters')?.addEventListener('click',event=>{
-  const choice=event.target.closest('[data-espn-stat]');
-  if(!choice)return;
-  activeStat=choice.dataset.espnStat||'points';
-  sortDirection='DESC';
-  saveStatsUiState();
-  renderStatFilters();
-  render();
-});
 function localPlayerId(name){
   try{
     const aliases={kylepittssr:'kylepitts',orondegadsdenii:'orondegadsden',haroldfanninJr:'haroldfannin'};

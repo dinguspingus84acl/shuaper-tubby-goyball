@@ -28,13 +28,13 @@ body.shua-clean .featured-player-card .featured-bio-value{font-size:1.12rem;marg
  body.shua-clean .featured-player-card.featured-name-long .featured-last{font-size:1rem}
  body.shua-clean .featured-player-card.featured-name-xlong .featured-last{font-size:.88rem}
  body.shua-clean .featured-player-card .featured-name{margin-bottom:6px}
- body.shua-clean .featured-player-card .featured-bio{gap:3px}
- body.shua-clean .featured-player-card .featured-bio-item{padding:5px 1px}
+ body.shua-clean .featured-player-card .featured-bio{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+ body.shua-clean .featured-player-card .featured-bio-item{padding:5px 3px}
  body.shua-clean .featured-player-card .featured-bio-label{font-size:.56rem}
- body.shua-clean .featured-player-card .featured-bio-value{font-size:.96rem;margin-top:3px}
+ body.shua-clean .featured-player-card .featured-bio-value{font-size:.96rem;margin-top:3px;overflow:visible;text-overflow:clip}
 }
 body.shua-clean.phone-mode .featured-player-profile #featuredPlayerCard,
-body.shua-clean.phone-mode #modal .player-swipe-preview .featured-player-card{height:206px}
+body.shua-clean.phone-mode #modal .player-swipe-preview .featured-player-card{height:220px}
 body.shua-clean.phone-mode .featured-player-card .featured-portrait-box{left:7px;right:7px;top:7px;bottom:53px}
 body.shua-clean.phone-mode .featured-player-card .featured-team-strip{left:7px;right:7px;bottom:5px;height:42px}
 body.shua-clean.phone-mode .featured-player-card .featured-right{padding:14px 12px 10px}
@@ -42,10 +42,10 @@ body.shua-clean.phone-mode .featured-player-card .featured-first{font-size:1.12r
 body.shua-clean.phone-mode .featured-player-card .featured-last{font-size:1.63rem}
 body.shua-clean.phone-mode .featured-player-card.featured-name-long .featured-last{font-size:1.37rem}
 body.shua-clean.phone-mode .featured-player-card.featured-name-xlong .featured-last{font-size:1.15rem}
-body.shua-clean.phone-mode .featured-player-card .featured-bio{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
-body.shua-clean.phone-mode .featured-player-card .featured-bio-item{padding:7px 2px;border-radius:7px}
+body.shua-clean.phone-mode .featured-player-card .featured-bio{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+body.shua-clean.phone-mode .featured-player-card .featured-bio-item{padding:6px 4px;border-radius:7px}
 body.shua-clean.phone-mode .featured-player-card .featured-bio-label{font-size:.61rem}
-body.shua-clean.phone-mode .featured-player-card .featured-bio-value{font-size:1.03rem;margin-top:3px}
+body.shua-clean.phone-mode .featured-player-card .featured-bio-value{font-size:1.03rem;margin-top:3px;overflow:visible;text-overflow:clip;font-variant-numeric:tabular-nums}
 body.shua-clean.phone-mode .featured-player-profile #unifiedProfilePanels{min-height:calc(100dvh - 268px)}
 
 /* 2. Compact player-to-player arrow controls; ends are intentionally blank. */

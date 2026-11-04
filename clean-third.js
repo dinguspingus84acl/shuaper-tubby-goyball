@@ -118,10 +118,14 @@
         const element=document.createElement('span');element.className='shua-row-pos';element.textContent=pos;
         small.insertBefore(element,small.firstChild);
       }
-      makeDetail(row,[['Player',name],['Team',row.dataset.myteamsPlayerTeam||'—'],['Position / slot',pos+' / '+(row.querySelector('.myteams-slot')?.textContent||'—')],['Weekly projection',row.querySelector(':scope > strong')?.textContent||'—']]);
+      // Roster fields are already visible in the row: avoid an expanded copy.
+      row.dataset.shuaRowReady='1';
+      row.classList.add('shua-uniform-player-row');
     });
     myTeams.querySelectorAll('.myteams-wire-line:not(.is-heading):not([data-shua-row-ready])').forEach(row=>{
-      makeDetail(row,[['Player',row.querySelector('.myteams-player-open b')?.textContent||'—'],['Position',row.children[2]?.textContent||'—'],['Projected',row.children[3]?.textContent||'—'],['Availability',row.children[4]?.textContent||'—']]);
+      // Waiver status, projection and position are visible at a glance.
+      row.dataset.shuaRowReady='1';
+      row.classList.add('shua-uniform-player-row');
     });
   }
   const stock=document.getElementById('shuaStock');
@@ -136,8 +140,8 @@
         sub.append(badge);
       }
       const leagues=row.querySelector('.stock-person')?.getAttribute('title')||'';
-      const metrics=[...row.querySelectorAll(':scope > .stock-value,:scope > .stock-num,:scope > .stock-percent')].map(el=>el.textContent.trim()).join(' · ');
-      makeDetail(row,[['Player',name?.firstChild?.textContent?.trim()||name?.textContent||'—'],['Position',pos],['Listed in leagues',leagues||'Not listed in the draft snapshot'],['Stats',metrics]]);
+      // League-level ownership is extra information, unlike visible row stats.
+      makeDetail(row,[['Listed in leagues',leagues||'Not listed in the draft snapshot']]);
     });
   }
   function toggleDetails(event){

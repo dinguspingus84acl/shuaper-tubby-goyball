@@ -7,7 +7,7 @@ const root=path.resolve(__dirname,'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const script=read('clean-third.js'),css=read('clean-third.css'),html=read('index.html');
 new vm.Script(script,{filename:'clean-third.js'});
-assert.match(html,/clean-polish\.js[^\n]*\n<link rel="stylesheet" href="clean-third\.css\?v=20261104-clean8c">\n<script src="clean-third\.js\?v=20261104-clean8c">/,'New refinements load after the backed-up clean layers');
+assert.match(html,/clean-polish\.js[^\n]*\n<link rel="stylesheet" href="clean-third\.css\?v=20261104-clean8c">\n<script src="clean-third\.js\?v=20261104-fourth10">/,'Third refinements load after the backed-up clean layers, with the new cache revision');
 assert.ok(script.includes('leagueRecord')&&script.includes('own.wins')&&script.includes('own.losses'),'League summaries use actual standing records');
 assert.ok(script.includes('shua-league-monogram')&&css.includes(':not(:has(>.myteams-team-logo))'),'Missing team logos get accessible initials instead of blank space');
 assert.ok(css.includes('.myteams-grid')&&css.includes('grid-template-columns:minmax(0,1fr)!important'),'My Teams is a compact one-column list');
@@ -15,7 +15,7 @@ assert.ok(script.includes('yearLabel.firstChild.textContent=\'Season \''),'Year 
 assert.ok(script.includes('shua-active-filters')&&script.includes("new Event('change',{bubbles:true})"),'Filter chips edit the live analytics controls');
 assert.ok(css.includes('.st-usage-sort:not(.is-active) .st-usage-sort-icon'),'Only the active sort direction is shown');
 assert.ok(script.includes('makeDetail(row')&&script.includes('event.stopImmediatePropagation()'),'Details expand without opening a player card');
-assert.ok(script.includes('decorateStock')&&script.includes('decorateRoster'),'Stock, roster and waivers get consistent row details');
+assert.ok(script.includes('decorateStock')&&script.includes('decorateRoster'),'Stock, roster and waivers retain consistent row styling');
 assert.ok(css.includes('.st-table-wrap:not(.st-usage-table) table thead th')&&css.includes('table:has(.st-team-opportunity-rank)'),'Sticky Analytics headings include the player column, including rank-first tables');
 assert.ok(script.includes("img.addEventListener('error',fail)")&&script.includes('teamTones')&&css.includes('.shua-avatar-initials'),'Missing portraits fall back to team-colored initials');
 assert.ok(script.includes('decorateWeatherIcons')&&css.includes('.shua-wx-game-details>summary .shua-line-icon'),'Outline icons coexist with weather emojis');

@@ -1,0 +1,156 @@
+/* Ten focused refinements. The pre-change design lives on the GitHub backup.
+   Player-card heading and significant injury / bye badges are unchanged. */
+
+/* 1. Compact icon-and-label navigation; no repetitive Explore subtitle. */
+body.shua-clean #shuaCleanNav .shua-clean-current{display:none!important}
+@media(max-width:700px){
+ body.shua-clean #shuaCleanNav .shua-clean-trigger{
+  flex-direction:row!important;gap:5px!important;min-height:48px!important;
+  padding:7px 4px!important;justify-content:center!important;
+ }
+ body.shua-clean #shuaCleanNav .shua-clean-trigger>.shua-line-icon{
+  display:inline-flex!important;width:16px;height:16px;flex:0 0 16px;
+ }
+ body.shua-clean #shuaCleanNav .shua-clean-group-name{font-size:10.5px!important}
+}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-trigger{
+ flex-direction:row!important;gap:5px!important;min-height:48px!important;padding:7px 4px!important;
+}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-trigger>.shua-line-icon{display:inline-flex!important}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-group-name{font-size:10.5px!important}
+
+/* 2. One chart selector: menu on desktop, dropdown on narrow layouts. */
+@media(min-width:1001px){
+ body.shua-clean:not(.phone-mode) #shuaAnalyticsSection .st-dashboard-picker{display:none!important}
+ body.shua-clean:not(.phone-mode) #shuaAnalyticsSection .st-navigation,
+ body.shua-clean:not(.phone-mode) #shuaAnalyticsSection[data-active-view="schedule"] .st-navigation{
+  display:flex!important;position:static!important;
+ }
+ body.shua-clean:not(.phone-mode) #shuaAnalyticsSection[data-active-view="schedule"] .st-navigation{
+  margin:0 8px 10px!important;width:calc(100% - 16px)!important;
+ }
+}
+@media(max-width:1000px){
+ body.shua-clean #shuaAnalyticsSection .st-navigation{display:none!important}
+ body.shua-clean #shuaAnalyticsSection .st-dashboard-picker{display:flex!important}
+}
+body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation{display:none!important}
+body.shua-clean.phone-mode #shuaAnalyticsSection .st-dashboard-picker{display:flex!important}
+
+/* 3. Quiet, expandable ESPN freshness information; real refresh action stays. */
+body.shua-clean #myTeamsLiveStatus{position:relative;align-items:center;gap:0;min-width:0}
+body.shua-clean #myTeamsLiveStatus .shua-espn-sync{position:relative;color:#b0d2df}
+body.shua-clean #myTeamsLiveStatus .shua-espn-sync>summary{
+ display:inline-flex;align-items:center;gap:7px;cursor:pointer;list-style:none;
+ padding:7px 9px;border:1px solid rgba(152,192,202,.2);border-radius:8px;
+ background:#0b2838;color:#b9d8e2;font-size:11px;font-weight:800;
+}
+body.shua-clean #myTeamsLiveStatus .shua-espn-sync>summary::-webkit-details-marker{display:none}
+body.shua-clean #myTeamsLiveStatus .shua-espn-sync>summary:focus-visible{outline:2px solid #4bd4ac;outline-offset:2px}
+body.shua-clean #myTeamsLiveStatus .shua-espn-sync-dot{
+ width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#45d9a9;
+ box-shadow:0 0 0 2px rgba(69,217,169,.14);
+}
+body.shua-clean #myTeamsLiveStatus.shua-espn-unavailable .shua-espn-sync-dot{background:#a0b4bd;box-shadow:none}
+body.shua-clean #myTeamsLiveStatus.shua-espn-checking .shua-espn-sync-dot{background:#e2b96b;box-shadow:none}
+body.shua-clean #myTeamsLiveStatus .shua-espn-sync-expanded{
+ position:absolute;top:calc(100% + 8px);right:0;z-index:155;
+ display:flex;flex-direction:column;align-items:flex-start;gap:9px;
+ width:min(335px,calc(100vw - 26px));padding:12px;
+ border:1px solid #3a6172;border-radius:10px;background:#0a293e;
+ box-shadow:0 16px 35px #0009;line-height:1.5;
+}
+body.shua-clean #myTeamsLiveStatus .shua-espn-sync:not([open]) .shua-espn-sync-expanded{display:none}
+body.shua-clean #myTeamsLiveStatus [data-myteams-sync-now]{min-height:32px;border-radius:7px}
+
+/* 4. Stock starts with RB only. Keep ALL available; one list uses full space. */
+body.shua-clean #shuaStock[data-stock-filter]:not([data-stock-filter="ALL"]) .stock-groups{
+ grid-template-columns:minmax(0,1fr);max-width:900px;margin-inline:auto;
+}
+body.shua-clean #shuaStock .stock-group-head{padding-block:9px}
+body.shua-clean #shuaStock .stock-header{background:transparent;letter-spacing:.02em}
+body.shua-clean #shuaStock .stock-filters{margin-bottom:11px}
+
+/* 5. Only Stock's league membership needs an expanded detail row. */
+body.shua-clean #shuaStock .shua-player-row-detail{
+ background:#0d2c3d;border-top:1px solid #2c5461;padding:9px 14px;
+}
+body.shua-clean #shuaStock .shua-player-row-detail>span{flex:1;min-width:0}
+
+/* 6. Routine FA text is understated; injury/bye and Waivers remain distinct. */
+body.shua-clean #shuaMyTeams .myteams-acquire.shua-fourth-free-agent{
+ background:transparent!important;border:0!important;border-radius:0!important;
+ padding:0!important;color:#68cda8!important;font-weight:850;
+}
+
+/* 7. Flatten panels within Team Shares rather than nesting framed cards. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="teams"] .st-grid2>.st-panel{
+ background:transparent!important;border:0!important;border-top:1px solid var(--shua-border)!important;
+ box-shadow:none!important;border-radius:0!important;margin:0!important;
+ padding:13px 4px!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="teams"] .st-grid2>.st-panel .st-panel-head{
+ margin-bottom:9px;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="teams"] .st-grid2{
+ gap:8px 17px!important;
+}
+
+/* 8. Analytics shows its search field with an inline All-players shortcut.
+      The original global search button is moved, not cloned or disabled. */
+body.shua-clean.shua-fourth-search-unified #shuaGlobalSearchBar{display:none!important}
+body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow>.shua-global-search-launch{
+ box-sizing:border-box;display:inline-flex!important;align-items:center;justify-content:center;
+ flex:0 0 37px!important;width:37px!important;min-width:37px!important;min-height:31px!important;height:31px;
+ padding:3px!important;border:1px solid #417a7f!important;border-radius:7px!important;
+ background:#123e4a!important;color:#b7eee0!important;box-shadow:none!important;
+ font:900 10px/1 system-ui,sans-serif;cursor:pointer;
+}
+body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow>.shua-global-search-launch:after{content:'All'}
+body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow>.shua-global-search-launch>svg,
+body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow>.shua-global-search-launch>span{display:none!important}
+body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow>.shua-global-search-launch:focus-visible{
+ outline:2px solid #4cddad;outline-offset:2px;
+}
+@media(max-width:700px){
+ body.shua-clean #shuaAnalyticsSection .st-global-search{
+  width:100%!important;max-width:100%!important;margin-right:0!important;
+ }
+}
+
+/* 9. Shared gutters and header rhythm for rankings, Stock, My Teams and charts.
+      Keep Schedule's intentional edge-to-edge heatmap exception. */
+body.shua-clean{--shua-page-gutter:clamp(9px,1.45vw,20px)}
+body.shua-clean main{padding-inline:var(--shua-page-gutter)!important}
+body.shua-clean :is(#shuaMyTeams,#shuaStock,#shuaWeatherSection){
+ box-sizing:border-box;padding-inline:0!important;
+}
+body.shua-clean #shuaAnalyticsSection:not([data-active-view="schedule"]){padding-inline:0!important}
+body.shua-clean #shuaMyTeams{max-width:1200px}
+body.shua-clean #shuaStock{max-width:1200px}
+body.shua-clean :is(#shuaMyTeams .myteams-header,#shuaStock .stock-top,#shuaAnalyticsSection .st-topline){
+ margin-bottom:12px!important;
+}
+body.shua-clean :is(#shuaMyTeams .myteams-grid,#shuaStock .stock-groups,#shuaWeatherSection .wx-games){
+ row-gap:10px;
+}
+@media(max-width:700px){
+ body.shua-clean main{padding-inline:9px!important}
+ body.shua-clean #shuaMyTeams .myteams-header{gap:8px}
+ body.shua-clean #shuaStock .stock-top{padding-inline:0!important}
+}
+body.shua-clean.phone-mode main{padding-inline:9px!important}
+
+/* 10. Same Schedule difficulty semantics with more restrained color blocks. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.easy{
+ background:#153d39!important;border-color:#3d8572!important;color:#c6e9de!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.neutral{
+ background:#38352a!important;border-color:#8a7951!important;color:#eadbb2!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.tough{
+ background:#3d2b36!important;border-color:#865967!important;color:#f1d5dc!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell:not(.bye) b{
+ color:#f4f9fc;font-size:13px;font-weight:900;
+}

@@ -13,7 +13,7 @@ let active=false,inflight=null,timer=null,lastSuccess=0,lastAttempt=0,lastFailur
 const status=document.createElement('div');
 status.id='myTeamsLiveStatus';
 status.className='myteams-live-status';
-status.innerHTML='<span data-myteams-sync-status role="status" aria-live="polite">Saved ESPN rosters · live sync not checked</span><button type="button" data-myteams-sync-now>Refresh rosters</button>';
+status.innerHTML='<details class="shua-espn-sync"><summary aria-label="ESPN roster update details"><span class="shua-espn-sync-dot" aria-hidden="true"></span><span data-myteams-sync-compact>ESPN not checked</span></summary><div class="shua-espn-sync-expanded"><span data-myteams-sync-status role="status" aria-live="polite">Saved ESPN rosters · live sync not checked</span><button type="button" data-myteams-sync-now>Refresh rosters</button></div></details>';
 root.querySelector('.myteams-header-right')?.append(status);
 const css=document.createElement('style');css.textContent=
  '#myTeamsLiveStatus{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font:750 10px system-ui,sans-serif;color:#b2c9db}' +
@@ -21,7 +21,14 @@ const css=document.createElement('style');css.textContent=
  '#myTeamsLiveStatus button:disabled{opacity:.5;cursor:wait}' +
  '@media(max-width:700px){#myTeamsLiveStatus{width:100%;justify-content:flex-start}#myTeamsLiveStatus [data-myteams-sync-now]{min-height:38px}}';
 document.head.append(css);
-const statusText=text=>{const el=status.querySelector('[data-myteams-sync-status]');if(el)el.textContent=text;};
+const statusText=text=>{
+ const el=status.querySelector('[data-myteams-sync-status]');if(el)el.textContent=text;
+ const compact=status.querySelector('[data-myteams-sync-compact]');
+ const updated=String(text).match(/\b\d{1,2}:\d{2}\s?[AP]M\b/i);
+ if(compact)compact.textContent=updated?'Updated '+updated[0]:text.startsWith('Checking')?'Checking ESPN…':text.includes('unavailable')?'Saved rosters · ESPN unavailable':'ESPN not checked';
+ status.classList.toggle('shua-espn-unavailable',text.includes('unavailable'));
+ status.classList.toggle('shua-espn-checking',text.startsWith('Checking'));
+};
 const btn=status.querySelector('button');
 function validLeagueId(s){return /^\d{4,14}$/.test(String(s||''));}
 function rosterEntry(entry){

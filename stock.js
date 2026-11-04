@@ -69,7 +69,8 @@ for(const league of window.ShuaPortfolioData?.leagues||[]){
  }
 }
 const currentPlayers=Object.fromEntries(order.map(pos=>[pos,[...currentGroups.get(pos).values()]]));
-let filter='ALL',mode='draft',metricLoading=false,metricError='';
+// Start with a focused position; ALL remains available in the filter controls.
+let filter='RB',mode='draft',metricLoading=false,metricError='';
 function metricsById(){return new Map((window.ShuaPortfolioMetrics?.players||[]).map(p=>[String(p[0]),p]));}
 function loadMetrics(){if(window.ShuaPortfolioMetrics)return Promise.resolve();if(metricLoading)return Promise.resolve();metricLoading=true;metricError='';return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='portfolio-metrics.js?v=20261026-2';script.async=true;script.onload=()=>{metricLoading=false;resolve();render()};script.onerror=()=>{metricLoading=false;metricError='Performance data unavailable.';reject(new Error(metricError));render()};document.head.append(script);});}
 const avg=(p,field)=>{const vals=(p?.picks||[]).map(x=>Number(x[field])).filter(n=>Number.isFinite(n));return vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):'—';};
@@ -78,6 +79,8 @@ function combined(pos){const list=new Map();for(const p of players[pos])list.set
  return [...list.values()].sort((a,b)=>mode==='current'?(b.current?.length||0)-(a.current?.length||0)||b.leagues.length-a.leagues.length:b.leagues.length-a.leagues.length||a.name.localeCompare(b.name));
 }
 function render(){
+ section.dataset.stockFilter=filter;
+ section.dataset.stockMode=mode;
  const groups=order.filter(pos=>filter==='ALL'||filter===pos);
  section.innerHTML='<div class="stock-top"><div><h2>Stock</h2><p class="stock-sub">'+(mode==='draft'?'2026 draft picks · Week 1 baseline':mode==='current'?'Drafted vs current ownership · Flaim snapshot':'Draft round vs actual 2026 full-PPR production')+'</p></div><span class="stock-count">'+denominator+' Teams</span></div>'+
  '<div class="stock-modes">'+[['draft','Draft Stock'],['current','Current Stock'],['performance','Performance']].map(([m,label])=>'<button type="button" data-stock-mode="'+m+'" aria-pressed="'+(mode===m)+'">'+label+'</button>').join('')+'</div>'+

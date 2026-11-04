@@ -568,10 +568,12 @@ function paintPlayerNav(id){
   nav.hidden=false;
   const prev=seq[index-1]||null,next=seq[index+1]||null;
   const paint=(btn,item,dir)=>{
-    btn.disabled=!item;btn.dataset.targetId=item?.id||'';
-    btn.innerHTML=item
-      ?'<span class="ranking-nav-rank">'+(dir==='prev'?'← ':'')+item.rank+(dir==='next'?' →':'')+'</span><span class="ranking-nav-name">'+item.name+'</span>'
-      :'<span class="ranking-nav-rank">'+(dir==='prev'?'← Start':'End →')+'</span><span class="ranking-nav-name">No more players</span>';
+    btn.disabled=!item;btn.hidden=!item;btn.dataset.targetId=item?.id||'';
+    if(!item){btn.replaceChildren();return;}
+    btn.innerHTML='<span class="ranking-nav-arrow" aria-hidden="true">'+(dir==='prev'?'←':'→')+'</span><span class="ranking-nav-copy"><span class="ranking-nav-rank"></span><span class="ranking-nav-name"></span></span>';
+    btn.querySelector('.ranking-nav-rank').textContent='#'+item.rank;
+    btn.querySelector('.ranking-nav-name').textContent=item.name;
+    btn.setAttribute('aria-label',(dir==='prev'?'Previous':'Next')+' player: '+item.name);
   };
   paint(nav.querySelector('[data-player-step="prev"]'),prev,'prev');
   paint(nav.querySelector('[data-player-step="next"]'),next,'next');

@@ -1,0 +1,131 @@
+/* 2026-11-04: ten targeted clarity refinements, layered over the reversible clean theme. */
+
+/* 1. Compact featured identity without hiding the portrait or the four bio facts. */
+body.shua-clean .featured-player-profile #featuredPlayerCard{height:206px}
+body.shua-clean .featured-player-card .featured-portrait-box{top:8px;left:8px;right:8px;bottom:57px}
+body.shua-clean .featured-player-card .featured-team-strip{left:8px;right:8px;bottom:6px;height:45px}
+body.shua-clean .featured-player-card .featured-mini-logo{width:32px;height:32px}
+body.shua-clean .featured-player-card .featured-divider{height:29px}
+body.shua-clean .featured-player-card .featured-right{padding:14px 17px 11px}
+body.shua-clean .featured-player-card .featured-name{margin-bottom:9px}
+body.shua-clean .featured-player-card .featured-first{font-size:1.38rem}
+body.shua-clean .featured-player-card .featured-last{font-size:2.18rem;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+body.shua-clean .featured-player-card.featured-name-long .featured-last{font-size:1.84rem}
+body.shua-clean .featured-player-card.featured-name-xlong .featured-last{font-size:1.55rem}
+body.shua-clean .featured-player-card .featured-bio{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+body.shua-clean .featured-player-card .featured-bio-item{padding:5px 2px;border-radius:7px}
+body.shua-clean .featured-player-card .featured-bio-label{font-size:.47rem;letter-spacing:0}
+body.shua-clean .featured-player-card .featured-bio-value{font-size:.81rem;margin-top:2px}
+@media(max-width:760px){
+ body.shua-clean .featured-player-profile #featuredPlayerCard{height:165px}
+ body.shua-clean .featured-player-card .featured-portrait-box{top:5px;left:5px;right:5px;bottom:43px}
+ body.shua-clean .featured-player-card .featured-team-strip{left:5px;right:5px;bottom:4px;height:34px}
+ body.shua-clean .featured-player-card .featured-mini-logo{width:23px;height:23px}
+ body.shua-clean .featured-player-card .featured-divider{height:21px}
+ body.shua-clean .featured-player-card .featured-right{padding:12px 9px 9px}
+ body.shua-clean .featured-player-card .featured-first{font-size:.86rem}
+ body.shua-clean .featured-player-card .featured-last{font-size:1.17rem}
+ body.shua-clean .featured-player-card.featured-name-long .featured-last{font-size:1rem}
+ body.shua-clean .featured-player-card.featured-name-xlong .featured-last{font-size:.88rem}
+ body.shua-clean .featured-player-card .featured-name{margin-bottom:6px}
+ body.shua-clean .featured-player-card .featured-bio{gap:3px}
+ body.shua-clean .featured-player-card .featured-bio-item{padding:4px 1px}
+ body.shua-clean .featured-player-card .featured-bio-label{font-size:.35rem}
+ body.shua-clean .featured-player-card .featured-bio-value{font-size:.56rem;margin-top:2px}
+}
+body.shua-clean.phone-mode .featured-player-profile #featuredPlayerCard,
+body.shua-clean.phone-mode #modal .player-swipe-preview .featured-player-card{height:206px}
+body.shua-clean.phone-mode .featured-player-card .featured-portrait-box{left:7px;right:7px;top:7px;bottom:53px}
+body.shua-clean.phone-mode .featured-player-card .featured-team-strip{left:7px;right:7px;bottom:5px;height:42px}
+body.shua-clean.phone-mode .featured-player-card .featured-right{padding:14px 12px 10px}
+body.shua-clean.phone-mode .featured-player-card .featured-first{font-size:1.12rem}
+body.shua-clean.phone-mode .featured-player-card .featured-last{font-size:1.63rem}
+body.shua-clean.phone-mode .featured-player-card.featured-name-long .featured-last{font-size:1.37rem}
+body.shua-clean.phone-mode .featured-player-card.featured-name-xlong .featured-last{font-size:1.15rem}
+body.shua-clean.phone-mode .featured-player-card .featured-bio{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+body.shua-clean.phone-mode .featured-player-card .featured-bio-item{padding:6px 2px;border-radius:7px}
+body.shua-clean.phone-mode .featured-player-card .featured-bio-label{font-size:.41rem}
+body.shua-clean.phone-mode .featured-player-card .featured-bio-value{font-size:.68rem;margin-top:2px}
+body.shua-clean.phone-mode .featured-player-profile #unifiedProfilePanels{min-height:calc(100dvh - 268px)}
+
+/* 2. Compact player-to-player arrow controls; ends are intentionally blank. */
+body.shua-clean #rankingPlayerNav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:5px 8px}
+body.shua-clean #rankingPlayerNav button:not([hidden]){
+ display:flex;align-items:center;gap:7px;min-height:35px;padding:5px 9px;
+ background:#0a2536;border:1px solid #264b60;border-radius:8px
+}
+body.shua-clean #rankingPlayerNav button:last-child{flex-direction:row-reverse}
+body.shua-clean #rankingPlayerNav .ranking-nav-arrow{font-size:17px;line-height:1;color:#5ce7b4;font-weight:900}
+body.shua-clean #rankingPlayerNav .ranking-nav-copy{display:block;min-width:0}
+body.shua-clean #rankingPlayerNav .ranking-nav-rank{font-size:9px;margin:0;color:#8aaabb}
+body.shua-clean #rankingPlayerNav .ranking-nav-name{font-size:11px;font-weight:850}
+body.shua-clean.phone-mode #rankingPlayerNav{padding:4px 2px}
+body.shua-clean.phone-mode #rankingPlayerNav button:not([hidden]){min-height:33px;padding:4px 6px;gap:5px}
+body.shua-clean.phone-mode #rankingPlayerNav .ranking-nav-name{font-size:10px}
+
+/* 3. Rank heading and ROS / Preseason selector share a responsive line. */
+body.shua-clean main>.head:has(>#positionToggle:not([hidden])){display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+body.shua-clean main>.head>#positionToggle{margin:0 0 0 auto;flex:0 0 auto;gap:5px}
+body.shua-clean main>.head>#positionToggle button{min-height:34px;padding:6px 10px}
+@media(max-width:460px){body.shua-clean main>.head h2{font-size:19px}body.shua-clean main>.head>#positionToggle button{font-size:11px;padding:6px 8px}}
+
+/* 4. Desktop positional columns use measured space, keeping the notes at right. */
+@media(min-width:761px){
+ body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard table{table-layout:fixed}
+ body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard :is(th,td):nth-child(1){width:64px}
+ body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard :is(th,td):nth-child(2){width:37%}
+ body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard :is(th,td):nth-child(5){width:18%;padding-left:12px}
+ body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard :is(th,td):nth-child(6){width:auto;text-align:left}
+}
+
+/* 5. Keep SOS categories legible without bright full-cell fills. */
+body.shua-clean .espn-game-log-opponent.gl-sos-easy{background:#0c2c2d!important;border:1px solid #285e51!important;border-left:3px solid #42daa0!important;color:#b8f7df!important}
+body.shua-clean .espn-game-log-opponent.gl-sos-neutral{background:#2a2920!important;border:1px solid #645435!important;border-left:3px solid #d8b65b!important;color:#f2dda9!important}
+body.shua-clean .espn-game-log-opponent.gl-sos-tough{background:#30202b!important;border:1px solid #6b394a!important;border-left:3px solid #ee8294!important;color:#f6c4ce!important}
+
+/* 6. Consistent chart controls, including a right-aligned timeframe selector. */
+body.shua-clean #shuaAnalyticsSection :is(.st-controls,.st-usage-controls,.st-injury-filters){display:flex;flex-wrap:wrap;align-items:end;gap:7px}
+body.shua-clean #shuaAnalyticsSection :is(.st-controls,.st-usage-controls,.st-injury-filters) select{min-height:38px;height:38px;border-radius:9px;padding-top:5px;padding-bottom:5px;font-size:12px}
+body.shua-clean #shuaAnalyticsSection :is(.st-position,.st-schedule-toolbar,.st-usage-controls) button{min-height:36px;border-radius:9px;font-size:12px}
+body.shua-clean #shuaAnalyticsSection .st-controls label:has(:is(#stWeek,#stSeason,#stTeamWindow)){margin-left:auto}
+body.shua-clean #shuaAnalyticsSection .st-controls label:has(#stWeek)+label:has(#stSeason){margin-left:0}
+body.shua-clean #shuaAnalyticsSection .st-usage-controls .st-usage-rank-filter{margin-left:auto}
+@media(max-width:690px){body.shua-clean #shuaAnalyticsSection .st-controls label:has(:is(#stWeek,#stSeason,#stTeamWindow)){margin-left:0}}
+
+/* 7. Clearly outline the current/selected matchup week without changing SOS hues. */
+body.shua-clean #shuaAnalyticsSection .st-heat-table td:not(.shua-sixth-week-focus) .st-heat-cell{filter:saturate(.9)}
+body.shua-clean #shuaAnalyticsSection .st-heat-table thead th.shua-sixth-week-focus{background:#1b4e56!important;box-shadow:inset 2px 0 #55e8bc,inset -2px 0 #55e8bc}
+body.shua-clean #shuaAnalyticsSection .st-heat-table tbody td.shua-sixth-week-focus{box-shadow:inset 2px 0 #55e8bc,inset -2px 0 #55e8bc;background:#103a45}
+body.shua-clean #shuaAnalyticsSection .st-heat-table tbody td.shua-sixth-week-focus .st-heat-cell{filter:none}
+
+/* 8. The My Teams list is a one-at-a-time accordion with a distinct active card. */
+body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])){border-color:#4cbe9c!important;box-shadow:0 0 0 1px #43b58c38!important}
+body.shua-clean #shuaMyTeams .myteams-card-trigger[aria-expanded="true"]{background:#123d41!important}
+body.shua-clean #shuaMyTeams .myteams-roster{padding:9px 10px 12px}
+body.shua-clean #shuaMyTeams .myteams-roster-row{min-height:44px;gap:8px}
+@media(max-width:620px){body.shua-clean #shuaMyTeams .myteams-roster{padding:7px 6px 10px}body.shua-clean #shuaMyTeams .myteams-roster-row{gap:5px}}
+
+/* 9. Native expand/collapse on the ALL Stock groups; individual tabs stay open. */
+body.shua-clean #shuaStock .stock-collapsible>.stock-group-head{cursor:pointer;list-style:none;user-select:none}
+body.shua-clean #shuaStock .stock-collapsible>.stock-group-head::-webkit-details-marker{display:none}
+body.shua-clean #shuaStock .stock-collapsible>.stock-group-head:hover{background:#184052}
+body.shua-clean #shuaStock .stock-collapsible>.stock-group-head:focus-visible{outline:2px solid #54dfaf;outline-offset:-3px}
+body.shua-clean #shuaStock .stock-expand-chevron{display:inline-block;margin-left:5px;font-size:15px;transition:transform .15s ease}
+body.shua-clean #shuaStock .stock-collapsible[open] .stock-expand-chevron{transform:rotate(180deg)}
+
+/* 10. Kickoff sections keep a chronological NFL slate, with previous games folded. */
+body.shua-clean #shuaWeatherSection #wxGames>.wx-kickoff-group,
+body.shua-clean #shuaWeatherSection #wxGames>.wx-past-games{grid-column:1/-1;min-width:0}
+body.shua-clean #shuaWeatherSection .wx-kickoff-group{margin-bottom:7px}
+body.shua-clean #shuaWeatherSection .wx-kickoff-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #33586a;margin:4px 0 9px;padding:5px 3px 8px}
+body.shua-clean #shuaWeatherSection .wx-kickoff-heading h3{margin:0;color:#f1fafc;font-size:14px;font-weight:900}
+body.shua-clean #shuaWeatherSection .wx-kickoff-heading span{font-size:11px;color:#9ab7c5;white-space:nowrap}
+body.shua-clean #shuaWeatherSection .wx-day-games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+body.shua-clean #shuaWeatherSection .wx-day-games>.wx-pending-game{grid-column:1/-1;display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:8px 12px!important;min-height:56px;background:#0a2031!important}
+body.shua-clean #shuaWeatherSection .wx-day-games>.wx-pending-game .wx-pending-fixture{display:flex;flex:1 1 260px;align-items:center;gap:14px;min-width:0}
+body.shua-clean #shuaWeatherSection .wx-past-games{margin-top:6px;border:1px solid #305263;border-radius:10px;background:#0b2333;padding:0 9px}
+body.shua-clean #shuaWeatherSection .wx-past-games>summary{cursor:pointer;padding:12px 3px;color:#dcebf0;font-size:13px;font-weight:900;list-style:none;display:flex;justify-content:space-between;gap:12px}
+body.shua-clean #shuaWeatherSection .wx-past-games>summary::-webkit-details-marker{display:none}
+body.shua-clean #shuaWeatherSection .wx-past-games>summary span{color:#8eaab9;font-weight:750;font-size:11px}
+body.shua-clean #shuaWeatherSection .wx-past-content{padding:5px 0 10px}
+@media(max-width:750px){body.shua-clean #shuaWeatherSection .wx-day-games{grid-template-columns:minmax(0,1fr)}body.shua-clean #shuaWeatherSection .wx-kickoff-heading h3{font-size:12px}}

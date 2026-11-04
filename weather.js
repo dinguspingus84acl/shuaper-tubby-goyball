@@ -188,6 +188,36 @@
       '</article>';
   }
 
+  // Kickoff buckets are derived from the actual ET kickoff, not from weather
+  // forecast availability. Grouping must never invent a missing forecast.
+  function kickoffGroup(game){
+    const kickoff=new Date(game.kickoffUtc);
+    if(!Number.isFinite(kickoff.getTime()))return {key:'unknown',label:'Kickoff time pending',sort:Infinity};
+    const timezone='America/New_York';
+    const parts=new Intl.DateTimeFormat('en-US',{timeZone:timezone,weekday:'long',year:'numeric',month:'short',day:'numeric',hour:'numeric',hourCycle:'h23'}).formatToParts(kickoff);
+    const part=name=>parts.find(item=>item.type===name)?.value||'';
+    const weekday=part('weekday'),hour=Number(part('hour'));
+    const bucket=weekday==='Sunday'?(hour<12?'Sunday Morning':hour<15?'Sunday Early':hour<19?'Sunday Late':'Sunday Night'):
+      weekday==='Thursday'?(hour>=17?'Thursday Night':'Thursday'):
+      weekday==='Monday'?(hour>=17?'Monday Night':'Monday'):
+      weekday==='Saturday'?(hour>=17?'Saturday Night':'Saturday'):
+      weekday+(hour>=17?' Night':'');
+    const date=[part('year'),part('month'),part('day')].join('-');
+    return {key:game.week+'-'+date+'-'+bucket,label:'Week '+(game.week??'—')+' · '+bucket+' · '+part('month')+' '+part('day'),sort:kickoff.getTime()};
+  }
+
+  function groupedGames(games){
+    const buckets=new Map();
+    games.slice().sort((a,b)=>new Date(a.kickoffUtc)-new Date(b.kickoffUtc)).forEach(game=>{
+      const group=kickoffGroup(game);
+      if(!buckets.has(group.key))buckets.set(group.key,{...group,games:[]});
+      buckets.get(group.key).games.push(game);
+    });
+    return [...buckets.values()].map(group=>'<section class="wx-kickoff-group" aria-label="'+escape(group.label)+'">'+
+      '<header class="wx-kickoff-heading"><h3>'+escape(group.label)+'</h3><span>'+group.games.length+' game'+(group.games.length===1?'':'s')+'</span></header>'+
+      '<div class="wx-day-games">'+group.games.map(gameCard).join('')+'</div></section>').join('');
+  }
+
   function renderList(){
     if(!snapshot)return;
     const all=snapshot.games||[];
@@ -206,7 +236,16 @@
       return [game.away.name,game.away.abbr,game.home.name,game.home.abbr,game.venue,game.city].some(value=>String(value||'').toLowerCase().includes(query));
     });
     section.querySelector('#wxResultCount').textContent=matches.length+' matchup'+(matches.length===1?'':'s');
-    section.querySelector('#wxGames').innerHTML=matches.length?matches.map(gameCard).join(''):'<p class="wx-empty">No matchups match this search and filter.</p>';
+    // A game can last longer than three hours; retain it in the active slate
+    // until four hours after scheduled kickoff. Past games remain one tap away.
+    const now=Date.now(),previous=matches.filter(game=>{
+      const kickoff=Date.parse(game.kickoffUtc);
+      return Number.isFinite(kickoff)&&kickoff+4*60*60*1000<now;
+    });
+    const upcoming=matches.filter(game=>!previous.includes(game));
+    section.querySelector('#wxGames').innerHTML=matches.length?groupedGames(upcoming)+
+      (previous.length?'<details class="wx-past-games"><summary>Previous Games <span>'+previous.length+' matchup'+(previous.length===1?'':'s')+'</span></summary><div class="wx-past-content">'+groupedGames(previous)+'</div></details>':''):
+      '<p class="wx-empty">No matchups match this search and filter.</p>';
   }
 
   function renderShell(){

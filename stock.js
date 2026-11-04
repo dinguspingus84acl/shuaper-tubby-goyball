@@ -71,6 +71,8 @@ for(const league of window.ShuaPortfolioData?.leagues||[]){
 const currentPlayers=Object.fromEntries(order.map(pos=>[pos,[...currentGroups.get(pos).values()]]));
 // Start with a focused position; ALL remains available in the filter controls.
 let filter='RB',mode='draft',metricLoading=false,metricError='';
+// Keep the user's expanded position groups when switching Stock views.
+const expandedGroups=new Set(['RB']);
 function metricsById(){return new Map((window.ShuaPortfolioMetrics?.players||[]).map(p=>[String(p[0]),p]));}
 function loadMetrics(){if(window.ShuaPortfolioMetrics)return Promise.resolve();if(metricLoading)return Promise.resolve();metricLoading=true;metricError='';return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='portfolio-metrics.js?v=20261026-2';script.async=true;script.onload=()=>{metricLoading=false;resolve();render()};script.onerror=()=>{metricLoading=false;metricError='Performance data unavailable.';reject(new Error(metricError));render()};document.head.append(script);});}
 const avg=(p,field)=>{const vals=(p?.picks||[]).map(x=>Number(x[field])).filter(n=>Number.isFinite(n));return vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):'—';};
@@ -91,14 +93,21 @@ function render(){
   const cls=mode==='draft'?'':' stock-'+mode;
   const cols=mode==='draft'?['#','Player','Teams','Stock %']:mode==='current'?['#','Player','Draft','Now','Now %']:['#','Player','Picks','Rd','PPG / Pts','Pos #'];
   const stats=metricsById();
-  return '<div class="stock-group"><div class="stock-group-head"><h3>'+pos+'</h3><small>'+list.length+' players</small></div><div class="stock-header'+cls+'">'+cols.map(c=>'<span>'+c+'</span>').join('')+'</div>'+
+  const disclosure=filter==='ALL';
+  return '<'+(disclosure?'details':'div')+' class="stock-group'+(disclosure?' stock-collapsible':'')+'" data-stock-group="'+esc(pos)+'"'+(disclosure&&expandedGroups.has(pos)?' open':'')+'><'+(disclosure?'summary':'div')+' class="stock-group-head"><h3>'+esc(pos)+'</h3><small>'+list.length+' players'+(disclosure?' <span class="stock-expand-chevron" aria-hidden="true">⌄</span>':'')+'</small></'+(disclosure?'summary':'div')+'><div class="stock-group-body"><div class="stock-header'+cls+'">'+cols.map(c=>'<span>'+c+'</span>').join('')+'</div>'+
   list.map((p,i)=>{const nfl=logo(p.nfl),defense=pos==='D/ST',portrait=defense?nfl:'https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png';
    const draftCount=p.leagues?.length||0,now=p.current?.length||0,row=stats.get(String(p.id)),pct=(100*now/denominator).toFixed(1),change=now-draftCount;
    const cells=mode==='draft'?'<span class="stock-num">'+draftCount+'</span><span class="stock-percent">'+(100*draftCount/denominator).toFixed(1)+'%</span>':mode==='current'?'<span class="stock-value">'+draftCount+'</span><span class="stock-value '+(change>0?'stock-up':change<0?'stock-down':'')+'">'+now+'<small>'+(change>0?'+':'')+change+'</small></span><span class="stock-percent">'+pct+'%</span>':'<span class="stock-value">'+draftCount+'</span><span class="stock-value">'+avg(p,'round')+'</span><span class="stock-value">'+(row&&row[5]!=null?Number(row[5]).toFixed(1):'—')+'<small>'+(row&&row[4]!=null?Number(row[4]).toFixed(1)+' pts':'—')+'</small></span><span class="stock-value">'+(row&&row[12]!=null?'#'+row[12]:'—')+'</span>';
    return '<div class="stock-row'+cls+'"><span class="stock-rank">'+(i+1)+'</span><button class="stock-person" type="button" data-stock-id="'+esc(p.id)+'" data-stock-pos="'+pos+'" title="'+esc((p.leagues||[]).join(' · '))+'"><img class="stock-face" src="'+portrait+'" loading="lazy" alt=""><span class="stock-name">'+esc(p.name)+'<span class="stock-meta">'+(defense?'D/ST · ':'')+(defense?'':nfl?'<img class="stock-logo" src="'+nfl+'" alt="">':'')+esc(p.nfl||'')+'</span></span></button>'+cells+'</div>';
-  }).join('')+'</div>';
+  }).join('')+'</div></'+(disclosure?'details':'div')+'>';
  }).join('')+'</div>'+'<p class="stock-sub" style="padding-top:10px">'+(mode==='performance'?'Performance metrics use full-PPR season actuals, not league-specific weekly projections. K/DST stats show — where not in the source.':mode==='current'?'Current ownership includes waiver and trade additions; drafted percentages remain fixed to Week 1.':'Players are counted once per league from verified ESPN drafts.')+'</p>';
 }
+section.addEventListener('toggle',e=>{
+ const group=e.target.closest('.stock-collapsible[data-stock-group]');
+ if(!group)return;
+ if(group.open)expandedGroups.add(group.dataset.stockGroup);
+ else expandedGroups.delete(group.dataset.stockGroup);
+},true);
 section.addEventListener('click',e=>{
  const pos=e.target.closest('[data-stock-position]');if(pos){filter=pos.dataset.stockPosition;render();return;}
  const chosen=e.target.closest('[data-stock-mode]');if(chosen){mode=chosen.dataset.stockMode;render();if(mode==='performance'&&!window.ShuaPortfolioMetrics)loadMetrics().catch(()=>{});return;}

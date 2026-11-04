@@ -571,7 +571,7 @@ function paintPlayerNav(id){
     btn.disabled=!item;btn.hidden=!item;btn.dataset.targetId=item?.id||'';
     if(!item){btn.replaceChildren();return;}
     btn.innerHTML='<span class="ranking-nav-arrow" aria-hidden="true">'+(dir==='prev'?'←':'→')+'</span><span class="ranking-nav-copy"><span class="ranking-nav-rank"></span><span class="ranking-nav-name"></span></span>';
-    btn.querySelector('.ranking-nav-rank').textContent='#'+item.rank;
+    btn.querySelector('.ranking-nav-rank').textContent=String(item.rank).startsWith('#')?item.rank:'#'+item.rank;
     btn.querySelector('.ranking-nav-name').textContent=item.name;
     btn.setAttribute('aria-label',(dir==='prev'?'Previous':'Next')+' player: '+item.name);
   };

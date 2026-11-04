@@ -9,7 +9,8 @@ const profile=source('unified-profile.js'),stock=source('stock.js'),weather=sour
 
 for(const name of ['clean-sixth.js','unified-profile.js','stock.js','weather.js'])new vm.Script(source(name),{filename:name});
 for(const name of ['clean-sixth.css','clean-sixth.js','weather.js','stock.js','unified-profile.js']){
- assert.ok(html.includes(name+'?v=20261104-sixth10'),name+' must load with a new cache key');
+ const version=['clean-sixth.css','stock.js','unified-profile.js'].includes(name)?'20261104-sixth10b':'20261104-sixth10';
+ assert.ok(html.includes(name+'?v='+version),name+' must load with a new cache key');
 }
 assert.ok(html.includes('clean-fifth.css?v=20261104-fifth9b'),'Previous design layer must remain intact');
 
@@ -35,10 +36,10 @@ assert.ok(js.includes("table.querySelector('thead .st-week-sort.active')")&&js.i
 // 8. My Teams already has exactly-one-open logic; highlight stays visual-only.
 assert.ok(html.includes("section.querySelectorAll('.myteams-roster').forEach(el=>el.hidden=true)"));
 assert.ok(css.includes('myteams-card-trigger[aria-expanded="true"]'));
-// 9. Position filters remain untouched while ALL groups use native disclosure.
+// 9. Position filters remain untouched while ALL groups have functional buttons.
 assert.ok(stock.includes("const expandedGroups=new Set(['RB'])"));
-assert.ok(stock.includes("filter==='ALL'")&&stock.includes("disclosure?'details':'div'"));
-assert.ok(stock.includes("section.addEventListener('toggle'"));
+assert.ok(stock.includes("filter==='ALL'")&&stock.includes('data-stock-toggle'));
+assert.ok(stock.includes("toggle.setAttribute('aria-expanded'")&&stock.includes('panel.hidden=!expanded'));
 // 10. ET kickoff groups and collapsed past games retain actual forecast cards.
 assert.ok(weather.includes("timeZone:timezone")&&weather.includes("timezone='America/New_York'"));
 assert.ok(weather.includes('Sunday Early')&&weather.includes('Sunday Late')&&weather.includes('Sunday Night'));

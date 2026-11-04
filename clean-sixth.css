@@ -105,13 +105,12 @@ body.shua-clean #shuaMyTeams .myteams-roster{padding:9px 10px 12px}
 body.shua-clean #shuaMyTeams .myteams-roster-row{min-height:44px;gap:8px}
 @media(max-width:620px){body.shua-clean #shuaMyTeams .myteams-roster{padding:7px 6px 10px}body.shua-clean #shuaMyTeams .myteams-roster-row{gap:5px}}
 
-/* 9. Native expand/collapse on the ALL Stock groups; individual tabs stay open. */
-body.shua-clean #shuaStock .stock-collapsible>.stock-group-head{cursor:pointer;list-style:none;user-select:none}
-body.shua-clean #shuaStock .stock-collapsible>.stock-group-head::-webkit-details-marker{display:none}
+/* 9. Expand/collapse buttons on ALL Stock groups; individual tabs stay open. */
+body.shua-clean #shuaStock .stock-collapsible>.stock-group-head{display:flex;width:100%;color:inherit;border:0;text-align:left;cursor:pointer;user-select:none}
 body.shua-clean #shuaStock .stock-collapsible>.stock-group-head:hover{background:#184052}
 body.shua-clean #shuaStock .stock-collapsible>.stock-group-head:focus-visible{outline:2px solid #54dfaf;outline-offset:-3px}
 body.shua-clean #shuaStock .stock-expand-chevron{display:inline-block;margin-left:5px;font-size:15px;transition:transform .15s ease}
-body.shua-clean #shuaStock .stock-collapsible[open] .stock-expand-chevron{transform:rotate(180deg)}
+body.shua-clean #shuaStock .stock-collapsible[data-stock-expanded="true"] .stock-expand-chevron{transform:rotate(180deg)}
 
 /* 10. Kickoff sections keep a chronological NFL slate, with previous games folded. */
 body.shua-clean #shuaWeatherSection #wxGames>.wx-kickoff-group,

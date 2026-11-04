@@ -1,0 +1,253 @@
+/* Eight Clean-design refinements. Player card heading and existing status
+   badges are intentionally left as they were. The previous build is backed up. */
+
+/* 1. My Teams becomes one neat, full-width league selector with real records. */
+body.shua-clean #shuaMyTeams .myteams-grid{
+  grid-template-columns:minmax(0,1fr)!important;gap:5px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card{
+  grid-column:1/-1!important;padding:0!important;border-radius:9px;
+  border:1px solid #29495e;background:#0b2537;
+}
+body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])){
+  border-color:#238e75;background:#0c2f3b;
+}
+body.shua-clean #shuaMyTeams .myteams-card-trigger{
+  box-sizing:border-box;display:flex;align-items:center;gap:12px;
+  min-height:59px;padding:9px 13px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card-identity{
+  display:flex;align-items:center;gap:11px;flex:1 1 auto;min-width:0;
+}
+body.shua-clean #shuaMyTeams .myteams-card-identity .myteams-team-logo{
+  flex:0 0 36px;width:36px;height:36px;object-fit:contain;border-radius:7px;
+}
+body.shua-clean #shuaMyTeams .shua-league-copy{
+  display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0;flex:1;
+}
+body.shua-clean #shuaMyTeams .myteams-name{
+  font-size:14px;line-height:1.18;font-weight:850;margin:0;
+  overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+}
+body.shua-clean #shuaMyTeams .myteams-league{
+  margin:0;font-size:10px;letter-spacing:0;text-transform:none;
+  line-height:1.2;color:#91b1c5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+body.shua-clean #shuaMyTeams .myteams-platform,
+body.shua-clean #shuaMyTeams .myteams-card-trigger>.myteams-finish{display:none!important}
+body.shua-clean #shuaMyTeams .shua-league-record{
+  display:inline-flex;flex:0 0 auto;justify-content:center;align-items:center;
+  min-width:47px;padding:4px 6px;border:1px solid #325c62;border-radius:7px;
+  background:#103b41;color:#b5eddc;font:800 11px/1.15 system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;text-align:center;
+}
+body.shua-clean #shuaMyTeams .myteams-card-trigger>.shua-line-icon{
+  width:17px;height:17px;color:#8db5c7;flex:0 0 17px;
+  transition:transform .2s ease;
+}
+body.shua-clean #shuaMyTeams .myteams-card-trigger[aria-expanded="true"]>.shua-line-icon{
+  transform:rotate(180deg);color:#5befb5;
+}
+body.shua-clean #shuaMyTeams .myteams-card-trigger[aria-expanded="true"]{
+  background:#123d42;
+}
+body.shua-clean #shuaMyTeams .myteams-roster{
+  margin:0;padding:10px 11px 13px;border-top-color:#2e675d;
+  border-radius:0 0 9px 9px;
+}
+@media(max-width:600px){
+ body.shua-clean #shuaMyTeams .myteams-grid{gap:4px!important}
+ body.shua-clean #shuaMyTeams .myteams-card-trigger{min-height:56px;padding:8px 9px!important;gap:7px}
+ body.shua-clean #shuaMyTeams .myteams-card-identity{gap:7px}
+ body.shua-clean #shuaMyTeams .myteams-card-identity .myteams-team-logo{width:32px;height:32px;flex-basis:32px}
+ body.shua-clean #shuaMyTeams .myteams-name{font-size:13px}
+ body.shua-clean #shuaMyTeams .myteams-league{font-size:9px}
+ body.shua-clean #shuaMyTeams .shua-league-record{min-width:42px;font-size:10px;padding:4px}
+ body.shua-clean #shuaMyTeams .myteams-roster{padding:7px 5px 10px}
+}
+
+/* 3. Time-frame selectors use identical labels, shape and touch targets. */
+body.shua-clean #shuaAnalyticsSection .st-controls select,
+body.shua-clean #shuaAnalyticsSection .st-injury-filters select,
+body.shua-clean #shuaAnalyticsSection .st-usage-controls select,
+body.shua-clean #shuaMyTeams #myTeamsYear{
+  box-sizing:border-box;min-height:38px;border:1px solid #365b72;
+  border-radius:9px;background:#102c40;color:#e7f7ff;
+  font-weight:760;font-variant-numeric:tabular-nums;
+}
+body.shua-clean #shuaAnalyticsSection .st-controls label:has(#stSeason),
+body.shua-clean #shuaAnalyticsSection .st-controls label:has(#stWeek),
+body.shua-clean #shuaAnalyticsSection .st-controls label:has(#stTeamWindow){
+  flex:0 1 166px;min-width:118px;max-width:180px;
+}
+body.shua-clean #shuaAnalyticsSection .st-controls label:has(#stSeason) .st-label,
+body.shua-clean #shuaAnalyticsSection .st-controls label:has(#stWeek) .st-label,
+body.shua-clean #shuaAnalyticsSection .st-controls label:has(#stTeamWindow) .st-label{
+  font-size:10px;color:#aac8d5;font-weight:850;letter-spacing:.06em;
+}
+body.shua-clean #shuaMyTeams .myteams-header-right label{
+  font-size:11px;color:#aac8d5;font-weight:850;
+}
+
+/* 4. A small row of editable filters exposes the current context on phones. */
+body.shua-clean #shuaAnalyticsSection .shua-active-filters{
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+  margin:3px 0 11px;padding:0 1px;min-height:29px;
+}
+body.shua-clean #shuaAnalyticsSection .shua-active-filters[hidden]{display:none!important}
+body.shua-clean #shuaAnalyticsSection .shua-filter-summary-label{
+  font-size:10px;text-transform:uppercase;letter-spacing:.05em;
+  color:#90a9bb;font-weight:850;margin-right:2px;
+}
+body.shua-clean #shuaAnalyticsSection .shua-active-filter-chip{
+  display:inline-flex;align-items:center;gap:6px;min-height:29px;
+  padding:4px 9px;border:1px solid #356c6d;border-radius:99px;
+  background:#113e41;color:#c8f2e7;cursor:pointer;
+  font:800 11px/1.15 system-ui,sans-serif;
+}
+body.shua-clean #shuaAnalyticsSection .shua-active-filter-chip:hover,
+body.shua-clean #shuaAnalyticsSection .shua-active-filter-chip:focus-visible{
+  outline:2px solid #41dba9;outline-offset:1px;background:#145549;
+}
+body.shua-clean #shuaAnalyticsSection .shua-chip-clear{
+  font-size:15px;line-height:.8;color:#7bdbbf;
+}
+
+/* 6. Only the active sortable Analytics column shows its direction arrow. */
+body.shua-clean #shuaAnalyticsSection .st-usage-sort:not(.is-active) .st-usage-sort-icon,
+body.shua-clean #shuaAnalyticsSection .st-week-sort:not(.active) .st-week-sort-icon{
+  display:none!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-usage-sort.is-active .st-usage-sort-icon,
+body.shua-clean #shuaAnalyticsSection .st-week-sort.active .st-week-sort-icon{
+  display:inline!important;color:#4af0b3!important;opacity:1;
+}
+
+/* 7. Consistent hierarchy across roster, waivers, and Stock. Keep names openable. */
+body.shua-clean .shua-uniform-player-row{position:relative;padding-right:29px!important}
+body.shua-clean #shuaMyTeams .myteams-roster-row.shua-uniform-player-row{min-height:49px}
+body.shua-clean #shuaMyTeams .myteams-wire-line.shua-uniform-player-row{min-height:51px}
+body.shua-clean #shuaStock .stock-row.shua-uniform-player-row{min-height:51px}
+body.shua-clean .shua-row-pos{
+  display:inline-block;white-space:nowrap;margin-right:3px;
+  padding:1px 4px;border-radius:4px;background:#1a4350;
+  color:#b8e5e9;font-size:9px;font-weight:900;
+}
+body.shua-clean .shua-row-detail-toggle{
+  position:absolute;right:3px;top:50%;transform:translateY(-50%);
+  display:grid;place-items:center;width:23px;height:28px;padding:2px;
+  border:1px solid transparent;border-radius:6px;background:transparent;
+  color:#91b9c5;cursor:pointer;z-index:3;
+}
+body.shua-clean .shua-row-detail-toggle:hover,
+body.shua-clean .shua-row-detail-toggle:focus-visible{
+  border-color:#3e8978;color:#65ebba;background:#16453f;
+}
+body.shua-clean .shua-row-detail-toggle[aria-expanded="true"] .shua-line-icon{transform:rotate(180deg)}
+body.shua-clean .shua-player-row-detail{
+  display:flex;align-items:stretch;flex-wrap:wrap;gap:8px 15px;
+  padding:9px 12px;border-top:1px solid #244f59;
+  background:#102e3d;color:#d4eef2;
+}
+body.shua-clean .shua-player-row-detail[hidden]{display:none!important}
+body.shua-clean .shua-player-row-detail>span{display:flex;flex-direction:column;gap:3px;min-width:60px;max-width:100%}
+body.shua-clean .shua-player-row-detail small{font-size:9px;color:#91afc0;font-weight:750;text-transform:uppercase}
+body.shua-clean .shua-player-row-detail strong{font-size:11px;font-weight:800;line-height:1.25;overflow-wrap:anywhere}
+body.shua-clean #shuaMyTeams .myteams-player-open b,
+body.shua-clean #shuaMyTeams .myteams-wire-line .myteams-player-open b,
+body.shua-clean #shuaStock .stock-name{
+  white-space:normal;overflow-wrap:anywhere;line-height:1.2;
+  font-size:12px;
+}
+body.shua-clean #shuaMyTeams .myteams-player-open small{
+  white-space:normal;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px;
+}
+body.shua-clean #shuaStock .stock-meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+body.shua-clean #shuaStock .stock-meta .stock-logo{margin:0 1px 0 0}
+@media(max-width:600px){
+ body.shua-clean #shuaMyTeams .myteams-wire-line .myteams-player-open b,
+ body.shua-clean #shuaMyTeams .myteams-player-open b,
+ body.shua-clean #shuaStock .stock-name{font-size:11px}
+ body.shua-clean #shuaMyTeams .myteams-wire-line.shua-uniform-player-row{grid-template-columns:16px minmax(0,1fr) 27px 38px 40px;gap:3px}
+ body.shua-clean #shuaStock .shua-uniform-player-row{padding-right:25px!important}
+ body.shua-clean .shua-player-row-detail{gap:8px 12px;padding:8px}
+}
+
+/* 8. Sticky Analytics headings and player column. Game Logs are untouched. */
+body.shua-clean #shuaAnalyticsSection .st-table-wrap:not(.st-usage-table) table thead th{
+  position:sticky;top:0;z-index:4;background:#102e43;
+  box-shadow:0 1px 0 #38586a;
+}
+body.shua-clean #shuaAnalyticsSection .st-table-wrap:not(.st-usage-table) table :is(thead th,tbody th,tbody td):first-child{
+  position:sticky;left:0;background:#0d293b;z-index:3;
+  box-shadow:2px 0 8px #06172477;
+}
+body.shua-clean #shuaAnalyticsSection .st-table-wrap:not(.st-usage-table) table thead th:first-child{
+  z-index:6;background:#12334a;
+}
+/* Team opportunity's first column is a rank; keep the adjacent player visible too. */
+body.shua-clean #shuaAnalyticsSection .st-table-wrap table:has(.st-team-opportunity-rank) tr>:nth-child(2){
+  position:sticky;left:39px;z-index:3;background:#0d293b;
+  box-shadow:2px 0 8px #06172477;
+}
+body.shua-clean #shuaAnalyticsSection .st-table-wrap table:has(.st-team-opportunity-rank) thead th:nth-child(2){
+  z-index:6;background:#12334a;
+}
+body.shua-clean #shuaAnalyticsSection .st-table-wrap table:has(.st-team-opportunity-rank) tr>:first-child{
+  width:39px;min-width:39px;max-width:39px;
+}
+body.shua-clean #shuaAnalyticsSection .st-usage-table thead th{box-shadow:0 1px 0 #38586a}
+body.shua-clean #shuaAnalyticsSection .st-heat-table thead th{position:sticky;top:0;z-index:5;background:#102c40}
+body.shua-clean #shuaAnalyticsSection .st-heat-table thead .st-heat-player{z-index:8}
+
+/* 9. Same circle, crop, outline and initials fallback in all small lists. */
+body.shua-clean{--shua-list-face-size:36px}
+body.shua-clean .shua-uniform-portrait{
+  box-sizing:border-box!important;width:var(--shua-list-face-size)!important;
+  height:var(--shua-list-face-size)!important;
+  min-width:var(--shua-list-face-size)!important;
+  flex:0 0 var(--shua-list-face-size)!important;
+  border:2px solid var(--shua-team-tone,#3f7890)!important;
+  border-radius:50%!important;object-fit:cover!important;
+  object-position:center 18%!important;background:#15374a!important;
+}
+body.shua-clean .shua-avatar-initials{
+  box-sizing:border-box;display:inline-grid;place-items:center;
+  width:var(--shua-list-face-size);height:var(--shua-list-face-size);
+  min-width:var(--shua-list-face-size);flex:0 0 var(--shua-list-face-size);
+  border:2px solid var(--shua-team-tone,#3f7890);border-radius:50%;
+  background:color-mix(in srgb,var(--shua-team-tone,#2d6685) 60%,#102536);
+  color:#f7fdff;font:900 11px/1 system-ui,sans-serif;letter-spacing:.015em;
+}
+body.shua-clean .shua-avatar-initials[hidden]{display:none!important}
+body.shua-clean #shuaAnalyticsSection .st-person .st-avatar-fallback{
+  box-sizing:border-box;border:2px solid #3f7890;border-radius:50%;
+  background:#164458;color:#e9fff4;
+}
+@media(max-width:600px){body.shua-clean{--shua-list-face-size:34px}}
+
+/* 10. A single thin-outline icon language for navigation and detail actions.
+   Weather's literal condition emojis are intentionally left unchanged. */
+body.shua-clean .shua-line-icon{
+  box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+  width:17px;height:17px;flex:0 0 17px;
+}
+body.shua-clean .shua-line-icon svg{display:block;width:100%;height:100%}
+body.shua-clean #shuaCleanNav .shua-line-icon{color:#8fcfc2}
+body.shua-clean #shuaCleanNav .shua-clean-group.is-active .shua-line-icon{color:#6af0b5}
+@media(max-width:700px){body.shua-clean #shuaCleanNav .shua-clean-trigger>.shua-line-icon{display:none}}
+body.shua-clean #shuaBoardOptions .shua-line-icon{width:14px;height:14px;transition:transform .2s}
+body.shua-clean.shua-board-options-open #shuaBoardOptions .shua-line-icon{transform:rotate(180deg)}
+body.shua-clean #shuaWeatherSection .shua-wx-game-details>summary{
+  display:flex;align-items:center;justify-content:space-between;gap:7px;
+}
+body.shua-clean #shuaWeatherSection .shua-wx-game-details>summary::after{content:none!important}
+body.shua-clean #shuaWeatherSection .shua-wx-game-details>summary .shua-line-icon{
+  color:#91d9c2;transition:transform .2s;
+}
+body.shua-clean #shuaWeatherSection .shua-wx-game-details[open]>summary .shua-line-icon{
+  transform:rotate(180deg);
+}
+body.shua-clean :is(.shua-row-detail-toggle,.myteams-card-trigger):focus-visible{
+  outline:2px solid #4af0b3;outline-offset:2px;
+}

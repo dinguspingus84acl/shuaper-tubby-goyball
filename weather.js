@@ -164,8 +164,14 @@
 
   function gameCard(game){
     const f=game.forecast,r=risk(game),isPending=!f;
-    const summary=isPending?'<div class="wx-pending">Forecast not yet posted · Check back closer to kickoff</div>':
-      '<div class="wx-metrics">'+[
+    // Pending games have no weather to analyse. Keep them as compact fixtures
+    // rather than implying an unissued forecast through a full-size card.
+    if(isPending)return '<article class="wx-game wx-pending-game" data-weather-game="'+escape(game.id)+'" aria-label="'+escape(game.away.name+' at '+game.home.name+', forecast pending')+'">'+
+      '<div class="wx-pending-fixture"><div class="wx-pending-matchup">'+logo(game.away)+'<strong>'+escape(game.away.abbr)+'</strong><span class="wx-pending-at">at</span>'+logo(game.home)+'<strong>'+escape(game.home.abbr)+'</strong></div>'+
+      '<div class="wx-pending-context"><strong>Week '+escape(game.week??'—')+' · '+escape(formatDate(game.kickoffUtc))+'</strong><small>'+escape(game.venue||'Venue TBA')+'</small></div></div>'+
+      '<span class="wx-impact wx-impact-pending">Forecast pending</span>'+
+      '<a class="wx-pending-link" href="https://mysportsweather.com/nfl" target="_blank" rel="noopener noreferrer" aria-label="Check weather for '+escape(game.away.abbr+' at '+game.home.abbr)+' on MySportsWeather">Check ↗</a></article>';
+    const summary='<div class="wx-metrics">'+[
         ['Temperature',display(f.tempF,'°F'),'temp'],
         ['Wind',display(f.windMph,' mph'),'wind'],
         ['Gusts',display(f.gustMph,' mph'),'gust'],
@@ -187,8 +193,8 @@
     const all=snapshot.games||[];
     const ready=all.filter(game=>game.forecast),watch=all.filter(game=>['watch','high'].includes(risk(game).level));
     const stats=section.querySelector('#wxOverview');
-    stats.innerHTML=[['Upcoming games',all.length],['Forecasts available',ready.length],['Weather watch',watch.length],['Awaiting forecast',all.length-ready.length]].map(([label,n])=>'<div class="wx-stat"><strong>'+n+'</strong><span>'+label+'</span></div>').join('');
-    section.querySelector('#wxFreshness').innerHTML='<strong>'+ready.length+' published forecast'+(ready.length===1?'':'s')+' currently available</strong><span>Last checked '+escape(formatUpdated(snapshot.generatedAt))+' · '+(all.length-ready.length)+' games awaiting MySportsWeather predictions. The tab automatically checks for updates while open.</span>';
+    stats.innerHTML=[['Games',all.length],['Forecasts available',ready.length],['Pending',all.length-ready.length],...(watch.length?[['Weather watch',watch.length]]:[])].map(([label,n])=>'<span class="wx-status-item"><strong>'+n+'</strong> '+escape(label)+'</span>').join('<span class="wx-status-divider" aria-hidden="true">·</span>');
+    section.querySelector('#wxFreshness').innerHTML='<span>MySportsWeather · Checked '+escape(formatUpdated(snapshot.generatedAt))+' · Updates automatically while this tab is open</span>';
     const buttons=section.querySelector('#wxFilters');
     buttons.innerHTML=filters.map(([value,label])=>'<button type="button" data-wx-filter="'+value+'" aria-pressed="'+(filter===value)+'">'+label+'</button>').join('');
     const query=search.trim().toLowerCase();

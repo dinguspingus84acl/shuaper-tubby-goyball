@@ -7,7 +7,7 @@ const root=path.resolve(__dirname,'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const script=read('clean-third.js'),css=read('clean-third.css'),html=read('index.html');
 new vm.Script(script,{filename:'clean-third.js'});
-assert.match(html,/clean-polish\.js[^\n]*\n<link rel="stylesheet" href="clean-third\.css\?v=20261104-clean8">\n<script src="clean-third\.js\?v=20261104-clean8">/,'New refinements load after the backed-up clean layers');
+assert.match(html,/clean-polish\.js[^\n]*\n<link rel="stylesheet" href="clean-third\.css\?v=20261104-clean8">\n<script src="clean-third\.js\?v=20261104-clean8b">/,'New refinements load after the backed-up clean layers');
 assert.ok(script.includes('leagueRecord')&&script.includes('own.wins')&&script.includes('own.losses'),'League summaries use actual standing records');
 assert.ok(css.includes('.myteams-grid')&&css.includes('grid-template-columns:minmax(0,1fr)!important'),'My Teams is a compact one-column list');
 assert.ok(script.includes('yearLabel.firstChild.textContent=\'Season \''),'Year selectors consistently say Season');

@@ -57,6 +57,9 @@ def check_weather(page, phone, url):
     if AVAILABLE:
         # Past games are deliberately folded into a collapsed section. Choose
         # a visible current forecast rather than an invisible previous card.
+        # The current visual design collapses hourly data behind a one-tap
+        # analysis disclosure; open that real control before checking it.
+        weather.locator('.wx-game:visible .shua-wx-game-details > summary').first.click()
         preview = weather.locator(".wx-game:visible .wx-hour-preview:visible").first
         preview.wait_for(state="visible", timeout=12000)
         assert preview.locator(".wx-preview-hour").count() >= 1
@@ -82,7 +85,8 @@ def check_weather(page, phone, url):
             eight_pm = preview.locator(".wx-preview-hour").filter(
                 has=page.locator("strong", has_text="8:00")
             ).first
-            assert eight_pm.locator(".wx-preview-sky").inner_text() == "🌙", +                "Clear weather after local sunset should use a moon, not a sun"
+            assert eight_pm.locator(".wx-preview-sky").inner_text() == "🌙", \
+                "Clear weather after local sunset should use a moon, not a sun"
         if phone and len(first_forecast["hourly"]) <= 5:
             widths = nws.locator(".wx-hourly-scroll").evaluate("el => ({total: el.scrollWidth, visible: el.clientWidth})")
             assert widths["total"] <= widths["visible"] + 2, f"Hourly columns should fit phone width: {widths}"

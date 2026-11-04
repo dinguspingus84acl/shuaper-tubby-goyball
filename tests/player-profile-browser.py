@@ -12,6 +12,10 @@ srv=ThreadingHTTPServer(('127.0.0.1',0),partial(SimpleHTTPRequestHandler,directo
 Thread(target=srv.serve_forever,daemon=True).start()
 base='http://127.0.0.1:%d/'%srv.server_address[1]
 
+def navigate(page,group,target):
+    page.locator(f'#shuaCleanNav [data-shua-group="{group}"] .shua-clean-trigger').click()
+    page.locator(f'#shuaCleanNav [data-shua-target="{target}"]').click()
+
 def open_search(page,phone):
     assert page.locator('#shuaGlobalSearchBar .shua-global-search-launch').is_visible(), 'Search bar must be visible on every site tab'
     page.locator('#shuaGlobalSearchBar .shua-global-search-launch').click()
@@ -19,11 +23,7 @@ def open_search(page,phone):
 
 def check_position_rankings(page,phone):
     for pos in ('QB','RB','WR','TE'):
-        if phone:
-            page.locator('#phoneMenuButton').click()
-            page.locator(f'#phoneMenuItems [data-target="{pos}"]').click()
-        else:
-            page.locator(f'.positions [data-pos="{pos}"]').click()
+        navigate(page,'rankings',pos)
         page.locator('#rows tr').first.wait_for(state='visible',timeout=18000)
         assert page.locator('.positions .pos.active').first.get_attribute('data-pos')==pos
         check=page.locator('#rows').evaluate('''root=>{
@@ -156,10 +156,7 @@ def check_browser(browser,phone):
     page.locator('#modal.open #featuredPlayerCard').wait_for(state='visible',timeout=25000)
     page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Brady')",timeout=18000)
     page.locator('#close').evaluate('(e)=>e.click()')
-    if phone:
-        page.locator('#phoneMenuButton').click()
-        page.locator('#phoneMenuItems [data-target="ANALYTICS"]').click()
-    else:page.locator('.positions [data-pos="ANALYTICS"]').click()
+    navigate(page,'analytics','ANALYTICS')
     assert page.locator('#shuaGlobalSearchBar .shua-global-search-launch').is_visible(),'Analytics tab needs global search'
     page.wait_for_function('window.ShuaStudio?.UI?.navigate !== undefined',timeout=25000)
     page.evaluate("window.ShuaStudio.UI.navigate('consistency')")
@@ -201,13 +198,13 @@ def check_rosters(browser):
           'roster':{'entries':[{'lineupSlotId':0,'playerPoolEntry':{'player':{
           'id':3915511,'fullName':'Joe Burrow','defaultPositionId':1,
           'proTeamId':4,'injuryStatus':'ACTIVE'}}}]}}],
-          'status':{'currentScoringPeriod':8,'currentMatchupPeriod':8}}
+          'status':{'currentScoringPeriod':9,'currentMatchupPeriod':9}}
     def fulfill(route):
         if '/leagues/'+str(info['id']) in route.request.url:
             route.fulfill(status=200,content_type='application/json',body=json.dumps(mock))
         else:route.fulfill(status=403,content_type='application/json',body='{}')
     page.route('**/apis/v3/games/ffl/seasons/2026/segments/0/leagues/**',fulfill)
-    page.locator('.positions [data-pos="MYTEAMS"]').click()
+    navigate(page,'teams','MYTEAMS')
     page.wait_for_function('window.ShuaMyTeamsLive && window.ShuaMyTeamsLive.lastSuccess > 0',timeout=35000)
     names=page.evaluate('window.ShuaMyTeamsUI.rosterSnapshots[0].roster.map(p=>p.name)')
     assert names==['Joe Burrow'],names

@@ -20,14 +20,17 @@ class QuietHandler(SimpleHTTPRequestHandler):
         pass
 
 
+def navigate(page, group, target):
+    # The redesigned site routes through the visible grouped navigation;
+    # the original .positions buttons deliberately remain hidden in Clean mode.
+    page.locator(f'#shuaCleanNav [data-shua-group="{group}"] .shua-clean-trigger').click()
+    page.locator(f'#shuaCleanNav [data-shua-target="{target}"]').click()
+
+
 def open_weather(page, phone, url):
     page.goto(url, wait_until="domcontentloaded", timeout=45000)
     page.locator('.positions [data-pos="WEATHER"]').wait_for(state="attached")
-    if phone:
-        page.locator("#phoneMenuButton").click()
-        page.locator('#phoneMenuItems button[data-target="WEATHER"]').click()
-    else:
-        page.locator('.positions [data-pos="WEATHER"]').click()
+    navigate(page, "tools", "WEATHER")
     page.locator('#shuaWeatherSection .wx-game').first.wait_for(state="visible", timeout=30000)
     assert page.locator('#shuaWeatherSection .wx-game').count() == len(GAMES)
     assert page.locator("body.shua-weather-open").count() == 1
@@ -37,7 +40,7 @@ def check_weather(page, phone, url):
     open_weather(page, phone, url)
     weather = page.locator("#shuaWeatherSection")
     assert weather.locator("#wxFreshness").is_visible()
-    assert "automatically checks" in weather.locator("#wxFreshness").inner_text()
+    assert "Source checked" in weather.locator("#wxFreshness").inner_text()
     weather.locator('[data-wx-filter="ready"]').click()
     assert weather.locator(".wx-game").count() == AVAILABLE
     if AVAILABLE:
@@ -83,10 +86,7 @@ def check_weather(page, phone, url):
     if phone:
         bounds = weather.evaluate("el => ({right: el.getBoundingClientRect().right, width: window.innerWidth})")
         assert bounds["right"] <= bounds["width"] + 8, f"Weather tab overflow: {bounds}"
-        page.locator("#phoneMenuButton").click()
-        page.locator('#phoneMenuItems button[data-target="HOME"]').click()
-    else:
-        page.locator('.positions [data-pos="ALL"]').click()
+    navigate(page, "rankings", "HOME")
     assert page.locator("body.shua-weather-open").count() == 0
     assert weather.is_hidden()
 

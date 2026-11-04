@@ -278,6 +278,12 @@ body.shua-clean.stats-mode #espnLiveSection .espn-metric-track span {
     grid-template-columns:37px minmax(0,1fr) 78px!important;
     gap:6px!important;
   }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head>:nth-child(3),
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head>:nth-child(4),
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head>:nth-child(5),
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-row>.espn-pos,
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-row>.espn-team,
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-row>.espn-points {display:none!important}
   body.shua-clean.stats-mode #espnLiveSection .espn-stat-bar-head,
   body.shua-clean.stats-mode #espnLiveSection .espn-metric-track {display:none!important}
   body.shua-clean.stats-mode #espnLiveSection .espn-live-head {

@@ -8,7 +8,7 @@ const html=read('index.html');
 const css=read('clean-seventh.css');
 const stats=read('espn-live.js');
 new vm.Script(stats,{filename:'espn-live.js'});
-assert.ok(html.includes('clean-seventh.css?v=20261104-stats3'),'New look must have its own reversible CSS layer');
+assert.ok(html.includes('clean-seventh.css?v=20261104-stats4'),'New look must have its own reversible CSS layer');
 assert.ok(html.includes('espn-live.js?v=20261104-metrics3'),'Stats behavior requires a fresh asset URL');
 assert.ok(html.includes('clean-sixth.css?v=20261104-weight3'),'Mobile weight sizing needs a fresh asset URL');
 assert.ok(css.includes('body.shua-clean.phone-mode:has(.positions .pos.active:is('),'Phone rank controls must be visible on position pages');

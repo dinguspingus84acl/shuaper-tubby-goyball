@@ -622,12 +622,23 @@ function panelHtml(item,tab){
  if(tab==='matchups')return matchupHtml(item.id);
  return wireHtml(item.id);
 }
+function leagueGlance(item){
+ if(item.year!==2026)return '';
+ const league=leagueFor(item.id);
+ if(!league)return '';
+ const sameTeam=team=>String(team?.teamId??'')===String(item.teamId);
+ const matchup=(league.matchups||[]).find(game=>sameTeam(game.home)||sameTeam(game.away));
+ const opponent=matchup?(sameTeam(matchup.home)?matchup.away:matchup.home):null;
+ const parts=[];
+ if(opponent?.teamName)parts.push('<span class="myteams-next-opponent">W'+escapeHtml(league.week||'—')+' · vs '+escapeHtml(opponent.teamName)+'</span>');
+ return parts.length?'<div class="myteams-glance" aria-label="Saved ESPN matchup">'+parts.join('')+'</div>':'';
+}
 function renderTeams(year){
  const current=year===2026;
  const cards=current?teamIndex.map(x=>({...x,year:2026})):pastTeams.filter(x=>x.year===year&&x.id!=='646444846'&&!/^diddy party/i.test(String(x.teamName||'').trim())).map(x=>({league:x.leagueName,team:x.teamName,year,id:x.id,teamId:x.teamId,index:-1}));
  section.querySelector('.myteams-count').textContent=cards.length+' Teams';
  section.querySelector('.myteams-header p').textContent='Your '+year+' ESPN fantasy football leagues';
- section.querySelector('.myteams-grid').innerHTML=cards.map((item,i)=>'<article class="myteams-card"><button type="button" class="myteams-card-trigger" data-myteams-open="'+i+'" aria-expanded="false"><div class="myteams-league">'+escapeHtml(item.league)+'</div><div class="myteams-card-identity">'+fantasyLogo(item)+'<div class="myteams-name">'+escapeHtml(item.team)+'</div></div>'+(current?'':'<div class="myteams-finish">'+escapeHtml(historyFinish(item))+'</div>')+'<div class="myteams-platform">ESPN · '+year+'</div></button><div class="myteams-roster" hidden></div></article>').join('');
+ section.querySelector('.myteams-grid').innerHTML=cards.map((item,i)=>'<article class="myteams-card"><button type="button" class="myteams-card-trigger" data-myteams-open="'+i+'" aria-expanded="false"><div class="myteams-league">'+escapeHtml(item.league)+'</div><div class="myteams-card-identity">'+fantasyLogo(item)+'<div class="myteams-name">'+escapeHtml(item.team)+'</div></div>'+leagueGlance(item)+(current?'':'<div class="myteams-finish">'+escapeHtml(historyFinish(item))+'</div>')+'<div class="myteams-platform">ESPN · '+year+'</div></button><div class="myteams-roster" hidden></div></article>').join('');
  section._cards=cards;
 }
 section.innerHTML='<header class="myteams-header"><div><h2>My Teams</h2><p>2026 ESPN fantasy football leagues</p></div><div class="myteams-header-right"><label>Year <select id="myTeamsYear">'+[2026,2025,2024,2023,2022,2021,2020].map(y=>'<option value="'+y+'">'+y+'</option>').join('')+'</select></label><span class="myteams-count">11 Teams</span></div></header><div class="myteams-grid"></div>';
@@ -699,4 +710,6 @@ button.addEventListener('click',()=>{if(!document.body.classList.contains('my-te
 <script src="clean-sixth.js?v=20261104-sixth10"></script>
 <link rel="stylesheet" href="clean-seventh.css?v=20261104-stats4">
 <link rel="stylesheet" href="clean-eighth.css?v=20261104-controls1">
+<link rel="stylesheet" href="clean-ninth.css?v=20261104-ten-clean1">
+<script src="clean-ninth.js?v=20261104-ten-clean1"></script>
 </body></html>

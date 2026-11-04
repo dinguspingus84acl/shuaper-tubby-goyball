@@ -166,26 +166,30 @@
 
   function gameCard(game){
     const f=game.forecast,r=risk(game),isPending=!f&&!game.indoor;
-    // Outdoor games without forecasts remain compact. Indoor games receive the
-    // same full card as other roof venues, without inventing weather readings.
+    // Keep unavailable forecasts explicit; never invent temperature or wind.
     if(isPending)return '<article class="wx-game wx-pending-game" data-weather-game="'+escape(game.id)+'" aria-label="'+escape(game.away.name+' at '+game.home.name+', forecast pending')+'">'+
       '<div class="wx-pending-fixture"><div class="wx-pending-matchup">'+logo(game.away)+'<strong>'+escape(game.away.abbr)+'</strong><span class="wx-pending-at">at</span>'+logo(game.home)+'<strong>'+escape(game.home.abbr)+'</strong></div>'+
       '<div class="wx-pending-context"><strong>Week '+escape(game.week??'—')+' · '+escape(formatDate(game.kickoffUtc))+'</strong><small>'+escape(game.venue||'Venue TBA')+'</small></div></div>'+
       '<span class="wx-impact wx-impact-pending">Forecast pending</span></article>';
-    const conditions=f?[
+    const fixture='<div class="wx-matchup"><div class="wx-team">'+logo(game.away)+'<span><b>'+escape(game.away.abbr)+'</b><small>'+escape(game.away.name)+'</small></span></div><span class="wx-versus">AT</span><div class="wx-team">'+logo(game.home)+'<span><b>'+escape(game.home.abbr)+'</b><small>'+escape(game.home.name)+'</small></span></div></div>';
+    const venue='<div class="wx-venue">'+escape(game.venue||'Venue TBA')+(game.city?' · '+escape(game.city):'')+'</div>';
+    const header='<div class="wx-game-top"><div class="wx-kick">Week '+escape(game.week??'—')+' <span>·</span> '+escape(formatDate(game.kickoffUtc))+'</div><span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div>';
+    // All fixed-roof venues, including the Saints at Caesars Superdome, use
+    // the identical compact indoor layout regardless of stray forecast fields.
+    if(game.indoor)return '<article class="wx-game wx-indoor-game" data-weather-game="'+escape(game.id)+'">'+
+      header+fixture+venue+'<div class="wx-indoor-note"><span class="wx-indoor-mark" aria-hidden="true">⌂</span> Indoor game · Weather is not expected to affect play</div></article>';
+    const conditions=[
       ['Temperature',display(f.tempF,'°F'),'temp'],
       ['Wind',display(f.windMph,' mph'),'wind'],
-      ['Gusts',display(f.gustMph,' mph'),'gust'],
       [f.precipType==='Snow'?'Snow chance':'Rain chance',display(f.precipPct,'%'),'rain']
-    ]:[['Venue','Indoor','indoor'],['Wind','N/A','wind'],['Gusts','N/A','gust'],['Rain chance','N/A','rain']];
+    ];
     const summary='<div class="wx-metrics">'+conditions.map(([label,value,klass])=>'<div class="wx-metric wx-'+klass+'"><span>'+escape(label)+'</span><strong>'+escape(value)+'</strong></div>').join('')+'</div>';
     const skyByTime=new Map((f?.hourly||[]).filter(h=>h.sky).map(h=>[h.time,h.sky]));
     const details=f&&(f.hourly?.length||f.nbmHourly?.length)?'<details class="wx-details"><summary>Full hourly weather data <span aria-hidden="true">⌄</span></summary>'+hourTable(f.hourly,'NWS hourly forecast',skyByTime,game)+hourTable(f.nbmHourly,'NBM higher-resolution forecast',skyByTime,game)+'</details>':'';
     return '<article class="wx-game" data-weather-game="'+escape(game.id)+'">'+
-      '<div class="wx-game-top"><div class="wx-kick">Week '+escape(game.week??'—')+' <span>·</span> '+escape(formatDate(game.kickoffUtc))+'</div><span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div>'+
-      '<div class="wx-matchup"><div class="wx-team">'+logo(game.away)+'<span><b>'+escape(game.away.abbr)+'</b><small>'+escape(game.away.name)+'</small></span></div><span class="wx-versus">AT</span><div class="wx-team">'+logo(game.home)+'<span><b>'+escape(game.home.abbr)+'</b><small>'+escape(game.home.name)+'</small></span></div></div>'+
-      '<div class="wx-venue">'+escape(game.venue||'Venue TBA')+(game.city?' · '+escape(game.city):'')+(game.indoor?' <span class="wx-dome">Indoor / roof venue</span>':'')+'</div>'+
-      summary+(f?hourlyPreview(f,game):'')+'<div class="wx-analysis"><span>FANTASY WEATHER ANALYSIS</span><p>'+escape(analysis(game))+'</p>'+(f&&trend(f)?'<small>'+escape(trend(f))+'</small>':'')+'</div>'+details+
+      header+fixture+venue+summary+
+      '<details class="wx-expanded"><summary>Weather details <span aria-hidden="true">⌄</span></summary>'+
+      hourlyPreview(f,game)+'<div class="wx-analysis"><span>FANTASY WEATHER ANALYSIS</span><p>'+escape(analysis(game))+'</p>'+(trend(f)?'<small>'+escape(trend(f))+'</small>':'')+'</div>'+details+'</details>'+
       '</article>';
   }
 
@@ -271,7 +275,8 @@
     loading=true;
     const refresh=section.querySelector('#wxRefresh');
     if(refresh){refresh.disabled=true;refresh.textContent='Refreshing…';}
-    if(!snapshot)section.querySelector('#wxGames').innerHTML='<p class="wx-empty">Loading the latest NFL games and forecasts…</p>';
+    if(!snapshot)section.querySelector('#wxGames').innerHTML='<div class="wx-loading-cards" role="status" aria-label="Loading the latest NFL forecasts">'+
+      Array.from({length:4},()=>'<div class="wx-loading-card" aria-hidden="true"><span></span><span></span><span></span></div>').join('')+'</div>';
     try{
       const response=await fetch('weather/data/nfl.json'+(force?'?v='+Date.now():''),{cache:'no-store'});
       if(!response.ok)throw new Error('Forecast data request failed ('+response.status+')');

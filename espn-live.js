@@ -469,6 +469,7 @@ section.innerHTML=`
         </div>
         <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
         <span class="espn-leader-count" id="espnStatsCount" aria-live="polite"></span>
+        <span class="espn-stats-fetched" id="espnStatsFetched" role="status"></span>
       </div>
       <div class="espn-stat-bar">
         <div class="espn-stat-primary">
@@ -1701,6 +1702,12 @@ function render(){
   const maxStat=Math.max(1,...ranked.map(player=>Math.max(0,statValue(player,activeStat))));
   const scope=document.getElementById('espnStatsCount');
   if(scope)scope.textContent=ranked.length+' players';
+  const freshness=document.getElementById('espnStatsFetched');
+  if(freshness){
+    const stamp=statsLastUpdated instanceof Date&&Number.isFinite(statsLastUpdated.getTime())?statsLastUpdated:null;
+    freshness.textContent=stamp?'ESPN fetched '+stamp.toLocaleDateString([], {month:'short',day:'numeric'})+' · '+stamp.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):'Saved ESPN statistics';
+    if(stamp)freshness.dateTime=stamp.toISOString();
+  }
   box.innerHTML=ranked.map((p,i)=>{
     const percent=Math.max(0,Math.min(100,Math.round(statValue(p,activeStat)/maxStat*100)));
     return `<div class="espn-live-row${selectedStatsName===nameKey(p.name)?' stats-selected':''}" data-espn-position="${p.position}" data-espn-player-id="${p.id}">
@@ -1805,7 +1812,8 @@ async function loadStatsSeason(year,{force=false}={}){
   }
 
   const box=document.getElementById('espnLiveRows');
-  if(box)box.innerHTML='<div class="espn-status">Loading '+year+' ESPN stats…</div>';
+  if(box)box.innerHTML='<div class="espn-loading" role="status" aria-label="Loading '+year+' ESPN stats"><span>Loading '+year+' ESPN stats…</span>'+
+    Array.from({length:5},()=>'<div class="espn-loading-row" aria-hidden="true"><i></i><i></i><i></i></div>').join('')+'</div>';
   loading=true;
   try{
     const fresh=year===SEASON?(force?await fetchEspn(SEASON):await ensureCurrentRows()):await fetchStatsSeasonData(year);

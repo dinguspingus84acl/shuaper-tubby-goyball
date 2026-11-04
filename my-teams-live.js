@@ -27,7 +27,7 @@ const statusText=text=>{
  const el=status.querySelector('[data-myteams-sync-status]');if(el)el.textContent=text;
  const compact=status.querySelector('[data-myteams-sync-compact]');
  const updated=String(text).match(/\b\d{1,2}:\d{2}\s?[AP]M\b/i);
- if(compact)compact.textContent=updated?'Live '+updated[0]:text.startsWith('Checking')?'Checking ESPN…':text.includes('unavailable')?savedLabel:savedLabel;
+ if(compact)compact.textContent=updated?'Rosters checked '+updated[0]:text.startsWith('Checking')?'Checking rosters…':savedLabel;
  status.classList.toggle('shua-espn-unavailable',text.includes('unavailable'));
  status.classList.toggle('shua-espn-checking',text.startsWith('Checking'));
 };
@@ -125,7 +125,7 @@ async function refresh(force=false){
   lastFailures=failed;
   if(readable){
    lastSuccess=Date.now();
-   statusText('Live ESPN: '+readable+'/'+clubs.length+' leagues checked · '+updated+' roster'+(updated===1?'':'s')+' changed · '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+(failed?' · '+failed+' unavailable':''));
+   statusText('ESPN rosters checked: '+readable+'/'+clubs.length+' publicly accessible leagues · '+updated+' roster'+(updated===1?'':'s')+' changed · '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+(failed?' · '+failed+' unavailable':'')+'. Standings, matchups and waivers use the saved snapshot.');
   }else statusText(savedLabel+' · Live ESPN roster access unavailable (private or blocked leagues). Saved data remains visible.');
   return {readable,updated,failed};
  })().finally(()=>{btn.disabled=false;inflight=null;});

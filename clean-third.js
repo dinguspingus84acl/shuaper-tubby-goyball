@@ -58,6 +58,12 @@
       const copy=document.createElement('span');copy.className='shua-league-copy';
       copy.append(team,league);
       identity.append(copy);
+      const monogram=document.createElement('span');
+      monogram.className='shua-league-monogram';
+      monogram.textContent=initials(team.textContent);
+      monogram.setAttribute('role','img');
+      monogram.setAttribute('aria-label',team.textContent+' logo unavailable');
+      identity.prepend(monogram);
       trigger.prepend(identity);
       const result=document.createElement('span');result.className='shua-league-record';
       const record=leagueRecord(myTeams._cards?.[i]);

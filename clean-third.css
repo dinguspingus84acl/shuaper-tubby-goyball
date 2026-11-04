@@ -22,6 +22,13 @@ body.shua-clean #shuaMyTeams .myteams-card-identity{
 body.shua-clean #shuaMyTeams .myteams-card-identity .myteams-team-logo{
   flex:0 0 36px;width:36px;height:36px;object-fit:contain;border-radius:7px;
 }
+body.shua-clean #shuaMyTeams .shua-league-monogram{
+  box-sizing:border-box;display:none;place-items:center;
+  flex:0 0 36px;width:36px;height:36px;border-radius:8px;
+  background:#174c4b;border:1px solid #3c7772;
+  color:#d8f5ea;font:900 12px/1 system-ui,sans-serif;
+}
+body.shua-clean #shuaMyTeams .myteams-card-identity:not(:has(>.myteams-team-logo))>.shua-league-monogram{display:grid}
 body.shua-clean #shuaMyTeams .shua-league-copy{
   display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0;flex:1;
 }
@@ -60,6 +67,7 @@ body.shua-clean #shuaMyTeams .myteams-roster{
  body.shua-clean #shuaMyTeams .myteams-card-trigger{min-height:56px;padding:8px 9px!important;gap:7px}
  body.shua-clean #shuaMyTeams .myteams-card-identity{gap:7px}
  body.shua-clean #shuaMyTeams .myteams-card-identity .myteams-team-logo{width:32px;height:32px;flex-basis:32px}
+ body.shua-clean #shuaMyTeams .shua-league-monogram{width:32px;height:32px;flex-basis:32px}
  body.shua-clean #shuaMyTeams .myteams-name{font-size:13px}
  body.shua-clean #shuaMyTeams .myteams-league{font-size:9px}
  body.shua-clean #shuaMyTeams .shua-league-record{min-width:42px;font-size:10px;padding:4px}

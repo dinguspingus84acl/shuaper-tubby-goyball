@@ -467,6 +467,7 @@ section.innerHTML=`
           <div id="espnTeamFilterMenu" class="espn-team-filter-menu" role="listbox" hidden></div>
           <select id="espnTeamFilter" hidden aria-hidden="true" tabindex="-1"><option value="ALL">All</option></select>
         </div>
+        <span class="espn-leader-count" id="espnStatsCount" aria-live="polite"></span>
       </div>
       <div class="espn-stat-bar">
         <div class="espn-stat-primary">
@@ -476,18 +477,16 @@ section.innerHTML=`
             <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
           </div>
           <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
-
         </div>
         <div class="espn-stats-right-controls">
-          
-          
+          <label for="espnColumnStatSelect">Rank by stat</label>
+          <select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Sort players by stat"></select>
         </div>
       </div>
     </div>
     <div class="espn-live-card">
-      <div class="espn-chart-sort"><label for="espnColumnStatSelect">Rank by</label><select id="espnColumnStatSelect" class="espn-column-stat-select" aria-label="Sort players by stat"></select></div>
     <div class="espn-live-head">
-        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div>PPR Pts</div><div class="espn-selected-stat-head-spacer" aria-hidden="true"></div>
+        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div>PPR Pts</div><div class="espn-stat-bar-head">Compared to leader</div><div id="espnSelectedStatHead" class="espn-selected-stat-head">Stat</div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open Stats to load rankings.</div></div>
     </div>
@@ -1669,6 +1668,8 @@ function renderStatFilters(){
   const select=document.getElementById('espnColumnStatSelect');
   const cfg=configForFilter().filter(x=>statView!=='PERGAME'||x.key!=='average');
   if(!cfg.some(x=>x.key===activeStat))activeStat='points';
+  const heading=document.getElementById('espnSelectedStatHead');
+  if(heading)heading.textContent=displayStatLabel(activeStat);
   if(select){
     select.innerHTML=cfg.map(x=>'<option value="'+x.key+'">'+fullStatLabel(x.key)+'</option>').join('');
     select.value=activeStat;
@@ -1697,13 +1698,18 @@ function render(){
     return;
   }
   const ranked=rankRows(statsRows,activeFilter);
+  const maxStat=Math.max(1,...ranked.map(player=>Math.max(0,statValue(player,activeStat))));
+  const scope=document.getElementById('espnStatsCount');
+  if(scope)scope.textContent=ranked.length+' players';
   box.innerHTML=ranked.map((p,i)=>{
-    return `<div class="espn-live-row${selectedStatsName===nameKey(p.name)?' stats-selected':''}" data-espn-player-id="${p.id}">
+    const percent=Math.max(0,Math.min(100,Math.round(statValue(p,activeStat)/maxStat*100)));
+    return `<div class="espn-live-row${selectedStatsName===nameKey(p.name)?' stats-selected':''}" data-espn-position="${p.position}" data-espn-player-id="${p.id}">
       <div class="espn-rank">#${i+1}</div>
       <div class="espn-player">${playerHeadshot(p)}<div class="espn-player-copy"><button type="button" class="espn-name-btn" data-espn-open-player="${p.id}">${p.name}</button><div class="espn-player-meta">${teamLogo(p.team)}<span>${p.team}</span><span class="espn-player-meta-pos"> · ${p.position}</span></div></div></div>
       <div class="espn-pos">${p.position}</div>
       <div class="espn-team">${teamLogo(p.team)}<span>${p.team}</span></div>
       <div class="espn-points">${formatStat(p,'points')}</div>
+      <div class="espn-metric-track" aria-hidden="true"><span style="width:${percent}%"></span></div>
       <div class="espn-selected-stat">${formatStat(p,activeStat)}</div>
     </div>`;
   }).join('');

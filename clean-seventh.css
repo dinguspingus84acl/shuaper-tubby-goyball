@@ -1,0 +1,298 @@
+/* Seventh refinement: restore positional rank modes on phones and make the
+   single-dropdown Stats leaderboard more useful without adding navigation. */
+
+/* The older phone layout hides main>.head, which also hid the real ROS /
+   Pre Season controls after they were moved beside the ranking title. */
+body.shua-clean.phone-mode:has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) main>.head {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+  margin-bottom:10px!important;
+}
+body.shua-clean.phone-mode main>.head>#positionToggle:not([hidden]) {
+  display:flex!important;
+  align-items:center;
+  flex-wrap:nowrap!important;
+  gap:5px!important;
+  width:auto!important;
+  margin:0 0 0 auto!important;
+}
+body.shua-clean main>.head>#positionToggle button {
+  min-height:40px;
+  border:1px solid #31546b;
+  border-radius:9px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+}
+body.shua-clean main>.head>#positionToggle button.active {
+  background:#17664e!important;
+  color:#e9fff5!important;
+  border-color:#3caa83!important;
+}
+@media(max-width:460px) {
+  body.shua-clean.phone-mode main>.head h2 {font-size:18px!important}
+  body.shua-clean.phone-mode main>.head>#positionToggle button {
+    min-height:39px!important;
+    padding:7px 9px!important;
+    font-size:11px!important;
+  }
+}
+
+/* Stats: one intentional control surface, with all statistical categories
+   inside the existing accessible Rank by stat select. */
+body.shua-clean.stats-mode #espnLiveSection .espn-live-shell {gap:11px}
+body.shua-clean.stats-mode #espnLiveSection .espn-sticky-controls {
+  gap:0;
+  padding-bottom:0;
+  border:1px solid #284c61;
+  border-radius:13px;
+  background:linear-gradient(155deg,#0a2739,#071a2d);
+  box-shadow:0 7px 24px #0003;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-live-toolbar {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:9px!important;
+  padding:12px 13px!important;
+  flex-wrap:wrap!important;
+  background:none!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-live-filters {gap:5px}
+body.shua-clean.stats-mode #espnLiveSection .espn-filter {
+  min-height:36px;
+  min-width:43px;
+  border:1px solid #29485e;
+  border-radius:8px;
+  background:#102a3c;
+  color:#b3c9d9;
+  transition:background .15s ease,border-color .15s ease;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-filter.active {
+  border-color:#3f957b!important;
+  background:#16533e!important;
+  color:#f2fff8!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-team-filter-wrap {
+  margin-left:4px!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-leader-count {
+  margin-left:auto;
+  color:#8ba9bb;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stat-bar {
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(240px,330px)!important;
+  align-items:center!important;
+  gap:12px!important;
+  padding:11px 13px 13px!important;
+  border:0!important;
+  border-top:1px solid #ffffff17!important;
+  border-radius:0 0 13px 13px!important;
+  background:#071b2a9e!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stat-primary {
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stat-label {
+  color:#91abbd;
+  font-size:11px;
+  letter-spacing:.045em;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stat-filters {
+  gap:3px;
+  padding:3px;
+  border-radius:9px;
+  background:#051522;
+  border:1px solid #254458;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-view-btn {
+  min-height:32px;
+  border:0;
+  border-radius:7px;
+  padding:6px 12px;
+  color:#adbfce;
+  background:transparent;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-view-btn.active {
+  background:#1a5670!important;
+  color:#fff!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-year-select {
+  height:38px;
+  border-color:#34556d;
+  border-radius:8px;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stats-right-controls {
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:9px!important;
+  width:100%!important;
+  justify-self:stretch!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stats-right-controls label {
+  font-size:11px;
+  font-weight:850;
+  color:#a7c2d4;
+  white-space:nowrap;
+}
+body.shua-clean.stats-mode #espnLiveSection #espnColumnStatSelect {
+  width:100%!important;
+  max-width:none!important;
+  height:40px!important;
+  border-color:#3c6c84;
+  background-color:#102d43;
+  border-radius:9px;
+  color:#eefaff;
+  font-size:12px!important;
+  text-align:left!important;
+  text-align-last:left!important;
+}
+body.shua-clean.stats-mode #espnLiveSection #espnColumnStatSelect:focus-visible {
+  outline:2px solid #45d5ad;
+  outline-offset:2px;
+}
+
+/* Rank / player / comparative metric bar / exact value. Keep bars away from
+   the dense phone version so names and stat values never fight for space. */
+body.shua-clean.stats-mode #espnLiveSection .espn-live-card {
+  border:1px solid #254b62;
+  border-radius:13px;
+  background:#071b2f;
+  box-shadow:0 9px 26px #0002;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-live-head {
+  background:#0c2a3d;
+  border-bottom:1px solid #ffffff19;
+  color:#98b5c9;
+  font-size:10px!important;
+  font-weight:900;
+  letter-spacing:.055em;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-selected-stat-head {
+  justify-self:end;
+  text-align:right;
+  padding-right:5px;
+  color:#c8e6e8;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stat-bar-head {
+  text-align:left;
+  color:#779ab0;
+}
+body.shua-clean.stats-mode #espnLiveSection #espnLiveRows>.espn-live-row {
+  min-height:61px;
+  border-top:1px solid #ffffff0f;
+  padding:8px 15px;
+  --shua-stat-accent:#54a6d8;
+}
+body.shua-clean.stats-mode #espnLiveSection #espnLiveRows>.espn-live-row:nth-child(even) {
+  background:#0b2338b0;
+}
+body.shua-clean.stats-mode #espnLiveSection #espnLiveRows>.espn-live-row[data-espn-position="QB"] {--shua-stat-accent:#a99deb}
+body.shua-clean.stats-mode #espnLiveSection #espnLiveRows>.espn-live-row[data-espn-position="RB"] {--shua-stat-accent:#62d4a4}
+body.shua-clean.stats-mode #espnLiveSection #espnLiveRows>.espn-live-row[data-espn-position="WR"] {--shua-stat-accent:#64b8e6}
+body.shua-clean.stats-mode #espnLiveSection #espnLiveRows>.espn-live-row[data-espn-position="TE"] {--shua-stat-accent:#dfb16e}
+body.shua-clean.stats-mode #espnLiveSection .espn-rank {
+  color:#7be8c3;
+  font-size:14px;
+  font-variant-numeric:tabular-nums;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-player-name,
+body.shua-clean.stats-mode #espnLiveSection .espn-name-btn {
+  font-size:14px;
+  font-weight:900;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-player-meta {font-size:10px}
+body.shua-clean.stats-mode #espnLiveSection .espn-selected-stat {
+  font-size:17px;
+  font-weight:950;
+  color:#f4fdff;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.025em;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-metric-track {
+  width:min(100%,540px);
+  height:8px;
+  border-radius:999px;
+  background:#ffffff13;
+  border:1px solid #ffffff0a;
+  overflow:hidden;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-metric-track span {
+  display:block;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--shua-stat-accent),color-mix(in srgb,var(--shua-stat-accent) 58%,#ffffff));
+  box-shadow:0 0 12px color-mix(in srgb,var(--shua-stat-accent) 25%,transparent);
+}
+@media(min-width:761px) {
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head,
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-row {
+    grid-template-columns:52px minmax(210px,390px) minmax(100px,1fr) 136px!important;
+    gap:13px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head>:nth-child(3),
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head>:nth-child(4),
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head>:nth-child(5),
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-row>.espn-pos,
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-row>.espn-team,
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-row>.espn-points {display:none!important}
+}
+@media(max-width:760px) {
+  body.shua-clean.stats-mode #espnLiveSection .espn-sticky-controls {border-radius:10px}
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-toolbar {
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:8px!important;
+    padding:9px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-filters {width:100%}
+  body.shua-clean.stats-mode #espnLiveSection .espn-team-filter-wrap {margin-left:0!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-leader-count {display:none}
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-bar {
+    grid-template-columns:1fr!important;
+    gap:9px!important;
+    padding:9px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-primary {gap:6px!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-label {display:none}
+  body.shua-clean.stats-mode #espnLiveSection .espn-view-btn {padding:6px 10px;font-size:11px}
+  body.shua-clean.stats-mode #espnLiveSection .espn-stats-right-controls {
+    grid-template-columns:76px minmax(0,1fr)!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head,
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-row,
+  body.shua-clean.phone-mode.stats-mode #espnLiveSection .espn-live-head,
+  body.shua-clean.phone-mode.stats-mode #espnLiveSection .espn-live-row {
+    grid-template-columns:37px minmax(0,1fr) 78px!important;
+    gap:6px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-bar-head,
+  body.shua-clean.stats-mode #espnLiveSection .espn-metric-track {display:none!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head {
+    padding:8px!important;
+    font-size:9px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection #espnLiveRows>.espn-live-row {
+    padding:8px!important;
+    min-height:60px;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-selected-stat {
+    width:auto!important;
+    justify-self:end!important;
+    padding-right:0!important;
+    font-size:14px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-name-btn {font-size:12px!important}
+}

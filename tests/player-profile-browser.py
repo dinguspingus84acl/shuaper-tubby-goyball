@@ -26,6 +26,15 @@ def check_position_rankings(page,phone):
         navigate(page,'rankings',pos)
         page.locator('#rows tr').first.wait_for(state='visible',timeout=18000)
         assert page.locator('.positions .pos.active').first.get_attribute('data-pos')==pos
+        modes=page.locator('main>.head #positionToggle')
+        assert modes.is_visible(),('ROS and Pre Season must remain visible above '+pos+' ranks',phone)
+        assert modes.locator('[data-posview="ROS"]').is_visible()
+        assert modes.locator('[data-posview="PRESEASON"]').is_visible()
+        if pos=='RB':
+            modes.locator('[data-posview="PRESEASON"]').click()
+            assert modes.locator('[data-posview="PRESEASON"]').get_attribute('class').find('active')>=0
+            modes.locator('[data-posview="ROS"]').click()
+            assert modes.locator('[data-posview="ROS"]').get_attribute('class').find('active')>=0
         check=page.locator('#rows').evaluate('''root=>{
           const rows=[...root.querySelectorAll('tr')];
           const invalidRanks=[],clippedNames=[],narrowRanks=[];

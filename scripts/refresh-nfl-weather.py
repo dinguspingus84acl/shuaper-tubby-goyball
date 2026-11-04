@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Publish a small, source-attributed NFL weather snapshot for the static site.
 
-Forecast observations are read from MySportsWeather's public NFL page, not
-invented from an alternate weather provider. ESPN supplies the fixture list so
-matchups without a MySportsWeather prediction can be clearly marked pending.
+Both the fixture list and its forecasts come from MySportsWeather's public NFL
+page. The optional previous snapshot supplies team/venue metadata and week
+numbers, so a blocked third-party scoreboard cannot stop weather updates.
 """
 
 from __future__ import annotations
@@ -12,7 +12,6 @@ import json
 import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
@@ -22,7 +21,6 @@ from lxml import html as lxml_html
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "weather" / "data" / "nfl.json"
 SOURCE = "https://mysportsweather.com/nfl"
-SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
 EASTERN = ZoneInfo("America/New_York")
 USER_AGENT = "ShuaperTubbyGoyball/1.0 (+https://shuapertubbygoyball.com; scheduled public weather index)"
 ALIASES = {
@@ -140,6 +138,104 @@ def parse_forecasts(page: str) -> dict[tuple[str, str, int, int], dict]:
     return forecasts
 
 
+def week_start(kickoff: datetime):
+    """NFL weeks start Thursday; Monday games belong to the preceding week."""
+    day = kickoff.astimezone(EASTERN).date()
+    return day - timedelta(days=(day.weekday() - 3) % 7)
+
+
+def kickoff_from_card(date_text: str, time_text: str, now: datetime) -> datetime | None:
+    date_match = re.fullmatch(r"(\d{1,2})/(\d{1,2})", date_text)
+    time_match = re.search(r"(\d{1,2}):?(\d{2})?\s*(AM|PM)", time_text, re.I)
+    if not date_match or not time_match:
+        return None
+    month, day = map(int, date_match.groups())
+    hour = int(time_match.group(1)) % 12 + (12 if time_match.group(3).upper() == "PM" else 0)
+    minute = int(time_match.group(2) or 0)
+    candidates = []
+    for year in (now.year - 1, now.year, now.year + 1):
+        try:
+            kickoff = datetime(year, month, day, hour, minute, tzinfo=EASTERN).astimezone(timezone.utc)
+        except ValueError:
+            continue
+        candidates.append(kickoff)
+    return min(candidates, key=lambda value: abs((value - now).total_seconds())) if candidates else None
+
+
+def parse_source_games(page: str, forecasts: dict, now: datetime, previous: dict | None = None) -> list[dict]:
+    """Use the source's own game cards, including those without forecasts."""
+    document = lxml_html.fromstring(page)
+    old_games = (previous or {}).get("games") or []
+    anchors = []
+    for game in old_games:
+        try:
+            if isinstance(game.get("week"), int) and game.get("kickoffUtc"):
+                anchors.append((week_start(datetime.fromisoformat(game["kickoffUtc"].replace("Z", "+00:00"))), game["week"]))
+        except (KeyError, ValueError, TypeError):
+            continue
+    articles = {article.get("id"): article for article in document.xpath(f'//article[{contains_class("mlb-game-block")}]')}
+    games = []
+    seen = set()
+    for card in document.xpath(f'//a[{contains_class("cheat-card")}]'):
+        event_id = card.get("href", "").lstrip("#")
+        match = re.fullmatch(r"match-([a-z0-9]+)-([a-z0-9]+)", event_id, re.I)
+        if not match:
+            continue
+        away, home = normalize(match.group(1)), normalize(match.group(2))
+        date_text = first(card, f'.//*[{contains_class("cheat-card__date")}]')
+        time_text = first(card, f'.//*[{contains_class("cheat-card__time")}]')
+        kickoff = kickoff_from_card(date_text, time_text, now)
+        if not kickoff or kickoff < now - timedelta(hours=5) or kickoff > now + timedelta(days=10):
+            continue
+        key = (away, home, kickoff.astimezone(EASTERN).month, kickoff.astimezone(EASTERN).day)
+        if key in seen:
+            continue
+        seen.add(key)
+        old = next((g for g in old_games if normalize(g.get("away", {}).get("abbr", "")) == away and
+                    normalize(g.get("home", {}).get("abbr", "")) == home and
+                    str(g.get("kickoffUtc", "")) and
+                    datetime.fromisoformat(g["kickoffUtc"].replace("Z", "+00:00")).astimezone(EASTERN).date() ==
+                    kickoff.astimezone(EASTERN).date()), None)
+        article = articles.get(event_id)
+        labels = article.xpath(f'.//*[{contains_class("matchup-team")}]/span/text()') if article is not None else []
+        labels = [clean(s) for s in labels if clean(s)]
+        venue_nodes = article.xpath(f'.//*[{contains_class("mlb-game-block__venue")}]') if article is not None else []
+        # The venue element may contain a nested roof-status badge. Keep its
+        # text out of the city field (e.g. "Madrid, ES", not "ES Retractable roof").
+        venue_text = clean(venue_nodes[0].text or "") if venue_nodes else ""
+        venue, _, city = venue_text.partition(" · ")
+        roof_text = first(article, f'.//*[{contains_class("venue-roof-flag")}]') if article is not None else ""
+        article_classes = article.get("class", "") if article is not None else ""
+        indoor = bool(re.search(r"indoor|fixed roof|dome", roof_text, re.I) or "is-roof-closed" in article_classes)
+        prior_venue = old.get("venue", "") if old else ""
+        prior_city = old.get("city", "") if old else ""
+        prior_indoor = bool(old.get("indoor")) if old else False
+        week = old.get("week") if old else None
+        if not isinstance(week, int) and anchors:
+            anchor, anchor_week = min(anchors, key=lambda entry: abs((week_start(kickoff) - entry[0]).days))
+            week = anchor_week + (week_start(kickoff) - anchor).days // 7
+            if not 1 <= week <= 18:
+                week = None
+        def team_info(code, position):
+            old_team = old.get(position, {}) if old else {}
+            name = labels[0 if position == "away" else 1] if len(labels) >= 2 else old_team.get("name", code)
+            slug = {"WAS": "wsh", "SF": "sf", "TB": "tb", "GB": "gb", "KC": "kc", "LV": "lv", "NE": "ne", "NO": "no", "LAR": "lar"}.get(code, code.lower())
+            return {"abbr": code, "name": name, "logo": old_team.get("logo") or f"https://a.espncdn.com/i/teamlogos/nfl/500/{slug}.png"}
+        forecast = forecasts.get(key)
+        if forecast:
+            forecast = {**forecast, "sourceUrl": f"{SOURCE}#{event_id}"}
+        games.append({
+            "id": old.get("id") if old else f"msw-{kickoff.date().isoformat()}-{away.lower()}-{home.lower()}",
+            "week": week,
+            "kickoffUtc": kickoff.isoformat().replace("+00:00", "Z"),
+            "away": team_info(away, "away"), "home": team_info(home, "home"),
+            "venue": venue or prior_venue, "city": city or prior_city,
+            "indoor": indoor or prior_indoor,
+            "forecast": forecast,
+        })
+    return sorted(games, key=lambda game: (game["kickoffUtc"], game["id"]))
+
+
 def parse_schedule(scoreboards: list[dict], forecasts: dict, now: datetime) -> list[dict]:
     games_by_id = {}
     for schedule in scoreboards:
@@ -183,22 +279,15 @@ def build_snapshot(now: datetime | None = None) -> dict:
     if "MySportsWeather" not in page or "NFL Weather" not in page:
         raise ValueError("The MySportsWeather NFL page did not look like a valid forecast page")
     forecasts = parse_forecasts(page)
-    primary = json.loads(get_text(SCOREBOARD + "?limit=100"))
-    year = int(primary["season"]["year"])
-    season_type = int(primary["season"]["type"])
-    current_week = int(primary["week"]["number"])
-    scoreboards = [primary]
-    for week in (current_week + 1, current_week + 2):
-        query = urlencode({"dates": year, "seasontype": season_type, "week": week, "limit": 100})
-        scoreboards.append(json.loads(get_text(SCOREBOARD + "?" + query)))
-    games = parse_schedule(scoreboards, forecasts, now)
+    previous = json.loads(OUTPUT.read_text(encoding="utf-8")) if OUTPUT.exists() else None
+    games = parse_source_games(page, forecasts, now, previous)
     if not games:
-        raise ValueError("ESPN returned no upcoming NFL games; retaining the last good snapshot")
+        raise ValueError("MySportsWeather returned no upcoming NFL games; retaining the last good snapshot")
     return {
-        "season": year,
+        "season": now.astimezone(EASTERN).year,
         "generatedAt": now.isoformat(timespec="seconds").replace("+00:00", "Z"),
         "weatherSource": SOURCE,
-        "scheduleSource": "ESPN",
+        "scheduleSource": "MySportsWeather",
         "games": games,
     }
 

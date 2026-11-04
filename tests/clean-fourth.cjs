@@ -18,7 +18,7 @@ new vm.Script(live,{filename:'my-teams-live.js'});
 assert.match(html,/clean-third\.js\?v=20261104-fourth10"><\/script>\s*<link rel="stylesheet" href="clean-fourth\.css\?v=20261104-fourth10">\s*<script src="clean-fourth\.js\?v=20261104-fourth10">/,'Fourth visual layer loads last');
 assert.ok(css.includes('.shua-clean-current{display:none!important}')&&css.includes('.shua-clean-trigger>.shua-line-icon'),'Mobile navigation retains icons and removes Explore');
 assert.ok(css.includes('@media(min-width:1001px)')&&css.includes('@media(max-width:1000px)')&&css.includes('.st-navigation{display:none!important}'),'Analytics uses exclusive desktop and mobile chart selectors');
-assert.ok(live.includes('shua-espn-sync-expanded')&&live.includes('data-myteams-sync-compact')&&live.includes('Updated '),'ESPN status is compact with full details available');
+assert.ok(live.includes('shua-espn-sync-expanded')&&live.includes('data-myteams-sync-compact')&&live.includes('savedLabel'),'ESPN status is compact and shows the latest verified snapshot date');
 assert.ok(live.includes('data-myteams-sync-now')&&live.includes('btn.onclick=()=>void refresh(true)'),'Real roster refresh is kept');
 assert.match(stock,/let filter='RB',mode='draft'/,'Stock defaults to RB, not ALL');
 assert.ok(stock.includes("['ALL',...order]")&&stock.includes('section.dataset.stockFilter=filter'),'Other positions and ALL remain reachable');

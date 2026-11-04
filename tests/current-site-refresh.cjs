@@ -1,0 +1,43 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const read=name=>fs.readFileSync(path.resolve(__dirname,'..',name),'utf8');
+const html=read('index.html');
+const stats=read('espn-live.js');
+const bio=read('clean-sixth.css');
+const live=read('my-teams-live.js');
+const overlay=read('my-teams-current.js');
+for(const name of ['espn-live.js','my-teams-current.js','my-teams-live.js','weather.js'])new vm.Script(read(name),{filename:name});
+assert.ok(html.includes('my-teams-current.js?v=20261104-flaim1'));
+assert.ok(html.indexOf('my-teams-data.js')<html.indexOf('my-teams-current.js'));
+assert.ok(html.indexOf('my-teams-current.js')<html.indexOf('id="shua-my-teams-script"'));
+assert.ok(html.includes('espn-live.js?v=20261104-metrics1'));
+assert.ok(stats.includes('id="espnMetricFilters"')&&stats.includes('data-espn-stat'));
+for(const metric of ['targets','recTD','passTD','rushTD','completions','rushAtt','recYds'])assert.ok(stats.includes("key:'"+metric+"'"),metric+' filter missing');
+assert.ok(/\.featured-bio-value\{font-size:1\.12rem/.test(bio));
+assert.ok(/phone-mode \.featured-player-card \.featured-bio-value\{font-size:1\.03rem/.test(bio));
+assert.ok(live.includes('window.ShuaMyTeamsData?.syncedOn'));
+assert.ok(overlay.includes("target.syncedOn='2026-11-04'"));
+
+const ctx={window:{}};
+vm.runInNewContext(read('my-teams-data.js'),ctx,{filename:'my-teams-data.js'});
+vm.runInNewContext(overlay,ctx,{filename:'my-teams-current.js'});
+const data=ctx.window.ShuaMyTeamsData;
+assert.equal(data.syncedLeagues,11);
+assert.equal(data.syncedOn,'2026-11-04');
+const syncedIds=['23392160','130781516','1039903352','737957483','2065456772','199065902','1402488855','360348328','334762737','702998591','1320791075'];
+for(const id of syncedIds){
+ const roster=data.rosterSnapshots.find(x=>String(x.id)===id);
+ const league=data.leagueData.find(x=>String(x.id)===id);
+ const waiver=data.waiverData.find(x=>String(x.id)===id);
+ const schedule=data.scheduleData.filter(x=>String(x.id)===id);
+ assert.ok(roster?.roster.length>=10,'Missing current team roster '+id);
+ assert.equal(league?.week,9,'League week must be current '+id);
+ assert.ok(league?.standings.length>=8,'Current standings missing '+id);
+ assert.ok(league?.matchups.length>=4,'Current matchup missing '+id);
+ assert.equal(waiver?.players.length,100,'Current waiver pool missing '+id);
+ assert.equal(schedule.slice(-3).map(x=>x.week).join(','),'7,8,9');
+}
+console.log('PASS: Week 9 Flaim snapshot, all visible ESPN leagues, restored metric controls and legible player bio.');

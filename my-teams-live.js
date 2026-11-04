@@ -10,10 +10,12 @@ const SLOT={0:'QB',2:'RB',4:'WR',6:'TE',16:'D/ST',17:'K',20:'Bench',21:'IR',23:'
 const NFL={1:'ATL',2:'BUF',3:'CHI',4:'CIN',5:'CLE',6:'DAL',7:'DEN',8:'DET',9:'GB',10:'TEN',11:'IND',12:'KC',13:'LV',14:'LAR',15:'MIA',16:'MIN',17:'NE',18:'NO',19:'NYG',20:'NYJ',21:'PHI',22:'ARI',23:'PIT',24:'LAC',25:'SF',26:'SEA',27:'TB',28:'WAS',29:'CAR',30:'JAX',33:'BAL',34:'HOU'};
 const WAIT=60000;
 let active=false,inflight=null,timer=null,lastSuccess=0,lastAttempt=0,lastFailures=0;
+const syncedOn=window.ShuaMyTeamsData?.syncedOn;
+const savedLabel=syncedOn?'ESPN data synced '+new Date(syncedOn+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Saved ESPN snapshot';
 const status=document.createElement('div');
 status.id='myTeamsLiveStatus';
 status.className='myteams-live-status';
-status.innerHTML='<details class="shua-espn-sync"><summary aria-label="ESPN roster update details"><span class="shua-espn-sync-dot" aria-hidden="true"></span><span data-myteams-sync-compact>ESPN not checked</span></summary><div class="shua-espn-sync-expanded"><span data-myteams-sync-status role="status" aria-live="polite">Saved ESPN rosters · live sync not checked</span><button type="button" data-myteams-sync-now>Refresh rosters</button></div></details>';
+status.innerHTML='<details class="shua-espn-sync"><summary aria-label="ESPN roster update details"><span class="shua-espn-sync-dot" aria-hidden="true"></span><span data-myteams-sync-compact>'+savedLabel+'</span></summary><div class="shua-espn-sync-expanded"><span data-myteams-sync-status role="status" aria-live="polite">'+savedLabel+' · standings, rosters, matchups and waivers</span><button type="button" data-myteams-sync-now>Check live rosters</button></div></details>';
 root.querySelector('.myteams-header-right')?.append(status);
 const css=document.createElement('style');css.textContent=
  '#myTeamsLiveStatus{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font:750 10px system-ui,sans-serif;color:#b2c9db}' +
@@ -25,7 +27,7 @@ const statusText=text=>{
  const el=status.querySelector('[data-myteams-sync-status]');if(el)el.textContent=text;
  const compact=status.querySelector('[data-myteams-sync-compact]');
  const updated=String(text).match(/\b\d{1,2}:\d{2}\s?[AP]M\b/i);
- if(compact)compact.textContent=updated?'Updated '+updated[0]:text.startsWith('Checking')?'Checking ESPN…':text.includes('unavailable')?'Saved rosters · ESPN unavailable':'ESPN not checked';
+ if(compact)compact.textContent=updated?'Live '+updated[0]:text.startsWith('Checking')?'Checking ESPN…':text.includes('unavailable')?savedLabel:savedLabel;
  status.classList.toggle('shua-espn-unavailable',text.includes('unavailable'));
  status.classList.toggle('shua-espn-checking',text.startsWith('Checking'));
 };
@@ -124,7 +126,7 @@ async function refresh(force=false){
   if(readable){
    lastSuccess=Date.now();
    statusText('Live ESPN: '+readable+'/'+clubs.length+' leagues checked · '+updated+' roster'+(updated===1?'':'s')+' changed · '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+(failed?' · '+failed+' unavailable':''));
-  }else statusText('Saved roster snapshots · ESPN live access unavailable (private or blocked leagues)');
+  }else statusText(savedLabel+' · Live ESPN roster access unavailable (private or blocked leagues). Saved data remains visible.');
   return {readable,updated,failed};
  })().finally(()=>{btn.disabled=false;inflight=null;});
  return inflight;

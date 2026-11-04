@@ -23,7 +23,7 @@
   const display=(n,suffix)=>number(n)===null?'—':String(n)+suffix;
   const formatDate=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(iso));
   const formatUpdated=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(iso));
-  const safeLink=url=>/^https:\/\/mysportsweather\.com\/nfl(?:\/|$)/.test(url||'')?url:'https://mysportsweather.com/nfl';
+  const safeLink=url=>/^https:\/\/mysportsweather\.com\/nfl(?:[\/#]|$)/.test(url||'')?url:'https://mysportsweather.com/nfl';
   const safeLogo=url=>/^https:\/\/a\.espncdn\.com\/i\/teamlogos\/nfl\//.test(url||'')?url:'';
   const logo=team=>safeLogo(team.logo)?'<img class="wx-team-logo" src="'+escape(safeLogo(team.logo))+'" alt="" loading="lazy">':'';
   const filters=[['all','All games'],['watch','Weather watch'],['ready','Forecasts'],['pending','Pending']];
@@ -224,7 +224,8 @@
     const ready=all.filter(game=>game.forecast),watch=all.filter(game=>['watch','high'].includes(risk(game).level));
     const stats=section.querySelector('#wxOverview');
     stats.innerHTML=[['Games',all.length],[ready.length===1?'Forecast available':'Forecasts available',ready.length],['Pending',all.length-ready.length],...(watch.length?[['Weather watch',watch.length]]:[])].map(([label,n])=>'<span class="wx-status-item"><strong>'+n+'</strong> '+escape(label)+'</span>').join('<span class="wx-status-divider" aria-hidden="true">·</span>');
-    section.querySelector('#wxFreshness').innerHTML='<span>MySportsWeather · Checked '+escape(formatUpdated(snapshot.generatedAt))+' · Updates automatically while this tab is open</span>';
+    const hoursOld=(Date.now()-Date.parse(snapshot.generatedAt))/3600000;
+    section.querySelector('#wxFreshness').innerHTML='<span>MySportsWeather · Source checked '+escape(formatUpdated(snapshot.generatedAt))+(hoursOld>6?' · Forecast snapshot overdue for refresh':' · Scheduled updates approximately every two hours')+'</span>';
     const buttons=section.querySelector('#wxFilters');
     buttons.innerHTML=filters.map(([value,label])=>'<button type="button" data-wx-filter="'+value+'" aria-pressed="'+(filter===value)+'">'+label+'</button>').join('');
     const query=search.trim().toLowerCase();
@@ -255,7 +256,7 @@
       '<div class="wx-freshness" id="wxFreshness" role="status"></div>'+
       '<div class="wx-controls"><label class="wx-search"><span aria-hidden="true">⌕</span><input id="wxSearch" type="search" placeholder="Search team or stadium" aria-label="Search NFL matchups" autocomplete="off"></label><div class="wx-filters" id="wxFilters"></div></div>'+
       '<div class="wx-game-count" id="wxResultCount"></div><div class="wx-games" id="wxGames"></div>'+
-      '<footer class="wx-footer"><p><strong>Forecast source:</strong> <a href="https://mysportsweather.com/nfl" target="_blank" rel="noopener noreferrer">MySportsWeather by Kevin Roth</a>, including its NWS and NBM hourly data. <strong>Schedule:</strong> ESPN. Fantasy impact labels and analysis are our own weather-based estimates, not Kevin Roth’s recommendations.</p><p id="wxUpdated"></p><p>Forecasts change as kickoff approaches. Pending games have no MySportsWeather prediction yet—no weather conditions are assumed for them.</p></footer></div>';
+      '<footer class="wx-footer"><p><strong>Game schedule and forecasts:</strong> <a href="https://mysportsweather.com/nfl" target="_blank" rel="noopener noreferrer">MySportsWeather by Kevin Roth</a>, including its NWS and NBM hourly data. Fantasy impact labels and analysis are our own weather-based estimates, not Kevin Roth’s recommendations.</p><p id="wxUpdated"></p><p>Forecasts change as kickoff approaches. Pending games have no MySportsWeather prediction yet—no weather conditions are assumed for them.</p></footer></div>';
     section.querySelector('#wxSearch').value=search;
     section.querySelector('#wxSearch').addEventListener('input',event=>{search=event.target.value;renderList();});
     section.querySelector('#wxFilters').addEventListener('click',event=>{const target=event.target.closest('[data-wx-filter]');if(target){filter=target.dataset.wxFilter;renderList();}});

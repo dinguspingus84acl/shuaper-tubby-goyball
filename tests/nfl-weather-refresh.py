@@ -6,6 +6,7 @@ import json
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,8 +17,8 @@ spec.loader.exec_module(weather)
 
 FIXTURE = """
 <html><head><title>MySportsWeather NFL Weather</title></head><body>
-<a class="cheat-card" href="#match-chi-sea"><span class="cheat-card__date">11/2</span></a>
-<a class="cheat-card" href="#match-jax-bal"><span class="cheat-card__date">11/5</span></a>
+<a class="cheat-card" href="#match-chi-sea"><span class="cheat-card__date">11/2</span><span class="cheat-card__time">8:15 PM ET</span></a>
+<a class="cheat-card" href="#match-jax-bal"><span class="cheat-card__date">11/5</span><span class="cheat-card__time">8:15 PM ET</span></a>
 <article class="mlb-game-block" id="match-chi-sea">
   <div class="game-summary">
     <div class="game-summary__cell"><span class="game-summary__primary-value">51°</span><span class="game-summary__primary-label">At kickoff</span></div>
@@ -37,6 +38,8 @@ FIXTURE = """
   <table class="hourly__table"><thead><tr><th></th><th class="hourly__hour-col is-game-hour">8 PM</th></tr></thead><tbody><tr><td class="hourly__label">Temp</td><td class="hourly__cell">50°</td></tr></tbody></table>
 </article>
 <article class="mlb-game-block" id="match-jax-bal">
+  <h2><span class="matchup-team"><span>Jacksonville Jaguars</span></span><span class="matchup-team"><span>Baltimore Ravens</span></span></h2>
+  <div class="mlb-game-block__venue">M&amp;T Bank Stadium · Baltimore, MD</div>
   <div class="game-summary">
     <div class="game-summary__cell"><span class="game-summary__primary-value">17 mph</span><span class="game-summary__primary-label">Wind</span></div>
   </div>
@@ -59,6 +62,32 @@ def game(game_id, kickoff, away, home, indoor=False):
 
 
 class TestWeather(unittest.TestCase):
+    def test_source_schedule_independent_of_espn_scoreboard(self):
+        now = datetime(2026, 11, 4, 20, tzinfo=timezone.utc)
+        source_games = weather.parse_source_games(FIXTURE, weather.parse_forecasts(FIXTURE), now)
+        self.assertEqual(len(source_games), 1)
+        baltimore = source_games[0]
+        self.assertEqual(baltimore["kickoffUtc"], "2026-11-06T01:15:00Z")
+        self.assertEqual(baltimore["away"]["name"], "Jacksonville Jaguars")
+        self.assertEqual(baltimore["venue"], "M&T Bank Stadium")
+        self.assertEqual(baltimore["city"], "Baltimore, MD")
+        self.assertEqual(baltimore["forecast"]["sourceUrl"], "https://mysportsweather.com/nfl#match-jax-bal")
+        with patch.object(weather, "get_text", return_value=FIXTURE) as fetch:
+            generated = weather.build_snapshot(now)
+            self.assertEqual(generated["scheduleSource"], "MySportsWeather")
+            self.assertEqual(len(generated["games"]), 1)
+            fetch.assert_called_once_with(weather.SOURCE)
+
+    def test_week_number_from_prior_thursday(self):
+        previous = {"games": [{
+            "id": "old", "week": 9, "kickoffUtc": "2026-11-06T01:15:00Z",
+            "away": {"abbr": "JAX"}, "home": {"abbr": "BAL"},
+        }]}
+        current = weather.parse_source_games(FIXTURE, weather.parse_forecasts(FIXTURE),
+                                             datetime(2026, 11, 4, tzinfo=timezone.utc), previous)
+        self.assertEqual(current[0]["week"], 9)
+        self.assertEqual(current[0]["id"], "old")
+
     def test_source_summary_and_hourly(self):
         forecasts = weather.parse_forecasts(FIXTURE)
         self.assertEqual(len(forecasts), 2)
@@ -93,7 +122,7 @@ class TestWeather(unittest.TestCase):
         for item in content["games"]:
             self.assertTrue(item["away"]["abbr"] and item["home"]["abbr"])
             if item["forecast"]:
-                self.assertTrue(item["forecast"]["sourceUrl"].startswith("https://mysportsweather.com/nfl/"))
+                self.assertTrue(item["forecast"]["sourceUrl"].startswith("https://mysportsweather.com/nfl"))
                 self.assertTrue(item["forecast"]["hourly"])
 
 

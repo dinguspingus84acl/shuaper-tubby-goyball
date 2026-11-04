@@ -2,6 +2,10 @@ name: Refresh NFL weather forecasts
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/refresh-nfl-weather.py'
+      - '.github/workflows/refresh-nfl-weather.yml'
   schedule:
     # MySportsWeather is checked about every two hours, including game days.
     - cron: '23 */2 * * *'
@@ -27,7 +31,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check lxml==6.0.2
       - name: Validate weather extraction
         run: python tests/nfl-weather-refresh.py
-      - name: Refresh public forecast and ESPN games
+      - name: Refresh MySportsWeather games and forecasts
         run: python -u scripts/refresh-nfl-weather.py
       - name: Validate new snapshot
         run: python tests/nfl-weather-refresh.py

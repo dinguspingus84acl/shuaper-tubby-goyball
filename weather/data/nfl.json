@@ -1,135 +1,9 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-02T23:04:26Z",
+  "generatedAt": "2026-11-04T19:14:55Z",
   "weatherSource": "https://mysportsweather.com/nfl",
-  "scheduleSource": "ESPN",
+  "scheduleSource": "MySportsWeather",
   "games": [
-    {
-      "id": "401873036",
-      "week": 8,
-      "kickoffUtc": "2026-11-03T01:15:00Z",
-      "away": {
-        "abbr": "CHI",
-        "name": "Chicago Bears",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/chi.png"
-      },
-      "home": {
-        "abbr": "SEA",
-        "name": "Seattle Seahawks",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/sea.png"
-      },
-      "venue": "Lumen Field",
-      "city": "Seattle, WA",
-      "indoor": false,
-      "forecast": {
-        "tempF": 51,
-        "precipPct": 2,
-        "precipType": "Rain",
-        "windMph": 1,
-        "gustMph": 2,
-        "windDirection": "S",
-        "hourly": [
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 1,
-            "tempF": 51,
-            "windMph": 1,
-            "gustMph": 2,
-            "windDirection": "W"
-          },
-          {
-            "time": "8 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 2,
-            "tempF": 51,
-            "windMph": 1,
-            "gustMph": 2,
-            "windDirection": "S"
-          },
-          {
-            "time": "9 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 2,
-            "tempF": 50,
-            "windMph": 1,
-            "gustMph": 2,
-            "windDirection": "SE"
-          },
-          {
-            "time": "10 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 2,
-            "tempF": 49,
-            "windMph": 1,
-            "gustMph": 2,
-            "windDirection": "SSE"
-          },
-          {
-            "time": "11 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 2,
-            "tempF": 49,
-            "windMph": 1,
-            "gustMph": 2,
-            "windDirection": "SE"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "precipPct": 1,
-            "tempF": 51,
-            "windMph": 1,
-            "gustMph": 2,
-            "windDirection": "WNW"
-          },
-          {
-            "time": "8 PM",
-            "inGame": true,
-            "precipPct": 1,
-            "tempF": 50,
-            "windMph": 1,
-            "gustMph": 2,
-            "windDirection": "WNW"
-          },
-          {
-            "time": "9 PM",
-            "inGame": true,
-            "precipPct": 2,
-            "tempF": 50,
-            "windMph": 1,
-            "gustMph": 2,
-            "windDirection": "W"
-          },
-          {
-            "time": "10 PM",
-            "inGame": true,
-            "precipPct": 1,
-            "tempF": 50,
-            "windMph": 1,
-            "gustMph": 2,
-            "windDirection": "NE"
-          },
-          {
-            "time": "11 PM",
-            "inGame": false,
-            "precipPct": 2,
-            "tempF": 50,
-            "windMph": 1,
-            "gustMph": 2,
-            "windDirection": "E"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl/2026-11-02/chi-sea"
-      }
-    },
     {
       "id": "401873037",
       "week": 9,
@@ -147,7 +21,114 @@
       "venue": "M&T Bank Stadium",
       "city": "Baltimore, MD",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 68,
+        "precipPct": 18,
+        "precipType": "Rain",
+        "windMph": 5,
+        "gustMph": 10,
+        "windDirection": "S",
+        "hourly": [
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 4,
+            "tempF": 69,
+            "windMph": 5,
+            "gustMph": 13,
+            "windDirection": "S"
+          },
+          {
+            "time": "8 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 7,
+            "tempF": 68,
+            "windMph": 5,
+            "gustMph": 10,
+            "windDirection": "S"
+          },
+          {
+            "time": "9 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 12,
+            "tempF": 67,
+            "windMph": 3,
+            "gustMph": 9,
+            "windDirection": "S"
+          },
+          {
+            "time": "10 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 18,
+            "tempF": 66,
+            "windMph": 2,
+            "gustMph": 8,
+            "windDirection": "S"
+          },
+          {
+            "time": "11 PM",
+            "inGame": false,
+            "sky": "partly",
+            "precipPct": 21,
+            "tempF": 66,
+            "windMph": 2,
+            "gustMph": 7,
+            "windDirection": "S"
+          }
+        ],
+        "nbmHourly": [
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "precipPct": 14,
+            "tempF": 69,
+            "windMph": 5,
+            "gustMph": 12,
+            "windDirection": "S"
+          },
+          {
+            "time": "8 PM",
+            "inGame": true,
+            "precipPct": 16,
+            "tempF": 68,
+            "windMph": 4,
+            "gustMph": 11,
+            "windDirection": "S"
+          },
+          {
+            "time": "9 PM",
+            "inGame": true,
+            "precipPct": 24,
+            "tempF": 67,
+            "windMph": 3,
+            "gustMph": 9,
+            "windDirection": "S"
+          },
+          {
+            "time": "10 PM",
+            "inGame": true,
+            "precipPct": 25,
+            "tempF": 66,
+            "windMph": 2,
+            "gustMph": 8,
+            "windDirection": "S"
+          },
+          {
+            "time": "11 PM",
+            "inGame": false,
+            "precipPct": 21,
+            "tempF": 66,
+            "windMph": 2,
+            "gustMph": 7,
+            "windDirection": "SSW"
+          }
+        ],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-jax-bal"
+      }
     },
     {
       "id": "401873038",
@@ -163,10 +144,66 @@
         "name": "Atlanta Falcons",
         "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/atl.png"
       },
-      "venue": "Santiago Bernabéu",
-      "city": "Madrid, Spain",
+      "venue": "Estadio Santiago Bernabeu",
+      "city": "Madrid, ES",
       "indoor": true,
-      "forecast": null
+      "forecast": {
+        "tempF": 60,
+        "precipPct": 57,
+        "precipType": "Rain",
+        "windMph": 3,
+        "gustMph": null,
+        "windDirection": "NNE",
+        "hourly": [
+          {
+            "time": "8 AM",
+            "inGame": false,
+            "sky": "rain",
+            "precipPct": 45,
+            "tempF": 54,
+            "windMph": 5,
+            "windDirection": "NNE"
+          },
+          {
+            "time": "9 AM",
+            "inGame": true,
+            "sky": "partly",
+            "precipPct": 22,
+            "tempF": 54,
+            "windMph": 6,
+            "windDirection": "NNE"
+          },
+          {
+            "time": "10 AM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 19,
+            "tempF": 60,
+            "windMph": 3,
+            "windDirection": "ENE"
+          },
+          {
+            "time": "11 AM",
+            "inGame": true,
+            "sky": "rain",
+            "precipPct": 57,
+            "tempF": 54,
+            "windMph": 7,
+            "windDirection": "NE"
+          },
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "rain",
+            "precipPct": 57,
+            "tempF": 54,
+            "windMph": 6,
+            "windDirection": "NE"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-cin-atl"
+      }
     },
     {
       "id": "401873039",
@@ -204,7 +241,68 @@
       "venue": "Lucas Oil Stadium",
       "city": "Indianapolis, IN",
       "indoor": true,
-      "forecast": null
+      "forecast": {
+        "tempF": 55,
+        "precipPct": 1,
+        "precipType": "Rain",
+        "windMph": 8,
+        "gustMph": 14,
+        "windDirection": "W",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 53,
+            "windMph": 7,
+            "gustMph": 12,
+            "windDirection": "W"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 1,
+            "tempF": 55,
+            "windMph": 8,
+            "gustMph": 14,
+            "windDirection": "W"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 1,
+            "tempF": 57,
+            "windMph": 8,
+            "gustMph": 15,
+            "windDirection": "W"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 1,
+            "tempF": 58,
+            "windMph": 8,
+            "gustMph": 15,
+            "windDirection": "W"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 1,
+            "tempF": 57,
+            "windMph": 8,
+            "gustMph": 15,
+            "windDirection": "W"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-dal-ind"
+      }
     },
     {
       "id": "401873041",
@@ -223,7 +321,68 @@
       "venue": "Bank of America Stadium",
       "city": "Charlotte, NC",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 63,
+        "precipPct": 0,
+        "precipType": "Rain",
+        "windMph": 3,
+        "gustMph": 9,
+        "windDirection": "WNW",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 61,
+            "windMph": 3,
+            "gustMph": 8,
+            "windDirection": "NW"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 63,
+            "windMph": 3,
+            "gustMph": 9,
+            "windDirection": "WNW"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 65,
+            "windMph": 5,
+            "gustMph": 10,
+            "windDirection": "W"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 65,
+            "windMph": 5,
+            "gustMph": 12,
+            "windDirection": "W"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 64,
+            "windMph": 5,
+            "gustMph": 12,
+            "windDirection": "W"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-den-car"
+      }
     },
     {
       "id": "401873042",
@@ -242,7 +401,68 @@
       "venue": "Hard Rock Stadium",
       "city": "Miami Gardens, FL",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 82,
+        "precipPct": 16,
+        "precipType": "Rain",
+        "windMph": 3,
+        "gustMph": 10,
+        "windDirection": "NE",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 6,
+            "tempF": 82,
+            "windMph": 3,
+            "gustMph": 9,
+            "windDirection": "NE"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 16,
+            "tempF": 82,
+            "windMph": 3,
+            "gustMph": 10,
+            "windDirection": "NE"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 16,
+            "tempF": 82,
+            "windMph": 5,
+            "gustMph": 12,
+            "windDirection": "NE"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 16,
+            "tempF": 83,
+            "windMph": 5,
+            "gustMph": 13,
+            "windDirection": "NE"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 16,
+            "tempF": 82,
+            "windMph": 6,
+            "gustMph": 13,
+            "windDirection": "NE"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-det-mia"
+      }
     },
     {
       "id": "401873043",
@@ -261,7 +481,68 @@
       "venue": "Northwest Stadium",
       "city": "Landover, MD",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 60,
+        "precipPct": 0,
+        "precipType": "Rain",
+        "windMph": 12,
+        "gustMph": 21,
+        "windDirection": "NW",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 1,
+            "tempF": 59,
+            "windMph": 12,
+            "gustMph": 21,
+            "windDirection": "NW"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 60,
+            "windMph": 12,
+            "gustMph": 21,
+            "windDirection": "NW"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 61,
+            "windMph": 10,
+            "gustMph": 20,
+            "windDirection": "NW"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 61,
+            "windMph": 9,
+            "gustMph": 17,
+            "windDirection": "W"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 60,
+            "windMph": 8,
+            "gustMph": 16,
+            "windDirection": "W"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-lar-was"
+      }
     },
     {
       "id": "401873044",
@@ -280,7 +561,68 @@
       "venue": "Lincoln Financial Field",
       "city": "Philadelphia, PA",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 58,
+        "precipPct": 5,
+        "precipType": "Rain",
+        "windMph": 10,
+        "gustMph": 16,
+        "windDirection": "W",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 57,
+            "windMph": 10,
+            "gustMph": 16,
+            "windDirection": "W"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 5,
+            "tempF": 58,
+            "windMph": 10,
+            "gustMph": 16,
+            "windDirection": "W"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 5,
+            "tempF": 59,
+            "windMph": 10,
+            "gustMph": 15,
+            "windDirection": "W"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 5,
+            "tempF": 60,
+            "windMph": 5,
+            "gustMph": 14,
+            "windDirection": "W"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 5,
+            "tempF": 59,
+            "windMph": 5,
+            "gustMph": 13,
+            "windDirection": "W"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-nyg-phi"
+      }
     },
     {
       "id": "401873045",
@@ -296,10 +638,71 @@
         "name": "Kansas City Chiefs",
         "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/kc.png"
       },
-      "venue": "Arrowhead Stadium",
+      "venue": "GEHA Field at Arrowhead Stadium",
       "city": "Kansas City, MO",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 60,
+        "precipPct": 0,
+        "precipType": "Rain",
+        "windMph": 3,
+        "gustMph": 5,
+        "windDirection": "W",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 56,
+            "windMph": 3,
+            "gustMph": 5,
+            "windDirection": "W"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 60,
+            "windMph": 3,
+            "gustMph": 5,
+            "windDirection": "W"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 62,
+            "windMph": 3,
+            "gustMph": 5,
+            "windDirection": "W"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 63,
+            "windMph": 3,
+            "gustMph": 6,
+            "windDirection": "W"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 62,
+            "windMph": 3,
+            "gustMph": 6,
+            "windDirection": "W"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-nyj-kc"
+      }
     },
     {
       "id": "401873046",
@@ -318,12 +721,73 @@
       "venue": "SoFi Stadium",
       "city": "Inglewood, CA",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 85,
+        "precipPct": 0,
+        "precipType": "Rain",
+        "windMph": 1,
+        "gustMph": 1,
+        "windDirection": "W",
+        "hourly": [
+          {
+            "time": "3 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 85,
+            "windMph": 5,
+            "gustMph": 7,
+            "windDirection": "NNE"
+          },
+          {
+            "time": "4 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 85,
+            "windMph": 1,
+            "gustMph": 1,
+            "windDirection": "W"
+          },
+          {
+            "time": "5 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 85,
+            "windMph": 1,
+            "gustMph": 1,
+            "windDirection": "W"
+          },
+          {
+            "time": "6 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 83,
+            "windMph": 1,
+            "gustMph": 1,
+            "windDirection": "W"
+          },
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 81,
+            "windMph": 5,
+            "gustMph": 9,
+            "windDirection": "W"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-hou-lac"
+      }
     },
     {
       "id": "401873047",
       "week": 9,
-      "kickoffUtc": "2026-11-08T21:25:00Z",
+      "kickoffUtc": "2026-11-08T21:05:00Z",
       "away": {
         "abbr": "LV",
         "name": "Las Vegas Raiders",
@@ -337,7 +801,68 @@
       "venue": "Levi's Stadium",
       "city": "Santa Clara, CA",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 72,
+        "precipPct": 0,
+        "precipType": "Rain",
+        "windMph": 5,
+        "gustMph": 7,
+        "windDirection": "NW",
+        "hourly": [
+          {
+            "time": "3 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 71,
+            "windMph": 1,
+            "gustMph": 5,
+            "windDirection": "NNW"
+          },
+          {
+            "time": "4 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 72,
+            "windMph": 5,
+            "gustMph": 7,
+            "windDirection": "NW"
+          },
+          {
+            "time": "5 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 73,
+            "windMph": 5,
+            "gustMph": 7,
+            "windDirection": "NW"
+          },
+          {
+            "time": "6 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 72,
+            "windMph": 5,
+            "gustMph": 7,
+            "windDirection": "NW"
+          },
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 70,
+            "windMph": 7,
+            "gustMph": 13,
+            "windDirection": "NW"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-lv-sf"
+      }
     },
     {
       "id": "401873048",
@@ -356,7 +881,68 @@
       "venue": "Lumen Field",
       "city": "Seattle, WA",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 55,
+        "precipPct": 21,
+        "precipType": "Rain",
+        "windMph": 9,
+        "gustMph": 13,
+        "windDirection": "SSW",
+        "hourly": [
+          {
+            "time": "3 PM",
+            "inGame": false,
+            "sky": "partly",
+            "precipPct": 21,
+            "tempF": 54,
+            "windMph": 12,
+            "gustMph": 16,
+            "windDirection": "SSW"
+          },
+          {
+            "time": "4 PM",
+            "inGame": true,
+            "sky": "partly",
+            "precipPct": 21,
+            "tempF": 55,
+            "windMph": 9,
+            "gustMph": 13,
+            "windDirection": "SSW"
+          },
+          {
+            "time": "5 PM",
+            "inGame": true,
+            "sky": "partly",
+            "precipPct": 21,
+            "tempF": 55,
+            "windMph": 9,
+            "gustMph": 13,
+            "windDirection": "SSW"
+          },
+          {
+            "time": "6 PM",
+            "inGame": true,
+            "sky": "partly",
+            "precipPct": 21,
+            "tempF": 55,
+            "windMph": 9,
+            "gustMph": 13,
+            "windDirection": "SSW"
+          },
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 10,
+            "tempF": 54,
+            "windMph": 3,
+            "gustMph": 5,
+            "windDirection": "SSW"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-ari-sea"
+      }
     },
     {
       "id": "401873049",
@@ -375,7 +961,68 @@
       "venue": "Gillette Stadium",
       "city": "Foxborough, MA",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 56,
+        "precipPct": 5,
+        "precipType": "Rain",
+        "windMph": 6,
+        "gustMph": 13,
+        "windDirection": "W",
+        "hourly": [
+          {
+            "time": "3 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 7,
+            "tempF": 57,
+            "windMph": 7,
+            "gustMph": 14,
+            "windDirection": "W"
+          },
+          {
+            "time": "4 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 5,
+            "tempF": 56,
+            "windMph": 6,
+            "gustMph": 13,
+            "windDirection": "W"
+          },
+          {
+            "time": "5 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 5,
+            "tempF": 53,
+            "windMph": 6,
+            "gustMph": 13,
+            "windDirection": "W"
+          },
+          {
+            "time": "6 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 5,
+            "tempF": 50,
+            "windMph": 5,
+            "gustMph": 13,
+            "windDirection": "W"
+          },
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 5,
+            "tempF": 47,
+            "windMph": 5,
+            "gustMph": 13,
+            "windDirection": "W"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-gb-ne"
+      }
     },
     {
       "id": "401873050",
@@ -394,7 +1041,68 @@
       "venue": "Soldier Field",
       "city": "Chicago, IL",
       "indoor": false,
-      "forecast": null
+      "forecast": {
+        "tempF": 48,
+        "precipPct": 2,
+        "precipType": "Rain",
+        "windMph": 5,
+        "gustMph": 12,
+        "windDirection": "W",
+        "hourly": [
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 49,
+            "windMph": 5,
+            "gustMph": 12,
+            "windDirection": "W"
+          },
+          {
+            "time": "8 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 48,
+            "windMph": 5,
+            "gustMph": 12,
+            "windDirection": "W"
+          },
+          {
+            "time": "9 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 48,
+            "windMph": 5,
+            "gustMph": 10,
+            "windDirection": "W"
+          },
+          {
+            "time": "10 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 47,
+            "windMph": 5,
+            "gustMph": 10,
+            "windDirection": "W"
+          },
+          {
+            "time": "11 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 46,
+            "windMph": 5,
+            "gustMph": 10,
+            "windDirection": "W"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-tb-chi"
+      }
     },
     {
       "id": "401873051",

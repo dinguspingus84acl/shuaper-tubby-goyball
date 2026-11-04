@@ -62,7 +62,7 @@
       const result=document.createElement('span');result.className='shua-league-record';
       const record=leagueRecord(myTeams._cards?.[i]);
       const finish=trigger.querySelector('.myteams-finish')?.textContent?.trim();
-      result.textContent=record||finish||(myTeams._cards?.[i]?.year||2026);
+      result.textContent=record||finish?.replace(/^🏆\s*/u,'')||(myTeams._cards?.[i]?.year||2026);
       result.title=record?'Win–loss record':finish?'Historical finish':'Season';
       trigger.append(result,icon('chevron'));
       trigger.dataset.shuaListReady='1';
@@ -231,7 +231,9 @@
     for(const item of tokens){
       const chip=document.createElement('button');chip.type='button';chip.className='shua-active-filter-chip';
       const removable=item.reset&&item.value!==item.reset;
-      chip.textContent=item.name==='Position'?item.value:item.name+' '+item.value;
+      const label=item.name==='Position'||(item.name==='Week'&&(item.value==='Season to Date'||/^Week\s/i.test(item.value)))?
+        item.value:item.name+' '+item.value;
+      chip.textContent=label;
       if(removable){const clear=document.createElement('span');clear.className='shua-chip-clear';clear.textContent='×';clear.setAttribute('aria-hidden','true');chip.append(clear);}
       chip.setAttribute('aria-label',removable?'Clear '+item.value+' position filter':'Edit '+item.name+' filter');
       chip.addEventListener('click',()=>{
@@ -244,6 +246,8 @@
             if(all){all.click();return;}
           }
         }
+        const collapsed=item.source.closest('.shua-filter-controls:not(.shua-filters-open)');
+        collapsed?.querySelector('.shua-filter-toggle')?.click();
         item.source.focus({preventScroll:true});
         if(item.source.tagName==='SELECT')try{item.source.showPicker?.();}catch(_){}
       });

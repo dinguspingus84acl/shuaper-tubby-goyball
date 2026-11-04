@@ -14,7 +14,7 @@ for(const name of ['espn-live.js','my-teams-current.js','my-teams-live.js','weat
 assert.ok(html.includes('my-teams-current.js?v=20261104-flaim1'));
 assert.ok(html.indexOf('my-teams-data.js')<html.indexOf('my-teams-current.js'));
 assert.ok(html.indexOf('my-teams-current.js')<html.indexOf('id="shua-my-teams-script"'));
-assert.ok(html.includes('espn-live.js?v=20261104-metrics3'));
+assert.ok(html.includes('espn-live.js?v=20261104-metrics4'));
 assert.ok(stats.includes('id="espnColumnStatSelect"')&&!stats.includes('id="espnMetricFilters"'),'Stats categories belong in the dropdown only');
 for(const metric of ['targets','recTD','passTD','rushTD','completions','rushAtt','recYds'])assert.ok(stats.includes("key:'"+metric+"'"),metric+' filter missing');
 assert.ok(weather.includes('isPending=!f&&!game.indoor'),'Indoor games without forecasts should use full-size cards');

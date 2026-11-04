@@ -467,6 +467,7 @@ section.innerHTML=`
           <div id="espnTeamFilterMenu" class="espn-team-filter-menu" role="listbox" hidden></div>
           <select id="espnTeamFilter" hidden aria-hidden="true" tabindex="-1"><option value="ALL">All</option></select>
         </div>
+        <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
         <span class="espn-leader-count" id="espnStatsCount" aria-live="polite"></span>
       </div>
       <div class="espn-stat-bar">
@@ -476,7 +477,6 @@ section.innerHTML=`
             <button type="button" class="espn-view-btn active" data-espn-view="TOTAL">Season</button>
             <button type="button" class="espn-view-btn" data-espn-view="PERGAME">Per Game</button>
           </div>
-          <select id="espnStatsYear" class="espn-year-select" aria-label="Stats year"></select>
         </div>
         <div class="espn-stats-right-controls">
           <label for="espnColumnStatSelect">Rank by stat</label>

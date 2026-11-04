@@ -1,0 +1,108 @@
+/* Stats controls: keep the year beside Teams and the sort selector beside
+   the equally sized Season / Per Game buttons. All metrics stay in one menu. */
+body.shua-clean.stats-mode #espnLiveSection .espn-live-toolbar > .espn-year-select {
+  flex:0 0 auto;
+  width:86px;
+  min-width:86px;
+  height:36px;
+  min-height:36px;
+  margin:0;
+  padding:6px 7px;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stat-bar {
+  display:flex!important;
+  justify-content:flex-start!important;
+  align-items:center!important;
+  flex-wrap:wrap!important;
+  gap:10px!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stat-primary {
+  flex:0 0 auto;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stat-filters {
+  display:flex!important;
+  width:auto!important;
+  flex-wrap:nowrap!important;
+  overflow:visible!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-view-btn {
+  box-sizing:border-box;
+  width:72px!important;
+  min-width:72px!important;
+  flex:0 0 72px!important;
+  padding:6px 4px!important;
+  font-size:11px!important;
+  text-align:center;
+  white-space:nowrap;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-stats-right-controls {
+  display:grid!important;
+  grid-template-columns:auto minmax(0,190px)!important;
+  align-items:center!important;
+  justify-self:start!important;
+  width:auto!important;
+  gap:8px!important;
+}
+body.shua-clean.stats-mode #espnLiveSection #espnColumnStatSelect {
+  min-width:0;
+}
+
+@media(max-width:760px) {
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-toolbar {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 86px!important;
+    align-items:center!important;
+    gap:8px!important;
+    padding:9px!important;
+    padding-right:9px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-filters {
+    grid-column:1 / -1;
+    grid-row:1;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-team-filter-wrap {
+    grid-column:1;
+    grid-row:2;
+    display:flex;
+    align-items:center;
+    width:100%;
+    min-width:0;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-team-filter-button {
+    flex:1 1 auto!important;
+    width:auto!important;
+    min-width:0!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-toolbar > .espn-year-select {
+    grid-column:2;
+    grid-row:2;
+    justify-self:end;
+    width:86px;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-bar {
+    display:flex!important;
+    align-items:center!important;
+    flex-wrap:nowrap!important;
+    gap:7px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-view-btn {
+    width:65px!important;
+    min-width:65px!important;
+    flex-basis:65px!important;
+    font-size:10.5px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-stats-right-controls {
+    display:flex!important;
+    flex:1 1 0!important;
+    min-width:0!important;
+    width:auto!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-stats-right-controls label {
+    display:none!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection #espnColumnStatSelect {
+    flex:1 1 auto;
+    width:100%!important;
+    min-width:0!important;
+  }
+}

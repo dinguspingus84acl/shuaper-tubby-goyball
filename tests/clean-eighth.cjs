@@ -1,0 +1,26 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const read=file=>fs.readFileSync(path.join(__dirname,'..',file),'utf8');
+const stats=read('espn-live.js');
+const css=read('clean-eighth.css');
+const html=read('index.html');
+new vm.Script(stats,{filename:'espn-live.js'});
+
+assert.ok(html.includes('clean-eighth.css?v=20261104-controls1'),'New controls should have a removable CSS layer');
+assert.ok(html.includes('espn-live.js?v=20261104-metrics4'),'Changed markup should have a fresh URL');
+const toolbar=stats.slice(stats.indexOf('<div class="espn-live-toolbar">'),stats.indexOf('<div class="espn-stat-bar">'));
+const controls=stats.slice(stats.indexOf('<div class="espn-stat-bar">'),stats.indexOf('<div class="espn-live-card">'));
+assert.ok(toolbar.includes('id="espnTeamFilterButton"'));
+assert.ok(toolbar.indexOf('id="espnStatsYear"')>toolbar.indexOf('id="espnTeamFilterButton"'),'Year must be immediately after Teams');
+assert.ok(toolbar.indexOf('id="espnStatsYear"')<toolbar.indexOf('id="espnStatsCount"'),'Player count should stay at the far right');
+assert.ok(!controls.includes('id="espnStatsYear"'),'Year cannot remain on the Season / Per Game row');
+assert.ok(controls.indexOf('id="espnColumnStatSelect"')>controls.indexOf('data-espn-view="PERGAME"'),'Rank by stat must follow Per Game');
+assert.ok(css.includes('width:72px!important')&&css.includes('min-width:72px!important'),'Season and Per Game must be the same compact width');
+assert.ok(css.includes('grid-template-columns:minmax(0,1fr) 86px!important'),'Mobile Teams and year belong on the same row');
+assert.ok(css.includes('flex-wrap:nowrap!important')&&css.includes('flex:1 1 0!important'),'Mobile Rank by stat must share a row with Season / Per Game');
+assert.ok(!stats.includes('id="espnMetricFilters"'),'Stat categories must remain dropdown-only');
+for(const stat of ['targets','recTD','rushTD','receptions','passTD'])assert.ok(stats.includes("key:'"+stat+"'"));
+console.log('PASS: Stats year beside Teams, equal-sized Season / Per Game, adjacent Rank by stat on desktop and mobile.');

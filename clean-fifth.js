@@ -65,8 +65,8 @@
 
   // Put the existing position buttons and existing Week select on one row.
   // Moving the real nodes preserves delegated click/change handlers.
-  const analytics=document.getElementById('shuaAnalyticsSection');
   function arrangeSchedule(){
+    const analytics=document.getElementById('shuaAnalyticsSection');
     if(!clean()||analytics?.dataset.activeView!=='schedule')return;
     const host=analytics.querySelector('#stContent');
     const positions=host?.querySelector(':scope > .st-schedule-positions');
@@ -113,7 +113,19 @@
     uiQueued=true;
     requestAnimationFrame(()=>{uiQueued=false;arrangeSchedule();arrangeGameLog();});
   }
-  if(analytics)new MutationObserver(requestUi).observe(analytics,{childList:true,subtree:true});
+  // Analytics mounts lazily the first time its navigation tab opens.
+  // Bind to that actual section when it appears, rather than retaining null.
+  let observedAnalytics=null;
+  function watchAnalytics(){
+    const node=document.getElementById('shuaAnalyticsSection');
+    if(!node||node===observedAnalytics)return;
+    observedAnalytics=node;
+    new MutationObserver(requestUi).observe(node,{childList:true,subtree:true});
+    requestUi();
+  }
+  const main=document.querySelector('main');
+  if(main)new MutationObserver(watchAnalytics).observe(main,{childList:true});
+  watchAnalytics();
   if(gameLog)new MutationObserver(requestUi).observe(gameLog,{childList:true});
   new MutationObserver(()=>{requestRanking();requestUi();}).observe(document.body,{attributes:true,attributeFilter:['class']});
   requestUi();

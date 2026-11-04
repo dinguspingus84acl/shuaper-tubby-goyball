@@ -13,7 +13,7 @@ const live=source('espn-live.js');
 
 new vm.Script(js,{filename:'clean-fifth.js'});
 new vm.Script(weather,{filename:'weather.js'});
-assert.ok(html.includes('clean-fifth.css?v=20261104-fifth9')&&html.includes('clean-fifth.js?v=20261104-fifth9'),'The new stylesheet/script must load');
+assert.ok(html.includes('clean-fifth.css?v=20261104-fifth9b')&&html.includes('clean-fifth.js?v=20261104-fifth9b'),'The new stylesheet/script must load');
 assert.ok(html.includes('clean-fourth.css?v=20261104-fourth10')&&html.includes('clean-polish.css?v=20261103-10clean2'),'Old design layers remain recoverable');
 
 // 1. Notes retain the full text and a keyboard-accessible expander.
@@ -32,13 +32,14 @@ assert.ok(live.includes('cached.rows.map(g=>')&&live.includes("!g.hasStats?'gl-u
 assert.ok(!css.includes('.gl-unplayed{display:none')&&!js.includes('gl-unplayed'));
 // 6. Same existing Schedule buttons and season/week selection, reorganized.
 assert.ok(js.includes('line.append(positions,week)')&&css.includes('.shua-fifth-schedule-line'));
+assert.ok(js.includes('function watchAnalytics()')&&js.includes('new MutationObserver(watchAnalytics).observe(main'),'Schedule observer must attach when Analytics mounts lazily');
 assert.ok(css.includes('.shua-active-filters{display:none!important}')&&css.includes('phone-mode #shuaAnalyticsSection'));
 // 7. Smaller league selector rows keep real logos and records.
 assert.ok(css.includes('myteams-card-trigger{min-height:51px')&&css.includes('myteams-card-trigger{min-height:49px'));
 // 8. Retain position badges in All while hiding them in one-position Stock.
 assert.ok(css.includes('[data-stock-filter]:not([data-stock-filter="ALL"]) .stock-meta .shua-row-pos'));
 // 9. Weather totals remain derived directly from the loaded snapshot.
-assert.ok(weather.includes("['Games',all.length]")&&weather.includes("['Pending',all.length-ready.length]"));
+assert.ok(weather.includes("['Games',all.length]")&&weather.includes("['Pending',all.length-ready.length]")&&weather.includes('Forecast available'));
 assert.ok(css.includes('wx-status-item')&&css.includes('wx-overview'));
 // 10. Pending games are truthful fixtures, not imaginary forecasts.
 assert.ok(weather.includes('if(isPending)return')&&weather.includes('wx-pending-fixture'));

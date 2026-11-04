@@ -193,7 +193,7 @@
     const all=snapshot.games||[];
     const ready=all.filter(game=>game.forecast),watch=all.filter(game=>['watch','high'].includes(risk(game).level));
     const stats=section.querySelector('#wxOverview');
-    stats.innerHTML=[['Games',all.length],['Forecasts available',ready.length],['Pending',all.length-ready.length],...(watch.length?[['Weather watch',watch.length]]:[])].map(([label,n])=>'<span class="wx-status-item"><strong>'+n+'</strong> '+escape(label)+'</span>').join('<span class="wx-status-divider" aria-hidden="true">·</span>');
+    stats.innerHTML=[['Games',all.length],[ready.length===1?'Forecast available':'Forecasts available',ready.length],['Pending',all.length-ready.length],...(watch.length?[['Weather watch',watch.length]]:[])].map(([label,n])=>'<span class="wx-status-item"><strong>'+n+'</strong> '+escape(label)+'</span>').join('<span class="wx-status-divider" aria-hidden="true">·</span>');
     section.querySelector('#wxFreshness').innerHTML='<span>MySportsWeather · Checked '+escape(formatUpdated(snapshot.generatedAt))+' · Updates automatically while this tab is open</span>';
     const buttons=section.querySelector('#wxFilters');
     buttons.innerHTML=filters.map(([value,label])=>'<button type="button" data-wx-filter="'+value+'" aria-pressed="'+(filter===value)+'">'+label+'</button>').join('');

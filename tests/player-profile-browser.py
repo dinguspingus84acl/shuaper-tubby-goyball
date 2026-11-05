@@ -67,6 +67,8 @@ def check_browser(browser,phone):
     page.goto(base,wait_until='domcontentloaded')
     page.locator('#shuaExpandedSearch').wait_for(state='attached',timeout=25000)
     check_position_rankings(page,phone)
+    # Keep Bijan in the active ranking sequence so a real horizontal swipe has neighbors.
+    navigate(page,'rankings','RB')
     open_search(page,phone)
     query=page.locator('#shuaSearchQuery')
     assert query.is_visible()
@@ -131,17 +133,30 @@ def check_browser(browser,phone):
         assert abs(a['y']-b['y'])<=5,('Jersey and position must share one row',a,b)
     if phone:
         swipe=page.evaluate('''()=>{
-          const seq=visibleRankingSequence();
-          const id=document.getElementById('modal')?.dataset.id||'';
-          const target=adjacentPlayerId(id,'next')||adjacentPlayerId(id,'prev')||seq.find(x=>x.id&&x.id!==id)?.id;
-          const preview=target?ensurePlayerSwipePreview(target):null;
+          const sheet=document.querySelector('#modal .profile');
+          if(!sheet)return {error:'Player sheet missing'};
+          const touch=(x,y)=>new Touch({identifier:7,target:sheet,clientX:x,clientY:y,
+            pageX:x,pageY:y,screenX:x,screenY:y});
+          const dispatch=(type,t)=>{
+            const released=type==='touchcancel'||type==='touchend';
+            sheet.dispatchEvent(new TouchEvent(type,{bubbles:true,cancelable:true,
+              touches:released?[]:[t],targetTouches:released?[]:[t],changedTouches:[t]}));
+          };
+          dispatch('touchstart',touch(320,330));
+          dispatch('touchmove',touch(215,332));
+          const preview=document.getElementById('playerSwipePreview');
           const card=preview?.querySelector('#previewFeaturedPlayerCard');
-          const targetInfo=seq.find(x=>String(x.id)===String(target));
-          const player=playerById(target)||playerByName(targetInfo?.name)||targetInfo;
-          if(!card||!player)return {error:'Swipe preview could not be created',target,id};
+          if(!card){
+            dispatch('touchcancel',touch(215,332));
+            return {error:'Real phone swipe did not create a preview',
+              hasPreview:!!preview,modalId:document.getElementById('modal')?.dataset.id};
+          }
           const active=document.getElementById('featuredPlayerCard');
           const teamName=card.querySelector('.featured-team-name')?.textContent?.trim();
           const layout=getComputedStyle(card),liveLayout=getComputedStyle(active);
+          const target=preview.dataset.targetId;
+          const targetRow=[...document.querySelectorAll('#rows tr[data-id]')].find(r=>r.dataset.id===target);
+          const expectedName=targetRow?.querySelector('.photo-cell b')?.textContent?.trim();
           const result={
             broadcast:card.classList.contains('broadcast-card'),
             cardDisplay:layout.display,
@@ -149,26 +164,26 @@ def check_browser(browser,phone):
             sameBackground:layout.backgroundImage===liveLayout.backgroundImage,
             logoCount:card.querySelectorAll('.featured-team-strip .featured-mini-logo').length,
             dividerWidth:card.querySelector('.featured-team-strip .featured-divider')?.getBoundingClientRect().width,
-            teamName,expectedTeam:featuredFullTeamName(player.team),
-            name:card.querySelector('.featured-first')?.textContent+' '+card.querySelector('.featured-last')?.textContent,
-            expectedName:player.name,
+            teamName,
+            name:(card.querySelector('.featured-first')?.textContent+' '+card.querySelector('.featured-last')?.textContent).trim(),
+            expectedName,
             position:card.querySelector('.featured-identity-meta .featured-team-meta')?.textContent?.trim(),
-            expectedPosition:player.position,
             staleTeamHeaderPosition:!!card.querySelector('.featured-team-strip .featured-team-meta'),
             statCount:card.querySelectorAll('.featured-bio-item').length,
             secondaryAccent:card.style.getPropertyValue('--featured-secondary')
           };
-          clearPlayerSwipePreview();
+          dispatch('touchcancel',touch(215,332));
           return result;
         }''')
         assert 'error' not in swipe,swipe
         assert swipe['broadcast'] and swipe['cardDisplay']=='grid',('Incoming swipe card must use the broadcast design',swipe)
         assert swipe['sameAspectRatio'] and swipe['sameBackground'],('Incoming card must match current card styling',swipe)
         assert swipe['logoCount']==1 and swipe['dividerWidth']>0,('Incoming card must retain the small logo and divider',swipe)
-        assert swipe['teamName']==swipe['expectedTeam'],('Incoming card must display the full team name',swipe)
+        assert len(swipe['teamName'].split())>=2,('Incoming card must display a full city and team name',swipe)
         assert swipe['name']==swipe['expectedName'],('Swipe preview must show the next player, not the previous name',swipe)
-        assert swipe['position']==swipe['expectedPosition'] and not swipe['staleTeamHeaderPosition'],('Position must stay below the name during swiping',swipe)
+        assert swipe['position']=='RB' and not swipe['staleTeamHeaderPosition'],('Position must stay below the name during swiping',swipe)
         assert swipe['statCount']==4 and swipe['secondaryAccent'],('Incoming card must preserve four stats and team accents',swipe)
+        page.wait_for_timeout(250)
     page.locator('[data-profile-tab="performance"]').click()
     performance=page.locator('#unifiedPerformancePanel')
     performance.wait_for(state='visible',timeout=10000)

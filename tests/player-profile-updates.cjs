@@ -81,7 +81,7 @@ assert.ok(!search.includes('shuaGlobalSearchBar')&&search.includes('window.ShuaP
 assert.ok(!studio.includes('id="stGlobalSearch"')&&studio.includes("state.studioSearch=''"),'The Analytics header must not show a second player search or preserve an invisible filter');
 assert.ok(!studio.includes('class="shua-active-filters"'),'Do not duplicate chart filters as a Showing row');
 assert.ok(!html.includes('clean-ninth.js?v='),'The redundant Analytics snapshot script must no longer load');
-assert.ok(/unified-profile\.js\?v=[A-Za-z0-9-]+/.test(html)&&html.includes('player-search.js?v=20261105-search-tools1'));
+assert.ok(/unified-profile\.js\?v=[A-Za-z0-9-]+/.test(html)&&html.includes('player-search.js?v=20261105-search-tools2'));
 assert.ok(profile.includes("if(pos)pos.textContent=String(player?.position||bio?.position||'—');"),'Player identity should not repeat the team abbreviation');
 const latestProfileCss=read('broadcast-player-card.css');
 assert.ok(latestProfileCss.includes('left:49%!important')&&latestProfileCss.includes('grid-column:1 / -1!important'),'The logo stays behind the portrait and stats span the entire broadcast card');
@@ -106,7 +106,8 @@ assert.ok(studioCss.includes('body.shua-clean #shuaAnalyticsSection.st-studio[da
  'Analytics dashboards must use the whole width without a duplicate sidebar');
 assert.ok(html.includes('clean-design.js?v=20261105-search-tools2'));
 assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261105-search-tools1'));
-assert.ok(html.includes('player-search.js?v=20261105-search-tools1')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
+assert.ok(html.includes('player-search.js?v=20261105-search-tools2')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
+assert.ok(search.includes("input.value='';mode='current';")&&search.includes("b.setAttribute('aria-pressed',String(b.dataset.searchMode===mode))"),'Each new Tools search must show current players after an archived-player lookup');
 assert.ok(loader.includes("const version = '20261105-search-tools1'"));
 const faces=read('player-face-fix.js');
 new vm.Script(faces,{filename:'player-face-fix.js'});

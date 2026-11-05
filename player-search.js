@@ -114,7 +114,12 @@ async function changeMode(next){
  }
 }
 function open(){
- if(visible)return;visible=true;overlay.hidden=false;
+ if(visible)return;
+ // Each Tools search begins with current NFL players, even if the previous
+ // lookup was in the retired-player directory.
+ input.value='';mode='current';
+ overlay.querySelectorAll('[data-search-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.searchMode===mode)));
+ visible=true;overlay.hidden=false;
  document.body.classList.remove('mobile-menu-open');
  document.body.dataset.shuaSearchOpen='1';
  const suggestions=document.getElementById('suggestions');if(suggestions)suggestions.style.display='none';

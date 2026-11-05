@@ -41,6 +41,51 @@ def check_press_and_slide(page,phone):
     assert page.locator('.positions .pos.active').first.get_attribute('data-pos')=='RB',('Releasing should open the highlighted tab',phone)
     assert page.locator('#shua-menu-rankings').is_hidden(),('The menu should close after selecting',phone)
 
+    # Once a menu is open, pressing any option and sliding must also work.
+    trigger.click()
+    start=page.locator('#shua-menu-rankings [data-shua-target="WR"]').bounding_box()
+    end=page.locator('#shua-menu-rankings [data-shua-target="TE"]').bounding_box()
+    assert start and end
+    page.mouse.move(start['x']+start['width']/2,start['y']+start['height']/2)
+    page.mouse.down()
+    page.mouse.move(end['x']+end['width']/2,end['y']+end['height']/2,steps=5)
+    assert page.locator('#shua-menu-rankings [data-shua-target="TE"]').evaluate("e=>e.classList.contains('is-drag-hover')")
+    page.mouse.up()
+    assert page.locator('.positions .pos.active').first.get_attribute('data-pos')=='TE'
+
+def check_real_touch_menu(page):
+    """Send Chromium touchStart/move/end, not mouse events in a phone viewport."""
+    cdp=page.context.new_cdp_session(page)
+    def center(locator):
+        rect=locator.bounding_box()
+        assert rect
+        return {'x':rect['x']+rect['width']/2,'y':rect['y']+rect['height']/2}
+    def touch(action,point=None):
+        points=[] if point is None else [{'x':point['x'],'y':point['y'],'id':1}]
+        cdp.send('Input.dispatchTouchEvent',{'type':action,'touchPoints':points})
+
+    trigger=page.locator('#shuaCleanNav [data-shua-group="rankings"] .shua-clean-trigger')
+    touch('touchStart',center(trigger))
+    rb=page.locator('#shua-menu-rankings [data-shua-target="RB"]')
+    rb.wait_for(state='visible',timeout=6000)
+    touch('touchMove',center(rb))
+    assert rb.evaluate("e=>e.classList.contains('is-drag-hover')"),'Real touch must highlight the hovered option'
+    touch('touchEnd')
+    assert page.locator('.positions .pos.active').first.get_attribute('data-pos')=='RB','Real touch release must navigate'
+    assert page.locator('#shua-menu-rankings').is_hidden()
+
+    # Open first with a tap, then start the press-and-slide on a menu option.
+    touch('touchStart',center(trigger))
+    touch('touchEnd')
+    wr=page.locator('#shua-menu-rankings [data-shua-target="WR"]')
+    wr.wait_for(state='visible',timeout=6000)
+    touch('touchStart',center(wr))
+    te=page.locator('#shua-menu-rankings [data-shua-target="TE"]')
+    touch('touchMove',center(te))
+    assert te.evaluate("e=>e.classList.contains('is-drag-hover')"),'Dragging inside an open menu must highlight'
+    touch('touchEnd')
+    assert page.locator('.positions .pos.active').first.get_attribute('data-pos')=='TE'
+
 def check_position_rankings(page,phone):
     for pos in ('QB','RB','WR','TE'):
         navigate(page,'rankings',pos)
@@ -91,6 +136,7 @@ def check_browser(browser,phone):
     assert page.locator('#shuaDisplayModeButton').count()==0,'Tools must not show a manual display switch'
     check_position_rankings(page,phone)
     check_press_and_slide(page,phone)
+    if phone and page.context.browser.browser_type.name=='chromium':check_real_touch_menu(page)
     # Keep Bijan in the active ranking sequence so a real horizontal swipe has neighbors.
     navigate(page,'rankings','RB')
     open_search(page,phone)

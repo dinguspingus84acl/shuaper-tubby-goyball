@@ -100,8 +100,9 @@
     }
   }
 
-  // Hold a bottom-navigation button and slide onto an option to preview it.
-  // Releasing selects that option; an ordinary tap leaves the menu open.
+  // Press and slide from either the bottom button or an already open menu.
+  // Touch uses native touch events: Safari may cancel pointer sequences when a
+  // finger leaves the trigger, so a mouse-only pointer handler is insufficient.
   let press=null,ignoreNativeClick=null;
   function hoveredOption(event){
     if(!press)return null;
@@ -115,38 +116,81 @@
     if(option)option.classList.add('is-drag-hover');
     press.option=option;
   }
-  cleanNav.addEventListener('pointerdown',event=>{
-    const trigger=event.target.closest('.shua-clean-trigger');
-    if(!trigger||event.button!==0||event.isPrimary===false)return;
-    const group=trigger.closest('.shua-clean-group');
+  function startPress(target,id,kind){
+    const trigger=target.closest('.shua-clean-trigger');
+    const option=target.closest('.shua-clean-popup button');
+    if(!trigger&&!option)return false;
+    const group=target.closest('.shua-clean-group');
+    if(!group)return false;
     const alreadyOpen=group.classList.contains('is-open');
-    if(!alreadyOpen)openMenu(group);
+    if(trigger&&!alreadyOpen)openMenu(group);
     group.classList.add('is-dragging');
-    press={pointerId:event.pointerId,trigger,group,alreadyOpen,option:null};
-  });
-  document.addEventListener('pointermove',event=>{
-    if(!press||event.pointerId!==press.pointerId)return;
+    press={pointerId:id,kind,trigger,group,alreadyOpen,option:null};
+    if(option)previewOption(option);
+    return true;
+  }
+  function movePress(position){
+    if(!press)return;
     const popup=press.group.querySelector('.shua-clean-popup');
     const box=popup.getBoundingClientRect();
-    if(event.clientY>=box.top&&event.clientY<=box.bottom&&popup.scrollHeight>popup.clientHeight){
-      if(event.clientY<box.top+25)popup.scrollTop-=12;
-      else if(event.clientY>box.bottom-25)popup.scrollTop+=12;
+    if(position.clientY>=box.top&&position.clientY<=box.bottom&&popup.scrollHeight>popup.clientHeight){
+      if(position.clientY<box.top+25)popup.scrollTop-=12;
+      else if(position.clientY>box.bottom-25)popup.scrollTop+=12;
     }
-    previewOption(hoveredOption(event));
-  });
-  document.addEventListener('pointerup',event=>{
-    if(!press||event.pointerId!==press.pointerId)return;
-    const gesture=press,chosen=hoveredOption(event);
+    previewOption(hoveredOption(position));
+  }
+  function finishPress(position){
+    if(!press)return;
+    const gesture=press,chosen=hoveredOption(position);
     previewOption(null);
     gesture.group.classList.remove('is-dragging');
     press=null;
-    const guard={};ignoreNativeClick=guard;
-    setTimeout(()=>{if(ignoreNativeClick===guard)ignoreNativeClick=null;},0);
+    // Touchstart is cancelled to prevent a delayed iOS synthetic click.
+    // For mouse pointers, ignore only the click dispatched after pointerup.
+    if(gesture.kind==='pointer'){
+      const guard={};ignoreNativeClick=guard;
+      setTimeout(()=>{if(ignoreNativeClick===guard)ignoreNativeClick=null;},0);
+    }
     if(chosen)chosen.click();
-    else if(gesture.alreadyOpen)closeMenus();
+    else if(gesture.trigger&&gesture.alreadyOpen)closeMenus();
+  }
+  cleanNav.addEventListener('pointerdown',event=>{
+    if(event.pointerType==='touch'||event.button!==0||event.isPrimary===false)return;
+    startPress(event.target,event.pointerId,'pointer');
+  });
+  document.addEventListener('pointermove',event=>{
+    if(!press||press.kind!=='pointer'||event.pointerId!==press.pointerId)return;
+    movePress(event);
+  });
+  document.addEventListener('pointerup',event=>{
+    if(!press||press.kind!=='pointer'||event.pointerId!==press.pointerId)return;
+    finishPress(event);
   });
   document.addEventListener('pointercancel',event=>{
-    if(!press||event.pointerId!==press.pointerId)return;
+    if(!press||press.kind!=='pointer'||event.pointerId!==press.pointerId)return;
+    previewOption(null);press=null;closeMenus();
+  });
+  cleanNav.addEventListener('touchstart',event=>{
+    if(event.touches.length!==1)return;
+    const touch=event.changedTouches[0];
+    if(startPress(event.target,touch.identifier,'touch'))event.preventDefault();
+  },{passive:false});
+  document.addEventListener('touchmove',event=>{
+    if(!press||press.kind!=='touch')return;
+    const touch=Array.from(event.touches).find(t=>t.identifier===press.pointerId);
+    if(!touch)return;
+    event.preventDefault();
+    movePress(touch);
+  },{passive:false});
+  document.addEventListener('touchend',event=>{
+    if(!press||press.kind!=='touch')return;
+    const touch=Array.from(event.changedTouches).find(t=>t.identifier===press.pointerId);
+    if(!touch)return;
+    event.preventDefault();
+    finishPress(touch);
+  },{passive:false});
+  document.addEventListener('touchcancel',event=>{
+    if(!press||press.kind!=='touch')return;
     previewOption(null);press=null;closeMenus();
   });
 

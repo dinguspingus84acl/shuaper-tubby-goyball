@@ -45,28 +45,29 @@ def check_weather(page, phone, url):
     assert weather.locator('.wx-game .wx-source-link, .wx-game .wx-pending-link').count() == 0, \
         'Game cards should not show per-game forecast links'
     for game in GAMES:
-        if game['indoor'] and not game['forecast']:
+        if game['indoor']:
             indoor = weather.locator(f'[data-weather-game="{game["id"]}"]')
             assert indoor.locator('.wx-matchup').count() == 1, \
-                f'Indoor {game["home"]["name"]} must use a full weather card'
+                f'Indoor {game["home"]["name"]} must show its matchup'
+            assert indoor.locator('.wx-indoor-note').count() == 1
             assert indoor.locator('.wx-impact-indoor').count() == 1
-            assert indoor.locator('.wx-metrics').count() == 1
+            assert indoor.locator('.wx-metrics').count() == 0, \
+                'Indoor games must not display invented N/A weather readings'
             assert 'Forecast pending' not in indoor.inner_text()
     weather.locator('[data-wx-filter="ready"]').click()
     assert weather.locator(".wx-game").count() == AVAILABLE
     if AVAILABLE:
         # Past games are deliberately folded into a collapsed section. Choose
         # a visible current forecast rather than an invisible previous card.
-        # The current visual design collapses hourly data behind a one-tap
-        # analysis disclosure; open that real control before checking it.
-        weather.locator('.wx-game:visible .shua-wx-game-details > summary').first.click()
+        # Detailed hourly data remains inside a single compact disclosure.
+        weather.locator('.wx-game:visible .wx-expanded > summary').first.click()
         preview = weather.locator(".wx-game:visible .wx-hour-preview:visible").first
         preview.wait_for(state="visible", timeout=12000)
         assert preview.locator(".wx-preview-hour").count() >= 1
         assert ":" in preview.locator(".wx-preview-hour strong").first.inner_text()
         assert preview.locator(".wx-preview-hour small").first.inner_text() in ("AM", "PM")
         assert preview.locator('.wx-preview-sky[role="img"]').count() >= 1
-        weather.locator(".wx-game:visible .wx-details summary").first.click()
+        weather.locator(".wx-game:visible .wx-expanded[open] .wx-details summary").first.click()
         nws = weather.locator(".wx-details[open] .wx-hourly-block").first
         assert nws.get_by_text("NWS hourly forecast").first.is_visible()
         assert nws.locator(".wx-hour-col").count() >= 1

@@ -76,3 +76,66 @@ body.shua-clean.phone-mode .featured-player-card .featured-mini-logo{width:27px!
 body.shua-clean.phone-mode .featured-player-card .featured-team-name,
 body.shua-clean.phone-mode .featured-player-card.featured-team-long .featured-team-name{font-size:.76rem!important}
 body.shua-clean.phone-mode .featured-player-card .featured-team-meta{font-size:.60rem!important}
+
+
+/* Player-card identity: center the faded logo behind the portrait and give
+   the team logo, full team name, and position their own aligned columns. */
+body.shua-clean .featured-player-card .featured-portrait-box .featured-bg-logo{
+  left:50%!important;top:50%!important;
+  width:118%!important;height:118%!important;max-width:none!important;
+  transform:translate(-50%,-50%)!important;
+  object-fit:contain!important;object-position:center!important;
+}
+body.shua-clean .featured-player-card .featured-team-strip{
+  display:grid!important;
+  grid-template-columns:30px minmax(0,1fr) max-content!important;
+  align-items:center!important;column-gap:11px!important;
+  width:100%!important;min-width:0!important;
+}
+body.shua-clean .featured-player-card .featured-team-copy{display:contents!important}
+body.shua-clean .featured-player-card .featured-mini-logo{
+  grid-column:1;justify-self:center;
+  width:30px!important;height:30px!important;flex:none!important;
+}
+body.shua-clean .featured-player-card .featured-team-name{
+  grid-column:2;min-width:0;align-self:center;
+  line-height:1.18!important;
+}
+body.shua-clean .featured-player-card .featured-team-meta{
+  grid-column:3;align-self:center;justify-self:end;
+  margin:0!important;overflow:visible!important;text-overflow:clip!important;
+  white-space:nowrap!important;line-height:1!important;
+}
+body.shua-clean .featured-player-card .featured-team-meta strong{
+  display:inline-block;padding:5px 6px;
+  border-radius:6px;border:1px solid #ffffff23;
+  background:#ffffff0d;color:var(--featured-accent);
+}
+body.shua-clean .featured-player-card .featured-team-strip:not(:has(>.featured-mini-logo)){
+  grid-template-columns:minmax(0,1fr) max-content!important;
+}
+body.shua-clean .featured-player-card .featured-team-strip:not(:has(>.featured-mini-logo)) .featured-team-name{grid-column:1}
+body.shua-clean .featured-player-card .featured-team-strip:not(:has(>.featured-mini-logo)) .featured-team-meta{grid-column:2}
+body.shua-clean .featured-player-card .featured-team-strip>span:empty{display:none!important}
+@media(max-width:760px){
+  body.shua-clean .featured-player-card .featured-team-strip{
+    grid-template-columns:23px minmax(0,1fr) max-content!important;
+    column-gap:6px!important;
+  }
+  body.shua-clean .featured-player-card .featured-mini-logo{
+    width:23px!important;height:23px!important;
+  }
+  body.shua-clean .featured-player-card .featured-team-meta strong{
+    padding:4px 5px;font-size:.59rem;
+  }
+}
+body.shua-clean.phone-mode .featured-player-card .featured-team-strip{
+  grid-template-columns:27px minmax(0,1fr) max-content!important;
+  column-gap:8px!important;
+}
+body.shua-clean.phone-mode .featured-player-card .featured-mini-logo{
+  width:27px!important;height:27px!important;
+}
+body.shua-clean.phone-mode .featured-player-card .featured-team-meta strong{
+  padding:4px 6px;font-size:.6rem;
+}

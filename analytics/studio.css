@@ -1173,3 +1173,27 @@ body.shua-clean:not(.phone-mode) #shuaAnalyticsSection[data-active-view="schedul
 body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation{
  grid-template-columns:repeat(2,minmax(0,1fr))!important;
 }
+
+/* Beat the theme's state-specific desktop flex navigation and mobile dropdown
+   rules, even when older theme sheets finish loading after Studio. */
+body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-dashboard-picker,
+body.shua-clean.phone-mode #shuaAnalyticsSection.st-studio[data-active-view] .st-dashboard-picker{
+ display:none!important;
+}
+body.shua-clean:not(.phone-mode) #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation,
+body.shua-clean.phone-mode #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation,
+body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation{
+ display:grid!important;
+ grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ flex-direction:initial!important;position:static!important;
+ margin:0!important;width:100%!important;
+}
+@media(max-width:700px){
+ body.shua-clean:not(.phone-mode) #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation,
+ body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ }
+}
+body.shua-clean.phone-mode #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation{
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+}

@@ -109,9 +109,9 @@ assert.ok(cleanDesign.includes("data-shua-studio=")&&cleanDesign.includes('ShuaS
 assert.ok(studioCss.includes('body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation'),
  'Expanded Analytics buttons must override the phone theme hiding the nav');
 assert.ok(html.includes('clean-design.js?v=20261105-analytics-menu2'));
-assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261105-expanded-nav2'));
+assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261105-expanded-nav3'));
 assert.ok(html.includes('player-search.js?v=20261102-facefix1')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
-assert.ok(loader.includes("const version = '20261105-expanded-nav2'"));
+assert.ok(loader.includes("const version = '20261105-expanded-nav3'"));
 const faces=read('player-face-fix.js');
 new vm.Script(faces,{filename:'player-face-fix.js'});
 for(const id of ['4685278','3126486','4870653','4723820','4686658','4685307'])

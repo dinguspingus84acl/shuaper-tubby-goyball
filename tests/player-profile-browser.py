@@ -316,6 +316,7 @@ def check_browser(browser,phone):
         return bands.length;
       };
       return {width:el.clientWidth,scrollWidth:el.scrollWidth,
+        display:getComputedStyle(el).display,template:getComputedStyle(el).gridTemplateColumns,
         columns:clusters(rects.map(r=>r.left)),rows:clusters(rects.map(r=>r.top)),
         positions:rects.map(r=>[Math.round(r.left),Math.round(r.top)])};
     }''')

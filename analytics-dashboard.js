@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   if (window.ShuaStudioLoader) return;
-  const version = '20261105-expanded-nav2';
+  const version = '20261105-expanded-nav3';
   const base = new URL('.', document.currentScript.src);
   const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js',
     'analytics/intelligence.js', 'analytics/intelligence-view.js',

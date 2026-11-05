@@ -282,12 +282,15 @@ def check_browser(browser,phone):
         page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]').click()
         selected=page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]')
         assert selected.is_visible() and selected.get_attribute('aria-selected')=='true',('Analytics navigation must stay visible after changing charts',view)
-    nav_size=page.locator('#shuaAnalyticsSection .st-navigation').evaluate('''el=>({
-      width:el.clientWidth,scrollWidth:el.scrollWidth,
-      columns:getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length
-    })''')
+    nav_size=page.locator('#shuaAnalyticsSection .st-navigation').evaluate('''el=>{
+      const rects=[...el.querySelectorAll('.st-tab')].map(b=>b.getBoundingClientRect());
+      return {width:el.clientWidth,scrollWidth:el.scrollWidth,
+        columns:new Set(rects.map(r=>Math.round(r.left))).size,
+        rows:new Set(rects.map(r=>Math.round(r.top))).size};
+    }''')
     assert nav_size['scrollWidth']<=nav_size['width']+2,('All Analytics choices must fit without sideways swiping',nav_size)
     assert nav_size['columns']==(2 if phone else 4),('Analytics choices must be displayed as an organized button grid',nav_size)
+    assert nav_size['rows']==(4 if phone else 2),('All eight Analytics choices should be laid out without hidden rows',nav_size)
     page.evaluate("window.ShuaStudio.UI.navigate('consistency')")
     analytic=page.locator('#stGlobalSearch')
     analytic.wait_for(state='visible',timeout=30000)

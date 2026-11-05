@@ -8,7 +8,7 @@ const read=name=>fs.readFileSync(path.join(root,name),'utf8');
 const js=read('clean-polish.js'),css=read('clean-polish.css'),html=read('index.html');
 new vm.Script(js,{filename:'clean-polish.js'});
 
-assert.ok(html.includes('clean-design.js?v=20261105-search-tools1'),'Preserve the existing Clean UI layer');
+assert.ok(html.includes('clean-design.js?v=20261105-search-tools2'),'Preserve the existing Clean UI layer');
 assert.ok(html.includes('clean-polish.css?v=20261103-10clean2')&&html.includes('clean-polish.js?v=20261103-10clean2'),'Load the second-pass improvements after Clean');
 assert.ok(css.includes('body.shua-clean #viewModeToggle{display:none!important}')&&js.includes('originalViewToggle.querySelector'),'Display settings are in Tools, but the manual override still works');
 assert.ok(js.includes('shua-polish-scrolled')&&css.includes('shua-polish-scrolled'),'Header should compact while scrolling');

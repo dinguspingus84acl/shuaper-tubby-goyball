@@ -101,7 +101,7 @@
     if(chart){
       const view=chart.dataset.shuaStudio;
       closeMenus();
-      const activate=api=>{api.navigate(view);requestAnimationFrame(syncSelected);};
+      const activate=api=>{api.navigate(view);syncSelected();requestAnimationFrame(syncSelected);};
       const api=window.ShuaStudio?.UI;
       if(api?.navigate)activate(api);
       else if(window.ShuaStudioLoader?.load){

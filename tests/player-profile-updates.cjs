@@ -101,9 +101,10 @@ for(const view of ['usage','intelligence','consistency','teams','injury','schedu
 assert.ok(cleanDesign.includes("data-shua-studio=")&&cleanDesign.includes('ShuaStudioLoader.load().then(activate)'),
  'Every Analytics bottom-menu option must open its dashboard directly');
 assert.ok(cleanDesign.includes("data-shua-search=\"players\"")&&cleanDesign.includes('ShuaPlayerSearch?.open?.()'),'Search current and historical players from the Tools menu');
+assert.ok(cleanDesign.includes('api.navigate(view);syncSelected();requestAnimationFrame(syncSelected);'),'The Analytics menu label must update synchronously with the selected dashboard');
 assert.ok(studioCss.includes('body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-layout'),
  'Analytics dashboards must use the whole width without a duplicate sidebar');
-assert.ok(html.includes('clean-design.js?v=20261105-search-tools1'));
+assert.ok(html.includes('clean-design.js?v=20261105-search-tools2'));
 assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261105-search-tools1'));
 assert.ok(html.includes('player-search.js?v=20261105-search-tools1')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
 assert.ok(loader.includes("const version = '20261105-search-tools1'"));

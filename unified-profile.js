@@ -866,7 +866,7 @@ function fillFeaturedBio(player,seed,bio){
   });
   const number=override.number??bio?.number??bio?.jersey_number;
   const meta=card.querySelector('.featured-team-meta');
-  if(meta)meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong> · '+canonicalTeam(player?.team||bio?.team||'—');
+  if(meta)meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong>';
   const jersey=card.querySelector('.featured-jersey-number');
   if(jersey)jersey.textContent=number!==null&&number!==undefined&&String(number)!==''?'#'+number:'';
   fitFeaturedName(card);
@@ -901,7 +901,7 @@ function applyFeaturedProfile(name,seed=null){
   hero.style.setProperty('--featured-accent',accent);
 
   const historical=!!seedYear(seed);
-  const initialMeta='<strong>'+String(player.position||'—')+'</strong>'+(historical?' · '+seedYear(seed):'');
+  const initialMeta='<strong>'+String(player.position||'—')+'</strong>';
   const stat=(label,value)=>'<div class="featured-bio-item"><span class="featured-bio-label">'+label+'</span><b class="featured-bio-value">'+value+'</b></div>';
 
   hero.innerHTML=

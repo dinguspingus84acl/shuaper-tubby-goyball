@@ -69,8 +69,8 @@ assert.ok(swipePreviewSource.includes('cachedSleeperBio(p.name,p.position,team)'
 assert.ok(swipePreviewSource.includes('paintSwipeProfilePanel(p,view,panel,preview,targetId)')&&swipePreviewSource.includes("content.className='preview-profile-content'"),'Swiping must show the selected player section below the bio, not just the hero and tabs');
 assert.ok(profile.includes('async function paintSwipeProfilePanel(')&&profile.includes('window.ShuaEspnLive.renderGameLog(name,panel)')&&profile.includes('window.ShuaPlayerHistory.render(name,panel)')&&profile.includes('window.ShuaStudio.UI.profile(name,panel)'),'The swipe preview must load the next player\'s Game Log, History and Analytics sections');
 const analyticsTabsCss=read('analytics/studio.css');
-assert.ok(analyticsTabsCss.includes('Expose every Analytics destination as a button')&&analyticsTabsCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))!important'),'Analytics should display all dashboard options as visible, non-scrolling mobile buttons');
-assert.ok(analyticsTabsCss.includes('[data-active-view="schedule"] .st-navigation')&&analyticsTabsCss.includes('[data-active-view="consistency"] .st-navigation'),'Analytics navigation should remain visible for Schedule and Consistency');
+assert.ok(!studio.includes('class="st-navigation"')&&!studio.includes('class="st-dashboard-picker"'),'The Analytics shell must not duplicate the bottom navigation');
+assert.ok(analyticsTabsCss.includes('The bottom navigation')&&analyticsTabsCss.includes('display:none!important'),'Obsolete in-page Analytics selectors must stay hidden');
 assert.ok(profile.includes('featured-name-ladd'),'Ladd surname must stay on one line');
 assert.ok(search.includes('faceHtml(p)')&&search.includes('legacy-stats/headshots.json'),'Search must use player photos');
 assert.ok(search.includes('shua-search-initials')&&search.includes('shua-search-face'),'Initials fallback required');
@@ -106,12 +106,12 @@ for(const view of ['usage','intelligence','consistency','teams','injury','schedu
  assert.ok(cleanDesign.includes("view:'"+view+"'"),'The Analytics bottom menu must include '+view);
 assert.ok(cleanDesign.includes("data-shua-studio=")&&cleanDesign.includes('ShuaStudioLoader.load().then(activate)'),
  'Every Analytics bottom-menu option must open its dashboard directly');
-assert.ok(studioCss.includes('body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation'),
- 'Expanded Analytics buttons must override the phone theme hiding the nav');
+assert.ok(studioCss.includes('body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-layout'),
+ 'Analytics dashboards must use the whole width without a duplicate sidebar');
 assert.ok(html.includes('clean-design.js?v=20261105-analytics-menu2'));
-assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261105-expanded-nav3'));
+assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261105-analytics-clean-top1'));
 assert.ok(html.includes('player-search.js?v=20261102-facefix1')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
-assert.ok(loader.includes("const version = '20261105-expanded-nav3'"));
+assert.ok(loader.includes("const version = '20261105-analytics-clean-top1'"));
 const faces=read('player-face-fix.js');
 new vm.Script(faces,{filename:'player-face-fix.js'});
 for(const id of ['4685278','3126486','4870653','4723820','4686658','4685307'])

@@ -286,13 +286,10 @@ def check_browser(browser,phone):
     page.wait_for_function('document.querySelector("#shuaAnalyticsSection")?.dataset.activeView==="usage"',timeout=30000)
     assert page.locator('#shuaGlobalSearchBar .shua-global-search-launch').is_visible(),'Analytics tab needs global search'
     page.wait_for_function('window.ShuaStudio?.UI?.navigate !== undefined',timeout=25000)
-    dashboards=page.locator('#shuaAnalyticsSection .st-navigation .st-tab')
-    dashboards.first.wait_for(state='visible',timeout=25000)
-    assert dashboards.count()==8,'All eight Analytics destinations must be available as buttons'
-    assert page.locator('#shuaAnalyticsSection .st-dashboard-picker').is_hidden(),'Analytics should not rely on a chart dropdown'
-    for view in ('usage','schedule','consistency','weekly'):
-        button=page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]')
-        assert button.is_visible(),('Analytics option must be visible and clickable',view,phone)
+    assert page.locator('#shuaAnalyticsSection .st-navigation').count()==0,'Do not repeat the bottom Analytics menu inside a dashboard'
+    assert page.locator('#shuaAnalyticsSection .st-dashboard-picker').count()==0,'Do not add a duplicate chart dropdown'
+    assert page.locator('#shuaAnalyticsSection #stWorkspace').is_visible(),'Keep the chart workspace immediately below search'
+    assert page.locator('#shuaAnalyticsSection #stContent').is_visible(),'The active Analytics chart must remain visible'
     for view in ('schedule','consistency','weekly'):
         analytics_trigger.click()
         option=analytics_menu.locator('[data-shua-studio="'+view+'"]')
@@ -302,27 +299,8 @@ def check_browser(browser,phone):
         assert analytics_trigger.locator('.shua-clean-current').text_content().strip()=={
             'schedule':'Schedule','consistency':'Consistency','weekly':'Weekly Report'
         }[view]
-    for view in ('schedule','consistency'):
-        page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]').click()
-        selected=page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]')
-        assert selected.is_visible() and selected.get_attribute('aria-selected')=='true',('Analytics navigation must stay visible after changing charts',view)
-    nav_size=page.locator('#shuaAnalyticsSection .st-navigation').evaluate('''el=>{
-      const rects=[...el.querySelectorAll('.st-tab')].map(b=>b.getBoundingClientRect());
-      const clusters=values=>{
-        const bands=[];
-        for(const value of values){
-          if(!bands.some(x=>Math.abs(x-value)<5))bands.push(value);
-        }
-        return bands.length;
-      };
-      return {width:el.clientWidth,scrollWidth:el.scrollWidth,
-        display:getComputedStyle(el).display,template:getComputedStyle(el).gridTemplateColumns,
-        columns:clusters(rects.map(r=>r.left)),rows:clusters(rects.map(r=>r.top)),
-        positions:rects.map(r=>[Math.round(r.left),Math.round(r.top)])};
-    }''')
-    assert nav_size['scrollWidth']<=nav_size['width']+2,('All Analytics choices must fit without sideways swiping',nav_size)
-    assert nav_size['columns']==(2 if phone else 4),('Analytics choices must be displayed as an organized button grid',nav_size)
-    assert nav_size['rows']==(4 if phone else 2),('All eight Analytics choices should be laid out without hidden rows',nav_size)
+        assert page.locator('#shuaAnalyticsSection .st-navigation').count()==0,('In-page chart navigation must stay removed',view,phone)
+        assert page.locator('#shuaAnalyticsSection #stWorkspace').is_visible(),('Every dashboard must fill the workspace',view,phone)
     page.evaluate("window.ShuaStudio.UI.navigate('consistency')")
     analytic=page.locator('#stGlobalSearch')
     analytic.wait_for(state='visible',timeout=30000)

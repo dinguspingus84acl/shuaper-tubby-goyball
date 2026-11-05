@@ -1098,102 +1098,29 @@ body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-osp-heading{
  #shuaAnalyticsSection .st-global-search-inputrow{gap:8px}
 }
 
-/* Expose every Analytics destination as a button, including Schedule and
-   Consistency. No collapsed picker or sideways-swiping navigation. */
+/* Only the selected chart is displayed inside Analytics. The bottom navigation
+   provides all dashboard choices, so no in-page selector or empty sidebar. */
+#shuaAnalyticsSection .st-navigation,
 #shuaAnalyticsSection .st-dashboard-picker,
-#shuaAnalyticsSection[data-active-view="schedule"] .st-dashboard-picker,
-#shuaAnalyticsSection[data-active-view="consistency"] .st-dashboard-picker{
+body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation,
+body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-dashboard-picker{
  display:none!important;
 }
 #shuaAnalyticsSection .st-layout,
-#shuaAnalyticsSection[data-active-view="schedule"] .st-layout,
-#shuaAnalyticsSection[data-active-view="consistency"] .st-layout{
- display:flex!important;flex-direction:column!important;gap:10px!important;
- min-width:0!important;width:100%!important;max-width:none!important;
+body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-layout{
+ display:block!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ gap:0!important;
+ padding:0!important;
+ margin:0!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:none!important;
 }
-#shuaAnalyticsSection .st-navigation,
-#shuaAnalyticsSection[data-active-view="schedule"] .st-navigation,
-#shuaAnalyticsSection[data-active-view="consistency"] .st-navigation{
- display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
- width:100%!important;box-sizing:border-box;position:static!important;top:auto!important;
- overflow:visible!important;gap:6px!important;padding:7px!important;margin:0!important;
- border-radius:12px!important;background:#071a2cee!important;
-}
-#shuaAnalyticsSection .st-navigation .st-tab{
- display:flex!important;justify-content:center!important;align-items:center!important;
- min-width:0!important;min-height:43px!important;padding:7px 9px!important;
- border:1px solid #28485e!important;border-radius:8px!important;
- background:#0c263a!important;color:#b8cedc!important;
- text-align:center!important;font-size:clamp(11px,1vw,13px)!important;
- font-weight:850!important;white-space:normal!important;line-height:1.2!important;
-}
-#shuaAnalyticsSection .st-navigation .st-tab span{display:none!important}
-#shuaAnalyticsSection .st-navigation .st-tab[aria-selected="true"]{
- background:#155244!important;border-color:#35a98e!important;
- box-shadow:inset 0 -2px #46d6a7!important;color:#f0fff9!important;
-}
-#shuaAnalyticsSection .st-navigation .st-tab:focus-visible{
- outline:2px solid #56e6b5!important;outline-offset:1px!important;
-}
-#shuaAnalyticsSection .st-workspace{min-width:0!important;width:100%!important;max-width:none!important}
-@media(max-width:700px){
- #shuaAnalyticsSection .st-navigation,
- #shuaAnalyticsSection[data-active-view="schedule"] .st-navigation,
- #shuaAnalyticsSection[data-active-view="consistency"] .st-navigation{
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:5px!important;padding:5px!important;
- }
- #shuaAnalyticsSection .st-navigation .st-tab{
-  min-height:39px!important;padding:6px 5px!important;font-size:11px!important;
- }
-}
-
-/* The site's bottom-navigation theme otherwise overrides the Studio selector,
-   turning the eight dashboard buttons into a single vertical stack (or hiding
-   them entirely on phones). Match that theme's specificity explicitly. */
-body.shua-clean #shuaAnalyticsSection .st-dashboard-picker,
-body.shua-clean.phone-mode #shuaAnalyticsSection .st-dashboard-picker{
- display:none!important;
-}
-body.shua-clean #shuaAnalyticsSection .st-navigation,
-body.shua-clean:not(.phone-mode) #shuaAnalyticsSection .st-navigation,
-body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation,
-body.shua-clean:not(.phone-mode) #shuaAnalyticsSection[data-active-view="schedule"] .st-navigation{
- display:grid!important;flex-direction:initial!important;
- grid-template-columns:repeat(4,minmax(0,1fr))!important;
- position:static!important;width:100%!important;margin:0!important;
-}
-@media(max-width:700px){
- body.shua-clean #shuaAnalyticsSection .st-navigation,
- body.shua-clean:not(.phone-mode) #shuaAnalyticsSection .st-navigation,
- body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation{
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
- }
-}
-body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation{
- grid-template-columns:repeat(2,minmax(0,1fr))!important;
-}
-
-/* Beat the theme's state-specific desktop flex navigation and mobile dropdown
-   rules, even when older theme sheets finish loading after Studio. */
-body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-dashboard-picker,
-body.shua-clean.phone-mode #shuaAnalyticsSection.st-studio[data-active-view] .st-dashboard-picker{
- display:none!important;
-}
-body.shua-clean:not(.phone-mode) #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation,
-body.shua-clean.phone-mode #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation,
-body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation{
- display:grid!important;
- grid-template-columns:repeat(4,minmax(0,1fr))!important;
- flex-direction:initial!important;position:static!important;
- margin:0!important;width:100%!important;
-}
-@media(max-width:700px){
- body.shua-clean:not(.phone-mode) #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation,
- body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation{
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
- }
-}
-body.shua-clean.phone-mode #shuaAnalyticsSection.st-studio[data-active-view] .st-navigation{
- grid-template-columns:repeat(2,minmax(0,1fr))!important;
+#shuaAnalyticsSection .st-workspace{
+ width:100%!important;
+ min-width:0!important;
+ max-width:none!important;
+ margin:0!important;
+ padding:0!important;
 }

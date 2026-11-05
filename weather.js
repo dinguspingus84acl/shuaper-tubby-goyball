@@ -132,6 +132,27 @@
       return {emoji:'☁️',label:'Partly cloudy night'};
     return sky;
   }
+  // Use the most frequent published sky condition during play as the card's
+  // at-a-glance emoji. Tie-breakers favor the earliest game hour; never
+  // fabricate a condition when the hourly forecast is missing.
+  function gameSky(game){
+    if(game.indoor)return {emoji:'🏟️',label:'Indoor stadium'};
+    const hours=(game.forecast?.hourly||[]).filter(h=>h.inGame&&skyConditions[String(h.sky||'').toLowerCase()]);
+    if(!hours.length)return null;
+    const counts=new Map();
+    for(const h of hours){
+      const code=String(h.sky).toLowerCase();
+      counts.set(code,(counts.get(code)||0)+1);
+    }
+    const mostCommon=hours.reduce((best,h)=>counts.get(String(h.sky).toLowerCase())>counts.get(String(best.sky).toLowerCase())?h:best,hours[0]);
+    return hourlySky(mostCommon.sky,mostCommon.time,game)||null;
+  }
+  function gameSkyIcon(game){
+    const sky=gameSky(game);
+    if(!sky)return '';
+    const description=(game.indoor?'Indoor game':'Typical game-hour weather')+': '+sky.label;
+    return '<span class="wx-game-sky" role="img" aria-label="'+escape(description)+'" title="'+escape(description)+'">'+sky.emoji+'</span>';
+  }
   function hourClock(value){
     const raw=String(value||'').trim();
     const match=raw.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
@@ -173,7 +194,7 @@
       '<span class="wx-impact wx-impact-pending">Forecast pending</span></article>';
     const fixture='<div class="wx-matchup"><div class="wx-team">'+logo(game.away)+'<span><b>'+escape(game.away.abbr)+'</b><small>'+escape(game.away.name)+'</small></span></div><span class="wx-versus">AT</span><div class="wx-team">'+logo(game.home)+'<span><b>'+escape(game.home.abbr)+'</b><small>'+escape(game.home.name)+'</small></span></div></div>';
     const venue='<div class="wx-venue">'+escape(game.venue||'Venue TBA')+(game.city?' · '+escape(game.city):'')+'</div>';
-    const header='<div class="wx-game-top"><div class="wx-kick">Week '+escape(game.week??'—')+' <span>·</span> '+escape(formatDate(game.kickoffUtc))+'</div><span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div>';
+    const header='<div class="wx-game-top"><div class="wx-kick">Week '+escape(game.week??'—')+' <span>·</span> '+escape(formatDate(game.kickoffUtc))+'</div><div class="wx-game-conditions">'+gameSkyIcon(game)+'<span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div></div>';
     // All fixed-roof venues, including the Saints at Caesars Superdome, use
     // the identical compact indoor layout regardless of stray forecast fields.
     if(game.indoor)return '<article class="wx-game wx-indoor-game" data-weather-game="'+escape(game.id)+'">'+

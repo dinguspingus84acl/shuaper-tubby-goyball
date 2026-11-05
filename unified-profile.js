@@ -901,7 +901,7 @@ function applyFeaturedProfile(name,seed=null){
   hero.style.setProperty('--featured-accent',accent);
 
   const historical=!!seedYear(seed);
-  const initialMeta='<strong>'+String(player.position||'—')+'</strong> · '+canonicalTeam(team)+(historical?' · '+seedYear(seed):'');
+  const initialMeta='<strong>'+String(player.position||'—')+'</strong>'+(historical?' · '+seedYear(seed):'');
   const stat=(label,value)=>'<div class="featured-bio-item"><span class="featured-bio-label">'+label+'</span><b class="featured-bio-value">'+value+'</b></div>';
 
   hero.innerHTML=
@@ -910,14 +910,14 @@ function applyFeaturedProfile(name,seed=null){
         (logo&&!defense?'<img class="featured-bg-logo" src="'+logo+'" alt="">':'')+
         featuredFaceHtml(player)+
       '</div>'+
+    '</div>'+
+    '<div class="featured-right">'+
+      '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span><span class="featured-jersey-number" aria-label="Jersey number"></span></span></h2>'+
       '<div class="featured-team-strip">'+
         (defense?'':logo?'<img class="featured-mini-logo" src="'+logo+'" alt="'+teamName+' logo">':'<span></span>')+
         (defense?'':'<span class="featured-divider"></span>')+
         '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div><div class="featured-team-meta">'+initialMeta+'</div></div>'+
       '</div>'+
-    '</div>'+
-    '<div class="featured-right">'+
-      '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span><span class="featured-jersey-number" aria-label="Jersey number"></span></span></h2>'+
       '<div class="featured-bio">'+
         (defense?stat('POSITION','D/ST')+stat('TEAM',team)+stat('SEASON','2026')+stat('TYPE','DEFENSE')
           :historical
@@ -1331,7 +1331,7 @@ function ensurePlayerSwipePreview(targetId){
   const strip=copy.querySelector('.featured-team-strip');
   if(strip)strip.innerHTML=(p.position==='D/ST'?'':logo?'<img class="featured-mini-logo" src="'+logo+'" alt="">':'<span></span>')+
     (p.position==='D/ST'?'':'<span class="featured-divider"></span>')+
-    '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div><div class="featured-team-meta"><strong>'+String(p.position||'—')+'</strong> · '+canonicalTeam(team)+'</div></div>';
+    '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div><div class="featured-team-meta"><strong>'+String(p.position||'—')+'</strong></div></div>';
   const parts=featuredNameParts(p.name);
   const first=copy.querySelector('.featured-first'),last=copy.querySelector('.featured-last');
   if(first)first.textContent=parts.first;

@@ -138,8 +138,9 @@ body.shua-clean .featured-player-card.broadcast-card .featured-mini-logo{
   object-fit:contain!important;
   filter:drop-shadow(0 1px 4px #0008)!important;
 }
-body.shua-clean .featured-player-card.broadcast-card .featured-divider{
+body.shua-clean .featured-player-card.broadcast-card .featured-team-strip>span.featured-divider{
   display:block!important;
+  visibility:visible!important;
   flex:0 0 2px!important;
   width:2px!important;
   height:clamp(27px,3.7vw,51px)!important;

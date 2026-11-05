@@ -940,7 +940,7 @@ function applyFeaturedProfile(name,seed=null){
     '<div class="featured-right">'+
       '<div class="featured-team-strip">'+
         (logo?'<img class="featured-mini-logo" src="'+logo+'" alt="">':'')+
-        (logo?'<span class="featured-divider" aria-hidden="true"></span>':'')+
+        (logo?'<span class="featured-divider" aria-hidden="true">&#8203;</span>':'')+
         '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div></div>'+
       '</div>'+
       '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span></span></h2>'+
@@ -1356,8 +1356,8 @@ function ensurePlayerSwipePreview(targetId){
   const face=copy.querySelector('.featured-portrait-box');
   if(face)face.innerHTML=(logo&&p.position!=='D/ST'?'<img class="featured-bg-logo" src="'+logo+'" alt="">':'')+featuredFaceHtml(p);
   const strip=copy.querySelector('.featured-team-strip');
-  if(strip)strip.innerHTML=(p.position==='D/ST'?'':logo?'<img class="featured-mini-logo" src="'+logo+'" alt="">':'<span></span>')+
-    (p.position==='D/ST'?'':'<span class="featured-divider"></span>')+
+  if(strip)strip.innerHTML=(logo?'<img class="featured-mini-logo" src="'+logo+'" alt="">':'')+
+    (logo?'<span class="featured-divider" aria-hidden="true">&#8203;</span>':'')+
     '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div><div class="featured-team-meta"><strong>'+String(p.position||'—')+'</strong></div></div>';
   const parts=featuredNameParts(p.name);
   const first=copy.querySelector('.featured-first'),last=copy.querySelector('.featured-last');

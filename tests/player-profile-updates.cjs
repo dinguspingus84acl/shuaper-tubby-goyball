@@ -67,8 +67,9 @@ assert.ok(profile.includes("if(meta)meta.innerHTML='<strong>'+String(player?.pos
 const latestProfileCss=read('broadcast-player-card.css');
 assert.ok(latestProfileCss.includes('left:49%!important')&&latestProfileCss.includes('grid-column:1 / -1!important'),'The logo stays behind the portrait and stats span the entire broadcast card');
 assert.ok(latestProfileCss.includes('.featured-mini-logo')&&latestProfileCss.includes('.featured-divider'),'Broadcast team identity needs its small team logo and vertical divider');
+assert.ok(profile.includes('&#8203;</span>')&&latestProfileCss.includes('.featured-team-strip>span.featured-divider'),'Logo divider must remain visible despite the legacy empty-span hiding rule');
 assert.ok(latestProfileCss.includes('.featured-team-meta strong')&&latestProfileCss.includes('featured-jersey-number:empty + .featured-identity-divider'),'Number and position must remain aligned, even for missing jersey numbers');
-assert.ok(html.includes('broadcast-player-card.css?v=20261105-broadcast2'),'The new broadcast styling must load after the older overrides');
+assert.ok(html.includes('broadcast-player-card.css?v=20261105-broadcast3'),'The new broadcast styling must load after the older overrides');
 assert.ok(profile.includes("['performance','Analytics']"),'Player card Performance tab must read Analytics');
 assert.ok(profile.includes('playerDepthChartButton')&&profile.includes('openTeamDepthChart(team)'),'Player card needs its team depth-chart button');
 assert.ok(profile.includes('canonicalTeam(option.value)===canonicalTeam(team)'),'Team depth chart navigation must resolve league abbreviation aliases');

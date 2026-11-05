@@ -12,8 +12,8 @@ for(const f of ['unified-profile.js','espn-live.js','player-history.js','analyti
  new vm.Script(read(f),{filename:f});
 for(const [,code] of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))
  if(code.trim())new vm.Script(code);
-assert.ok(profile.includes('<span class="featured-jersey-number" aria-label="Jersey number"></span></span></h2>'), 'Jersey number must be in last-name flex row');
-assert.ok(profile.includes('flex-flow:row nowrap!important')&&profile.includes('position:static!important'),'Jersey cannot be positioned over a name');
+assert.ok(profile.includes('featured-identity-meta')&&profile.includes('featured-identity-divider'),'Jersey number and position must share a separated line below the name');
+assert.ok(profile.includes('featured-player-card broadcast-card')&&profile.includes("card.classList.contains('broadcast-card')?available"),'The broadcast card must fit the surname without subtracting the jersey width');
 assert.ok(profile.includes('function fitFeaturedName(card)')&&profile.includes('white-space:nowrap!important;overflow-wrap:normal!important'),'All names must fit on exactly two lines');
 assert.ok(studio.includes("target.innerHTML=C.line({title:'Weekly scoring',labels:gs.map(g=>'W'+g.week),series:[{name:'PPR',values:gs.map(g=>g.points)}]}"));
 assert.ok(!studio.includes("target.innerHTML=C.line({title:'Weekly scoring',labels:gs.map(g=>'W'+g.week),series:[{name:'PPR',values:gs.map(g=>g.points)},{name:'3-game average'"));
@@ -64,8 +64,10 @@ assert.ok(studio.includes("magnifier.toggleAttribute('hidden',!!player)"),'Analy
 assert.ok(studioCss.includes('.st-global-leading-avatar'),'Analytics leading face styling required');
 assert.ok(/unified-profile\.js\?v=[A-Za-z0-9-]+/.test(html)&&html.includes('player-search.js?v=20261102-facefix1'));
 assert.ok(profile.includes("if(meta)meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong>';"),'Player identity should not repeat the team abbreviation');
-const latestProfileCss=read('clean-tenth.css');
-assert.ok(latestProfileCss.includes('left:50%!important;top:50%!important')&&latestProfileCss.includes('grid-template-columns:30px minmax(0,1fr) max-content!important'),'Portrait logo and team metadata must be centered and aligned');
+const latestProfileCss=read('broadcast-player-card.css');
+assert.ok(latestProfileCss.includes('left:49%!important')&&latestProfileCss.includes('grid-column:1 / -1!important'),'The logo stays behind the portrait and stats span the entire broadcast card');
+assert.ok(latestProfileCss.includes('.featured-team-meta strong')&&latestProfileCss.includes('featured-jersey-number:empty + .featured-identity-divider'),'Number and position must remain aligned, even for missing jersey numbers');
+assert.ok(html.includes('broadcast-player-card.css?v=20261105-broadcast1'),'The new broadcast styling must load after the older overrides');
 assert.ok(profile.includes("['performance','Analytics']"),'Player card Performance tab must read Analytics');
 assert.ok(profile.includes('playerDepthChartButton')&&profile.includes('openTeamDepthChart(team)'),'Player card needs its team depth-chart button');
 assert.ok(profile.includes('canonicalTeam(option.value)===canonicalTeam(team)'),'Team depth chart navigation must resolve league abbreviation aliases');
@@ -100,4 +102,4 @@ assert.ok(rbCss.includes('grid-template-columns:54px minmax(0,1fr)'),'Show every
 assert.ok(rbCss.includes('white-space:normal!important')&&rbCss.includes('overflow:visible!important'),'Allow full position names to wrap instead of ellipsis');
 assert.ok(live.includes("credentials:'omit'")&&live.includes('view=mTeam&view=mRoster&view=mStatus'));
 assert.ok(live.includes('visibilitychange')&&live.includes('lastSuccess'));
-console.log('PASS: inline jersey, all two-line names, larger fixed game-log tables, rushing-style Snap Rates, global search on every tab, interactive swipe, and existing search/roster safeguards.');
+console.log('PASS: broadcast player cards, number | position identity, all two-line names, uniform game logs, Snap Rates, global search and swipe safeguards.');

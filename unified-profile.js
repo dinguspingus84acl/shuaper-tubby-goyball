@@ -21,6 +21,16 @@ const TEAM_NAMES={
   PHI:'EAGLES',PIT:'STEELERS',SEA:'SEAHAWKS',SF:'49ERS',SFO:'49ERS',TB:'BUCCANEERS',TAM:'BUCCANEERS',
   TEN:'TITANS',WAS:'COMMANDERS',WSH:'COMMANDERS'
 };
+const TEAM_FULL_NAMES={
+  ARI:'ARIZONA CARDINALS',ATL:'ATLANTA FALCONS',BAL:'BALTIMORE RAVENS',BUF:'BUFFALO BILLS',
+  CAR:'CAROLINA PANTHERS',CHI:'CHICAGO BEARS',CIN:'CINCINNATI BENGALS',CLE:'CLEVELAND BROWNS',
+  DAL:'DALLAS COWBOYS',DEN:'DENVER BRONCOS',DET:'DETROIT LIONS',GB:'GREEN BAY PACKERS',
+  HOU:'HOUSTON TEXANS',IND:'INDIANAPOLIS COLTS',JAX:'JACKSONVILLE JAGUARS',KC:'KANSAS CITY CHIEFS',
+  LAC:'LOS ANGELES CHARGERS',LAR:'LOS ANGELES RAMS',LV:'LAS VEGAS RAIDERS',MIA:'MIAMI DOLPHINS',
+  MIN:'MINNESOTA VIKINGS',NE:'NEW ENGLAND PATRIOTS',NO:'NEW ORLEANS SAINTS',NYG:'NEW YORK GIANTS',
+  NYJ:'NEW YORK JETS',PHI:'PHILADELPHIA EAGLES',PIT:'PITTSBURGH STEELERS',SEA:'SEATTLE SEAHAWKS',
+  SF:'SAN FRANCISCO 49ERS',TB:'TAMPA BAY BUCCANEERS',TEN:'TENNESSEE TITANS',WAS:'WASHINGTON COMMANDERS'
+};
 const TEAM_CANON={GNB:'GB',KAN:'KC',LVR:'LV',NWE:'NE',NOR:'NO',SFO:'SF',TAM:'TB',WSH:'WAS',JAC:'JAX',OAK:'LV',STL:'LAR',SD:'LAC'};
 const TEAM_ACCENTS={
   ARI:'#97233f',ATL:'#a71930',BAL:'#6a4c93',BUF:'#2f7ed8',CAR:'#0085ca',CHI:'#c83803',CIN:'#fb4f14',CLE:'#ff3c00',
@@ -28,6 +38,14 @@ const TEAM_ACCENTS={
   LAC:'#0080c6',LAR:'#3f65a8',LV:'#a5acaf',MIA:'#00a3a8',MIN:'#6b4c9a',NE:'#c60c30',NO:'#d3bc8d',
   NYG:'#3568b8',NYJ:'#2b7a55',PHI:'#007078',PIT:'#ffb612',SEA:'#3f8ed8',SF:'#c9243f',TB:'#d50a0a',
   TEN:'#4b92db',WAS:'#7b2638'
+};
+const TEAM_SECONDARY_ACCENTS={
+  ARI:'#ffb612',ATL:'#a5acaf',BAL:'#9e7c0c',BUF:'#c60c30',CAR:'#bfc0bf',CHI:'#c83803',
+  CIN:'#ffffff',CLE:'#311d00',DAL:'#869397',DEN:'#002244',DET:'#b0b7bc',GB:'#ffb612',
+  HOU:'#a71930',IND:'#a2aaad',JAX:'#d7a22a',KC:'#ffb81c',LAC:'#ffc20e',LAR:'#ffd100',
+  LV:'#a5acaf',MIA:'#fc4c02',MIN:'#ffc62f',NE:'#c60c30',NO:'#d3bc8d',NYG:'#a71930',
+  NYJ:'#2b7a55',PHI:'#a5acaf',PIT:'#ffb612',SEA:'#69be28',SF:'#b3995d',TB:'#ff7900',
+  TEN:'#c8102e',WAS:'#ffb612'
 };
 let sleeperBioPromise=null;
 let activeSeed=null;
@@ -689,6 +707,10 @@ function featuredTeamName(team){
   const raw=String(team||'').trim().toUpperCase();
   return TEAM_NAMES[raw]||TEAM_NAMES[canonicalTeam(raw)]||raw||'TEAM';
 }
+function featuredFullTeamName(team){
+  const key=canonicalTeam(team);
+  return TEAM_FULL_NAMES[key]||featuredTeamName(team);
+}
 function featuredLogoUrl(team){
   const raw=String(team||'').trim().toUpperCase();
   try{
@@ -753,7 +775,7 @@ function fitFeaturedName(card){
   };
   fit(first,available);
   const jerseyWidth=jersey?.textContent.trim()?jersey.getBoundingClientRect().width:0;
-  fit(last,Math.max(12,available-jerseyWidth-(jerseyWidth?8:0)));
+  fit(last,card.classList.contains('broadcast-card')?available:Math.max(12,available-jerseyWidth-(jerseyWidth?8:0)));
 }
 window.addEventListener('resize',()=>requestAnimationFrame(()=>fitFeaturedName(document.getElementById('featuredPlayerCard'))));
 function clearFeaturedProfile(){
@@ -864,7 +886,7 @@ function fillFeaturedBio(player,seed,bio){
     const el=card.querySelectorAll('.featured-bio-item')[i];
     if(el){el.querySelector('.featured-bio-label').textContent=label;el.querySelector('.featured-bio-value').textContent=value}
   });
-  const number=override.number??bio?.number??bio?.jersey_number;
+  const number=override.number??bio?.number??bio?.jersey_number??player?.jersey_number??player?.jerseyNumber??player?.number;
   const meta=card.querySelector('.featured-team-meta');
   if(meta)meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong>';
   const jersey=card.querySelector('.featured-jersey-number');
@@ -878,7 +900,7 @@ function applyFeaturedProfile(name,seed=null){
   if(!player)return false;
   const team=String(player.team||'').toUpperCase();
   const defense=player.position==='D/ST';
-  const teamName=featuredTeamName(team);
+  const teamName=featuredFullTeamName(team);
   const logo=featuredLogoUrl(team);
   const parts=featuredNameParts(player.name||name);
   const box=document.querySelector('#modal .profile');
@@ -891,7 +913,7 @@ function applyFeaturedProfile(name,seed=null){
 
   const hero=document.createElement('section');
   hero.id='featuredPlayerCard';
-  hero.className='featured-player-card';
+  hero.className='featured-player-card broadcast-card';
   if(defense)hero.classList.add('featured-defense-profile');
   const nameLength=String(player.name||name).replace(/\s+/g,'').length;
   if(nameLength>=18)hero.classList.add('featured-name-xlong');
@@ -899,6 +921,7 @@ function applyFeaturedProfile(name,seed=null){
   if(norm(player.name||name)==='laddmcconkey')hero.classList.add('featured-name-ladd');
   if(teamName.length>=9)hero.classList.add('featured-team-long');
   hero.style.setProperty('--featured-accent',accent);
+  hero.style.setProperty('--featured-secondary',TEAM_SECONDARY_ACCENTS[canonicalTeam(team)]||accent);
 
   const historical=!!seedYear(seed);
   const initialMeta='<strong>'+String(player.position||'—')+'</strong>';
@@ -912,18 +935,17 @@ function applyFeaturedProfile(name,seed=null){
       '</div>'+
     '</div>'+
     '<div class="featured-right">'+
-      '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span><span class="featured-jersey-number" aria-label="Jersey number"></span></span></h2>'+
       '<div class="featured-team-strip">'+
-        (defense?'':logo?'<img class="featured-mini-logo" src="'+logo+'" alt="'+teamName+' logo">':'<span></span>')+
-        (defense?'':'<span class="featured-divider"></span>')+
-        '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div><div class="featured-team-meta">'+initialMeta+'</div></div>'+
+        '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div></div>'+
       '</div>'+
-      '<div class="featured-bio">'+
+      '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span></span></h2>'+
+      '<div class="featured-identity-meta"><span class="featured-jersey-number" aria-label="Jersey number"></span><span class="featured-identity-divider" aria-hidden="true"></span><span class="featured-team-meta">'+initialMeta+'</span></div>'+
+    '</div>'+
+    '<div class="featured-bio">'+
         (defense?stat('POSITION','D/ST')+stat('TEAM',team)+stat('SEASON','2026')+stat('TYPE','DEFENSE')
           :historical
           ? stat('YEAR',String(seedYear(seed)))+stat('PPR PTS',Number.isFinite(Number(seed?.points))?Number(seed.points).toFixed(1):'—')+stat('PPG',Number.isFinite(Number(seed?.average))?Number(seed.average).toFixed(1):'—')+stat('GP',Number.isFinite(Number(seed?.gamesPlayed))?String(Number(seed.gamesPlayed)):'—')
           : stat('AGE','…')+stat('HEIGHT','…')+stat('WEIGHT','…')+stat('EXP','…'))+
-      '</div>'+
     '</div>';
 
   tabs.insertAdjacentElement('beforebegin',hero);

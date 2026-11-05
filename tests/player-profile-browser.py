@@ -85,6 +85,24 @@ def check_browser(browser,phone):
     values=page.evaluate("({selected:document.querySelector('#modal')?.dataset?.unifiedName,plain:document.querySelector('#pn')?.textContent,first:document.querySelector('#featuredPlayerCard .featured-first')?.textContent,last:document.querySelector('#featuredPlayerCard .featured-last')?.textContent})")
     print('PROFILE TRACE',values,flush=True)
     page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Robinson')",timeout=12000)
+    assert 'broadcast-card' in (hero.get_attribute('class') or ''),'Every player must use the broadcast identity design'
+    assert hero.locator('.featured-mini-logo').count()==0,'The small logo must not return beside the team name'
+    assert hero.locator('.featured-team-name').inner_text().strip()=='ATLANTA FALCONS','Use the full city and team name'
+    assert hero.locator('.featured-bio-item').count()==4,'The footer must remain a single four-stat strip'
+    layout=hero.evaluate('''card=>{
+      const rect=selector=>card.querySelector(selector)?.getBoundingClientRect();
+      const team=rect('.featured-team-name'),first=rect('.featured-first'),last=rect('.featured-last');
+      const identity=rect('.featured-identity-meta'),footer=rect('.featured-bio'),frame=card.getBoundingClientRect();
+      return {teamX:team.left,firstX:first.left,lastX:last.left,teamBottom:team.bottom,
+              firstTop:first.top,lastBottom:last.bottom,identityTop:identity.top,
+              footerTop:footer.top,footerRight:footer.right,frameRight:frame.right};
+    }''')
+    assert abs(layout['teamX']-layout['firstX'])<=7,('Team name must align with given name',layout)
+    assert abs(layout['lastX']-layout['firstX'])<=7,('First and last name must align',layout)
+    assert layout['teamBottom']<layout['firstTop']+2,('Team label must be above name',layout)
+    assert layout['lastBottom']<=layout['identityTop']+5,('Number and position must be below surname',layout)
+    assert layout['identityTop']<layout['footerTop'],('Identity block belongs above stat rail',layout)
+    assert abs(layout['footerRight']-layout['frameRight'])<=4,('Stat rail must span full card',layout)
     if phone:
         # Use the longest plausible weight label even if offline bio fetching
         # leaves a placeholder; its entire text must fit inside its tile.
@@ -98,12 +116,14 @@ def check_browser(browser,phone):
           return {textRight:text.right,tileRight:tile.right,textWidth:text.width,tileWidth:tile.width};
         }''')
         assert fit['textRight']<=fit['tileRight']-1,('Weight must fit without clipping on phone',fit)
-    a=hero.locator('.featured-last').bounding_box()
-    b=hero.locator('.featured-jersey-number').bounding_box()
-    if a and b:
-        assert b['x']>=a['x']+a['width']-3,('Jersey must be right of surname',a,b)
-        assert abs((b['y']+b['height'])-(a['y']+a['height']))<=13,('Jersey should align with surname',a,b)
-        assert not (a['x']+a['width']>b['x']+3 and a['y']+a['height']>b['y']),'Jersey overlaps name'
+    meta=hero.locator('.featured-identity-meta')
+    number=meta.locator('.featured-jersey-number')
+    position=meta.locator('.featured-team-meta strong')
+    assert position.inner_text().strip()=='RB','Player position must appear beneath the name'
+    if number.inner_text().strip():
+        a=number.bounding_box();b=position.bounding_box()
+        assert a and b and b['x']>a['x']+a['width'],('Display jersey number | position in that order',a,b)
+        assert abs(a['y']-b['y'])<=5,('Jersey and position must share one row',a,b)
     page.locator('[data-profile-tab="performance"]').click()
     performance=page.locator('#unifiedPerformancePanel')
     performance.wait_for(state='visible',timeout=10000)
@@ -148,7 +168,7 @@ def check_browser(browser,phone):
     if phone:
         snap_width=snap.locator('.espn-game-log-table-wrap').evaluate('(el)=>({total:el.scrollWidth,visible:el.clientWidth})')
         assert snap_width['total']<=snap_width['visible']+2,('Snap Rates should not swipe horizontally',snap_width)
-    # Short and long surnames must all occupy one line beneath the given name.
+    # Short and long surnames stay on one line; jersey is now below the surname.
     for full_name,last_piece in [('Ladd McConkey','McConkey'),('Jaxon Smith-Njigba','Smith-Njigba'),('Amon-Ra St. Brown','St. Brown')]:
         page.evaluate('(name)=>window.openUnifiedPlayerProfileByName(name)',full_name)
         page.wait_for_function('last=>document.querySelector("#modal.open #featuredPlayerCard .featured-last")?.textContent?.includes(last)',arg=last_piece,timeout=18000)
@@ -159,14 +179,15 @@ def check_browser(browser,phone):
         fit=longname.locator('.featured-last').evaluate('''el=>{
             const r=document.createRange();r.selectNodeContents(el);
             const rects=[...r.getClientRects()].filter(x=>x.width>0);
-            const row=el.closest('.featured-last-row').getBoundingClientRect();
-            const number=el.closest('.featured-last-row').querySelector('.featured-jersey-number').getBoundingClientRect();
-            return {lines:rects.length,textRight:Math.max(...rects.map(x=>x.right)),numberLeft:number.left,
-                    numberRight:number.right,rowRight:row.right};
+            const row=el.closest('.featured-name').getBoundingClientRect();
+            const number=el.closest('.broadcast-card').querySelector('.featured-jersey-number').getBoundingClientRect();
+            const last=el.getBoundingClientRect();
+            return {lines:rects.length,textRight:Math.max(...rects.map(x=>x.right)),
+                    numberTop:number.top,lastBottom:last.bottom,rowRight:row.right};
         }''')
         assert fit['lines']==1,('Surname wrapped onto a third row',full_name,fit)
-        assert fit['textRight']<=fit['numberLeft']+2,('Surname and jersey overlap',full_name,fit)
-        assert fit['numberRight']<=fit['rowRight']+4,('Jersey clipped off name row',full_name,fit)
+        assert fit['textRight']<=fit['rowRight']+4,('Surname clipped past the card name column',full_name,fit)
+        assert fit['numberTop']>=fit['lastBottom']-3,('Jersey must sit below the surname',full_name,fit)
     page.locator('#close').evaluate('(e)=>e.click()')
     open_search(page,phone)
     page.locator('[data-search-mode="historical"]').click()

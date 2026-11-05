@@ -8,31 +8,7 @@
   const activeClean=()=>body.classList.contains('shua-clean');
   const compact=()=>window.matchMedia('(max-width:700px)').matches||body.classList.contains('phone-mode');
 
-  // 1. Preserve the manual display override inside Tools, off the screen edge.
-  const originalViewToggle=document.getElementById('viewModeToggle');
-  const toolsPopup=nav.querySelector('#shua-menu-tools');
-  function updateDisplayButton(){
-    const button=document.getElementById('shuaDisplayModeButton');
-    if(button)button.textContent='Display mode: '+(body.classList.contains('phone-mode')?'Phone':'Desktop')+' · Switch';
-  }
-  function ensureDisplayButton(){
-    if(!toolsPopup||!originalViewToggle||toolsPopup.querySelector('#shuaDisplayModeButton'))return;
-    const button=document.createElement('button');
-    button.id='shuaDisplayModeButton';
-    button.type='button';
-    button.addEventListener('click',event=>{
-      event.stopPropagation();
-      const next=body.classList.contains('phone-mode')?'desktop':'phone';
-      originalViewToggle.querySelector('button[data-mode="'+next+'"]')?.click();
-      updateDisplayButton();
-    });
-    toolsPopup.append(button);
-    updateDisplayButton();
-  }
-  ensureDisplayButton();
-  if(toolsPopup)new MutationObserver(ensureDisplayButton).observe(toolsPopup,{childList:true});
-
-  // 2. Navigation stays accessible but takes less room after scrolling.
+  // Navigation stays accessible but takes less room after scrolling.
   function updateScrollClass(){
     body.classList.toggle('shua-polish-scrolled',window.scrollY>85);
   }
@@ -40,7 +16,6 @@
   updateScrollClass();
   function updateResponsiveMode(){
     body.classList.toggle('shua-polish-phone',compact());
-    updateDisplayButton();
   }
   window.addEventListener('resize',updateResponsiveMode,{passive:true});
   new MutationObserver(updateResponsiveMode).observe(body,{attributes:true,attributeFilter:['class']});

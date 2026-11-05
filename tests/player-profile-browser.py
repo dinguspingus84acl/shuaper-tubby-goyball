@@ -70,6 +70,9 @@ def check_browser(browser,phone):
     page=ctx.new_page()
     page.goto(base,wait_until='domcontentloaded')
     page.locator('#shuaExpandedSearch').wait_for(state='attached',timeout=25000)
+    assert page.locator('#viewModeToggle').count()==0,'The display-mode switch must be removed'
+    assert page.evaluate("document.body.classList.contains('phone-mode')")==phone,('Display mode must match device size',phone)
+    assert page.locator('#shuaDisplayModeButton').count()==0,'Tools must not show a manual display switch'
     check_position_rankings(page,phone)
     # Keep Bijan in the active ranking sequence so a real horizontal swipe has neighbors.
     navigate(page,'rankings','RB')

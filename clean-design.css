@@ -169,7 +169,6 @@ body.shua-clean #shuaWeatherSection .wx-details{background:#0b293b;border:1px so
   body.shua-clean #shuaGlobalSearchBar .shua-global-search-launch{flex:1;min-width:0;width:auto;min-height:40px}
   body.shua-clean #shuaDesignSwitch{flex:0 0 auto;max-width:109px;font-size:10px;white-space:normal;line-height:1.15;text-align:center;min-height:36px;padding:4px 7px}
   body.shua-clean main{padding-bottom:100px!important}
-  body.shua-clean #viewModeToggle{bottom:max(76px,calc(76px + env(safe-area-inset-bottom)))!important;transform:scale(.88);transform-origin:bottom right}
   body.shua-clean #tableCard td.rank{width:54px}
   body.shua-clean #tableCard .photo-cell{gap:7px}
   body.shua-clean #tableCard .photo{width:36px;height:36px;flex-basis:36px}
@@ -182,7 +181,7 @@ body.shua-clean #shuaWeatherSection .wx-details{background:#0b293b;border:1px so
   body.shua-clean #shuaWeatherSection .wx-game{padding:12px}
   body.shua-clean #shuaAnalyticsSection .st-panel{padding:10px}
 }
-/* The site's explicit Phone toggle can also simulate the compact view on desktop. */
+/* The automatic phone layout uses the same compact navigation on small screens. */
 body.shua-clean.phone-mode .sticky>.tools{display:block!important;min-height:0!important;height:0!important;padding:0!important;overflow:visible!important}
 body.shua-clean.phone-mode.fantasy-home-mode .sticky>.tools{display:block!important}
 body.shua-clean.phone-mode #shuaCleanNav{position:fixed;left:0;right:0;bottom:0;z-index:145;min-height:62px;padding:5px 6px max(5px,env(safe-area-inset-bottom));background:#061724;border-top:1px solid #355463;box-shadow:0 -8px 25px #0007}
@@ -197,7 +196,6 @@ body.shua-clean.phone-mode #shuaGlobalSearchBar{padding:7px 9px 3px;gap:6px;min-
 body.shua-clean.phone-mode #shuaGlobalSearchBar .shua-global-search-launch{flex:1;min-width:0;width:auto;min-height:40px}
 body.shua-clean.phone-mode #shuaDesignSwitch{flex:0 0 auto;max-width:109px;font-size:10px;white-space:normal;line-height:1.15;text-align:center;min-height:36px;padding:4px 7px}
 body.shua-clean.phone-mode main{padding-bottom:100px!important}
-body.shua-clean.phone-mode #viewModeToggle{bottom:max(76px,calc(76px + env(safe-area-inset-bottom)))!important}
 body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation{display:none!important}
 body.shua-clean.phone-mode #shuaAnalyticsSection .st-dashboard-picker{display:flex!important}
 @media(prefers-reduced-motion:reduce){#shuaCleanNav *,body.shua-clean #tableCard tr{transition:none!important}}

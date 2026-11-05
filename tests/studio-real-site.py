@@ -13,7 +13,7 @@ with sync_playwright() as pw:
   browser=getattr(pw,engine).launch(headless=True)
   for width,height in [(1440,1000),(390,844)]:
    context=browser.new_context(viewport={'width':width,'height':height},is_mobile=width<700,has_touch=width<700,device_scale_factor=1)
-   context.add_init_script("localStorage.setItem('shuaViewMode',"+json.dumps('phone' if width<700 else 'desktop')+");localStorage.setItem('shuaPageStateV2',JSON.stringify({section:'ANALYTICS'}));localStorage.setItem('shuaStudioStateV1',JSON.stringify({year:"+str(year)+",view:'weekly'}));")
+   context.add_init_script("localStorage.setItem('shuaPageStateV2',JSON.stringify({section:'ANALYTICS'}));localStorage.setItem('shuaStudioStateV1',JSON.stringify({year:"+str(year)+",view:'weekly'}));")
    page=context.new_page();errors=[]
    page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto('http://127.0.0.1:8765/',wait_until='domcontentloaded',timeout=90000)

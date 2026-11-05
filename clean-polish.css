@@ -4,14 +4,7 @@ body.shua-clean{
   --shua-polish-line:rgba(157,188,209,.13);
 }
 
-/* 1. Display-mode controls live in Tools, not over the content. */
-body.shua-clean #viewModeToggle{display:none!important}
-#shuaCleanNav #shuaDisplayModeButton{
-  border-top:1px solid #355367!important;border-radius:0!important;
-  margin-top:7px!important;padding-top:13px!important;color:#b8e5d7!important
-}
-
-/* 2. The navigation takes less vertical space as visitors scroll. */
+/* The navigation takes less vertical space as visitors scroll. */
 body.shua-clean.shua-polish-scrolled:not(.shua-polish-phone) .sticky>.tools{padding-top:5px!important;padding-bottom:5px!important}
 body.shua-clean.shua-polish-scrolled #shuaCleanNav .shua-clean-trigger{min-height:35px;padding-top:5px;padding-bottom:5px}
 body.shua-clean.shua-polish-scrolled #shuaGlobalSearchBar{padding-top:3px;padding-bottom:2px}

@@ -6,7 +6,7 @@ body.shua-clean.phone-mode #modal .player-swipe-preview .featured-player-card.br
   display:grid!important;
   grid-template-columns:42% minmax(0,58%)!important;
   grid-template-rows:minmax(0,1fr) 18%!important;
-  aspect-ratio:1.72;
+  aspect-ratio:1.84;
   height:auto!important;
   min-height:0!important;
   overflow:hidden;
@@ -109,16 +109,20 @@ body.shua-clean .featured-player-card.broadcast-card .featured-right{
   justify-content:flex-start!important;
   gap:0!important;
   min-width:0;
-  padding:clamp(19px,4.25vw,57px) 24px 4px 0!important;
+  padding:clamp(17px,3.15vw,44px) 24px 4px 0!important;
 }
 body.shua-clean .featured-player-card.broadcast-card .featured-team-strip{
   position:static!important;
   inset:auto!important;
-  display:block!important;
-  width:100%!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:clamp(6px,1.22vw,16px)!important;
+  width:calc(100% - clamp(4px,1vw,13px))!important;
   height:auto!important;
-  min-height:0!important;
-  margin:0 0 clamp(6px,1.2vw,15px)!important;
+  min-height:clamp(28px,4.3vw,61px)!important;
+  margin:0 0 clamp(4px,.72vw,10px) clamp(4px,1vw,13px)!important;
   padding:0!important;
   border:0!important;
   border-radius:0!important;
@@ -126,18 +130,34 @@ body.shua-clean .featured-player-card.broadcast-card .featured-team-strip{
   box-shadow:none!important;
 }
 body.shua-clean .featured-player-card.broadcast-card .featured-team-strip:after{display:none!important}
+body.shua-clean .featured-player-card.broadcast-card .featured-mini-logo{
+  display:block!important;
+  flex:0 0 clamp(27px,4.5vw,65px)!important;
+  width:clamp(27px,4.5vw,65px)!important;
+  height:clamp(27px,4.5vw,65px)!important;
+  object-fit:contain!important;
+  filter:drop-shadow(0 1px 4px #0008)!important;
+}
+body.shua-clean .featured-player-card.broadcast-card .featured-divider{
+  display:block!important;
+  flex:0 0 2px!important;
+  width:2px!important;
+  height:clamp(27px,3.7vw,51px)!important;
+  background:#aebdca85!important;
+}
 body.shua-clean .featured-player-card.broadcast-card .featured-team-copy{
   display:block!important;
   min-width:0;
+  flex:1 1 auto!important;
 }
 body.shua-clean .featured-player-card.broadcast-card .featured-team-name,
 body.shua-clean .featured-player-card.broadcast-card.featured-team-long .featured-team-name{
   display:block;
   grid-column:auto!important;
-  font-size:clamp(.5rem,1.62vw,1.32rem)!important;
+  font-size:clamp(.65rem,1.38vw,1.24rem)!important;
   font-weight:900!important;
   line-height:1.15!important;
-  letter-spacing:.19em!important;
+  letter-spacing:.17em!important;
   white-space:nowrap!important;
   word-break:normal!important;
   overflow:visible!important;
@@ -322,12 +342,25 @@ body.shua-clean .featured-player-card.broadcast-card .featured-bio-item:nth-chil
     padding:clamp(22px,6.1vw,34px) 8px 4px 0!important;
   }
   body.shua-clean .featured-player-card.broadcast-card .featured-team-strip{
-    margin-bottom:clamp(5px,1.5vw,10px)!important;
+    min-height:27px!important;
+    gap:clamp(4px,1.2vw,8px)!important;
+    margin:0 0 clamp(5px,1.5vw,10px) 3px!important;
+    width:calc(100% - 3px)!important;
+  }
+  body.shua-clean .featured-player-card.broadcast-card .featured-mini-logo{
+    flex-basis:clamp(23px,6.4vw,31px)!important;
+    width:clamp(23px,6.4vw,31px)!important;
+    height:clamp(23px,6.4vw,31px)!important;
+  }
+  body.shua-clean .featured-player-card.broadcast-card .featured-divider{
+    height:clamp(23px,6vw,30px)!important;
+    flex-basis:1px!important;
+    width:1px!important;
   }
   body.shua-clean .featured-player-card.broadcast-card .featured-team-name,
   body.shua-clean .featured-player-card.broadcast-card.featured-team-long .featured-team-name{
-    font-size:clamp(.48rem,2.18vw,.76rem)!important;
-    letter-spacing:.09em!important;
+    font-size:clamp(.56rem,2.5vw,.85rem)!important;
+    letter-spacing:.11em!important;
   }
   body.shua-clean .featured-player-card.broadcast-card .featured-first{
     font-size:clamp(1.05rem,4.8vw,1.5rem)!important;

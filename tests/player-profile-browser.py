@@ -86,18 +86,23 @@ def check_browser(browser,phone):
     print('PROFILE TRACE',values,flush=True)
     page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Robinson')",timeout=12000)
     assert 'broadcast-card' in (hero.get_attribute('class') or ''),'Every player must use the broadcast identity design'
-    assert hero.locator('.featured-mini-logo').count()==0,'The small logo must not return beside the team name'
+    assert hero.locator('.featured-mini-logo').count()==1,'The team header must include the small logo'
+    assert hero.locator('.featured-divider').count()==1,'The team header must separate its logo and name'
     assert hero.locator('.featured-team-name').inner_text().strip()=='ATLANTA FALCONS','Use the full city and team name'
     assert hero.locator('.featured-bio-item').count()==4,'The footer must remain a single four-stat strip'
     layout=hero.evaluate('''card=>{
       const rect=selector=>card.querySelector(selector)?.getBoundingClientRect();
-      const team=rect('.featured-team-name'),first=rect('.featured-first'),last=rect('.featured-last');
+      const team=rect('.featured-team-name'),logo=rect('.featured-mini-logo');
+      const divider=rect('.featured-divider'),first=rect('.featured-first'),last=rect('.featured-last');
       const identity=rect('.featured-identity-meta'),footer=rect('.featured-bio'),frame=card.getBoundingClientRect();
-      return {teamX:team.left,firstX:first.left,lastX:last.left,teamBottom:team.bottom,
+      return {teamX:team.left,logoX:logo.left,logoRight:logo.right,dividerX:divider.left,
+              dividerRight:divider.right,firstX:first.left,lastX:last.left,teamBottom:team.bottom,
               firstTop:first.top,lastBottom:last.bottom,identityTop:identity.top,
               footerTop:footer.top,footerRight:footer.right,frameRight:frame.right};
     }''')
-    assert abs(layout['teamX']-layout['firstX'])<=7,('Team name must align with given name',layout)
+    assert layout['logoX']>=layout['firstX']-5,('Small logo begins near the name column',layout)
+    assert layout['dividerX']>=layout['logoRight']-3,('Divider must be after the small logo',layout)
+    assert layout['teamX']>=layout['dividerRight']+2,('Team name must be after the divider',layout)
     assert abs(layout['lastX']-layout['firstX'])<=7,('First and last name must align',layout)
     assert layout['teamBottom']<layout['firstTop']+2,('Team label must be above name',layout)
     assert layout['lastBottom']<=layout['identityTop']+5,('Number and position must be below surname',layout)

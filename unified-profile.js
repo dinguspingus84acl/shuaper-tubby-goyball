@@ -776,6 +776,9 @@ function fitFeaturedName(card){
   fit(first,available);
   const jerseyWidth=jersey?.textContent.trim()?jersey.getBoundingClientRect().width:0;
   fit(last,card.classList.contains('broadcast-card')?available:Math.max(12,available-jerseyWidth-(jerseyWidth?8:0)));
+  const team=card.querySelector('.featured-team-name');
+  const teamCopy=card.querySelector('.featured-team-copy');
+  if(team&&teamCopy?.clientWidth)fit(team,teamCopy.clientWidth);
 }
 window.addEventListener('resize',()=>requestAnimationFrame(()=>fitFeaturedName(document.getElementById('featuredPlayerCard'))));
 function clearFeaturedProfile(){
@@ -936,6 +939,8 @@ function applyFeaturedProfile(name,seed=null){
     '</div>'+
     '<div class="featured-right">'+
       '<div class="featured-team-strip">'+
+        (logo?'<img class="featured-mini-logo" src="'+logo+'" alt="">':'')+
+        (logo?'<span class="featured-divider" aria-hidden="true"></span>':'')+
         '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div></div>'+
       '</div>'+
       '<h2 class="featured-name"><span class="featured-first">'+parts.first+'</span><span class="featured-last-row"><span class="featured-last">'+parts.last+'</span></span></h2>'+

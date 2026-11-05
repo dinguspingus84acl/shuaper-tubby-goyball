@@ -89,8 +89,8 @@ def check_browser(browser,phone):
     assert page.locator('#viewModeToggle').count()==0,'The display-mode switch must be removed'
     assert page.evaluate("document.body.classList.contains('phone-mode')")==phone,('Display mode must match device size',phone)
     assert page.locator('#shuaDisplayModeButton').count()==0,'Tools must not show a manual display switch'
-    check_press_and_slide(page,phone)
     check_position_rankings(page,phone)
+    check_press_and_slide(page,phone)
     # Keep Bijan in the active ranking sequence so a real horizontal swipe has neighbors.
     navigate(page,'rankings','RB')
     open_search(page,phone)

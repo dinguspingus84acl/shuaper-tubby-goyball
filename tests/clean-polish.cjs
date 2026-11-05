@@ -10,9 +10,9 @@ const responsive=read('responsive-mode.js'),liveDraft=read('live-draft.html');
 new vm.Script(js,{filename:'clean-polish.js'});
 new vm.Script(responsive,{filename:'responsive-mode.js'});
 
-assert.ok(html.includes('clean-design.js?v=20261105-search-tools2'),'Preserve the existing Clean UI layer');
+assert.ok(html.includes('clean-design.js?v=20261105-press-slide1'),'Preserve the existing Clean UI layer');
 assert.ok(html.includes('clean-polish.css?v=20261105-auto-device1')&&html.includes('clean-polish.js?v=20261105-auto-device1'),'Load the refreshed second-pass improvements after Clean');
-assert.ok(html.includes('clean-design.css?v=20261105-auto-device1'),'Load the updated mobile navigation styles');
+assert.ok(html.includes('clean-design.css?v=20261105-press-slide1'),'Load the updated mobile navigation styles');
 assert.ok(html.includes('responsive-mode.js?v=20261105-auto-device1')&&liveDraft.includes('responsive-mode.js?v=20261105-auto-device1'),'Both site pages must detect the display mode automatically');
 assert.ok(!html.includes('id="viewModeToggle"')&&!liveDraft.includes('id="viewModeToggle"')&&!js.includes('shuaDisplayModeButton')&&!css.includes('shuaDisplayModeButton'),'No manual display-mode switch should appear anywhere');
 assert.ok(responsive.includes("matchMedia('(max-width:700px)')")&&responsive.includes("addEventListener('change',apply)")&&!responsive.includes('localStorage'),'The page must react to device width changes, not saved display preferences');

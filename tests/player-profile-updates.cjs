@@ -102,9 +102,10 @@ assert.ok(cleanDesign.includes("data-shua-studio=")&&cleanDesign.includes('ShuaS
  'Every Analytics bottom-menu option must open its dashboard directly');
 assert.ok(cleanDesign.includes("data-shua-search=\"players\"")&&cleanDesign.includes('ShuaPlayerSearch?.open?.()'),'Search current and historical players from the Tools menu');
 assert.ok(cleanDesign.includes('api.navigate(view);syncSelected();requestAnimationFrame(syncSelected);'),'The Analytics menu label must update synchronously with the selected dashboard');
+assert.ok(cleanDesign.includes("addEventListener('pointerdown'")&&cleanDesign.includes("addEventListener('pointermove'")&&cleanDesign.includes("addEventListener('pointerup'")&&cleanDesign.includes('is-drag-hover'),'Bottom menus must highlight options while held and select on release');
 assert.ok(studioCss.includes('body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-layout'),
  'Analytics dashboards must use the whole width without a duplicate sidebar');
-assert.ok(html.includes('clean-design.js?v=20261105-search-tools2'));
+assert.ok(html.includes('clean-design.js?v=20261105-press-slide1')&&html.includes('clean-design.css?v=20261105-press-slide1'));
 assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261105-search-tools1'));
 assert.ok(html.includes('player-search.js?v=20261105-search-tools2')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
 assert.ok(search.includes("input.value='';mode='current';")&&search.includes("b.setAttribute('aria-pressed',String(b.dataset.searchMode===mode))"),'Each new Tools search must show current players after an archived-player lookup');

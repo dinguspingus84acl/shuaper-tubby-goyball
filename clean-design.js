@@ -44,9 +44,18 @@
     cleanNav.querySelectorAll('.shua-clean-group').forEach(group=>{
       if(group===except)return;
       group.classList.remove('is-open');
+      group.classList.remove('is-dragging');
+      group.querySelectorAll('.is-drag-hover').forEach(item=>item.classList.remove('is-drag-hover'));
       group.querySelector('.shua-clean-trigger')?.setAttribute('aria-expanded','false');
       const popup=group.querySelector('.shua-clean-popup');if(popup)popup.hidden=true;
     });
+  }
+
+  function openMenu(group){
+    closeMenus();
+    group.classList.add('is-open');
+    group.querySelector('.shua-clean-trigger')?.setAttribute('aria-expanded','true');
+    const popup=group.querySelector('.shua-clean-popup');if(popup)popup.hidden=false;
   }
 
   function populate(){
@@ -91,7 +100,62 @@
     }
   }
 
+  // Hold a bottom-navigation button and slide onto an option to preview it.
+  // Releasing selects that option; an ordinary tap leaves the menu open.
+  let press=null,ignoreNativeClick=null;
+  function hoveredOption(event){
+    if(!press)return null;
+    const popup=press.group.querySelector('.shua-clean-popup');
+    const hit=document.elementFromPoint(event.clientX,event.clientY)?.closest('.shua-clean-popup button');
+    return hit&&popup?.contains(hit)?hit:null;
+  }
+  function previewOption(option){
+    if(!press)return;
+    press.group.querySelectorAll('.is-drag-hover').forEach(item=>item.classList.remove('is-drag-hover'));
+    if(option)option.classList.add('is-drag-hover');
+    press.option=option;
+  }
+  cleanNav.addEventListener('pointerdown',event=>{
+    const trigger=event.target.closest('.shua-clean-trigger');
+    if(!trigger||event.button!==0||event.isPrimary===false)return;
+    const group=trigger.closest('.shua-clean-group');
+    const alreadyOpen=group.classList.contains('is-open');
+    if(!alreadyOpen)openMenu(group);
+    group.classList.add('is-dragging');
+    press={pointerId:event.pointerId,trigger,group,alreadyOpen,option:null};
+  });
+  document.addEventListener('pointermove',event=>{
+    if(!press||event.pointerId!==press.pointerId)return;
+    const popup=press.group.querySelector('.shua-clean-popup');
+    const box=popup.getBoundingClientRect();
+    if(event.clientY>=box.top&&event.clientY<=box.bottom&&popup.scrollHeight>popup.clientHeight){
+      if(event.clientY<box.top+25)popup.scrollTop-=12;
+      else if(event.clientY>box.bottom-25)popup.scrollTop+=12;
+    }
+    previewOption(hoveredOption(event));
+  });
+  document.addEventListener('pointerup',event=>{
+    if(!press||event.pointerId!==press.pointerId)return;
+    const gesture=press,chosen=hoveredOption(event);
+    previewOption(null);
+    gesture.group.classList.remove('is-dragging');
+    press=null;
+    const guard={};ignoreNativeClick=guard;
+    setTimeout(()=>{if(ignoreNativeClick===guard)ignoreNativeClick=null;},0);
+    if(chosen)chosen.click();
+    else if(gesture.alreadyOpen)closeMenus();
+  });
+  document.addEventListener('pointercancel',event=>{
+    if(!press||event.pointerId!==press.pointerId)return;
+    previewOption(null);press=null;closeMenus();
+  });
+
   cleanNav.addEventListener('click',event=>{
+    // A pointer-generated click follows pointerup. Selection was already
+    // handled there; keyboard clicks still use the regular accessible menu.
+    if(ignoreNativeClick&&event.isTrusted&&event.detail>0){
+      ignoreNativeClick=null;event.preventDefault();return;
+    }
     if(event.target.closest('[data-shua-search="players"]')){
       closeMenus();
       window.ShuaPlayerSearch?.open?.();
@@ -122,15 +186,10 @@
     if(!trigger)return;
     const group=trigger.closest('.shua-clean-group');
     const shouldOpen=!group.classList.contains('is-open');
-    closeMenus();
-    if(shouldOpen){
-      group.classList.add('is-open');
-      trigger.setAttribute('aria-expanded','true');
-      group.querySelector('.shua-clean-popup').hidden=false;
-    }
+    if(shouldOpen)openMenu(group);else closeMenus();
   });
   document.addEventListener('click',event=>{if(!cleanNav.contains(event.target))closeMenus();});
-  document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMenus();});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'){press=null;closeMenus();}});
   new MutationObserver(()=>requestAnimationFrame(populate)).observe(nav,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
 
   // Notes stay intact and available in full, without dominating each ranking row.

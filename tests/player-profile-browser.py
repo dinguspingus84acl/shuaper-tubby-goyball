@@ -25,6 +25,22 @@ def open_search(page,phone):
     launch.click()
     page.locator('#shuaExpandedSearch .shua-search-dialog').wait_for(state='visible',timeout=18000)
 
+def check_press_and_slide(page,phone):
+    trigger=page.locator('#shuaCleanNav [data-shua-group="rankings"] .shua-clean-trigger')
+    source=trigger.bounding_box()
+    assert source,('Bottom navigation trigger is missing',phone)
+    page.mouse.move(source['x']+source['width']/2,source['y']+source['height']/2)
+    page.mouse.down()
+    option=page.locator('#shua-menu-rankings [data-shua-target="RB"]')
+    option.wait_for(state='visible',timeout=6000)
+    target=option.bounding_box()
+    assert target,('Press-and-slide option is missing',phone)
+    page.mouse.move(target['x']+target['width']/2,target['y']+target['height']/2,steps=6)
+    assert option.evaluate("e=>e.classList.contains('is-drag-hover')"),('Dragging should highlight the tab under the pointer',phone)
+    page.mouse.up()
+    assert page.locator('.positions .pos.active').first.get_attribute('data-pos')=='RB',('Releasing should open the highlighted tab',phone)
+    assert page.locator('#shua-menu-rankings').is_hidden(),('The menu should close after selecting',phone)
+
 def check_position_rankings(page,phone):
     for pos in ('QB','RB','WR','TE'):
         navigate(page,'rankings',pos)
@@ -73,6 +89,7 @@ def check_browser(browser,phone):
     assert page.locator('#viewModeToggle').count()==0,'The display-mode switch must be removed'
     assert page.evaluate("document.body.classList.contains('phone-mode')")==phone,('Display mode must match device size',phone)
     assert page.locator('#shuaDisplayModeButton').count()==0,'Tools must not show a manual display switch'
+    check_press_and_slide(page,phone)
     check_position_rankings(page,phone)
     # Keep Bijan in the active ranking sequence so a real horizontal swipe has neighbors.
     navigate(page,'rankings','RB')

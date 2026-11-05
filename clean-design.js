@@ -12,9 +12,19 @@
   // Ignore old saved Classic selections: without a toggle, nobody should be
   // stranded on the previous layout. ?design=classic remains a manual fallback.
   let mode=requested==='classic'?'classic':'clean';
+  const analyticsViews=[
+    {view:'usage',label:'Usage'},
+    {view:'intelligence',label:'Fantasy Intelligence'},
+    {view:'consistency',label:'Consistency'},
+    {view:'teams',label:'Team Shares'},
+    {view:'injury',label:'Injury Impact'},
+    {view:'schedule',label:'Schedule'},
+    {view:'startsit',label:'Start / Sit'},
+    {view:'weekly',label:'Weekly Report'}
+  ];
   const groups=[
     {id:'rankings',label:'Rankings',items:['HOME','ALL','QB','RB','WR','TE','MYGUYS','DND']},
-    {id:'analytics',label:'Analytics',items:['ANALYTICS','ESPN','COMPARE']},
+    {id:'analytics',label:'Analytics',items:[...analyticsViews,'ESPN','COMPARE']},
     {id:'teams',label:'My Teams',items:['MYTEAMS','STOCK']},
     {id:'tools',label:'Tools',items:['MOCK','DEPTH','TRADE','COMMAND','WEATHER']}
   ];
@@ -43,10 +53,11 @@
     for(const group of groups){
       const popup=cleanNav.querySelector('#shua-menu-'+group.id);
       if(!popup)continue;
-      const html=group.items.map(id=>{
-        const original=nav.querySelector('.pos[data-pos="'+id+'"]');
+      const html=group.items.map(item=>{
+        if(typeof item==='object')return '<button type="button" data-shua-studio="'+item.view+'">'+item.label+'</button>';
+        const original=nav.querySelector('.pos[data-pos="'+item+'"]');
         if(!original)return '';
-        return '<button type="button" data-shua-target="'+id+'">'+original.textContent.trim()+'</button>';
+        return '<button type="button" data-shua-target="'+item+'">'+original.textContent.trim()+'</button>';
       }).join('');
       if(popup.innerHTML!==html)popup.innerHTML=html;
     }
@@ -55,21 +66,45 @@
 
   function syncSelected(){
     const active=nav.querySelector('.pos.active');
+    const currentAnalytics=active?.dataset.pos==='ANALYTICS';
+    const currentView=window.ShuaStudio?.UI?.state?.view;
     cleanNav.querySelectorAll('[data-shua-target]').forEach(item=>{
       const selected=item.dataset.shuaTarget===active?.dataset.pos;
       item.classList.toggle('is-selected',selected);
       if(selected)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');
     });
+    cleanNav.querySelectorAll('[data-shua-studio]').forEach(item=>{
+      const selected=currentAnalytics&&item.dataset.shuaStudio===currentView;
+      item.classList.toggle('is-selected',selected);
+      if(selected)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');
+    });
     for(const group of groups){
       const container=cleanNav.querySelector('[data-shua-group="'+group.id+'"]');
-      const child=group.items.includes(active?.dataset.pos);
+      const child=group.items.some(item=>typeof item==='string'?
+        item===active?.dataset.pos:active?.dataset.pos==='ANALYTICS');
       container?.classList.toggle('is-active',child);
       const label=container?.querySelector('.shua-clean-current');
-      if(label)label.textContent=child?(active?.textContent.trim()||group.label):'Explore';
+      if(label)label.textContent=child?(group.id==='analytics'&&currentAnalytics?
+        (analyticsViews.find(item=>item.view===currentView)?.label||'Analytics'):
+        (active?.textContent.trim()||group.label)):'Explore';
     }
   }
 
   cleanNav.addEventListener('click',event=>{
+    const chart=event.target.closest('[data-shua-studio]');
+    if(chart){
+      const view=chart.dataset.shuaStudio;
+      closeMenus();
+      const activate=api=>{api.navigate(view);requestAnimationFrame(syncSelected);};
+      const api=window.ShuaStudio?.UI;
+      if(api?.navigate)activate(api);
+      else if(window.ShuaStudioLoader?.load){
+        window.ShuaStudioLoader.load().then(activate).catch(()=>{
+          nav.querySelector('.pos[data-pos="ANALYTICS"]')?.click();
+        });
+      }else nav.querySelector('.pos[data-pos="ANALYTICS"]')?.click();
+      return;
+    }
     const item=event.target.closest('[data-shua-target]');
     if(item){
       const original=nav.querySelector('.pos[data-pos="'+item.dataset.shuaTarget+'"]');
@@ -90,7 +125,7 @@
   });
   document.addEventListener('click',event=>{if(!cleanNav.contains(event.target))closeMenus();});
   document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMenus();});
-  new MutationObserver(()=>requestAnimationFrame(syncSelected)).observe(nav,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
+  new MutationObserver(()=>requestAnimationFrame(populate)).observe(nav,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
 
   // Notes stay intact and available in full, without dominating each ranking row.
   const rows=document.getElementById('rows');

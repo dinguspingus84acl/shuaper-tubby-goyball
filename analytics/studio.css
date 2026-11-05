@@ -1147,3 +1147,29 @@ body.phone-mode #shuaAnalyticsSection[data-active-view="teams"] .st-osp-heading{
   min-height:39px!important;padding:6px 5px!important;font-size:11px!important;
  }
 }
+
+/* The site's bottom-navigation theme otherwise overrides the Studio selector,
+   turning the eight dashboard buttons into a single vertical stack (or hiding
+   them entirely on phones). Match that theme's specificity explicitly. */
+body.shua-clean #shuaAnalyticsSection .st-dashboard-picker,
+body.shua-clean.phone-mode #shuaAnalyticsSection .st-dashboard-picker{
+ display:none!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-navigation,
+body.shua-clean:not(.phone-mode) #shuaAnalyticsSection .st-navigation,
+body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation,
+body.shua-clean:not(.phone-mode) #shuaAnalyticsSection[data-active-view="schedule"] .st-navigation{
+ display:grid!important;flex-direction:initial!important;
+ grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ position:static!important;width:100%!important;margin:0!important;
+}
+@media(max-width:700px){
+ body.shua-clean #shuaAnalyticsSection .st-navigation,
+ body.shua-clean:not(.phone-mode) #shuaAnalyticsSection .st-navigation,
+ body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ }
+}
+body.shua-clean.phone-mode #shuaAnalyticsSection .st-navigation{
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+}

@@ -268,7 +268,20 @@ def check_browser(browser,phone):
     page.locator('#modal.open #featuredPlayerCard').wait_for(state='visible',timeout=25000)
     page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Brady')",timeout=18000)
     page.locator('#close').evaluate('(e)=>e.click()')
-    navigate(page,'analytics','ANALYTICS')
+    analytics_trigger=page.locator('#shuaCleanNav [data-shua-group="analytics"] .shua-clean-trigger')
+    analytics_trigger.click()
+    analytics_menu=page.locator('#shua-menu-analytics')
+    analytics_options=analytics_menu.locator('[data-shua-studio]')
+    assert analytics_options.count()==8,'The bottom Analytics button must expose all eight dashboards, like Rankings'
+    assert analytics_options.all_inner_texts()==[
+        'Usage','Fantasy Intelligence','Consistency','Team Shares',
+        'Injury Impact','Schedule','Start / Sit','Weekly Report'
+    ],'Every Analytics view must have its own bottom-menu option'
+    assert analytics_menu.locator('[data-shua-target="ESPN"]').count()==1
+    assert analytics_menu.locator('[data-shua-target="COMPARE"]').count()==1
+    analytics_menu.locator('[data-shua-studio="usage"]').click()
+    page.locator('#shuaAnalyticsSection').wait_for(state='visible',timeout=30000)
+    assert page.locator('#shuaAnalyticsSection').get_attribute('data-active-view')=='usage'
     assert page.locator('#shuaGlobalSearchBar .shua-global-search-launch').is_visible(),'Analytics tab needs global search'
     page.wait_for_function('window.ShuaStudio?.UI?.navigate !== undefined',timeout=25000)
     dashboards=page.locator('#shuaAnalyticsSection .st-navigation .st-tab')
@@ -278,6 +291,15 @@ def check_browser(browser,phone):
     for view in ('usage','schedule','consistency','weekly'):
         button=page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]')
         assert button.is_visible(),('Analytics option must be visible and clickable',view,phone)
+    for view in ('schedule','consistency','weekly'):
+        analytics_trigger.click()
+        option=analytics_menu.locator('[data-shua-studio="'+view+'"]')
+        assert option.is_visible(),('Analytics options must remain available from the bottom navigation',view,phone)
+        option.click()
+        page.wait_for_function('view=>document.querySelector("#shuaAnalyticsSection")?.dataset.activeView===view',arg=view,timeout=25000)
+        assert analytics_trigger.locator('.shua-clean-current').text_content().strip()=={
+            'schedule':'Schedule','consistency':'Consistency','weekly':'Weekly Report'
+        }[view]
     for view in ('schedule','consistency'):
         page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]').click()
         selected=page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]')

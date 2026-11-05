@@ -129,6 +129,46 @@ def check_browser(browser,phone):
         a=number.bounding_box();b=position.bounding_box()
         assert a and b and b['x']>a['x']+a['width'],('Display jersey number | position in that order',a,b)
         assert abs(a['y']-b['y'])<=5,('Jersey and position must share one row',a,b)
+    if phone:
+        swipe=page.evaluate('''()=>{
+          const seq=visibleRankingSequence();
+          const id=document.getElementById('modal')?.dataset.id||'';
+          const target=adjacentPlayerId(id,'next')||adjacentPlayerId(id,'prev')||seq.find(x=>x.id&&x.id!==id)?.id;
+          const preview=target?ensurePlayerSwipePreview(target):null;
+          const card=preview?.querySelector('#previewFeaturedPlayerCard');
+          const targetInfo=seq.find(x=>String(x.id)===String(target));
+          const player=playerById(target)||playerByName(targetInfo?.name)||targetInfo;
+          if(!card||!player)return {error:'Swipe preview could not be created',target,id};
+          const active=document.getElementById('featuredPlayerCard');
+          const teamName=card.querySelector('.featured-team-name')?.textContent?.trim();
+          const layout=getComputedStyle(card),liveLayout=getComputedStyle(active);
+          const result={
+            broadcast:card.classList.contains('broadcast-card'),
+            cardDisplay:layout.display,
+            sameAspectRatio:layout.aspectRatio===liveLayout.aspectRatio,
+            sameBackground:layout.backgroundImage===liveLayout.backgroundImage,
+            logoCount:card.querySelectorAll('.featured-team-strip .featured-mini-logo').length,
+            dividerWidth:card.querySelector('.featured-team-strip .featured-divider')?.getBoundingClientRect().width,
+            teamName,expectedTeam:featuredFullTeamName(player.team),
+            name:card.querySelector('.featured-first')?.textContent+' '+card.querySelector('.featured-last')?.textContent,
+            expectedName:player.name,
+            position:card.querySelector('.featured-identity-meta .featured-team-meta')?.textContent?.trim(),
+            expectedPosition:player.position,
+            staleTeamHeaderPosition:!!card.querySelector('.featured-team-strip .featured-team-meta'),
+            statCount:card.querySelectorAll('.featured-bio-item').length,
+            secondaryAccent:card.style.getPropertyValue('--featured-secondary')
+          };
+          clearPlayerSwipePreview();
+          return result;
+        }''')
+        assert 'error' not in swipe,swipe
+        assert swipe['broadcast'] and swipe['cardDisplay']=='grid',('Incoming swipe card must use the broadcast design',swipe)
+        assert swipe['sameAspectRatio'] and swipe['sameBackground'],('Incoming card must match current card styling',swipe)
+        assert swipe['logoCount']==1 and swipe['dividerWidth']>0,('Incoming card must retain the small logo and divider',swipe)
+        assert swipe['teamName']==swipe['expectedTeam'],('Incoming card must display the full team name',swipe)
+        assert swipe['name']==swipe['expectedName'],('Swipe preview must show the next player, not the previous name',swipe)
+        assert swipe['position']==swipe['expectedPosition'] and not swipe['staleTeamHeaderPosition'],('Position must stay below the name during swiping',swipe)
+        assert swipe['statCount']==4 and swipe['secondaryAccent'],('Incoming card must preserve four stats and team accents',swipe)
     page.locator('[data-profile-tab="performance"]').click()
     performance=page.locator('#unifiedPerformancePanel')
     performance.wait_for(state='visible',timeout=10000)

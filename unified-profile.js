@@ -1342,15 +1342,18 @@ function ensurePlayerSwipePreview(targetId){
   preview.dataset.targetId=String(targetId);
   const copy=hero.cloneNode(true);
   copy.id='previewFeaturedPlayerCard';
-  copy.className='featured-player-card';
+  // Keep the incoming card in the exact same broadcast layout as the live card.
+  // The previous preview dropped this class and briefly showed the old design.
+  copy.className='featured-player-card broadcast-card';
   const nameLength=String(p.name||'').replace(/\s+/g,'').length;
   if(nameLength>=18)copy.classList.add('featured-name-xlong');
   else if(nameLength>=14)copy.classList.add('featured-name-long');
   if(norm(p.name)==='laddmcconkey')copy.classList.add('featured-name-ladd');
   const team=String(p.team||'').toUpperCase();
-  const logo=featuredLogoUrl(team),teamName=featuredTeamName(team);
+  const logo=featuredLogoUrl(team),teamName=featuredFullTeamName(team);
   const accent=TEAM_ACCENTS[canonicalTeam(team)]||'#3d8cff';
   copy.style.setProperty('--featured-accent',accent);
+  copy.style.setProperty('--featured-secondary',TEAM_SECONDARY_ACCENTS[canonicalTeam(team)]||accent);
   if(teamName.length>=9)copy.classList.add('featured-team-long');
   if(p.position==='D/ST')copy.classList.add('featured-defense-profile');
   const face=copy.querySelector('.featured-portrait-box');
@@ -1358,14 +1361,28 @@ function ensurePlayerSwipePreview(targetId){
   const strip=copy.querySelector('.featured-team-strip');
   if(strip)strip.innerHTML=(logo?'<img class="featured-mini-logo" src="'+logo+'" alt="">':'')+
     (logo?'<span class="featured-divider" aria-hidden="true">&#8203;</span>':'')+
-    '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div><div class="featured-team-meta"><strong>'+String(p.position||'—')+'</strong></div></div>';
+    '<div class="featured-team-copy"><div class="featured-team-name">'+teamName+'</div></div>';
   const parts=featuredNameParts(p.name);
   const first=copy.querySelector('.featured-first'),last=copy.querySelector('.featured-last');
   if(first)first.textContent=parts.first;
   if(last)last.textContent=parts.last;
+  const meta=copy.querySelector('.featured-identity-meta .featured-team-meta');
+  if(meta)meta.innerHTML='<strong>'+String(p.position||'—')+'</strong>';
   const jersey=copy.querySelector('.featured-jersey-number');
-  if(jersey)jersey.textContent='';
-  copy.querySelectorAll('.featured-bio-value').forEach(el=>el.textContent='—');
+  const number=PROFILE_BIO_OVERRIDES[norm(p.name)]?.number??p.jersey_number??p.jerseyNumber??p.number;
+  if(jersey)jersey.textContent=number!=null&&number!==''?'#'+number:'';
+  const historicalYear=seedYear(p);
+  const bio=p.position==='D/ST'
+    ?[['POSITION','D/ST'],['TEAM',team],['SEASON','2026'],['TYPE','DEFENSE']]
+    :historicalYear
+      ?[['YEAR',String(historicalYear)],['PPR PTS',p.points??'—'],['PPG',p.average??'—'],['GP',p.gamesPlayed??'—']]
+      :[['AGE','—'],['HEIGHT','—'],['WEIGHT','—'],['EXP','—']];
+  copy.querySelectorAll('.featured-bio-item').forEach((item,i)=>{
+    if(bio[i]){
+      item.querySelector('.featured-bio-label').textContent=bio[i][0];
+      item.querySelector('.featured-bio-value').textContent=bio[i][1];
+    }
+  });
   preview.replaceChildren(copy);
   fitFeaturedName(copy);
   const tabs=document.getElementById('unifiedProfileTabs')?.cloneNode(true);

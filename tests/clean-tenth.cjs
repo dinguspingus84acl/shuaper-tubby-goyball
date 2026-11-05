@@ -32,7 +32,7 @@ test('Stats hides only refresh copy and keeps existing stat controls',()=>{
   assert.match(tenth,/#espnStatsFetched\{display:none!important\}/);
   assert.match(html,/clean-tenth\.css\?v=20261105-card-align1/);
   assert.match(html,/broadcast-player-card\.css\?v=20261105-broadcast3/);
-  assert.match(html,/unified-profile\.js\?v=20261105-broadcast3/);
+  assert.match(html,/unified-profile\.js\?v=20261105-broadcast4/);
   assert.match(html,/weather\.js\?v=20261104-game-emoji1/);
   assert.match(read('espn-live.js'),/id="espnColumnStatSelect"/);
 });

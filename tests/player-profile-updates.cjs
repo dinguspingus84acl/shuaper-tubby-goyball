@@ -46,6 +46,10 @@ assert.ok(!espn.includes('espn-snap-summary')&&!espn.includes('espn-snap-table')
 assert.ok(espn.includes('overflow-x:hidden!important')&&espn.includes('table-layout:fixed!important'),'Game log should fit without sideways scrolling');
 assert.ok(espn.includes('font-size:clamp(.9rem,4vw,1.02rem)!important')&&espn.includes('.espn-game-log-table tbody td.gl-stat,.espn-game-log-table tbody td.gl-pts'),'All Game Log amounts must be uniformly larger');
 assert.ok(profile.includes('ensurePlayerSwipePreview(target)')&&profile.includes("translate3d('+shift+'px,0,0)"),'Swipe must move with the finger and preview next player');
+const swipePreviewSource=profile.slice(profile.indexOf('function ensurePlayerSwipePreview(targetId){'),profile.indexOf('function resetPhoneProfileSheet(){'));
+assert.ok(swipePreviewSource.includes("copy.className='featured-player-card broadcast-card'"),'Swipe preview must use the same broadcast layout as the live card');
+assert.ok(swipePreviewSource.includes('featuredFullTeamName(team)')&&swipePreviewSource.includes("copy.style.setProperty('--featured-secondary'"),'Swipe preview must use the full team name and correct team colors');
+assert.ok(swipePreviewSource.includes(".featured-identity-meta .featured-team-meta")&&!swipePreviewSource.includes('<div class="featured-team-meta">'),'Swipe preview must keep the position below the name, not in the team header');
 assert.ok(profile.includes('featured-name-ladd'),'Ladd surname must stay on one line');
 assert.ok(search.includes('faceHtml(p)')&&search.includes('legacy-stats/headshots.json'),'Search must use player photos');
 assert.ok(search.includes('shua-search-initials')&&search.includes('shua-search-face'),'Initials fallback required');

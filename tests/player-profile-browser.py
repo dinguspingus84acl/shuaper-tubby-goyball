@@ -283,7 +283,7 @@ def check_browser(browser,phone):
         assert analytics_menu.locator('[data-shua-target="COMPARE"]').count()==1
     analytics_menu.locator('[data-shua-studio="usage"]').click()
     page.locator('#shuaAnalyticsSection').wait_for(state='visible',timeout=30000)
-    assert page.locator('#shuaAnalyticsSection').get_attribute('data-active-view')=='usage'
+    page.wait_for_function('document.querySelector("#shuaAnalyticsSection")?.dataset.activeView==="usage"',timeout=30000)
     assert page.locator('#shuaGlobalSearchBar .shua-global-search-launch').is_visible(),'Analytics tab needs global search'
     page.wait_for_function('window.ShuaStudio?.UI?.navigate !== undefined',timeout=25000)
     dashboards=page.locator('#shuaAnalyticsSection .st-navigation .st-tab')

@@ -170,7 +170,10 @@ def check_browser(browser,phone):
             staleTeamHeaderPosition:!!card.querySelector('.featured-team-strip .featured-team-meta'),
             statCount:card.querySelectorAll('.featured-bio-item').length,
             bioValues:[...card.querySelectorAll('.featured-bio-value')].map(x=>x.textContent.trim()),
-            secondaryAccent:card.style.getPropertyValue('--featured-secondary')
+            secondaryAccent:card.style.getPropertyValue('--featured-secondary'),
+            previewSection:preview.querySelector('.preview-profile-panel')?.dataset.profilePanel,
+            previewRankLabels:[...preview.querySelectorAll('.preview-overview-stats .stat span')].map(x=>x.textContent.trim()),
+            previewRankCount:preview.querySelectorAll('.preview-overview-stats .stat').length
           };
           return result;
         }''')
@@ -184,6 +187,8 @@ def check_browser(browser,phone):
         assert swipe['name']==swipe['expectedName'],('Swipe preview must show the next player, not the previous name',swipe)
         assert swipe['position']=='RB' and not swipe['staleTeamHeaderPosition'],('Position must stay below the name during swiping',swipe)
         assert swipe['statCount']==4 and swipe['secondaryAccent'],('Incoming card must preserve four stats and team accents',swipe)
+        assert swipe['previewSection']=='overview' and swipe['previewRankCount']>=5,('Incoming card must show the next player\'s data below the bio',swipe)
+        assert 'ROS RB' in swipe['previewRankLabels'] and 'ESPN RB' in swipe['previewRankLabels'],('Swipe preview must include the next player\'s ranking details',swipe)
         if swipe['expectedName']=='Jahmyr Gibbs':
             assert swipe['number']=='#0',('Known jersey number should be visible before releasing swipe',swipe)
             assert swipe['bioValues']==['24','5\'9"','202 lbs','4'],('Known age, height, weight and experience should be visible during swipe',swipe)
@@ -266,6 +271,23 @@ def check_browser(browser,phone):
     navigate(page,'analytics','ANALYTICS')
     assert page.locator('#shuaGlobalSearchBar .shua-global-search-launch').is_visible(),'Analytics tab needs global search'
     page.wait_for_function('window.ShuaStudio?.UI?.navigate !== undefined',timeout=25000)
+    dashboards=page.locator('#shuaAnalyticsSection .st-navigation .st-tab')
+    dashboards.first.wait_for(state='visible',timeout=25000)
+    assert dashboards.count()==8,'All eight Analytics destinations must be available as buttons'
+    assert page.locator('#shuaAnalyticsSection .st-dashboard-picker').is_hidden(),'Analytics should not rely on a chart dropdown'
+    for view in ('usage','schedule','consistency','weekly'):
+        button=page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]')
+        assert button.is_visible(),('Analytics option must be visible and clickable',view,phone)
+    for view in ('schedule','consistency'):
+        page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]').click()
+        selected=page.locator('#shuaAnalyticsSection .st-navigation [data-st-view="'+view+'"]')
+        assert selected.is_visible() and selected.get_attribute('aria-selected')=='true',('Analytics navigation must stay visible after changing charts',view)
+    nav_size=page.locator('#shuaAnalyticsSection .st-navigation').evaluate('''el=>({
+      width:el.clientWidth,scrollWidth:el.scrollWidth,
+      columns:getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length
+    })''')
+    assert nav_size['scrollWidth']<=nav_size['width']+2,('All Analytics choices must fit without sideways swiping',nav_size)
+    assert nav_size['columns']==(2 if phone else 4),('Analytics choices must be displayed as an organized button grid',nav_size)
     page.evaluate("window.ShuaStudio.UI.navigate('consistency')")
     analytic=page.locator('#stGlobalSearch')
     analytic.wait_for(state='visible',timeout=30000)

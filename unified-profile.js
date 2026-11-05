@@ -348,8 +348,32 @@ style.textContent=`
 }
 .phone-mode #modal .profile.featured-player-profile{z-index:2}
 .phone-mode #modal .player-swipe-preview{
-  position:fixed;inset:0;z-index:1;overflow:hidden;pointer-events:none;
+  position:fixed;inset:0;z-index:1;overflow-x:hidden;overflow-y:auto;pointer-events:none;
   background:#06111f;will-change:transform
+}
+.phone-mode #modal .player-swipe-preview::-webkit-scrollbar{display:none}
+.phone-mode #modal .player-swipe-preview .preview-profile-content{
+  box-sizing:border-box;width:100%;min-height:calc(100dvh - 315px);
+  padding:10px 10px 28px;background:#06111f
+}
+.phone-mode #modal .player-swipe-preview .preview-profile-panel{padding-top:6px}
+.phone-mode #modal .player-swipe-preview .preview-overview-stats{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px
+}
+.phone-mode #modal .player-swipe-preview .preview-overview-stats .stat{
+  display:flex;flex-direction:column;justify-content:center;box-sizing:border-box;
+  min-width:0;min-height:82px;padding:11px;border:1px solid #294357;
+  border-radius:9px;background:#081a2d
+}
+.phone-mode #modal .player-swipe-preview .preview-overview-stats .stat span{
+  color:#92aec5;font-size:.63rem;font-weight:850
+}
+.phone-mode #modal .player-swipe-preview .preview-overview-stats .stat b{
+  color:#f3faff;font-size:1.05rem;font-weight:950;margin-top:5px
+}
+.phone-mode #modal .player-swipe-preview .preview-player-notes{
+  margin-top:10px;padding:12px;border:1px solid #294357;border-radius:9px;
+  background:#081a2d;color:#bed1e0;font-size:.75rem;line-height:1.4
 }
 .phone-mode #modal .player-swipe-preview .featured-player-card{
   width:calc(100% - 16px);height:254px;margin:8px 8px 0;
@@ -1345,6 +1369,81 @@ function isPhoneProfileSheet(){
 function clearPlayerSwipePreview(){
   document.getElementById('playerSwipePreview')?.remove();
 }
+function paintSwipeOverview(player,panel){
+  const name=String(player?.name||''),pos=String(player?.position||'—');
+  let espnRank=null;
+  try{espnRank=window.ShuaEspnLive?.getPositionRank?.(name)||null}catch(e){}
+  const rows=[
+    ['ROS '+pos,rosRank(name,pos)],
+    ['Preseason '+pos,preseasonRank(name)],
+    ['ESPN '+pos,espnRank],
+    ['Overall rank',overallRank(name)],
+    ['ESPN ADP',espnPreseasonRank(name)]
+  ];
+  let ppg=null;
+  try{
+    const maps={
+      RB:typeof rbPpgRanks==='undefined'?null:rbPpgRanks,
+      QB:typeof qbPpgRanks==='undefined'?null:qbPpgRanks,
+      WR:typeof wrPpgRanks==='undefined'?null:wrPpgRanks,
+      TE:typeof tePpgRanks==='undefined'?null:tePpgRanks
+    };
+    ppg=maps[pos]?.get(norm(name))||null;
+  }catch(e){}
+  if(ppg)rows.push(['2025 PPG rank',ppg]);
+  const grid=document.createElement('div');
+  grid.className='preview-overview-stats';
+  rows.forEach(([label,value])=>{
+    const tile=document.createElement('div');tile.className='stat';
+    const title=document.createElement('span');title.textContent=label;
+    const figure=document.createElement('b');figure.textContent=Number(value)>0?'#'+value:'—';
+    tile.append(title,figure);grid.appendChild(tile);
+  });
+  panel.replaceChildren(grid);
+  const notes=player?.additionalStats?.notes||basePositionPlayer(name)?.additionalStats?.notes;
+  if(notes){
+    const item=document.createElement('div');
+    item.className='preview-player-notes';item.textContent=notes;panel.appendChild(item);
+  }
+}
+async function paintSwipeProfilePanel(player,view,panel,preview,targetId){
+  const name=String(player?.name||'');
+  if(view==='overview'){
+    try{paintSwipeOverview(player,panel)}
+    catch(e){panel.innerHTML='<div class="unified-profile-loading">Player overview will load when the card opens.</div>'}
+    return;
+  }
+  panel.innerHTML='<div class="unified-profile-loading">Loading '+(view==='gamelog'?'game log':view==='history'?'player history':'analytics')+'…</div>';
+  try{
+    if(view==='gamelog'){
+      if(player.position==='K'&&window.ShuaKickerProfile?.renderGameLog)
+        await window.ShuaKickerProfile.renderGameLog(name,player.id,panel);
+      else if(player.position==='D/ST'&&window.ShuaDefenseProfile?.renderGameLog)
+        await window.ShuaDefenseProfile.renderGameLog(name,player.id,player.team,panel);
+      else if(window.ShuaEspnLive?.renderGameLog)await window.ShuaEspnLive.renderGameLog(name,panel);
+      else throw new Error('Game Log unavailable');
+    }else if(view==='history'){
+      if(player.position==='K'&&window.ShuaKickerProfile?.renderHistory)
+        await window.ShuaKickerProfile.renderHistory(name,player.id,panel);
+      else if(player.position==='D/ST'&&window.ShuaDefenseProfile?.renderHistory)
+        await window.ShuaDefenseProfile.renderHistory(name,player.id,player.team,panel);
+      else if(window.ShuaPlayerHistory?.render)await window.ShuaPlayerHistory.render(name,panel);
+      else throw new Error('History unavailable');
+    }else if(view==='performance'){
+      if(['K','D/ST'].includes(player.position)){
+        panel.textContent='Season analytics are unavailable for this position.';
+      }else{
+        if(!window.ShuaStudio?.UI)await window.ShuaStudioLoader?.load();
+        if(!window.ShuaStudio?.UI?.profile)throw new Error('Analytics unavailable');
+        await window.ShuaStudio.UI.profile(name,panel);
+      }
+    }
+  }catch(e){
+    if(panel.isConnected)panel.innerHTML='<div class="unified-profile-loading">This section will load when the player opens.</div>';
+  }
+  if(preview.isConnected&&preview.dataset.targetId===String(targetId))
+    preview.scrollTop=document.querySelector('#modal .profile')?.scrollTop||0;
+}
 function ensurePlayerSwipePreview(targetId){
   const modal=document.getElementById('modal');
   const hero=document.getElementById('featuredPlayerCard');
@@ -1411,6 +1510,15 @@ function ensurePlayerSwipePreview(targetId){
   }
   const tabs=document.getElementById('unifiedProfileTabs')?.cloneNode(true);
   if(tabs){tabs.removeAttribute('id');tabs.setAttribute('aria-hidden','true');preview.appendChild(tabs)}
+  const view=document.querySelector('#unifiedProfileTabs .unified-profile-tab.active')?.dataset.profileTab||preferredProfileTab||'overview';
+  const content=document.createElement('div');
+  content.className='preview-profile-content';
+  const panel=document.createElement('section');
+  panel.className='unified-profile-panel preview-profile-panel';
+  panel.dataset.profilePanel=view;
+  content.appendChild(panel);preview.appendChild(content);
+  paintSwipeProfilePanel(p,view,panel,preview,targetId);
+  preview.scrollTop=document.querySelector('#modal .profile')?.scrollTop||0;
   return preview;
 }
 function resetPhoneProfileSheet(){
@@ -1483,6 +1591,7 @@ function installPhoneSwipeDismiss(){
    if(preview){
     preview.style.transition='none';
     preview.style.transform='translate3d('+(shift+(shift>0?-width():width()))+'px,0,0)';
+    preview.scrollTop=sheet.scrollTop;
    }else clearPlayerSwipePreview();
    return;
   }

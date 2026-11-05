@@ -66,6 +66,11 @@ assert.ok(swipePreviewSource.includes("copy.className='featured-player-card broa
 assert.ok(swipePreviewSource.includes('featuredFullTeamName(team)')&&swipePreviewSource.includes("copy.style.setProperty('--featured-secondary'"),'Swipe preview must use the full team name and correct team colors');
 assert.ok(swipePreviewSource.includes("paintFeaturedIdentity(copy,p,")&&!swipePreviewSource.includes('<div class="featured-team-meta">'),'Swipe preview must keep the position below the name, not in the team header');
 assert.ok(swipePreviewSource.includes('cachedSleeperBio(p.name,p.position,team)')&&swipePreviewSource.includes('getSleeperBio(p.name,p.position,team).then(loaded=>'),'Swipe preview should populate the entire bio from cache or hydrate it without a layout swap');
+assert.ok(swipePreviewSource.includes('paintSwipeProfilePanel(p,view,panel,preview,targetId)')&&swipePreviewSource.includes("content.className='preview-profile-content'"),'Swiping must show the selected player section below the bio, not just the hero and tabs');
+assert.ok(profile.includes('async function paintSwipeProfilePanel(')&&profile.includes('window.ShuaEspnLive.renderGameLog(name,panel)')&&profile.includes('window.ShuaPlayerHistory.render(name,panel)')&&profile.includes('window.ShuaStudio.UI.profile(name,panel)'),'The swipe preview must load the next player\'s Game Log, History and Analytics sections');
+const analyticsTabsCss=read('analytics/studio.css');
+assert.ok(analyticsTabsCss.includes('Expose every Analytics destination as a button')&&analyticsTabsCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))!important'),'Analytics should display all dashboard options as visible, non-scrolling mobile buttons');
+assert.ok(analyticsTabsCss.includes('[data-active-view="schedule"] .st-navigation')&&analyticsTabsCss.includes('[data-active-view="consistency"] .st-navigation'),'Analytics navigation should remain visible for Schedule and Consistency');
 assert.ok(profile.includes('featured-name-ladd'),'Ladd surname must stay on one line');
 assert.ok(search.includes('faceHtml(p)')&&search.includes('legacy-stats/headshots.json'),'Search must use player photos');
 assert.ok(search.includes('shua-search-initials')&&search.includes('shua-search-face'),'Initials fallback required');
@@ -96,9 +101,9 @@ assert.ok(profile.includes('canonicalTeam(option.value)===canonicalTeam(team)'),
 const cleanDesign=read('clean-design.js');
 assert.ok(!cleanDesign.includes("switcher.id='shuaDesignSwitch'"),'Remove the Classic toggle without removing the clean theme');
 assert.ok(cleanDesign.includes("requested==='classic'?'classic':'clean'"),'Previously saved Classic selection must not trap visitors on the old UI');
-assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261104-ten-clean2'));
+assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261105-expanded-nav1'));
 assert.ok(html.includes('player-search.js?v=20261102-facefix1')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
-assert.ok(loader.includes("const version = '20261104-ten-clean2'"));
+assert.ok(loader.includes("const version = '20261105-expanded-nav1'"));
 const faces=read('player-face-fix.js');
 new vm.Script(faces,{filename:'player-face-fix.js'});
 for(const id of ['4685278','3126486','4870653','4723820','4686658','4685307'])

@@ -284,9 +284,16 @@ def check_browser(browser,phone):
         assert selected.is_visible() and selected.get_attribute('aria-selected')=='true',('Analytics navigation must stay visible after changing charts',view)
     nav_size=page.locator('#shuaAnalyticsSection .st-navigation').evaluate('''el=>{
       const rects=[...el.querySelectorAll('.st-tab')].map(b=>b.getBoundingClientRect());
+      const clusters=values=>{
+        const bands=[];
+        for(const value of values){
+          if(!bands.some(x=>Math.abs(x-value)<5))bands.push(value);
+        }
+        return bands.length;
+      };
       return {width:el.clientWidth,scrollWidth:el.scrollWidth,
-        columns:new Set(rects.map(r=>Math.round(r.left))).size,
-        rows:new Set(rects.map(r=>Math.round(r.top))).size};
+        columns:clusters(rects.map(r=>r.left)),rows:clusters(rects.map(r=>r.top)),
+        positions:rects.map(r=>[Math.round(r.left),Math.round(r.top)])};
     }''')
     assert nav_size['scrollWidth']<=nav_size['width']+2,('All Analytics choices must fit without sideways swiping',nav_size)
     assert nav_size['columns']==(2 if phone else 4),('Analytics choices must be displayed as an organized button grid',nav_size)

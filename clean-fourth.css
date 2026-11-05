@@ -96,28 +96,6 @@ body.shua-clean #shuaAnalyticsSection[data-active-view="teams"] .st-grid2{
  gap:8px 17px!important;
 }
 
-/* 8. Analytics shows its search field with an inline All-players shortcut.
-      The original global search button is moved, not cloned or disabled. */
-body.shua-clean.shua-fourth-search-unified #shuaGlobalSearchBar{display:none!important}
-body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow>.shua-global-search-launch{
- box-sizing:border-box;display:inline-flex!important;align-items:center;justify-content:center;
- flex:0 0 37px!important;width:37px!important;min-width:37px!important;min-height:31px!important;height:31px;
- padding:3px!important;border:1px solid #417a7f!important;border-radius:7px!important;
- background:#123e4a!important;color:#b7eee0!important;box-shadow:none!important;
- font:900 10px/1 system-ui,sans-serif;cursor:pointer;
-}
-body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow>.shua-global-search-launch:after{content:'All'}
-body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow>.shua-global-search-launch>svg,
-body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow>.shua-global-search-launch>span{display:none!important}
-body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow>.shua-global-search-launch:focus-visible{
- outline:2px solid #4cddad;outline-offset:2px;
-}
-@media(max-width:700px){
- body.shua-clean #shuaAnalyticsSection .st-global-search{
-  width:100%!important;max-width:100%!important;margin-right:0!important;
- }
-}
-
 /* 9. Shared gutters and header rhythm for rankings, Stock, My Teams and charts.
       Keep Schedule's intentional edge-to-edge heatmap exception. */
 body.shua-clean{--shua-page-gutter:clamp(9px,1.45vw,20px)}

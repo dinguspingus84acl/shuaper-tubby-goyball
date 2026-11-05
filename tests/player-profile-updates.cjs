@@ -77,17 +77,11 @@ assert.ok(search.includes('shua-search-initials')&&search.includes('shua-search-
 assert.ok(searchCss.includes('.shua-search-avatar')&&searchCss.includes('[hidden]{display:none!important}'),'Search avatar styling');
 assert.ok(search.includes('shuaSearchInputFace')&&search.includes('syncInputAvatar(found[0])'),'Player face must also show in search input');
 assert.ok(searchCss.includes('.shua-search-field-shell')&&searchCss.includes('.shua-search-input-avatar'),'Face-preview input styling');
-assert.ok(search.includes('shuaGlobalSearchBar')&&search.includes("sticky.insertAdjacentElement('afterend',globalSearch)"),'Search must stay visible across site tabs outside main content');
-assert.ok(searchCss.includes('#shuaGlobalSearchBar .shua-global-search-launch')&&searchCss.includes('body.phone-mode #shuaGlobalSearchBar'),'Desktop and phone need a visible global search bar');
-assert.ok(searchCss.includes('pointer-events:none')&&searchCss.includes('pointer-events:auto'),'Search bar must not cover navigation with an invisible hitbox');
-assert.ok(searchCss.includes('body.fantasy-home-mode #shuaGlobalSearchBar{position:fixed;top:70px;left:0;right:0;z-index:35}'),'Search control must remain above the home header while its empty area stays click-through');
-assert.ok(studio.includes('stGlobalPlayerMatches')&&studio.includes('showAnalyticsPlayerMatches'),'Analytics suggestions required');
-assert.ok(studio.includes("face(p,'st-global-player-face')"),'Analytics suggestions must include player faces');
-assert.ok(studioCss.includes('st-global-search-inputrow')&&studioCss.includes('st-global-player-matches'),'Analytics search styling required');
-assert.ok(studio.includes('stGlobalLeadingAvatar')&&studio.includes('setAnalyticsLeadingAvatar(options[0]||null)'),'Analytics input needs a face preview');
-assert.ok(studio.includes("magnifier.toggleAttribute('hidden',!!player)"),'Analytics magnifier must actually hide as an SVG attribute');
-assert.ok(studioCss.includes('.st-global-leading-avatar'),'Analytics leading face styling required');
-assert.ok(/unified-profile\.js\?v=[A-Za-z0-9-]+/.test(html)&&html.includes('player-search.js?v=20261102-facefix1'));
+assert.ok(!search.includes('shuaGlobalSearchBar')&&search.includes('window.ShuaPlayerSearch={open,close'),'Do not render a sitewide search bar; keep the full player search overlay');
+assert.ok(!studio.includes('id="stGlobalSearch"')&&studio.includes("state.studioSearch=''"),'The Analytics header must not show a second player search or preserve an invisible filter');
+assert.ok(!studio.includes('class="shua-active-filters"'),'Do not duplicate chart filters as a Showing row');
+assert.ok(!html.includes('clean-ninth.js?v='),'The redundant Analytics snapshot script must no longer load');
+assert.ok(/unified-profile\.js\?v=[A-Za-z0-9-]+/.test(html)&&html.includes('player-search.js?v=20261105-search-tools1'));
 assert.ok(profile.includes("if(pos)pos.textContent=String(player?.position||bio?.position||'—');"),'Player identity should not repeat the team abbreviation');
 const latestProfileCss=read('broadcast-player-card.css');
 assert.ok(latestProfileCss.includes('left:49%!important')&&latestProfileCss.includes('grid-column:1 / -1!important'),'The logo stays behind the portrait and stats span the entire broadcast card');
@@ -106,12 +100,13 @@ for(const view of ['usage','intelligence','consistency','teams','injury','schedu
  assert.ok(cleanDesign.includes("view:'"+view+"'"),'The Analytics bottom menu must include '+view);
 assert.ok(cleanDesign.includes("data-shua-studio=")&&cleanDesign.includes('ShuaStudioLoader.load().then(activate)'),
  'Every Analytics bottom-menu option must open its dashboard directly');
+assert.ok(cleanDesign.includes("data-shua-search=\"players\"")&&cleanDesign.includes('ShuaPlayerSearch?.open?.()'),'Search current and historical players from the Tools menu');
 assert.ok(studioCss.includes('body.shua-clean #shuaAnalyticsSection.st-studio[data-active-view] .st-layout'),
  'Analytics dashboards must use the whole width without a duplicate sidebar');
-assert.ok(html.includes('clean-design.js?v=20261105-analytics-menu2'));
-assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261105-analytics-clean-top1'));
-assert.ok(html.includes('player-search.js?v=20261102-facefix1')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
-assert.ok(loader.includes("const version = '20261105-analytics-clean-top1'"));
+assert.ok(html.includes('clean-design.js?v=20261105-search-tools1'));
+assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261105-search-tools1'));
+assert.ok(html.includes('player-search.js?v=20261105-search-tools1')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
+assert.ok(loader.includes("const version = '20261105-search-tools1'"));
 const faces=read('player-face-fix.js');
 new vm.Script(faces,{filename:'player-face-fix.js'});
 for(const id of ['4685278','3126486','4870653','4723820','4686658','4685307'])
@@ -137,4 +132,4 @@ assert.ok(rbCss.includes('grid-template-columns:54px minmax(0,1fr)'),'Show every
 assert.ok(rbCss.includes('white-space:normal!important')&&rbCss.includes('overflow:visible!important'),'Allow full position names to wrap instead of ellipsis');
 assert.ok(live.includes("credentials:'omit'")&&live.includes('view=mTeam&view=mRoster&view=mStatus'));
 assert.ok(live.includes('visibilitychange')&&live.includes('lastSuccess'));
-console.log('PASS: broadcast player cards, number | position identity, all two-line names, uniform game logs, Snap Rates, global search and swipe safeguards.');
+console.log('PASS: broadcast player cards, number | position identity, game logs, Snap Rates, Tools-only player search and swipe safeguards.');

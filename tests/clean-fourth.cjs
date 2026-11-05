@@ -15,7 +15,7 @@ new vm.Script(script,{filename:'clean-fourth.js'});
 new vm.Script(third,{filename:'clean-third.js'});
 new vm.Script(stock,{filename:'stock.js'});
 new vm.Script(live,{filename:'my-teams-live.js'});
-assert.match(html,/clean-third\.js\?v=20261104-fourth10"><\/script>\s*<link rel="stylesheet" href="clean-fourth\.css\?v=20261104-fourth10">\s*<script src="clean-fourth\.js\?v=20261104-fourth10">/,'Fourth visual layer loads last');
+assert.match(html,/clean-third\.js\?v=20261105-search-tools1"><\/script>\s*<link rel="stylesheet" href="clean-fourth\.css\?v=20261105-search-tools1">\s*<script src="clean-fourth\.js\?v=20261105-search-tools1">/,'Fourth visual layer loads last');
 assert.ok(css.includes('.shua-clean-current{display:none!important}')&&css.includes('.shua-clean-trigger>.shua-line-icon'),'Mobile navigation retains icons and removes Explore');
 assert.ok(css.includes('@media(min-width:1001px)')&&css.includes('@media(max-width:1000px)')&&css.includes('.st-navigation{display:none!important}'),'Analytics uses exclusive desktop and mobile chart selectors');
 assert.ok(live.includes('shua-espn-sync-expanded')&&live.includes('data-myteams-sync-compact')&&live.includes('savedLabel'),'ESPN status is compact and shows the latest verified snapshot date');
@@ -25,7 +25,7 @@ assert.ok(stock.includes("['ALL',...order]")&&stock.includes('section.dataset.st
 assert.ok(third.includes("makeDetail(row,[['Listed in leagues'")&&!third.includes("makeDetail(row,[['Player',name]"),'Stock detail shows unique league info, roster does not repeat name');
 assert.ok(script.includes("label.textContent.trim()==='FA'")&&css.includes('.myteams-acquire.shua-fourth-free-agent'),'Routine free-agent label is understated');
 assert.ok(css.includes('[data-active-view="teams"] .st-grid2>.st-panel')&&css.includes('border-top:1px'),'Team share inner chart cards are flattened');
-assert.ok(script.includes('parent.appendChild(launch)')&&script.includes('shua-fourth-search-unified')&&css.includes('.st-global-search-inputrow>.shua-global-search-launch'),'The original all-player search moves inside Analytics search and remains clickable');
+assert.ok(!script.includes('parent.appendChild(launch)')&&!css.includes('.st-global-search-inputrow>.shua-global-search-launch'),'Search is now launched from Tools, not from a duplicate Analytics header');
 assert.ok(css.includes('--shua-page-gutter')&&css.includes('padding-inline:var(--shua-page-gutter)'),'Site gutters are standardized');
 assert.ok(css.includes('.st-heat-cell.easy')&&css.includes('.st-heat-cell.neutral')&&css.includes('.st-heat-cell.tough'),'Schedule retains three muted difficulty categories');
 assert.ok(!css.includes('myteams-injury')&&!css.includes('myteams-bye')&&!css.includes('profile-top'),'Player header and significant statuses remain untouched');

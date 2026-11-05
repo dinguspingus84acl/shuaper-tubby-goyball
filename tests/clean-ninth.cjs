@@ -11,7 +11,8 @@ const stats=read('espn-live.js');
 const teams=read('my-teams-live.js');
 
 assert.match(html,/backup|leagueGlance\(item\)|clean-ninth\.css/);
-assert.match(html,/clean-ninth\.js\?v=20261104-ten-clean2/);
+assert.match(html,/clean-ninth\.css\?v=20261105-search-tools1/);
+assert.doesNotMatch(html,/clean-ninth\.js\?v=/,'The redundant Analytics snapshot label must not be injected');
 assert.match(css,/espn-stat-label\{display:none!important\}/);
 assert.match(css,/--shua-ui-control-height:36px/);
 assert.match(css,/\.st-panel\{[\s\S]*?border-color:var\(--shua-ui-border\)/);

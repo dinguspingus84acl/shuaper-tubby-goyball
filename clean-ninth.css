@@ -166,23 +166,10 @@ body.shua-clean #shuaWeatherSection .wx-expanded .wx-analysis{margin-top:7px}
 body.shua-clean #shuaWeatherSection .wx-freshness{font-size:11px;line-height:1.4;color:#9ebcc6}
 body.shua-clean #shuaWeatherSection .wx-freshness span{text-align:left}
 
-/* 9. Keep the existing consolidated player search; specialized inputs such
-   as waiver search and the Start/Sit A/B picker are intentionally independent. */
-body.shua-clean #shuaGlobalSearchBar .shua-global-search-launch,
-body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow{border-radius:var(--shua-ui-radius)}
-body.shua-clean #shuaAnalyticsSection .st-global-search-inputrow{border-color:var(--shua-ui-border)}
-
-/* 10. Truthful, unobtrusive source timestamps and stable loading placeholders. */
-body.shua-clean #espnLiveSection .espn-stats-fetched,
-body.shua-clean #shuaAnalyticsSection .shua-analytics-fetched{
+/* 10. Keep source timestamps with their own relevant reports and stable loading placeholders. */
+body.shua-clean #espnLiveSection .espn-stats-fetched{
   font-size:10px;line-height:1.3;font-weight:750;color:#91b7bd;
   white-space:nowrap;font-variant-numeric:tabular-nums
-}
-body.shua-clean #shuaAnalyticsSection .shua-analytics-fetched{
-  display:inline-flex;align-items:center;gap:5px;margin:3px 0 8px;padding:0 2px
-}
-body.shua-clean #shuaAnalyticsSection .shua-analytics-fetched:before{
-  content:'';display:block;width:6px;height:6px;border-radius:50%;background:#4bb999
 }
 body.shua-clean #myTeamsLiveStatus .shua-espn-sync>summary{
   border-color:transparent;background:transparent;padding:5px 4px;color:#9cbec5;font-size:10px
@@ -214,5 +201,4 @@ body.shua-clean #espnLiveSection .espn-loading-row i:nth-child(3){width:85%}
  body.shua-clean #shuaWeatherSection .wx-loading-cards{grid-template-columns:1fr}
  body.shua-clean #espnLiveSection .espn-stats-fetched{justify-self:end;text-align:right}
  body.shua-clean.stats-mode #espnLiveSection .espn-live-toolbar{row-gap:7px!important}
- body.shua-clean #shuaAnalyticsSection .shua-analytics-fetched{font-size:9px}
 }

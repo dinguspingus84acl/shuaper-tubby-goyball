@@ -14,7 +14,7 @@ const live=source('espn-live.js');
 new vm.Script(js,{filename:'clean-fifth.js'});
 new vm.Script(weather,{filename:'weather.js'});
 assert.ok(html.includes('clean-fifth.css?v=20261104-indoor2')&&html.includes('clean-fifth.js?v=20261104-fifth9b'),'The new stylesheet/script must load');
-assert.ok(html.includes('clean-fourth.css?v=20261104-fourth10')&&html.includes('clean-polish.css?v=20261103-10clean2'),'Old design layers remain recoverable');
+assert.ok(html.includes('clean-fourth.css?v=20261105-search-tools1')&&html.includes('clean-polish.css?v=20261103-10clean2'),'Old design layers remain recoverable');
 
 // 1. Notes retain the full text and a keyboard-accessible expander.
 assert.match(css,/\.shua-note-excerpt\s*\{[^}]*-webkit-line-clamp:1/);

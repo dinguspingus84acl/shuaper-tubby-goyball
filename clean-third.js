@@ -205,71 +205,15 @@
     });
   }
 
-  // 3 and 4. Display the actual active filters. An x clears an optional
-  // position filter; season/week chips open the existing working selectors.
+  // Dashboard controls already identify active filters. Avoid repeating them
+  // as a separate "Showing" summary above every Analytics chart.
   let analytics=document.getElementById('shuaAnalyticsSection');
-  function decorateFilters(){
-    if(!analytics||!isClean())return;
-    const host=analytics.querySelector('#stContent');if(!host)return;
-    const select=id=>host.querySelector('#'+id);
-    const activeButton=selector=>host.querySelector(selector+'[aria-pressed="true"]');
-    const pos=activeButton('[data-st-weekly-pos]')||activeButton('[data-st-pos]')||activeButton('[data-st-schedule-pos]');
-    const positionSelector=pos?.dataset.stWeeklyPos?'[data-st-weekly-pos]':pos?.dataset.stSchedulePos?'[data-st-schedule-pos]':'[data-st-pos]';
-    const posSelect=select('stUsagePos')||select('stInjuryPos');
-    const season=select('stSeason');
-    const week=select('stWeek')||select('stTeamWindow');
-    const team=select('stTeam');
-    const tokens=[];
-    if(pos||posSelect){
-      const value=pos?.dataset.stWeeklyPos||pos?.dataset.stPos||pos?.dataset.stSchedulePos||posSelect?.selectedOptions?.[0]?.textContent||'';
-      tokens.push({name:'Position',value,source:pos||posSelect,selector:positionSelector,reset:value==='ALL'?null:'ALL'});
-    }
-    if(week){
-      const std=analytics.querySelector('[data-st-team-std][aria-pressed="true"]');
-      tokens.push({name:'Week',value:std?'Season to Date':week.selectedOptions[0]?.textContent||week.value,source:week});
-    }
-    if(season)tokens.push({name:'Season',value:season.value,source:season});
-    if(team&&team.value!=='ALL')tokens.push({name:'Team',value:team.selectedOptions[0]?.textContent||team.value,source:team});
-    const signature=analytics.dataset.activeView+'|'+tokens.map(t=>t.name+':'+t.value).join('|');
-    let bar=host.querySelector(':scope > .shua-active-filters');
-    if(bar?.dataset.signature===signature)return;
-    if(!bar){bar=document.createElement('div');bar.className='shua-active-filters';bar.setAttribute('aria-label','Active chart filters');host.prepend(bar);}
-    bar.dataset.signature=signature;bar.replaceChildren();
-    if(!tokens.length){bar.hidden=true;return;}
-    bar.hidden=false;
-    const label=document.createElement('span');label.className='shua-filter-summary-label';label.textContent='Showing';bar.append(label);
-    for(const item of tokens){
-      const chip=document.createElement('button');chip.type='button';chip.className='shua-active-filter-chip';
-      const removable=item.reset&&item.value!==item.reset;
-      const label=item.name==='Position'||(item.name==='Week'&&(item.value==='Season to Date'||/^Week\s/i.test(item.value)))?
-        item.value:item.name+' '+item.value;
-      chip.textContent=label;
-      if(removable){const clear=document.createElement('span');clear.className='shua-chip-clear';clear.textContent='×';clear.setAttribute('aria-hidden','true');chip.append(clear);}
-      chip.setAttribute('aria-label',removable?'Clear '+item.value+' position filter':'Edit '+item.name+' filter');
-      chip.addEventListener('click',()=>{
-        if(removable){
-          if(item.source.tagName==='SELECT'){
-            const option=[...item.source.options].find(o=>o.value==='ALL');
-            if(option){item.source.value=option.value;item.source.dispatchEvent(new Event('change',{bubbles:true}));return;}
-          }else{
-            const all=host.querySelector(item.selector+'[data-st-weekly-pos="ALL"],'+item.selector+'[data-st-pos="ALL"],'+item.selector+'[data-st-schedule-pos="ALL"]');
-            if(all){all.click();return;}
-          }
-        }
-        const collapsed=item.source.closest('.shua-filter-controls:not(.shua-filters-open)');
-        collapsed?.querySelector('.shua-filter-toggle')?.click();
-        item.source.focus({preventScroll:true});
-        if(item.source.tagName==='SELECT')try{item.source.showPicker?.();}catch(_){}
-      });
-      bar.append(chip);
-    }
-  }
   function watchAnalytics(){
     analytics=document.getElementById('shuaAnalyticsSection');
     if(!analytics||analytics.dataset.shuaThirdObserved==='1')return false;
     analytics.dataset.shuaThirdObserved='1';
     let pending=false;
-    const update=()=>{if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;decorateFilters();decoratePortraits();});};
+    const update=()=>{if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;decoratePortraits();});};
     new MutationObserver(update).observe(analytics,{subtree:true,childList:true});
     update();return true;
   }
@@ -280,5 +224,5 @@
   decoratePortraits();
   for(const root of [myTeams,stock])if(root)new MutationObserver(()=>requestAnimationFrame(decoratePortraits)).observe(root,{childList:true,subtree:true});
   // Reapply without altering Classic when a saved design query changes.
-  window.addEventListener('pageshow',()=>{decorateLeagues();decorateRoster();decorateStock();decorateFilters();decoratePortraits();});
+  window.addEventListener('pageshow',()=>{decorateLeagues();decorateRoster();decorateStock();decoratePortraits();});
 })();

@@ -8,6 +8,7 @@ const pages=[['usage','Usage analytics','Snap share, routes, targets and yards p
 let section=document.getElementById('shuaAnalyticsSection');if(!section){section=document.createElement('section');section.id='shuaAnalyticsSection';section.hidden=true;main.append(section);}section.className='st-studio';
 let button=document.querySelector('.positions [data-pos="ANALYTICS"]');if(!button){button=document.createElement('button');button.className='pos';button.dataset.pos='ANALYTICS';button.textContent='Analytics';navigation.append(button);}button.id='studioNav';
 let state={view:'weekly',year:2026,pos:'RB',player:'',team:'DET',week:0,range:0,rankSource:'big-board.json',playoffs:false,compare:[],outWeeks:null};try{const saved=JSON.parse(localStorage.getItem('shuaStudioStateV1')||'null');if(saved){state={...state,...saved};if(!pages.some(p=>p[0]===state.view))state.view='weekly';if(![2024,2025,2026].includes(+state.year))state.year=2026;state.outWeeks=null;}}catch(e){}
+state.studioSearch=''; // Previous in-page search must never silently filter the data.
 if(state.usageSortVersion!==3){state.usageGroup='volume';state.usageMetric='espnPositionRank';state.usageSortDirection='asc';state.usageSortVersion=3;}
 let dataset=null,epoch=0,renderId=0,visible=false,historyData=null,hiddenBefore=new Map();
 function linkedView(){const m=location.hash.match(/^#analytics\/([a-z]+)$/);return m&&pages.some(p=>p[0]===m[1])?m[1]:null;}
@@ -749,18 +750,9 @@ function applyStudioSearch(){
  section.querySelectorAll('#stContent .st-rank-row,#stContent .st-injury-item,#stContent .st-team-snap-row,#stContent .st-hit-rate-table tbody tr,#stContent .st-usage-table tbody tr,#stContent .st-table-wrap tbody tr,#stContent .st-schedule-best-row').forEach(el=>{el.hidden=!!q&&!el.textContent.toLowerCase().includes(q);});
 }
 function shell(){
- // The bottom Analytics menu owns dashboard navigation. Only render the
- // active chart and its own search/filters here; no second chart menu.
+ // The bottom Analytics menu owns navigation, and Tools owns player search.
+ // Render the active dashboard's controls and chart without redundant bars.
  section.innerHTML=`
-  <div class="st-global-search" ${['schedule','startsit'].includes(state.view)?'hidden':''}>
-   <div class="st-global-search-inputrow">
-    <svg class="st-global-search-icon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg>
-    <span id="stGlobalLeadingAvatar" class="st-global-leading-avatar" aria-hidden="true" hidden></span>
-    <input id="stGlobalSearch" type="search" autocomplete="off" aria-label="Search analytics players" aria-controls="stGlobalPlayerMatches" aria-autocomplete="list" placeholder="Search players in Analytics…" value="${E(state.studioSearch||'')}">
-    <button type="button" class="st-global-search-clear" aria-label="Clear search" data-st-clear-search ${state.studioSearch?'':'hidden'}>×</button>
-   </div>
-   <div class="st-global-player-matches" id="stGlobalPlayerMatches" role="listbox" aria-label="Matching players" hidden></div>
-  </div>
   <div class="st-layout">
    <div class="st-workspace" id="stWorkspace" role="region" aria-label="${E(pages.find(p=>p[0]===state.view)?.[1]||'Analytics dashboard')}">
     <div id="stContent"></div>
@@ -770,13 +762,12 @@ function shell(){
 }
 function persist(){updateLink();try{localStorage.setItem('shuaStudioStateV1',JSON.stringify({...state,outWeeks:null}));}catch(e){}}
 function render(){hideUsageTooltip();if(!visible||!dataset)return;const id=++renderId;C.reset();section.dataset.activeView=state.view;shell();const host=document.getElementById('stContent');try{if(state.view==='rankings')rankings(id);else host.innerHTML=renderers[state.view]();}catch(e){host.innerHTML=note('This dashboard could not render. '+E(e.message),true);console.error('SHUA Studio render',e);}
- const footer=document.getElementById('stSource');if(footer)footer.hidden=['consistency','weekly','injury','teams'].includes(state.view);if(footer)footer.textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');if(state.view==='teams'&&S.ReceiverEfficiency)S.ReceiverEfficiency.mount(state.team);applyStudioSearch();if(state.studioSearch){const term=String(state.studioSearch).trim().toLowerCase();setAnalyticsLeadingAvatar(dataset.players.find(p=>p.name.toLowerCase().includes(term))||null);}persist();section.dataset.ready='true';}
+ const footer=document.getElementById('stSource');if(footer)footer.hidden=['consistency','weekly','injury','teams'].includes(state.view);if(footer)footer.textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');if(state.view==='teams'&&S.ReceiverEfficiency)S.ReceiverEfficiency.mount(state.team);persist();section.dataset.ready='true';}
 function rerenderUsage(){
  hideUsageTooltip();
  const host=section.querySelector('#stContent');
  if(!host||state.view!=='usage'||!dataset){render();return;}
  host.innerHTML=usage();
- applyStudioSearch();
  persist();
 }
 let firstLoad=true;

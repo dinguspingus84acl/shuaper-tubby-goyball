@@ -153,17 +153,7 @@ input.addEventListener('keydown',event=>{
 document.addEventListener('keydown',event=>{if(visible&&event.key==='Escape'){event.preventDefault();close();}},true);
 const original=document.getElementById('search');
 original.addEventListener('focus',open);original.addEventListener('click',open);
-// One consistent search entry point is visible above every site section, even when
-// Analytics/Stats/Trades hide the other <main> children or phone mode hides navigation.
-const globalSearch=document.createElement('div');
-globalSearch.id='shuaGlobalSearchBar';
-globalSearch.setAttribute('role','search');
-globalSearch.innerHTML='<button type="button" class="shua-global-search-launch" aria-label="Search NFL players">'+
- '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.7" cy="10.7" r="6.5"></circle><path d="m16 16 5 5"></path></svg>'+
- '<span>Search players…</span><span class="shua-global-search-hint">Current &amp; historical</span></button>';
-const sticky=document.querySelector('.sticky');
-if(sticky)sticky.insertAdjacentElement('afterend',globalSearch);
-else document.body.prepend(globalSearch);
-globalSearch.querySelector('button').addEventListener('click',open);
+// The single sitewide search entry is Tools > Search Players. Keep this full
+// overlay available from every section without rendering a page-level bar.
 window.ShuaPlayerSearch={open,close,get mode(){return mode;}};
 })();

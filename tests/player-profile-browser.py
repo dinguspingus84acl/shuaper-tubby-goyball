@@ -17,8 +17,12 @@ def navigate(page,group,target):
     page.locator(f'#shuaCleanNav [data-shua-target="{target}"]').click()
 
 def open_search(page,phone):
-    assert page.locator('#shuaGlobalSearchBar .shua-global-search-launch').is_visible(), 'Search bar must be visible on every site tab'
-    page.locator('#shuaGlobalSearchBar .shua-global-search-launch').click()
+    assert page.locator('#shuaGlobalSearchBar').count()==0, 'No standalone search bar should occupy space on any tab'
+    tools=page.locator('#shuaCleanNav [data-shua-group="tools"] .shua-clean-trigger')
+    tools.click()
+    launch=page.locator('#shua-menu-tools [data-shua-search="players"]')
+    assert launch.is_visible(),('Tools must contain the player search command',phone)
+    launch.click()
     page.locator('#shuaExpandedSearch .shua-search-dialog').wait_for(state='visible',timeout=18000)
 
 def check_position_rankings(page,phone):
@@ -284,7 +288,8 @@ def check_browser(browser,phone):
     analytics_menu.locator('[data-shua-studio="usage"]').click()
     page.locator('#shuaAnalyticsSection').wait_for(state='visible',timeout=30000)
     page.wait_for_function('document.querySelector("#shuaAnalyticsSection")?.dataset.activeView==="usage"',timeout=30000)
-    assert page.locator('#shuaGlobalSearchBar .shua-global-search-launch').is_visible(),'Analytics tab needs global search'
+    assert page.locator('#shuaGlobalSearchBar').count()==0,'Analytics should not show a sitewide search bar'
+    assert page.locator('#shuaAnalyticsSection #stGlobalSearch').count()==0,'Analytics should not have a second player search bar'
     page.wait_for_function('window.ShuaStudio?.UI?.navigate !== undefined',timeout=25000)
     assert page.locator('#shuaAnalyticsSection .st-navigation').count()==0,'Do not repeat the bottom Analytics menu inside a dashboard'
     assert page.locator('#shuaAnalyticsSection .st-dashboard-picker').count()==0,'Do not add a duplicate chart dropdown'
@@ -302,32 +307,26 @@ def check_browser(browser,phone):
         assert page.locator('#shuaAnalyticsSection .st-navigation').count()==0,('In-page chart navigation must stay removed',view,phone)
         assert page.locator('#shuaAnalyticsSection #stWorkspace').is_visible(),('Every dashboard must fill the workspace',view,phone)
     page.evaluate("window.ShuaStudio.UI.navigate('consistency')")
-    analytic=page.locator('#stGlobalSearch')
-    analytic.wait_for(state='visible',timeout=30000)
-    assert page.locator('.st-global-search-inputrow .st-global-search-icon').is_visible()
-    analytic.fill('Bijan')
-    suggestions=page.locator('#stGlobalPlayerMatches [data-st-open]')
-    suggestions.first.wait_for(state='visible',timeout=12000)
-    assert 'Bijan' in suggestions.first.inner_text()
-    assert suggestions.first.locator('.st-global-player-face').count()==1
-    assert page.locator('#stGlobalLeadingAvatar').is_visible(),'Analytics input needs the matching face'
-    assert page.locator('#stGlobalLeadingAvatar .st-global-leading-image').count()==1
-    assert page.locator('.st-global-search-icon').is_hidden()
-    assert page.locator('[data-st-clear-search]').is_visible()
-    page.locator('[data-st-clear-search]').click()
-    assert analytic.input_value()==''
-    assert page.locator('#stGlobalLeadingAvatar').is_hidden()
-    assert page.locator('.st-global-search-icon').is_visible()
-    analytic.fill('Bijan')
-    suggestions=page.locator('#stGlobalPlayerMatches [data-st-open]')
-    suggestions.first.wait_for(state='visible',timeout=12000)
-    suggestions.first.click()
+    assert page.locator('#shuaAnalyticsSection .shua-analytics-fetched').count()==0,'Remove the redundant Analytics snapshot line'
+    assert page.locator('#shuaAnalyticsSection .shua-active-filters').count()==0,'Remove the redundant Showing summary'
+    assert page.locator('#shuaAnalyticsSection #stGlobalSearch').count()==0,'The player search is in Tools, not the Analytics header'
+    assert page.locator('#stContent .st-hit-rate-full-panel').is_visible(),'Keep the chart and its live filters'
+    for view in ('usage','intelligence','teams','injury','schedule','startsit','weekly','consistency'):
+        page.evaluate('(v)=>window.ShuaStudio.UI.navigate(v)',view)
+        page.wait_for_function('v=>document.querySelector("#shuaAnalyticsSection")?.dataset.activeView===v',arg=view,timeout=25000)
+        assert page.locator('#shuaAnalyticsSection .shua-analytics-fetched').count()==0,('Snapshot label reappeared',view,phone)
+        assert page.locator('#shuaAnalyticsSection .shua-active-filters').count()==0,('Showing filter summary reappeared',view,phone)
+        assert page.locator('#shuaAnalyticsSection #stGlobalSearch').count()==0,('Search bar reappeared',view,phone)
+        assert page.locator('#shuaAnalyticsSection #stContent').is_visible(),('Dashboard content must remain available',view,phone)
+    open_search(page,phone)
+    page.locator('#shuaSearchQuery').fill('Bijan Robinson')
+    page.locator('[data-search-player]').first.click()
     page.wait_for_function("document.querySelector('#modal.open #featuredPlayerCard .featured-last')?.textContent?.includes('Robinson')",timeout=18000)
     page.locator('#close').evaluate('(e)=>e.click()')
     open_search(page,phone)
     page.locator('#shuaExpandedSearch .shua-search-close').click()
     print('PASS',browser.browser_type.name,'phone' if phone else 'desktop',
-          'two-line names, uniform game-log amounts, inline snap rates, headshot search and clean Analytics search',flush=True)
+          'two-line names, uniform game-log amounts, inline snap rates and Tools player search',flush=True)
     ctx.close()
 
 def check_rosters(browser):

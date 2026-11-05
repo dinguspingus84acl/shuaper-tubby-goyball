@@ -26,7 +26,7 @@
     {id:'rankings',label:'Rankings',items:['HOME','ALL','QB','RB','WR','TE','MYGUYS','DND']},
     {id:'analytics',label:'Analytics',items:[...analyticsViews,'ESPN','COMPARE']},
     {id:'teams',label:'My Teams',items:['MYTEAMS','STOCK']},
-    {id:'tools',label:'Tools',items:['MOCK','DEPTH','TRADE','COMMAND','WEATHER']}
+    {id:'tools',label:'Tools',items:['SEARCH','MOCK','DEPTH','TRADE','COMMAND','WEATHER']}
   ];
   const cleanNav=document.createElement('nav');
   cleanNav.id='shuaCleanNav';
@@ -55,6 +55,7 @@
       if(!popup)continue;
       const html=group.items.map(item=>{
         if(typeof item==='object')return '<button type="button" data-shua-studio="'+item.view+'">'+item.label+'</button>';
+        if(item==='SEARCH')return '<button type="button" data-shua-search="players">Search Players</button>';
         const original=nav.querySelector('.pos[data-pos="'+item+'"]');
         if(!original)return '';
         return '<button type="button" data-shua-target="'+item+'">'+original.textContent.trim()+'</button>';
@@ -91,6 +92,11 @@
   }
 
   cleanNav.addEventListener('click',event=>{
+    if(event.target.closest('[data-shua-search="players"]')){
+      closeMenus();
+      window.ShuaPlayerSearch?.open?.();
+      return;
+    }
     const chart=event.target.closest('[data-shua-studio]');
     if(chart){
       const view=chart.dataset.shuaStudio;

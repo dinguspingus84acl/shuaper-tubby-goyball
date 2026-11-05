@@ -131,7 +131,9 @@ def check_browser(browser,phone):
         a=number.bounding_box();b=position.bounding_box()
         assert a and b and b['x']>a['x']+a['width'],('Display jersey number | position in that order',a,b)
         assert abs(a['y']-b['y'])<=5,('Jersey and position must share one row',a,b)
-    if phone:
+    # Chrome's touch-input protocol allows a drag-in-progress assertion.
+    # WebKit runs the normal phone-card checks above, without a CDP session.
+    if phone and browser.browser_type.name=='chromium':
         point=hero.locator('.featured-left').evaluate('''el=>{
           const r=el.getBoundingClientRect();
           return {x:r.left+Math.min(75,r.width*.55),y:r.top+Math.min(45,r.height*.25)};

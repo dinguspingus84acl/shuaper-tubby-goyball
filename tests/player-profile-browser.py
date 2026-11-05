@@ -278,7 +278,9 @@ def check_browser(browser,phone):
         'Injury Impact','Schedule','Start / Sit','Weekly Report'
     ],'Every Analytics view must have its own bottom-menu option'
     assert analytics_menu.locator('[data-shua-target="ESPN"]').count()==1
-    assert analytics_menu.locator('[data-shua-target="COMPARE"]').count()==1
+    # The legacy Compare tab can be absent when Start/Sit owns comparison.
+    if page.locator('.positions [data-pos="COMPARE"]').count():
+        assert analytics_menu.locator('[data-shua-target="COMPARE"]').count()==1
     analytics_menu.locator('[data-shua-studio="usage"]').click()
     page.locator('#shuaAnalyticsSection').wait_for(state='visible',timeout=30000)
     assert page.locator('#shuaAnalyticsSection').get_attribute('data-active-view')=='usage'

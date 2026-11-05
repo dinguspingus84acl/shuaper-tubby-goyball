@@ -2,8 +2,7 @@
    player-search state remain owned by the original components. */
 (()=>{
   'use strict';
-  const section=document.getElementById('shuaAnalyticsSection');
-  if(!section)return;
+  let section=null;
   let pending=false;
   function sync(){
     pending=false;
@@ -29,9 +28,23 @@
     pending=true;
     requestAnimationFrame(sync);
   }
-  new MutationObserver(queue).observe(section,{
-    attributes:true,attributeFilter:['data-ready','data-active-view'],
-    childList:true,subtree:true
-  });
-  queue();
+  function watchStudio(){
+    if(section)return true;
+    const found=document.getElementById('shuaAnalyticsSection');
+    if(!found)return false;
+    section=found;
+    new MutationObserver(queue).observe(section,{
+      attributes:true,attributeFilter:['data-ready','data-active-view'],
+      childList:true,subtree:true
+    });
+    queue();
+    return true;
+  }
+  // Analytics is loaded on demand from analytics-dashboard.js, so the section
+  // usually does not exist when this footer script first runs.
+  if(!watchStudio()){
+    const parent=document.querySelector('main')||document.body;
+    const waiting=new MutationObserver(()=>{if(watchStudio())waiting.disconnect();});
+    waiting.observe(parent,{childList:true,subtree:true});
+  }
 })();

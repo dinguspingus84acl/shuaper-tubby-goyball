@@ -30,7 +30,7 @@ for(const token of ['data-st-usage-field','data-st-usage-info',"e.target.closest
 }
 assert.ok(!js.includes('showUsageTooltip(usageValue,true)'),'Player stat values must not open tooltips');
 assert.ok(!js.includes("e.target.closest?.('.st-usage-table [data-st-usage-field]')"),'Hover is limited to the info icons');
-assert.ok(js.includes('if(anchor===usageTooltipAnchor&&!anchor.contains(e.relatedTarget))hideUsageTooltip();'),'Tooltip must close as soon as the pointer leaves its icon');
+assert.ok(js.includes('if(anchor&&anchor===usageTooltipAnchor&&!anchor.contains(e.relatedTarget))hideUsageTooltip();'),'Tooltip must close as soon as the pointer leaves its icon without throwing on unrelated pointer-out events');
 assert.ok(!css.includes('td[data-st-usage-field]{cursor:help}'),'Only info icons should advertise a tooltip on hover');
 assert.ok(css.includes('.st-usage-tooltip[hidden]'),'Tooltip needs a hidden state');
 assert.ok(js.includes('hideUsageTooltip();\n const host=section.querySelector'), 'Filtering must close stale tooltips');

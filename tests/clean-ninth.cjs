@@ -11,7 +11,7 @@ const stats=read('espn-live.js');
 const teams=read('my-teams-live.js');
 
 assert.match(html,/backup|leagueGlance\(item\)|clean-ninth\.css/);
-assert.match(html,/clean-ninth\.js\?v=20261104-ten-clean1/);
+assert.match(html,/clean-ninth\.js\?v=20261104-ten-clean2/);
 assert.match(css,/espn-stat-label\{display:none!important\}/);
 assert.match(css,/--shua-ui-control-height:36px/);
 assert.match(css,/\.st-panel\{[\s\S]*?border-color:var\(--shua-ui-border\)/);
@@ -23,6 +23,8 @@ assert.match(css,/\.wx-indoor-game/);
 assert.match(css,/\.wx-expanded/);
 assert.match(ui,/ShuaStudio\?\.UI\?\.dataset/);
 assert.match(ui,/snapshotAt\|\|data\.generatedAt/);
+assert.match(ui,/if\(!watchStudio\(\)\)/);
+assert.match(read('analytics/ui.js'),/if\(anchor&&anchor===usageTooltipAnchor/);
 assert.match(teams,/Rosters checked /);
 
 assert.match(html,/const opponent=matchup\?/);

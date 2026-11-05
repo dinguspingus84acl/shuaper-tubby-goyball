@@ -69,9 +69,9 @@ assert.ok(profile.includes('canonicalTeam(option.value)===canonicalTeam(team)'),
 const cleanDesign=read('clean-design.js');
 assert.ok(!cleanDesign.includes("switcher.id='shuaDesignSwitch'"),'Remove the Classic toggle without removing the clean theme');
 assert.ok(cleanDesign.includes("requested==='classic'?'classic':'clean'"),'Previously saved Classic selection must not trap visitors on the old UI');
-assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261102-facefix1'));
+assert.ok(html.includes('espn-live.js?v=20261104-metrics4')&&html.includes('analytics-dashboard.js?v=20261104-ten-clean2'));
 assert.ok(html.includes('player-search.js?v=20261102-facefix1')&&html.includes('player-search.css?v=20261101-search-all-tabs5'));
-assert.ok(loader.includes("const version = '20261102-facefix1'"));
+assert.ok(loader.includes("const version = '20261104-ten-clean2'"));
 const faces=read('player-face-fix.js');
 new vm.Script(faces,{filename:'player-face-fix.js'});
 for(const id of ['4685278','3126486','4870653','4723820','4686658','4685307'])

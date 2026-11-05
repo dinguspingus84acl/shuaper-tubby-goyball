@@ -783,7 +783,7 @@ section.addEventListener('pointerover',e=>{
 section.addEventListener('pointerout',e=>{
  if(e.pointerType==='touch')return;
  const anchor=e.target.closest?.('.st-usage-info');
- if(anchor===usageTooltipAnchor&&!anchor.contains(e.relatedTarget))hideUsageTooltip();
+ if(anchor&&anchor===usageTooltipAnchor&&!anchor.contains(e.relatedTarget))hideUsageTooltip();
 });
 section.addEventListener('focusin',e=>{
  if(e.target.matches?.('.st-usage-info:focus-visible')&&!usageTooltipPinned)showUsageTooltip(e.target);

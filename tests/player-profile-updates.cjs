@@ -62,7 +62,10 @@ assert.ok(studioCss.includes('st-global-search-inputrow')&&studioCss.includes('s
 assert.ok(studio.includes('stGlobalLeadingAvatar')&&studio.includes('setAnalyticsLeadingAvatar(options[0]||null)'),'Analytics input needs a face preview');
 assert.ok(studio.includes("magnifier.toggleAttribute('hidden',!!player)"),'Analytics magnifier must actually hide as an SVG attribute');
 assert.ok(studioCss.includes('.st-global-leading-avatar'),'Analytics leading face styling required');
-assert.ok(/unified-profile\.js\?v=20261104-team-right1/.test(html)&&html.includes('player-search.js?v=20261102-facefix1'));
+assert.ok(/unified-profile\.js\?v=[A-Za-z0-9-]+/.test(html)&&html.includes('player-search.js?v=20261102-facefix1'));
+assert.ok(profile.includes("if(meta)meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong>';"),'Player identity should not repeat the team abbreviation');
+const latestProfileCss=read('clean-tenth.css');
+assert.ok(latestProfileCss.includes('left:50%!important;top:50%!important')&&latestProfileCss.includes('grid-template-columns:30px minmax(0,1fr) max-content!important'),'Portrait logo and team metadata must be centered and aligned');
 assert.ok(profile.includes("['performance','Analytics']"),'Player card Performance tab must read Analytics');
 assert.ok(profile.includes('playerDepthChartButton')&&profile.includes('openTeamDepthChart(team)'),'Player card needs its team depth-chart button');
 assert.ok(profile.includes('canonicalTeam(option.value)===canonicalTeam(team)'),'Team depth chart navigation must resolve league abbreviation aliases');

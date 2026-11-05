@@ -58,7 +58,11 @@ function parseLeague(data,leagueId,teamId){
  const unique=new Set(result.map(x=>x.id+'|'+x.slot));
  if(unique.size!==result.length)return null;
  const period=Number(data.status?.currentMatchupPeriod||data.status?.currentScoringPeriod||0);
- return {roster:result,period:Number.isInteger(period)&&period>=1&&period<=18?period:null};
+ // ESPN includes user-customized fantasy team logos in the public mTeam view.
+ // Keep a verified URL only; private leagues continue using their initials.
+ const rawLogo=typeof team.logo==='string'?team.logo:typeof team.logoUrl==='string'?team.logoUrl:'';
+ const logoUrl=/^https:\/\//i.test(rawLogo)?rawLogo:'';
+ return {roster:result,period:Number.isInteger(period)&&period>=1&&period<=18?period:null,logoUrl};
 }
 async function fetchLeague(id,teamId){
  const base='/apis/v3/games/ffl/seasons/2026/segments/0/leagues/'+encodeURIComponent(id);
@@ -105,6 +109,17 @@ async function refresh(force=false){
      readable++;
      const snapshot=snapshots[x.index];
      if(!snapshot)continue;
+     if(value.logoUrl){
+      x.logoUrl=value.logoUrl;
+      const currentCard=ui.section._cards?.findIndex(card=>String(card.id)===String(x.id)&&String(card.teamId)===String(x.teamId));
+      const identity=currentCard>=0?ui.section.querySelectorAll('.myteams-grid > .myteams-card')[currentCard]?.querySelector('.myteams-card-identity'):null;
+      if(identity&&!identity.querySelector('.myteams-team-logo')){
+       const logo=document.createElement('img');
+       logo.className='myteams-team-logo';logo.loading='lazy';logo.alt='';logo.src=value.logoUrl;
+       logo.onerror=()=>logo.remove();
+       identity.prepend(logo);
+      }
+     }
      const previous=JSON.stringify((snapshot.roster||[]).map(p=>[String(p.id),String(p.slot)]).sort());
      const fresh=JSON.stringify(value.roster.map(p=>[p.id,p.slot]).sort());
      if(fresh!==previous){

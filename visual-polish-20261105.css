@@ -1,0 +1,146 @@
+/* November 5 visual pass. All selectors are additive, keep the existing
+   broadcast player card and data/navigation behavior, and omit percentage bars. */
+body.shua-clean{
+  --visual-bg:#071827;
+  --visual-panel:#0b2235;
+  --visual-line:rgba(165,201,220,.14);
+  --visual-muted:#a9c0d0;
+  --visual-positive:#61dfb2;
+  --visual-negative:#f28c9d;
+}
+
+/* 1: Give the positional rankings purposeful column proportions and readable
+   excerpts, rather than one enormous player column and empty space. */
+@media(min-width:701px){
+ body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard table{table-layout:fixed!important}
+ body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard :is(th,td):nth-child(1){width:8%!important}
+ body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard :is(th,td):nth-child(2){width:37%!important}
+ body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard :is(th,td):nth-child(5){width:14%!important}
+ body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) #tableCard :is(th,td):nth-child(6){width:41%!important;max-width:none!important}
+ body.shua-clean:not(.phone-mode) #tableCard td.notes .shua-note-excerpt{-webkit-line-clamp:2!important;line-clamp:2!important;line-height:1.36}
+}
+body.shua-clean #tableCard :is(th,td){border-color:var(--visual-line)}
+body.shua-clean #tableCard tbody tr:nth-child(2n){background:rgba(76,118,145,.055)}
+body.shua-clean #tableCard tbody tr:hover{background:rgba(63,151,133,.145)!important}
+body.shua-clean #tableCard tbody tr:hover>td:first-child{box-shadow:inset 3px 0 0 #51d4a9}
+body.shua-clean #tableCard td.rank{font-size:15px!important;letter-spacing:-.025em}
+body.shua-clean #tableCard .rank-player-copy>b{font-size:clamp(14px,1.05vw,16px)!important;font-weight:900}
+body.shua-clean #tableCard .photo{width:43px;height:43px;flex-basis:43px}
+body.shua-clean #tableCard .photo-cell{gap:11px}
+body.shua-clean #tableCard .phone-rank-meta{font-size:11px;color:#a6bdcc}
+body.shua-clean #tableCard .shua-fifth-espn-gap{font-size:13px!important}
+
+/* 3: Protect the approved NFL-broadcast identity layout as photos and names
+   vary in length; keep the top line aligned with the same portrait crop. */
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-team-name{
+  font-size:clamp(.72rem,1.55vw,1.34rem)!important;
+  letter-spacing:.12em!important;
+  line-height:1.12!important;
+  text-wrap:nowrap;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-right{min-width:0}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box .featured-photo{
+  object-position:center bottom!important;
+}
+body.shua-clean #modal .player-swipe-preview .featured-player-card.broadcast-card{
+  transition:none!important;
+}
+
+/* 4: A shared control language across every dashboard. No search bars added. */
+body.shua-clean :is(
+  #shuaAnalyticsSection .st-usage-controls select,
+  #shuaAnalyticsSection .st-controls select,
+  #shuaAnalyticsSection .st-injury-filters select,
+  #espnLiveSection #espnStatsYear,
+  #espnLiveSection #espnColumnStatSelect,
+  #shuaMyTeams #myTeamsYear
+){min-height:37px!important;border-radius:9px!important;border:1px solid #35576b!important;background-color:#0d2b40!important;color:#ecf5fa!important;font-weight:800!important}
+body.shua-clean :is(
+  #shuaAnalyticsSection .st-usage-groups button,
+  #shuaAnalyticsSection .st-position button,
+  #shuaMyTeams .myteams-subnav button,
+  #espnLiveSection .espn-filter,
+  #espnLiveSection .espn-view-btn,
+  #positionToggle button
+){border-radius:9px!important;min-height:36px!important;font-weight:850!important}
+body.shua-clean :is(
+  #shuaAnalyticsSection .st-usage-groups button[aria-pressed="true"],
+  #shuaAnalyticsSection .st-position button[aria-pressed="true"],
+  #shuaMyTeams .myteams-subnav button[aria-selected="true"],
+  #espnLiveSection .espn-filter.active,
+  #espnLiveSection .espn-view-btn.active,
+  #positionToggle button.active
+){background:#145341!important;border-color:#3d9578!important;color:#e6fff5!important}
+
+/* 5: Real NFL team colors on portraits, subtle enough to keep one site theme. */
+body.shua-clean #tableCard .shua-accent-ready .photo,
+body.shua-clean #shuaAnalyticsSection .shua-accent-ready .st-face,
+body.shua-clean #espnLiveSection .shua-accent-ready .espn-headshot,
+body.shua-clean #shuaMyTeams .shua-accent-ready .myteams-player-open>img{
+  border:2px solid var(--shua-player-color,#54869f)!important;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--shua-player-color,#54869f) 45%,transparent)!important;
+}
+
+/* 6: Analytics has visible hierarchy, without synthetic statistics or bars. */
+body.shua-clean #shuaAnalyticsSection .st-panel{background:#0a2033!important;border-color:var(--visual-line)!important}
+body.shua-clean #shuaAnalyticsSection .st-panel-head h3{font-size:clamp(15px,1.25vw,18px);line-height:1.2;letter-spacing:-.025em;font-weight:900;color:#f2faff}
+body.shua-clean #shuaAnalyticsSection .st-panel-head p{font-size:11px;color:var(--visual-muted);line-height:1.4}
+body.shua-clean #shuaAnalyticsSection .st-metric b{font-size:clamp(19px,2vw,26px)!important;font-variant-numeric:tabular-nums}
+body.shua-clean #shuaAnalyticsSection .st-rank-row:nth-of-type(-n+3){background:linear-gradient(90deg,rgba(58,153,132,.085),transparent 75%);border-radius:7px}
+body.shua-clean #shuaAnalyticsSection .st-rank-num{font-size:14px;letter-spacing:-.03em}
+body.shua-clean #shuaAnalyticsSection .st-score{font-weight:900;font-variant-numeric:tabular-nums}
+body.shua-clean #shuaAnalyticsSection .st-usage-table thead th{color:#bed0dd;font-size:11px!important;letter-spacing:.005em}
+body.shua-clean #shuaAnalyticsSection .st-usage-table .st-usage-sort.is-active{color:#6af0be!important}
+body.shua-clean #shuaAnalyticsSection .st-usage-table td:not(:first-child){font-size:12px;font-variant-numeric:tabular-nums}
+body.shua-clean #shuaAnalyticsSection .st-usage-table tbody tr:nth-child(2n) td{background-color:rgba(64,113,146,.075)}
+body.shua-clean #shuaAnalyticsSection .st-usage-table tbody tr:hover td{background-color:rgba(51,127,121,.17)}
+
+/* 8: Fantasy league identity and record align clearly; prefer genuine logos,
+   while initials remain a reliable fallback for private leagues. */
+body.shua-clean #shuaMyTeams .myteams-card-trigger{min-height:62px!important;padding:10px 14px!important}
+body.shua-clean #shuaMyTeams .myteams-card-identity{gap:12px!important}
+body.shua-clean #shuaMyTeams :is(.myteams-team-logo,.shua-league-monogram){height:39px!important;width:39px!important;flex-basis:39px!important;border-radius:9px}
+body.shua-clean #shuaMyTeams .myteams-team-logo{object-fit:contain;background:transparent!important}
+body.shua-clean #shuaMyTeams .shua-league-monogram{background:linear-gradient(135deg,#1c5755,#103743);border:1px solid #34766f;font-size:13px}
+body.shua-clean #shuaMyTeams .myteams-name{font-size:15px!important;font-weight:900;line-height:1.2}
+body.shua-clean #shuaMyTeams .myteams-league{font-size:11px!important;color:#a7bdca}
+body.shua-clean #shuaMyTeams .shua-league-record{min-width:48px;padding:6px 8px!important;font-size:12px!important}
+body.shua-clean #shuaMyTeams .myteams-glance{color:#b5c9d5;font-size:11px}
+body.shua-clean #shuaMyTeams .myteams-card:has(.myteams-card-trigger[aria-expanded="true"]){border-color:#3c9a7d!important}
+
+/* 9: Consistent type scale: identity first, metadata second, numbers tabular. */
+body.shua-clean main>.head h2,
+body.shua-clean #shuaMyTeams .myteams-header h2,
+body.shua-clean #shuaStock .stock-top h2{font-size:clamp(21px,2vw,27px)!important;line-height:1.17!important;letter-spacing:-.035em!important;font-weight:900!important}
+body.shua-clean #shuaAnalyticsSection .st-person strong,
+body.shua-clean #espnLiveSection .espn-player-name{font-size:13.5px!important;font-weight:900!important;line-height:1.2!important}
+body.shua-clean :is(#shuaAnalyticsSection .st-person small,#espnLiveSection .espn-player-meta){color:var(--visual-muted)!important;font-size:10.5px}
+
+/* 10: Predictable selection feedback without slow or distracting motion. */
+body.shua-clean :is(#shuaCleanNav .shua-clean-trigger,#shuaCleanNav .shua-clean-popup button,#tableCard tbody tr,#shuaMyTeams .myteams-card-trigger,#shuaAnalyticsSection .st-usage-groups button){transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease!important}
+body.shua-clean #shuaCleanNav .shua-clean-popup button:is(.is-selected,.is-drag-hover){box-shadow:inset 3px 0 0 #68e5b4}
+body.shua-clean #shuaCleanNav .shua-clean-trigger:focus-visible,
+body.shua-clean #shuaMyTeams .myteams-card-trigger:focus-visible,
+body.shua-clean #tableCard tbody tr:focus-within{outline:2px solid #5ce8b6;outline-offset:2px}
+
+/* 7: Phone first—full two-line names and one anchored identity column.
+   The existing horizontal metric scroll and per-column sorting stay intact. */
+@media(max-width:760px){
+ body.shua-clean #tableCard .photo{width:37px!important;height:37px!important;flex-basis:37px!important}
+ body.shua-clean #tableCard .photo-cell{gap:8px!important}
+ body.shua-clean #tableCard .rank-player-copy>b{font-size:clamp(14px,3.9vw,16px)!important;line-height:1.19!important}
+ body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th:first-child,
+ body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:first-child{min-width:185px!important;width:185px!important;max-width:185px!important}
+ body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table .st-person strong{font-size:13px!important;line-height:1.22!important;white-space:normal!important;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden!important}
+ body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table .st-person .st-face{height:34px!important;width:34px!important;min-width:34px!important;flex-basis:34px!important}
+ body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:not(:first-child){min-width:77px!important;font-size:12px!important}
+ body.shua-clean #shuaMyTeams .myteams-card-trigger{min-height:58px!important;padding:9px!important;gap:7px!important}
+ body.shua-clean #shuaMyTeams :is(.myteams-team-logo,.shua-league-monogram){width:34px!important;height:34px!important;flex-basis:34px!important}
+ body.shua-clean #shuaMyTeams .myteams-card-identity{gap:7px!important}
+ body.shua-clean #shuaMyTeams .myteams-name{font-size:13.5px!important}
+ body.shua-clean #shuaMyTeams .myteams-league{font-size:10px!important}
+ body.shua-clean #modal .featured-player-card.broadcast-card .featured-team-name{font-size:clamp(.62rem,2.7vw,.9rem)!important;letter-spacing:.075em!important}
+}
+@media(prefers-reduced-motion:reduce){
+ body.shua-clean :is(#shuaCleanNav .shua-clean-trigger,#shuaCleanNav .shua-clean-popup button,#tableCard tbody tr,#shuaMyTeams .myteams-card-trigger,#shuaAnalyticsSection .st-usage-groups button){transition:none!important}
+}

@@ -48,6 +48,7 @@ const TEAM_SECONDARY_ACCENTS={
   TEN:'#c8102e',WAS:'#ffb612'
 };
 let sleeperBioPromise=null;
+let sleeperBioMap=null;
 let activeSeed=null;
 let preferredProfileTab=(()=>{try{return sessionStorage.getItem('shuaProfileTab')||'overview'}catch(e){return'overview'}})();
 let swipeHintShownThisSession=false;
@@ -831,6 +832,23 @@ function expLabel(value){
   const n=Number(value);
   return Number.isFinite(n)&&n>=0?(n===0?'R':String(n)):'—';
 }
+function findSleeperBio(map,name,position='',team=''){
+  if(!map)return null;
+  const wanted=norm(name);
+  let list=map.get(wanted)||[];
+  if(!list.length){
+    const base=wanted.replace(/(jr|sr|ii|iii|iv)$/,'');
+    for(const [key,rows] of map){if(key.replace(/(jr|sr|ii|iii|iv)$/,'')===base){list=rows;break}}
+  }
+  const pos=String(position||'').toUpperCase();
+  const tm=canonicalTeam(team);
+  return list.find(p=>(!pos||String(p.position||'').toUpperCase()===pos)&&(!tm||canonicalTeam(p.team)===tm))||
+    list.find(p=>!pos||String(p.position||'').toUpperCase()===pos)||
+    list[0]||null;
+}
+function cachedSleeperBio(name,position='',team=''){
+  return findSleeperBio(sleeperBioMap,name,position,team);
+}
 async function getSleeperBio(name,position='',team=''){
   if(!sleeperBioPromise){
     sleeperBioPromise=fetch('https://api.sleeper.app/v1/players/nfl',{cache:'force-cache'})
@@ -844,22 +862,41 @@ async function getSleeperBio(name,position='',team=''){
           if(!map.has(key))map.set(key,[]);
           map.get(key).push(p);
         });
+        sleeperBioMap=map;
         return map;
       })
       .catch(()=>new Map());
   }
   const map=await sleeperBioPromise;
-  const wanted=norm(name);
-  let list=map.get(wanted)||[];
-  if(!list.length){
-    const base=wanted.replace(/(jr|sr|ii|iii|iv)$/,'');
-    for(const [key,rows] of map){if(key.replace(/(jr|sr|ii|iii|iv)$/,'')===base){list=rows;break}}
-  }
-  const pos=String(position||'').toUpperCase();
-  const tm=canonicalTeam(team);
-  return list.find(p=>(!pos||String(p.position||'').toUpperCase()===pos)&&(!tm||canonicalTeam(p.team)===tm))||
-    list.find(p=>!pos||String(p.position||'').toUpperCase()===pos)||
-    list[0]||null;
+  return findSleeperBio(map,name,position,team);
+}
+function featuredBioRows(player,bio){
+  const override=PROFILE_BIO_OVERRIDES[norm(player?.name)]||{};
+  return [
+    ['AGE',override.age||ageLabel(bio?.age??player?.age,bio?.birth_date??player?.birth_date)],
+    ['HEIGHT',override.height||heightLabel(bio?.height??player?.height)],
+    ['WEIGHT',override.weight||weightLabel(bio?.weight??player?.weight)],
+    ['EXP',override.exp||expLabel(bio?.years_exp??player?.years_exp??player?.yearsExp)]
+  ];
+}
+function featuredJerseyNumber(player,bio){
+  const override=PROFILE_BIO_OVERRIDES[norm(player?.name)]||{};
+  const number=override.number??bio?.number??bio?.jersey_number??player?.jersey_number??player?.jerseyNumber??player?.number;
+  return number!=null&&String(number)!==''?'#'+number:'';
+}
+function paintFeaturedBio(card,rows){
+  card?.querySelectorAll('.featured-bio-item').forEach((item,i)=>{
+    if(!rows[i])return;
+    const label=item.querySelector('.featured-bio-label'),value=item.querySelector('.featured-bio-value');
+    if(label)label.textContent=rows[i][0];
+    if(value)value.textContent=rows[i][1];
+  });
+}
+function paintFeaturedIdentity(card,player,bio){
+  const pos=card?.querySelector('.featured-identity-meta .featured-team-meta strong');
+  if(pos)pos.textContent=String(player?.position||bio?.position||'—');
+  const jersey=card?.querySelector('.featured-jersey-number');
+  if(jersey)jersey.textContent=featuredJerseyNumber(player,bio);
 }
 function fillFeaturedBio(player,seed,bio){
   const card=document.getElementById('featuredPlayerCard');
@@ -872,28 +909,11 @@ function fillFeaturedBio(player,seed,bio){
       ppg:Number.isFinite(Number(seed?.average))?Number(seed.average).toFixed(1):'—',
       games:Number.isFinite(Number(seed?.gamesPlayed))?String(Number(seed.gamesPlayed)):'—'
     };
-    [['YEAR',vals.year],['PPR PTS',vals.points],['PPG',vals.ppg],['GP',vals.games]].forEach(([label,value],i)=>{
-      const el=card.querySelectorAll('.featured-bio-item')[i];
-      if(el){el.querySelector('.featured-bio-label').textContent=label;el.querySelector('.featured-bio-value').textContent=value}
-    });
+    paintFeaturedBio(card,[['YEAR',vals.year],['PPR PTS',vals.points],['PPG',vals.ppg],['GP',vals.games]]);
     return;
   }
-  const override=PROFILE_BIO_OVERRIDES[norm(player?.name)]||{};
-  const values={
-    age:override.age||ageLabel(bio?.age,bio?.birth_date),
-    height:override.height||heightLabel(bio?.height),
-    weight:override.weight||weightLabel(bio?.weight),
-    exp:override.exp||expLabel(bio?.years_exp)
-  };
-  [['AGE',values.age],['HEIGHT',values.height],['WEIGHT',values.weight],['EXP',values.exp]].forEach(([label,value],i)=>{
-    const el=card.querySelectorAll('.featured-bio-item')[i];
-    if(el){el.querySelector('.featured-bio-label').textContent=label;el.querySelector('.featured-bio-value').textContent=value}
-  });
-  const number=override.number??bio?.number??bio?.jersey_number??player?.jersey_number??player?.jerseyNumber??player?.number;
-  const meta=card.querySelector('.featured-team-meta');
-  if(meta)meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong>';
-  const jersey=card.querySelector('.featured-jersey-number');
-  if(jersey)jersey.textContent=number!==null&&number!==undefined&&String(number)!==''?'#'+number:'';
+  paintFeaturedBio(card,featuredBioRows(player,bio));
+  paintFeaturedIdentity(card,player,bio);
   fitFeaturedName(card);
 }
 function applyFeaturedProfile(name,seed=null){
@@ -1366,25 +1386,29 @@ function ensurePlayerSwipePreview(targetId){
   const first=copy.querySelector('.featured-first'),last=copy.querySelector('.featured-last');
   if(first)first.textContent=parts.first;
   if(last)last.textContent=parts.last;
-  const meta=copy.querySelector('.featured-identity-meta .featured-team-meta');
-  if(meta)meta.innerHTML='<strong>'+String(p.position||'—')+'</strong>';
-  const jersey=copy.querySelector('.featured-jersey-number');
-  const number=PROFILE_BIO_OVERRIDES[norm(p.name)]?.number??p.jersey_number??p.jerseyNumber??p.number;
-  if(jersey)jersey.textContent=number!=null&&number!==''?'#'+number:'';
+  const cachedBio=cachedSleeperBio(p.name,p.position,team);
   const historicalYear=seedYear(p);
   const bio=p.position==='D/ST'
     ?[['POSITION','D/ST'],['TEAM',team],['SEASON','2026'],['TYPE','DEFENSE']]
     :historicalYear
       ?[['YEAR',String(historicalYear)],['PPR PTS',p.points??'—'],['PPG',p.average??'—'],['GP',p.gamesPlayed??'—']]
-      :[['AGE','—'],['HEIGHT','—'],['WEIGHT','—'],['EXP','—']];
-  copy.querySelectorAll('.featured-bio-item').forEach((item,i)=>{
-    if(bio[i]){
-      item.querySelector('.featured-bio-label').textContent=bio[i][0];
-      item.querySelector('.featured-bio-value').textContent=bio[i][1];
-    }
-  });
+      :featuredBioRows(p,cachedBio);
+  paintFeaturedBio(copy,bio);
+  paintFeaturedIdentity(copy,p,p.position==='D/ST'?null:cachedBio);
   preview.replaceChildren(copy);
   fitFeaturedName(copy);
+  // The first player opening loads the Sleeper bio directory once. Use the
+  // in-memory result immediately, or hydrate the visible incoming card as soon
+  // as that same request completes without rebuilding its layout.
+  if(p.position!=='D/ST'&&!historicalYear&&!cachedBio){
+    getSleeperBio(p.name,p.position,team).then(loaded=>{
+      if(preview.isConnected&&preview.dataset.targetId===String(targetId)&&preview.contains(copy)){
+        paintFeaturedBio(copy,featuredBioRows(p,loaded));
+        paintFeaturedIdentity(copy,p,loaded);
+        fitFeaturedName(copy);
+      }
+    }).catch(()=>{});
+  }
   const tabs=document.getElementById('unifiedProfileTabs')?.cloneNode(true);
   if(tabs){tabs.removeAttribute('id');tabs.setAttribute('aria-hidden','true');preview.appendChild(tabs)}
   return preview;

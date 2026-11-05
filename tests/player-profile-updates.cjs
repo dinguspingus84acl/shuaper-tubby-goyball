@@ -17,11 +17,26 @@ assert.ok(profile.includes('featured-player-card broadcast-card')&&profile.inclu
 assert.ok(profile.includes('function fitFeaturedName(card)')&&profile.includes('white-space:nowrap!important;overflow-wrap:normal!important'),'All names must fit on exactly two lines');
 assert.ok(studio.includes("target.innerHTML=C.line({title:'Weekly scoring',labels:gs.map(g=>'W'+g.week),series:[{name:'PPR',values:gs.map(g=>g.points)}]}"));
 assert.ok(!studio.includes("target.innerHTML=C.line({title:'Weekly scoring',labels:gs.map(g=>'W'+g.week),series:[{name:'PPR',values:gs.map(g=>g.points)},{name:'3-game average'"));
-function sourceFunction(source,start,end){
+function sourceFunction(source,start,end,context={}){
  const i=source.indexOf(start),j=source.indexOf(end,i);
  assert.ok(i>=0&&j>i,start+' missing');
- return vm.runInNewContext('('+source.slice(i,j).trim()+')');
+ return vm.runInNewContext('('+source.slice(i,j).trim()+')',context);
 }
+const playerBioContext={
+  PROFILE_BIO_OVERRIDES:{bijanrobinson:{age:'24',height:'5\'11"',weight:'215 lbs',exp:'4',number:'7'}},
+  norm:s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''),
+  ageLabel:sourceFunction(profile,'function ageLabel(value,birthDate,seasonYear=null){','function expLabel(value){'),
+  heightLabel:sourceFunction(profile,'function heightLabel(value){','function weightLabel(value){'),
+  weightLabel:sourceFunction(profile,'function weightLabel(value){','function ageLabel(value,birthDate,seasonYear=null){'),
+  expLabel:sourceFunction(profile,'function expLabel(value){','function findSleeperBio(map,name,position=\'\',team=\'\'){')
+};
+const bioRows=sourceFunction(profile,'function featuredBioRows(player,bio){','function featuredJerseyNumber(player,bio){',playerBioContext);
+const jerseyNumber=sourceFunction(profile,'function featuredJerseyNumber(player,bio){','function paintFeaturedBio(card,rows){',playerBioContext);
+assert.equal(JSON.stringify(bioRows({name:'Other Player'},{age:28,height:71,weight:220,years_exp:6})),
+ JSON.stringify([['AGE','28'],['HEIGHT','5\'11"'],['WEIGHT','220 lbs'],['EXP','6']]),'Swipe preview must format all four loaded bio fields');
+assert.equal(JSON.stringify(bioRows({name:'Bijan Robinson'},null)),
+ JSON.stringify([['AGE','24'],['HEIGHT','5\'11"'],['WEIGHT','215 lbs'],['EXP','4']]),'Swipe preview should show bio overrides instantly');
+assert.equal(jerseyNumber({name:'Bijan Robinson'},null),'#7','Swipe preview should show the known jersey number immediately');
 const columns=sourceFunction(espn,'function gameLogColumns(mode,position){','function cleanGameLogOpponent');
 const modes=sourceFunction(espn,'function gameLogModesFor(position){','function defaultGameLogMode');
 for(const pos of ['RB','WR','TE','QB']){
@@ -49,7 +64,8 @@ assert.ok(profile.includes('ensurePlayerSwipePreview(target)')&&profile.includes
 const swipePreviewSource=profile.slice(profile.indexOf('function ensurePlayerSwipePreview(targetId){'),profile.indexOf('function resetPhoneProfileSheet(){'));
 assert.ok(swipePreviewSource.includes("copy.className='featured-player-card broadcast-card'"),'Swipe preview must use the same broadcast layout as the live card');
 assert.ok(swipePreviewSource.includes('featuredFullTeamName(team)')&&swipePreviewSource.includes("copy.style.setProperty('--featured-secondary'"),'Swipe preview must use the full team name and correct team colors');
-assert.ok(swipePreviewSource.includes(".featured-identity-meta .featured-team-meta")&&!swipePreviewSource.includes('<div class="featured-team-meta">'),'Swipe preview must keep the position below the name, not in the team header');
+assert.ok(swipePreviewSource.includes("paintFeaturedIdentity(copy,p,")&&!swipePreviewSource.includes('<div class="featured-team-meta">'),'Swipe preview must keep the position below the name, not in the team header');
+assert.ok(swipePreviewSource.includes('cachedSleeperBio(p.name,p.position,team)')&&swipePreviewSource.includes('getSleeperBio(p.name,p.position,team).then(loaded=>'),'Swipe preview should populate the entire bio from cache or hydrate it without a layout swap');
 assert.ok(profile.includes('featured-name-ladd'),'Ladd surname must stay on one line');
 assert.ok(search.includes('faceHtml(p)')&&search.includes('legacy-stats/headshots.json'),'Search must use player photos');
 assert.ok(search.includes('shua-search-initials')&&search.includes('shua-search-face'),'Initials fallback required');
@@ -67,7 +83,7 @@ assert.ok(studio.includes('stGlobalLeadingAvatar')&&studio.includes('setAnalytic
 assert.ok(studio.includes("magnifier.toggleAttribute('hidden',!!player)"),'Analytics magnifier must actually hide as an SVG attribute');
 assert.ok(studioCss.includes('.st-global-leading-avatar'),'Analytics leading face styling required');
 assert.ok(/unified-profile\.js\?v=[A-Za-z0-9-]+/.test(html)&&html.includes('player-search.js?v=20261102-facefix1'));
-assert.ok(profile.includes("if(meta)meta.innerHTML='<strong>'+String(player?.position||bio?.position||'—')+'</strong>';"),'Player identity should not repeat the team abbreviation');
+assert.ok(profile.includes("if(pos)pos.textContent=String(player?.position||bio?.position||'—');"),'Player identity should not repeat the team abbreviation');
 const latestProfileCss=read('broadcast-player-card.css');
 assert.ok(latestProfileCss.includes('left:49%!important')&&latestProfileCss.includes('grid-column:1 / -1!important'),'The logo stays behind the portrait and stats span the entire broadcast card');
 assert.ok(latestProfileCss.includes('.featured-mini-logo')&&latestProfileCss.includes('.featured-divider'),'Broadcast team identity needs its small team logo and vertical divider');

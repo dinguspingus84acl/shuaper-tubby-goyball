@@ -132,22 +132,18 @@ def check_browser(browser,phone):
         assert a and b and b['x']>a['x']+a['width'],('Display jersey number | position in that order',a,b)
         assert abs(a['y']-b['y'])<=5,('Jersey and position must share one row',a,b)
     if phone:
-        swipe=page.evaluate('''()=>{
-          const sheet=document.querySelector('#modal .profile');
-          if(!sheet)return {error:'Player sheet missing'};
-          const touch=(x,y)=>new Touch({identifier:7,target:sheet,clientX:x,clientY:y,
-            pageX:x,pageY:y,screenX:x,screenY:y});
-          const dispatch=(type,t)=>{
-            const released=type==='touchcancel'||type==='touchend';
-            sheet.dispatchEvent(new TouchEvent(type,{bubbles:true,cancelable:true,
-              touches:released?[]:[t],targetTouches:released?[]:[t],changedTouches:[t]}));
-          };
-          dispatch('touchstart',touch(320,330));
-          dispatch('touchmove',touch(215,332));
+        point=hero.locator('.featured-left').evaluate('''el=>{
+          const r=el.getBoundingClientRect();
+          return {x:r.left+Math.min(75,r.width*.55),y:r.top+Math.min(45,r.height*.25)};
+        }''')
+        cdp=ctx.new_cdp_session(page)
+        cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[point]})
+        cdp.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[{'x':point['x']+100,'y':point['y']}]})
+        try:
+            swipe=page.evaluate('''()=>{
           const preview=document.getElementById('playerSwipePreview');
           const card=preview?.querySelector('#previewFeaturedPlayerCard');
           if(!card){
-            dispatch('touchcancel',touch(215,332));
             return {error:'Real phone swipe did not create a preview',
               hasPreview:!!preview,modalId:document.getElementById('modal')?.dataset.id};
           }
@@ -168,13 +164,16 @@ def check_browser(browser,phone):
             name:(card.querySelector('.featured-first')?.textContent+' '+card.querySelector('.featured-last')?.textContent).trim(),
             expectedName,
             position:card.querySelector('.featured-identity-meta .featured-team-meta')?.textContent?.trim(),
+            number:card.querySelector('.featured-identity-meta .featured-jersey-number')?.textContent?.trim(),
             staleTeamHeaderPosition:!!card.querySelector('.featured-team-strip .featured-team-meta'),
             statCount:card.querySelectorAll('.featured-bio-item').length,
+            bioValues:[...card.querySelectorAll('.featured-bio-value')].map(x=>x.textContent.trim()),
             secondaryAccent:card.style.getPropertyValue('--featured-secondary')
           };
-          dispatch('touchcancel',touch(215,332));
           return result;
         }''')
+        finally:
+            cdp.send('Input.dispatchTouchEvent',{'type':'touchCancel','touchPoints':[]})
         assert 'error' not in swipe,swipe
         assert swipe['broadcast'] and swipe['cardDisplay']=='grid',('Incoming swipe card must use the broadcast design',swipe)
         assert swipe['sameAspectRatio'] and swipe['sameBackground'],('Incoming card must match current card styling',swipe)
@@ -183,6 +182,9 @@ def check_browser(browser,phone):
         assert swipe['name']==swipe['expectedName'],('Swipe preview must show the next player, not the previous name',swipe)
         assert swipe['position']=='RB' and not swipe['staleTeamHeaderPosition'],('Position must stay below the name during swiping',swipe)
         assert swipe['statCount']==4 and swipe['secondaryAccent'],('Incoming card must preserve four stats and team accents',swipe)
+        if swipe['expectedName']=='Jahmyr Gibbs':
+            assert swipe['number']=='#0',('Known jersey number should be visible before releasing swipe',swipe)
+            assert swipe['bioValues']==['24','5\'9"','202 lbs','4'],('Known age, height, weight and experience should be visible during swipe',swipe)
         page.wait_for_timeout(250)
     page.locator('[data-profile-tab="performance"]').click()
     performance=page.locator('#unifiedPerformancePanel')

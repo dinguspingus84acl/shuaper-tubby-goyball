@@ -1,0 +1,157 @@
+/* Approved improvements 2, 3, 5, 6, 9, 10 — visual-only layer. */
+
+/* 2. Player rows already include a team logo, team, and position. Give that
+   information one home and use the recovered width for scouting notes. */
+body.shua-clean #tableCard :is(th,td):is(:nth-child(3),:nth-child(4)) {
+  display:none!important;
+}
+@media (min-width:701px) {
+  body.shua-clean #tableCard table {table-layout:fixed!important}
+  body.shua-clean #tableCard :is(th,td):nth-child(1) {width:7%!important}
+  body.shua-clean #tableCard :is(th,td):nth-child(2) {width:37%!important}
+  body.shua-clean #tableCard :is(th,td):nth-child(5) {width:12%!important}
+  body.shua-clean #tableCard :is(th,td):nth-child(6) {width:44%!important;max-width:none!important}
+  body.shua-clean #tableCard .rank-player-copy {min-width:0}
+}
+@media (max-width:700px) {
+  body.shua-clean.phone-mode #tableCard tbody tr:has(.photo-cell) {
+    grid-template-columns:44px minmax(0,1fr)!important;
+  }
+  body.shua-clean.phone-mode #tableCard tbody td:nth-child(2) {min-width:0!important}
+}
+
+/* 3. Two readable lines by default. The disclosure still opens the entire
+   note; an older stylesheet forced a two-line clamp even while expanded. */
+body.shua-clean #tableCard td.notes {
+  color:#e0edf5!important;font-size:13.5px!important;
+  line-height:1.55!important;letter-spacing:.004em;
+}
+body.shua-clean:not(.phone-mode) #tableCard td.notes .shua-note-excerpt {
+  display:-webkit-box!important;-webkit-box-orient:vertical;
+  -webkit-line-clamp:2!important;line-clamp:2!important;
+  overflow:hidden;overflow-wrap:break-word;
+}
+body.shua-clean:not(.phone-mode) #tableCard td.notes.is-expanded .shua-note-excerpt {
+  display:block!important;-webkit-line-clamp:unset!important;line-clamp:unset!important;
+  overflow:visible!important;
+}
+body.shua-clean #tableCard .shua-note-toggle:focus-visible {
+  outline:2px solid #70e9c1;outline-offset:3px;
+}
+
+/* 5. Three levels of text contrast across the information-heavy screens. */
+body.shua-clean :is(#tableCard .rank-player-copy>b,#tableCard .tagged-player-copy>b,
+  #espnLiveSection .espn-player-name,#espnLiveSection .espn-name-btn,
+  #shuaStock .stock-name,#shuaMyTeams .myteams-name,
+  #shuaAnalyticsSection .st-person strong) {color:#f5fbff!important}
+body.shua-clean :is(#tableCard .phone-rank-meta,#espnLiveSection .espn-player-meta,
+  #shuaMyTeams .myteams-league,#shuaMyTeams .myteams-player-open small,
+  #shuaStock .stock-meta,#shuaAnalyticsSection .st-person small,
+  #shuaAnalyticsSection .st-panel-head p,#shuaWeatherSection .wx-venue) {
+  color:#bacfdc!important;
+}
+body.shua-clean :is(main>.head small,#shuaMyTeams .myteams-subtitle,
+  #shuaStock .stock-sub,#shuaAnalyticsSection .st-chart-unit) {
+  color:#a7c2d1!important;
+}
+
+/* 6. Make the active Stats sort obvious, but don't color the whole row. */
+body.shua-clean.stats-mode #espnLiveSection #espnSelectedStatHead {
+  color:#e3fff6!important;font-weight:950!important;position:relative;
+  padding-bottom:8px!important;
+}
+body.shua-clean.stats-mode #espnLiveSection #espnSelectedStatHead::after {
+  content:"";position:absolute;right:4px;bottom:1px;
+  width:34px;height:2px;border-radius:3px;background:#4be0b3;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-selected-stat {
+  color:#f4fffb!important;font-weight:950!important;font-variant-numeric:tabular-nums;
+}
+body.shua-clean.stats-mode #espnLiveSection #espnColumnStatSelect {
+  border-color:#4b987f!important;
+}
+
+/* 9. Two visual identities directly above the existing shared line chart.
+   Colors are supplied from the chart's actual series palette. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-players {
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;
+  margin:2px 0 13px;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-player {
+  display:flex;align-items:center;min-width:0;gap:10px;
+  padding:10px 12px;background:#102b3e;border:1px solid #315368;
+  border-top:3px solid var(--compare-series-color);border-radius:10px;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-player .st-face,
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-player .st-avatar-fallback {
+  width:41px!important;height:41px!important;min-width:41px!important;
+  flex:0 0 41px;object-fit:cover;border-radius:50%!important;
+  border:1.5px solid var(--compare-series-color);
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-copy {
+  flex:1;min-width:0;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-copy b {
+  display:block;color:#f7fcff;font-size:13px;line-height:1.25;
+  overflow-wrap:break-word;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-copy small {
+  display:block;margin-top:3px;color:#b2cad8;font-size:10px;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-average {
+  margin-left:auto;text-align:right;flex:0 0 auto;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-average strong {
+  display:block;color:var(--compare-series-color);font-size:18px;
+  font-variant-numeric:tabular-nums;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-average span {
+  display:block;color:#b8ccda;font-size:9px;
+}
+
+/* 10. Show the real fantasy logo when available, otherwise the existing
+   monogram. Make records and official standings visually prominent. */
+body.shua-clean #shuaMyTeams .myteams-card-identity:has(.myteams-team-logo)>.shua-league-monogram {
+  display:none!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card-identity .myteams-team-logo,
+body.shua-clean #shuaMyTeams .myteams-card-identity>.shua-league-monogram {
+  width:49px!important;height:49px!important;min-width:49px!important;
+  flex:0 0 49px!important;object-fit:contain!important;
+  border-radius:10px!important;background:transparent;
+}
+body.shua-clean #shuaMyTeams .shua-league-record {
+  color:#eafff7!important;background:#16473f!important;
+  border:1px solid #3b927b!important;
+  border-radius:8px!important;padding:7px 10px!important;
+  font-size:12px!important;font-weight:950!important;
+  letter-spacing:.01em;white-space:nowrap;
+}
+body.shua-clean #shuaMyTeams .myteams-card-trigger {
+  border-radius:inherit;
+}
+body.shua-clean #shuaMyTeams .myteams-glance {
+  color:#b9d2df!important;
+}
+
+@media (max-width:700px) {
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-players {gap:6px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-player {
+    padding:7px;gap:6px;flex-wrap:wrap;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-player .st-face,
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-player .st-avatar-fallback {
+    width:34px!important;height:34px!important;min-width:34px!important;flex-basis:34px;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-copy b {font-size:11px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-copy small {font-size:9px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-average {
+    width:100%;display:flex;align-items:baseline;gap:5px;justify-content:flex-end;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-average strong {font-size:15px}
+  body.shua-clean #shuaMyTeams .myteams-card-identity .myteams-team-logo,
+  body.shua-clean #shuaMyTeams .myteams-card-identity>.shua-league-monogram {
+    width:39px!important;height:39px!important;min-width:39px!important;flex-basis:39px!important;
+  }
+  body.shua-clean #shuaMyTeams .shua-league-record {font-size:10px!important;padding:5px 7px!important}
+}

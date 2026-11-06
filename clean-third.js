@@ -43,7 +43,9 @@
     const own=league?.standings?.find(x=>String(x.teamId)===String(item.teamId))||
       league?.standings?.find(x=>x.teamName===item.team);
     if(!own||!Number.isFinite(Number(own.wins))||!Number.isFinite(Number(own.losses)))return null;
-    return own.wins+'–'+own.losses+(Number(own.ties)>0?'–'+own.ties:'');
+    const standing=Number(own.rank);
+    const placement=Number.isInteger(standing)&&standing>0?'#'+standing+' · ':'';
+    return placement+own.wins+'–'+own.losses+(Number(own.ties)>0?'–'+own.ties:'');
   }
   function decorateLeagues(){
     const grid=myTeams?.querySelector('.myteams-grid');
@@ -75,7 +77,7 @@
       const record=leagueRecord(myTeams._cards?.[i]);
       const finish=trigger.querySelector('.myteams-finish')?.textContent?.trim();
       result.textContent=record||finish?.replace(/^🏆\s*/u,'')||(myTeams._cards?.[i]?.year||2026);
-      result.title=record?'Win–loss record':finish?'Historical finish':'Season';
+      result.title=record?'League standing · win–loss record':finish?'Historical finish':'Season';
       trigger.append(result,icon('chevron'));
       trigger.dataset.shuaListReady='1';
     });

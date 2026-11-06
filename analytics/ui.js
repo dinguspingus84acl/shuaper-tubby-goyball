@@ -766,6 +766,7 @@ function shell(){
 }
 function persist(){updateLink();try{localStorage.setItem('shuaStudioStateV1',JSON.stringify({...state,outWeeks:null}));}catch(e){}}
 function render(){hideUsageTooltip();if(!visible||!dataset)return;const id=++renderId;C.reset();section.dataset.activeView=state.view;shell();const host=document.getElementById('stContent');try{if(state.view==='rankings')rankings(id);else host.innerHTML=renderers[state.view]();}catch(e){host.innerHTML=note('This dashboard could not render. '+E(e.message),true);console.error('SHUA Studio render',e);}
+ try{window.ShuaVisualSix?.decorateCompare?.(section);}catch(e){console.warn('SHUA comparison decoration',e);}
  const footer=document.getElementById('stSource');if(footer)footer.hidden=['consistency','weekly','injury','teams'].includes(state.view);if(footer)footer.textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');if(state.view==='teams'&&S.ReceiverEfficiency)S.ReceiverEfficiency.mount(state.team);persist();section.dataset.ready='true';}
 function rerenderUsage(){
  hideUsageTooltip();

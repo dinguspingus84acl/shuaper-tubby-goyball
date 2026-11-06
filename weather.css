@@ -172,7 +172,15 @@ body.shua-clean #shuaWeatherSection .wx-week-bar{
   box-shadow:0 7px 20px #00000025;
 }
 body.shua-clean #shuaWeatherSection .wx-game-top{
-  justify-content:flex-end;
+  justify-content:space-between;
+}
+body.shua-clean #shuaWeatherSection .wx-game-time{
+  font-size:16px;
+  font-weight:950;
+  line-height:1.2;
+  color:#e8f8ff;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
 }
 @media(max-width:700px){
   body.shua-clean #shuaWeatherSection .wx-week-bar{

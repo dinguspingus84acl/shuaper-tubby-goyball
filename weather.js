@@ -22,6 +22,7 @@
   const number=v=>typeof v==='number'&&Number.isFinite(v)?v:null;
   const display=(n,suffix)=>number(n)===null?'—':String(n)+suffix;
   const formatDate=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(iso));
+  const formatKickoffTime=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(new Date(iso));
   const safeLogo=url=>/^https:\/\/a\.espncdn\.com\/i\/teamlogos\/nfl\//.test(url||'')?url:'';
   const logo=team=>safeLogo(team.logo)?'<img class="wx-team-logo" src="'+escape(safeLogo(team.logo))+'" alt="" loading="lazy">':'';
   let snapshot=null,loading=false,visible=false,error='',lastFetchedAt=0,refreshTimer=null;
@@ -188,11 +189,11 @@
     // Keep unavailable forecasts explicit; never invent temperature or wind.
     if(isPending)return '<article class="wx-game wx-pending-game" data-weather-game="'+escape(game.id)+'" aria-label="'+escape(game.away.name+' at '+game.home.name+', forecast pending')+'">'+
       '<div class="wx-pending-fixture"><div class="wx-pending-matchup">'+logo(game.away)+'<strong>'+escape(game.away.abbr)+'</strong><span class="wx-pending-at">at</span>'+logo(game.home)+'<strong>'+escape(game.home.abbr)+'</strong></div>'+
-      '<div class="wx-pending-context"><small>'+escape(game.venue||'Venue TBA')+'</small></div></div>'+
+      '<div class="wx-pending-context"><strong>'+escape(formatKickoffTime(game.kickoffUtc))+'</strong><small>'+escape(game.venue||'Venue TBA')+'</small></div></div>'+
       '<span class="wx-impact wx-impact-pending">Forecast pending</span></article>';
     const fixture='<div class="wx-matchup"><div class="wx-team">'+logo(game.away)+'<span><b>'+escape(game.away.abbr)+'</b><small>'+escape(game.away.name)+'</small></span></div><span class="wx-versus">AT</span><div class="wx-team">'+logo(game.home)+'<span><b>'+escape(game.home.abbr)+'</b><small>'+escape(game.home.name)+'</small></span></div></div>';
     const venue='<div class="wx-venue">'+escape(game.venue||'Venue TBA')+(game.city?' · '+escape(game.city):'')+'</div>';
-    const header='<div class="wx-game-top"><div class="wx-game-conditions">'+gameSkyIcon(game)+'<span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div></div>';
+    const header='<div class="wx-game-top"><strong class="wx-game-time">'+escape(formatKickoffTime(game.kickoffUtc))+'</strong><div class="wx-game-conditions">'+gameSkyIcon(game)+'<span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div></div>';
     // All fixed-roof venues, including the Saints at Caesars Superdome, use
     // the identical compact indoor layout regardless of stray forecast fields.
     if(game.indoor)return '<article class="wx-game wx-indoor-game" data-weather-game="'+escape(game.id)+'">'+

@@ -579,7 +579,7 @@ function visibleRankingSequence(){
     if(typeof position!=='undefined'&&position==='ALL')arr=[...(board||[])];
     else if(typeof list==='function'&&typeof position!=='undefined'&&['QB','RB','WR','TE'].includes(position))arr=list();
     else arr=[...(board||[])];
-    return arr.map((p,i)=>({id:String(p.id||''),rank:'#'+(p.overallRank||p.positionRank||i+1),name:p.name||'Player'})).filter(x=>x.id);
+    return arr.map((p,i)=>({id:String(p.id||''),rank:String(p.overallRank||p.positionRank||i+1),name:p.name||'Player'})).filter(x=>x.id);
   }catch(e){return []}
 }
 function activeSequenceIndex(id){
@@ -614,7 +614,7 @@ function paintPlayerNav(id){
     btn.disabled=!item;btn.hidden=!item;btn.dataset.targetId=item?.id||'';
     if(!item){btn.replaceChildren();return;}
     btn.innerHTML='<span class="ranking-nav-arrow" aria-hidden="true">'+(dir==='prev'?'←':'→')+'</span><span class="ranking-nav-copy"><span class="ranking-nav-rank"></span><span class="ranking-nav-name"></span></span>';
-    btn.querySelector('.ranking-nav-rank').textContent=String(item.rank).startsWith('#')?item.rank:'#'+item.rank;
+    btn.querySelector('.ranking-nav-rank').textContent=String(item.rank).replace(/^#(?=\d)/,'');
     btn.querySelector('.ranking-nav-name').textContent=item.name;
     btn.setAttribute('aria-label',(dir==='prev'?'Previous':'Next')+' player: '+item.name);
   };
@@ -705,7 +705,7 @@ function normalizeEspnAdpCard(name){
     const label=card.querySelector('span');
     if(label?.textContent?.trim()==='ESPN ADP'){
       const value=card.querySelector('b');
-      if(value)value.textContent=rank?'#'+rank:'—';
+      if(value)value.textContent=rank?String(rank):'—';
     }
   });
 }
@@ -1100,7 +1100,7 @@ function ensureCompareAction(name){
   };
 }
 function compareNum(v,d=1){return Number.isFinite(Number(v))?Number(v).toFixed(d):'—'}
-function compareRank(v){return Number.isFinite(Number(v))&&Number(v)>0?'#'+Number(v):'—'}
+function compareRank(v){return Number.isFinite(Number(v))&&Number(v)>0?String(Number(v)):'—'}
 function compareCardHtml(local,espn){
   const logo=espn?.teamLogo||featuredLogoUrl(local.team);
   const face=espn?.headshot||'';
@@ -1296,8 +1296,8 @@ function renderOverviewRanks(name){
   if(!stats)return;
   stats.querySelectorAll('.unified-overview-rank').forEach(x=>x.remove());
   stats.insertAdjacentHTML('afterbegin',
-    '<div class="stat unified-overview-rank"><span>ROS '+pos+'</span><b>'+(ros?'#'+ros:'—')+'</b></div>'+
-    '<div class="stat unified-overview-rank"><span>Preseason '+pos+'</span><b>'+(pre?'#'+pre:'—')+'</b></div>'+
+    '<div class="stat unified-overview-rank"><span>ROS '+pos+'</span><b>'+(ros?String(ros):'—')+'</b></div>'+
+    '<div class="stat unified-overview-rank"><span>Preseason '+pos+'</span><b>'+(pre?String(pre):'—')+'</b></div>'+
     '<div class="stat unified-overview-rank" id="unifiedEspnRankCard"><span>ESPN '+pos+'</span><b>…</b></div>'
   );
   normalizeEspnAdpCard(name);
@@ -1310,7 +1310,7 @@ async function loadOverviewEspnRank(name,pos){
     if(window.ShuaEspnLive?.ensureData)await window.ShuaEspnLive.ensureData();
     const rank=window.ShuaEspnLive?.getPositionRank?.(name);
     if(document.getElementById('modal')?.dataset.unifiedName!==name)return;
-    card.innerHTML='<span>ESPN '+pos+'</span><b>'+(rank?'#'+rank:'—')+'</b>';
+    card.innerHTML='<span>ESPN '+pos+'</span><b>'+(rank?String(rank):'—')+'</b>';
   }catch(e){
     card.innerHTML='<span>ESPN '+pos+'</span><b>—</b>';
   }
@@ -1396,7 +1396,7 @@ function paintSwipeOverview(player,panel){
   rows.forEach(([label,value])=>{
     const tile=document.createElement('div');tile.className='stat';
     const title=document.createElement('span');title.textContent=label;
-    const figure=document.createElement('b');figure.textContent=Number(value)>0?'#'+value:'—';
+    const figure=document.createElement('b');figure.textContent=Number(value)>0?String(value):'—';
     tile.append(title,figure);grid.appendChild(tile);
   });
   panel.replaceChildren(grid);

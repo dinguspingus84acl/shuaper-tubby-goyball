@@ -111,14 +111,8 @@
   function decorateRoster(){
     if(!myTeams||!isClean())return;
     myTeams.querySelectorAll('.myteams-roster-row:not([data-shua-row-ready])').forEach(row=>{
-      const name=row.dataset.myteamsPlayer||'Player';
-      const pos=row.dataset.myteamsPlayerPos||'—';
-      const small=row.querySelector('.myteams-player-open small');
-      if(small&&!small.querySelector('.shua-row-pos')){
-        const element=document.createElement('span');element.className='shua-row-pos';element.textContent=pos;
-        small.insertBefore(element,small.firstChild);
-      }
-      // Roster fields are already visible in the row: avoid an expanded copy.
+      // The lineup slot at left already identifies the player's position.
+      // Do not repeat it beneath the name or for players on the bench.
       row.dataset.shuaRowReady='1';
       row.classList.add('shua-uniform-player-row');
     });

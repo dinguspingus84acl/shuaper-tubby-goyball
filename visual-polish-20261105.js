@@ -14,15 +14,15 @@
  };
  const aliases={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',DAL:'dal',DEN:'den',DET:'det',GB:'gb',GNB:'gb',HOU:'hou',IND:'ind',JAX:'jax',KC:'kc',KAN:'kc',LV:'lv',LVR:'lv',LAC:'lac',LAR:'lar',LA:'lar',MIA:'mia',MIN:'min',NE:'ne',NWE:'ne',NO:'no',NOR:'no',NYG:'nyg',NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SF:'sf',SFO:'sf',TB:'tb',TAM:'tb',TEN:'ten',WAS:'wsh',WSH:'wsh'};
  const findCode=node=>{
-  const logo=node.querySelector('.lineup-team-logo,.st-person small img,.espn-player-meta img,.myteams-nfl-logo');
+  const logo=node.querySelector('.lineup-team-logo,.tagged-player-team-logo,.stock-logo,.st-person small img,.espn-player-meta img,.myteams-nfl-logo');
   const slug=logo?.getAttribute('src')?.match(/\/nfl\/500\/([a-z]+)\.png/i)?.[1]?.toLowerCase();
   if(slug&&colors[slug])return slug;
-  const meta=node.querySelector('.phone-rank-meta,.st-person small,.espn-player-meta,.myteams-player-open small');
+  const meta=node.querySelector('.phone-rank-meta,.tagged-player-team-name,.stock-meta,.st-person small,.espn-player-meta,.myteams-player-open small');
   const text=(meta?.textContent||'').toUpperCase();
   const match=text.match(/\b(ARI|ATL|BAL|BUF|CAR|CHI|CIN|CLE|DAL|DEN|DET|GB|GNB|HOU|IND|JAX|KC|KAN|LV|LVR|LAC|LAR|MIA|MIN|NE|NWE|NO|NOR|NYG|NYJ|PHI|PIT|SEA|SF|SFO|TB|TAM|TEN|WAS|WSH)\b/);
   return aliases[match?.[1]];
  };
- const selector='#rows .photo-cell,#shuaAnalyticsSection .st-person,#espnLiveSection .espn-player,#shuaMyTeams .myteams-roster-row';
+ const selector='#rows .photo-cell,#shuaStock .stock-person,#shuaAnalyticsSection .st-person,#espnLiveSection .espn-player,#shuaMyTeams .myteams-roster-row';
  function apply(){
   document.querySelectorAll(selector).forEach(node=>{
    if(node.classList.contains('shua-accent-ready'))return;

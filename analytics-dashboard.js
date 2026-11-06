@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   if (window.ShuaStudioLoader) return;
-  const version = '20261105-search-tools1';
+  const version = '20261106-injury-card1';
   const base = new URL('.', document.currentScript.src);
   const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js',
     'analytics/intelligence.js', 'analytics/intelligence-view.js',

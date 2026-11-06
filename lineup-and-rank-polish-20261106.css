@@ -1,0 +1,73 @@
+/* November 6: match the approved WR ranking layout in every player list. */
+
+/* My Guys / Do Not Draft already have team and position beneath the name.
+   Use exactly the WR list's four visible columns and row dimensions. */
+body.shua-clean:has(.positions .pos.active:is([data-pos="MYGUYS"],[data-pos="DND"])) #tableCard :is(th,td):is(:nth-child(3),:nth-child(4)){
+  display:none!important;
+}
+body.shua-clean #tableCard .tagged-player-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+body.shua-clean #tableCard .tagged-player-copy>b{font-size:clamp(14px,1.05vw,16px)!important;line-height:1.22!important;font-weight:900;white-space:normal!important}
+body.shua-clean #tableCard .tagged-player-team-line{gap:5px;color:#a6bdcc;font-size:11px}
+body.shua-clean #tableCard .tagged-player-team-logo{width:15px;height:15px;flex:0 0 15px}
+body.shua-clean #tableCard .tag-group td{padding:11px 14px!important;background:#102a40!important;color:#c9e1ed!important;font-size:11px;letter-spacing:.09em;border-left:3px solid #3baf8a!important}
+@media(min-width:701px){
+  body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="MYGUYS"],[data-pos="DND"])) #tableCard table{table-layout:fixed!important}
+  body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="MYGUYS"],[data-pos="DND"])) #tableCard :is(th,td):nth-child(1){width:8%!important}
+  body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="MYGUYS"],[data-pos="DND"])) #tableCard :is(th,td):nth-child(2){width:37%!important}
+  body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="MYGUYS"],[data-pos="DND"])) #tableCard :is(th,td):nth-child(5){width:14%!important}
+  body.shua-clean:not(.phone-mode):has(.positions .pos.active:is([data-pos="MYGUYS"],[data-pos="DND"])) #tableCard :is(th,td):nth-child(6){width:41%!important;max-width:none!important}
+}
+@media(max-width:700px){
+  body.shua-clean #tableCard .tagged-player-copy>b{font-size:clamp(14px,3.9vw,16px)!important}
+  body.shua-clean #tableCard .tagged-player-team-line{font-size:10px!important}
+  body.shua-clean #tableCard tr.tag-group{display:block!important}
+  body.shua-clean #tableCard tr.tag-group td{display:block!important;width:100%!important}
+}
+
+/* Stock is now a single-column, full-width ranking table, not a tile grid. */
+body.shua-clean #shuaStock{max-width:1500px!important;width:100%;padding-inline:0!important}
+body.shua-clean #shuaStock .stock-groups{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+body.shua-clean #shuaStock .stock-group{border:1px solid rgba(165,201,220,.14)!important;background:#091d2f!important;border-radius:12px!important}
+body.shua-clean #shuaStock .stock-group-head{background:#102a40!important;border-left:3px solid #3baf8a;padding:11px 15px!important}
+body.shua-clean #shuaStock .stock-group-head h3{font-size:13px;letter-spacing:.05em}
+body.shua-clean #shuaStock .stock-group-body{overflow-x:auto;scrollbar-width:thin}
+body.shua-clean #shuaStock :is(.stock-header,.stock-row){grid-template-columns:8% minmax(0,1fr) 12% 13%!important;column-gap:10px;align-items:center}
+body.shua-clean #shuaStock .stock-header{background:#0a2135!important;color:#a4bdcf!important;font-size:10px!important;letter-spacing:.06em;padding:11px 16px!important;border-top:0}
+body.shua-clean #shuaStock .stock-row{min-height:65px;padding:10px 16px!important;border-top:1px solid rgba(160,188,209,.1)!important}
+body.shua-clean #shuaStock .stock-row:nth-child(2n){background:rgba(76,118,145,.055)}
+body.shua-clean #shuaStock .stock-row:hover{background:rgba(63,151,133,.145)!important;box-shadow:inset 3px 0 0 #51d4a9}
+body.shua-clean #shuaStock .stock-rank{font-size:15px!important;color:#cce6e4!important;font-weight:900}
+body.shua-clean #shuaStock .stock-person{gap:11px;min-height:44px;width:100%;align-items:center}
+body.shua-clean #shuaStock .stock-face{width:43px;height:43px;flex-basis:43px;border:2px solid #6188a0}
+body.shua-clean #shuaStock .stock-person.shua-accent-ready .stock-face{border-color:var(--shua-player-color,#6188a0)!important}
+body.shua-clean #shuaStock .stock-name{font-size:clamp(14px,1.05vw,16px)!important;color:#f0f7fa;line-height:1.22;font-weight:900;overflow-wrap:break-word}
+body.shua-clean #shuaStock .stock-meta{display:block;font-size:11px;margin-top:5px;color:#a6bdcc;font-weight:700}
+body.shua-clean #shuaStock .stock-logo{width:15px;height:15px;vertical-align:middle}
+body.shua-clean #shuaStock :is(.stock-num,.stock-percent,.stock-value){font-size:14px!important;font-weight:900;font-variant-numeric:tabular-nums}
+body.shua-clean #shuaStock :is(.stock-header.stock-current,.stock-row.stock-current){grid-template-columns:8% minmax(0,1fr) 11% 11% 12%!important}
+body.shua-clean #shuaStock :is(.stock-header.stock-performance,.stock-row.stock-performance){grid-template-columns:8% minmax(0,1fr) 10% 10% 15% 11%!important}
+@media(max-width:700px){
+  body.shua-clean #shuaStock{padding:8px 3px 96px!important}
+  body.shua-clean #shuaStock :is(.stock-header,.stock-row){grid-template-columns:39px minmax(0,1fr) 45px 55px!important;gap:5px;padding:9px 6px!important}
+  body.shua-clean #shuaStock .stock-row{min-height:60px}
+  body.shua-clean #shuaStock .stock-face{width:37px;height:37px;flex-basis:37px}
+  body.shua-clean #shuaStock .stock-name{font-size:clamp(14px,3.9vw,16px)!important}
+  body.shua-clean #shuaStock :is(.stock-num,.stock-percent,.stock-value){font-size:12px!important}
+  body.shua-clean #shuaStock :is(.stock-header.stock-current,.stock-row.stock-current){grid-template-columns:39px minmax(135px,1fr) 44px 44px 57px!important;min-width:390px}
+  body.shua-clean #shuaStock :is(.stock-header.stock-performance,.stock-row.stock-performance){grid-template-columns:39px minmax(175px,1fr) 45px 45px 72px 58px!important;min-width:490px}
+}
+
+/* Lineup slot already identifies position; keep team and injury on the subline. */
+body.shua-clean #shuaMyTeams .myteams-roster-row .shua-row-pos{display:none!important}
+
+/* In Injury Impact, the portrait/name opens the card; the status button
+   continues to choose whose absence the charts analyze. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="injury"] .st-injury-item{cursor:default!important;padding:6px!important;gap:4px}
+body.shua-clean #shuaAnalyticsSection .st-injury-profile-open{display:flex;align-items:center;gap:8px;flex:1;min-width:0;text-align:left;padding:2px;background:transparent;border:0;color:#f4fbff;cursor:pointer;border-radius:7px}
+body.shua-clean #shuaAnalyticsSection .st-injury-profile-open:hover .st-injury-name b{color:#68e5b4}
+body.shua-clean #shuaAnalyticsSection .st-injury-select{flex:0 0 80px;display:grid;justify-items:center;gap:3px;padding:4px 2px;background:#10263b;border:1px solid #35556b;border-radius:7px;color:#a8c3d2;cursor:pointer}
+body.shua-clean #shuaAnalyticsSection .st-injury-select[aria-pressed="true"]{border-color:#3bc995;background:#164638;color:#e6fff5}
+body.shua-clean #shuaAnalyticsSection .st-injury-select .st-injury-tag{max-width:none}
+body.shua-clean #shuaAnalyticsSection .st-injury-select small{font-size:9px;font-weight:850}
+body.shua-clean #shuaAnalyticsSection .st-injury-focused-profile{margin:5px 0 12px;border:1px solid #327d65;border-radius:8px;background:#123d32;color:#c9ffeb;font-size:11px;font-weight:900;padding:9px 12px;cursor:pointer}
+body.shua-clean #shuaAnalyticsSection :is(.st-injury-profile-open,.st-injury-select,.st-injury-focused-profile):focus-visible{outline:2px solid #5ce8b6;outline-offset:2px}

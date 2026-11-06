@@ -518,14 +518,18 @@ const fantasyLogo=t=>{const url=t?.logoUrl||t?.logo;if(typeof url!=='string'||!/
 const rosterHtml=(index,archive)=>{
  const snapshot=archive?{roster:archive.roster}:rosterSnapshots[index];if(!snapshot?.roster?.length)return '<p class="myteams-empty">No roster snapshot available for this season.</p>';
  const order=['QB','RB','WR','TE','FLEX','RB/WR/TE','OP','D/ST','K','Bench','IR'];
+ let previousRosterGroup='';
  return '<div class="myteams-roster-head"><span>Slot</span><span>Player</span><span>Proj</span></div>'+[...snapshot.roster].sort((a,b)=>{const i=order.indexOf(a.slot),j=order.indexOf(b.slot);return(i<0?20:i)-(j<0?20:j)}).map(p=>{
+  const rosterGroup=p.slot==='Bench'?'bench':p.slot==='IR'?'ir':'starter';
+  const groupHeading=rosterGroup!==previousRosterGroup?'<div class="shua-roster-group-heading" data-group="'+rosterGroup+'">'+({starter:'STARTERS',bench:'BENCH',ir:'INJURED RESERVE'}[rosterGroup])+'</div>':'';
+  previousRosterGroup=rosterGroup;
   const dst=p.pos==='D/ST'||p.pos==='DST'||/D\/ST|Defense/i.test(p.name||'');
   const faceImg=dst?'<span class="myteams-defense-badge">'+nflLogo(p.nfl)+'</span>':p.id?'<img loading="lazy" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+encodeURIComponent(p.id)+'.png" alt="" onerror="this.style.display=\'none\'">':'';
   const status=/^questionable$/i.test(p.status)?'Q':/^doubtful$/i.test(p.status)?'D':/^(day.to.day|dtd)$/i.test(p.status)?'DTD':p.status&&p.status!=='Active'?p.status:'';
   const proj=weeklyProjection(p,leagueFor(snapshot.id)?.week||7);
   const bye=archive?null:byeWeeks[String(p.nfl||'').toUpperCase()];
   const byeLabel=bye===(leagueFor(snapshot.id)?.week||7)?'<span class="myteams-bye is-now">BYE</span>':'';
-  return '<div class="myteams-roster-row" data-myteams-player="'+escapeHtml(p.name||'')+'" data-myteams-player-id="'+escapeHtml(p.id||'')+'" data-myteams-player-pos="'+escapeHtml(p.pos||'')+'" data-myteams-player-team="'+escapeHtml(p.nfl||'')+'" role="button" tabindex="0"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+(dst?'':nflLogo(p.nfl))+escapeHtml(p.nfl||'FA')+' '+byeLabel+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="'+(proj==='—'?'ESPN weekly projection unavailable':'ESPN weekly projection')+'">'+proj+'</strong></div>';
+  return groupHeading+'<div class="myteams-roster-row" data-myteams-player="'+escapeHtml(p.name||'')+'" data-myteams-player-id="'+escapeHtml(p.id||'')+'" data-myteams-player-pos="'+escapeHtml(p.pos||'')+'" data-myteams-player-team="'+escapeHtml(p.nfl||'')+'" role="button" tabindex="0"><span class="myteams-slot">'+escapeHtml(p.slot||'—')+'</span><div class="myteams-player"><button type="button" class="myteams-player-open">'+faceImg+'<span><b>'+escapeHtml(p.name||'Unknown')+'</b><small>'+(dst?'':nflLogo(p.nfl))+escapeHtml(p.nfl||'FA')+' '+byeLabel+(status?' <em class="myteams-injury">'+escapeHtml(status)+'</em>':'')+'</small></span></button></div><strong title="'+(proj==='—'?'ESPN weekly projection unavailable':'ESPN weekly projection')+'">'+proj+'</strong></div>';
  }).join('');
 };
 const leagueFor=id=>leagueData.find(x=>x.id===id);
@@ -741,4 +745,6 @@ button.addEventListener('click',()=>{if(!document.body.classList.contains('my-te
 <script src="rank-display-20261106.js?v=20261106-v1"></script>
 <link rel="stylesheet" href="feature-polish-20261106.css?v=20261106-v1">
 <script src="feature-polish-20261106.js?v=20261106-v1"></script>
+<link rel="stylesheet" href="consistency-polish-20261106.css?v=20261106-v1">
+<script src="consistency-polish-20261106.js?v=20261106-v1"></script>
 </body></html>

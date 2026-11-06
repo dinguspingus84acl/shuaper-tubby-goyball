@@ -1,0 +1,346 @@
+/* Shared visual rhythm for rank, player and analytics surfaces.
+   Deliberately presentation-only: scores, ordering and actions stay untouched. */
+body.shua-clean {
+  --shua-consistency-gap: 10px;
+  --shua-consistency-pad: 12px;
+  --shua-consistency-radius: 11px;
+  --shua-consistency-line: rgba(151, 187, 207, .12);
+  --shua-consistency-row: rgba(55, 92, 113, .08);
+}
+
+/* 3 — Repeated player identity is recognizably the same in every data list. */
+body.shua-clean #shuaStock .stock-row,
+body.shua-clean #shuaAnalyticsSection .st-rank-row,
+body.shua-clean #shuaAnalyticsSection .st-team-snap-row {
+  align-items:center;
+  min-height:49px;
+  border-top:1px solid var(--shua-consistency-line);
+}
+body.shua-clean #shuaStock .stock-row:nth-child(even),
+body.shua-clean #shuaAnalyticsSection .st-rank-row:nth-child(even),
+body.shua-clean #shuaAnalyticsSection .st-team-snap-row:nth-child(even) {
+  background:var(--shua-consistency-row);
+}
+body.shua-clean #shuaAnalyticsSection .st-rank-num,
+body.shua-clean #shuaStock .stock-rank {
+  color:#a9c1d1;
+  font-size:12px;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+}
+body.shua-clean #shuaAnalyticsSection .st-person,
+body.shua-clean #shuaStock .stock-person {
+  gap:9px;
+  min-width:0;
+  align-items:center;
+}
+body.shua-clean #shuaAnalyticsSection .st-person .st-face,
+body.shua-clean #shuaStock .stock-face {
+  width:39px!important;
+  height:39px!important;
+  min-width:39px!important;
+  flex:0 0 39px!important;
+  object-fit:cover;
+  object-position:center top;
+  border-radius:50%!important;
+  border:1.5px solid var(--shua-player-color, #5a8096)!important;
+  box-shadow:0 0 0 2px #071c2c;
+  background:#142e42;
+}
+body.shua-clean #shuaStock .stock-name,
+body.shua-clean #shuaAnalyticsSection .st-person strong {
+  color:#edf7ff;
+  font-size:13px;
+  font-weight:850;
+  line-height:1.25;
+}
+body.shua-clean #shuaStock .stock-meta,
+body.shua-clean #shuaAnalyticsSection .st-person small {
+  color:#a5becd;
+  font-size:10px;
+  line-height:1.25;
+}
+body.shua-clean #shuaAnalyticsSection .st-person .st-logo,
+body.shua-clean #shuaStock .stock-logo {
+  width:17px;
+  height:17px;
+  object-fit:contain;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="injury"] .st-injury-item {
+  min-height:53px;
+  border-radius:9px;
+  background:rgba(42,75,95,.12);
+  border:1px solid transparent;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="injury"] .st-injury-item.selected {
+  border-color:rgba(56,187,143,.42);
+  background:rgba(35,111,99,.18);
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="injury"] .st-injury-face {
+  border:1.5px solid #668ba1;
+  border-radius:50%;
+  object-fit:cover;
+  object-position:center top;
+}
+
+/* 4 — One quiet outer panel, with interior separation by surface and air. */
+body.shua-clean #shuaAnalyticsSection .st-panel {
+  background:#0b2234!important;
+  box-shadow:0 4px 15px rgba(0,0,0,.1)!important;
+  border-color:rgba(106,157,179,.22)!important;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-metric,.st-timeline>div,.st-method,.st-callout) {
+  background:#112b3d!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-feature {
+  border-color:rgba(135,180,200,.16)!important;
+  box-shadow:none!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-table-wrap {
+  border-color:var(--shua-consistency-line);
+}
+body.shua-clean #shuaAnalyticsSection .st-panel-head {
+  margin-bottom:14px;
+  gap:12px;
+}
+
+/* 5 — Game logs scan like a polished match ledger. */
+body.shua-clean .espn-game-log-table {
+  border-collapse:separate;
+  border-spacing:0;
+  font-variant-numeric:tabular-nums;
+}
+body.shua-clean .espn-game-log-table thead th {
+  color:#a9c6d5;
+  background:#102a3d;
+  border-bottom:1px solid rgba(122,175,193,.24);
+  font-weight:800;
+}
+body.shua-clean .espn-game-log-table tbody tr {
+  position:relative;
+  transition:background-color .15s ease;
+}
+body.shua-clean .espn-game-log-table tbody tr:nth-child(even) {
+  background:rgba(70,102,126,.09);
+}
+body.shua-clean .espn-game-log-table tbody tr:hover {
+  background:rgba(60,119,126,.17)!important;
+}
+body.shua-clean .espn-game-log-table tbody tr:has(.gl-pts-high) td:first-child {
+  box-shadow:inset 3px 0 #39d9a0;
+}
+body.shua-clean .espn-game-log-table tbody tr:has(.gl-pts-low) td:first-child {
+  box-shadow:inset 3px 0 #e17c89;
+}
+body.shua-clean .espn-game-log-table tbody tr.is-selected-week {
+  background:rgba(36,121,101,.27)!important;
+  outline:1px solid rgba(71,196,156,.38);
+  outline-offset:-1px;
+}
+body.shua-clean .espn-game-log-table .gl-pts {
+  font-size:15px!important;
+  font-weight:950!important;
+  letter-spacing:-.025em;
+}
+body.shua-clean .espn-game-log-table td {
+  border-bottom:1px solid rgba(136,172,193,.06);
+}
+
+/* 6 — Softer chart grid, larger data labels and a common line treatment. */
+body.shua-clean #shuaAnalyticsSection .st-gridline {
+  stroke:#93afc1!important;
+  stroke-opacity:.16!important;
+  stroke-width:.7!important;
+  stroke-dasharray:2 5!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-axis-line {
+  stroke:#9bb5c5!important;
+  stroke-opacity:.3!important;
+  stroke-width:.85!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-axis {
+  fill:#bed1dd!important;
+  font-size:12px!important;
+  font-weight:650;
+}
+body.shua-clean #shuaAnalyticsSection .st-bar-value {
+  fill:#f0faff!important;
+  font-size:12.5px!important;
+  font-weight:850!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-radar-grid {
+  stroke:#88a5b7;
+  stroke-opacity:.27;
+  stroke-width:.8;
+}
+body.shua-clean #shuaAnalyticsSection .st-legend {
+  gap:13px;
+  margin-bottom:13px;
+}
+body.shua-clean #shuaAnalyticsSection .st-legend-btn {
+  font-size:12px;
+  font-weight:700;
+}
+
+/* 8 — Real lineup section labels, uniform rows, distinct low-contrast groups. */
+body.shua-clean #shuaMyTeams .shua-roster-group-heading {
+  margin:12px 0 0;
+  padding:8px 9px 6px;
+  background:rgba(43,82,101,.2);
+  color:#bdd7e5;
+  border-top:1px solid rgba(117,167,185,.24);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+body.shua-clean #shuaMyTeams .shua-roster-group-heading:first-of-type {
+  margin-top:0;
+  border-top:none;
+}
+body.shua-clean #shuaMyTeams .shua-roster-group-heading[data-group="bench"] {
+  color:#c2d5e3;
+  background:rgba(53,76,96,.26);
+}
+body.shua-clean #shuaMyTeams .shua-roster-group-heading[data-group="ir"] {
+  color:#e3b5b9;
+  background:rgba(135,63,73,.17);
+}
+body.shua-clean #shuaMyTeams .myteams-roster-row {
+  min-height:57px!important;
+  padding-block:8px!important;
+  border-top:1px solid rgba(140,176,196,.1)!important;
+}
+body.shua-clean #shuaMyTeams .myteams-roster-row.shua-lineup-group-start {
+  border-top:0!important;
+  margin-top:0!important;
+  padding-top:8px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-roster-row[data-shua-lineup-group="starter"] {
+  background:rgba(28,84,75,.065);
+}
+body.shua-clean #shuaMyTeams .myteams-roster-row[data-shua-lineup-group="bench"] {
+  background:rgba(53,78,101,.14);
+}
+body.shua-clean #shuaMyTeams .myteams-roster-row[data-shua-lineup-group="ir"] {
+  background:rgba(135,63,73,.085);
+}
+
+/* 9 — Balanced Start/Sit cards; winner only when the actual estimate exists. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  align-items:stretch;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-feature {
+  height:100%;
+  padding:14px 15px!important;
+  background:linear-gradient(165deg,rgba(32,64,83,.52),#0d2537 70%)!important;
+  border-top:3px solid var(--shua-compare-accent,#688fa5)!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-feature.is-top-estimate {
+  border-color:rgba(56,203,155,.62)!important;
+  border-top-color:#3bd6a2!important;
+  box-shadow:0 0 0 1px rgba(56,203,155,.15)!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-feature-top {
+  height:120px;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-face {
+  width:150px!important;
+  height:124px!important;
+  object-fit:contain;
+  object-position:bottom;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-place {
+  display:none;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-feature h4 {
+  min-height:unset;
+  font-size:17px;
+  margin:9px 0 5px;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-big-value {
+  font-size:32px;
+  color:#e6fff1;
+  margin:10px 0 8px;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-big-value small {
+  font-size:10px;
+  color:#a6c6cc;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-compare-metric {
+  padding:9px 0;
+  border-top:1px solid rgba(142,182,200,.13);
+  font-size:11px;
+  gap:9px;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-compare-metric b {
+  font-size:15px;
+  text-align:right;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-top-estimate {
+  display:inline-flex;
+  margin-bottom:8px;
+  padding:4px 8px;
+  border-radius:100px;
+  color:#c3ffdf;
+  background:rgba(28,131,91,.23);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.055em;
+}
+
+/* 10 — One spacing scale for buttons, dropdowns, lists and analytics cards. */
+body.shua-clean #shuaAnalyticsSection :is(.st-controls,.st-position,.st-weekly-rank-toolbar) {
+  gap:8px;
+  margin-bottom:12px;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-grid2,.st-grid3,.st-grid4) {
+  gap:12px;
+  margin-bottom:14px;
+}
+body.shua-clean #shuaAnalyticsSection .st-metrics {
+  gap:8px;
+  margin-bottom:14px;
+}
+body.shua-clean #shuaAnalyticsSection .st-panel {
+  padding:15px!important;
+  margin-bottom:13px;
+}
+body.shua-clean #shuaAnalyticsSection :is(select,.st-button),
+body.shua-clean #shuaStock :is(select,.stock-filters button,.stock-modes button),
+body.shua-clean #shuaMyTeams .myteams-subnav button {
+  border-radius:9px;
+  min-height:34px;
+}
+body.shua-clean #shuaCleanNav .shua-clean-popup button {
+  min-height:36px;
+  padding:8px 10px;
+}
+@media (max-width:700px) {
+  body.shua-clean {--shua-consistency-gap:7px;--shua-consistency-pad:9px}
+  body.shua-clean #shuaAnalyticsSection .st-panel {padding:11px!important;margin-bottom:10px}
+  body.shua-clean #shuaAnalyticsSection :is(.st-grid2,.st-grid3,.st-grid4) {gap:9px;margin-bottom:10px}
+  body.shua-clean #shuaAnalyticsSection .st-rank-row {min-height:45px}
+  body.shua-clean #shuaAnalyticsSection .st-person .st-face,
+  body.shua-clean #shuaStock .stock-face {width:34px!important;height:34px!important;min-width:34px!important;flex-basis:34px!important}
+  body.shua-clean #shuaAnalyticsSection .st-person strong,
+  body.shua-clean #shuaStock .stock-name {font-size:12px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison {gap:8px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-feature {padding:9px!important}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-feature-top {height:88px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-face {width:110px!important;height:95px!important}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-feature h4 {font-size:13px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-big-value {font-size:26px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-compare-metric {font-size:10px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-compare-metric b {font-size:12px}
+  body.shua-clean .espn-game-log-table .gl-pts {font-size:14px!important}
+  body.shua-clean #shuaMyTeams .shua-roster-group-heading {padding:7px 6px 5px}
+}
+@media (prefers-reduced-motion:reduce) {
+  body.shua-clean .espn-game-log-table tbody tr,
+  body.shua-clean #shuaMyTeams .myteams-roster-row {transition:none!important}
+}

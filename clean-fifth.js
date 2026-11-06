@@ -45,7 +45,7 @@
       const gap=Number(raw);
       const badge=document.createElement('span');
       badge.className='shua-fifth-espn-gap '+(gap>0?'is-up':gap<0?'is-down':'is-even');
-      badge.textContent=gap>0?'↑ '+gap:gap<0?'↓ '+Math.abs(gap):'= 0';
+      badge.textContent=gap>0?'↑ '+gap:gap<0?'↓ '+Math.abs(gap):'0';
       badge.title=gap>0?`Your preseason positional rank was ${gap} spot${gap===1?'':'s'} higher than ESPN`:
         gap<0?`Your preseason positional rank was ${Math.abs(gap)} spot${gap===-1?'':'s'} lower than ESPN`:'Same preseason positional rank as ESPN';
       badge.setAttribute('aria-label',badge.title);

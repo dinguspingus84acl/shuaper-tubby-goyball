@@ -21,7 +21,7 @@
   const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const number=v=>typeof v==='number'&&Number.isFinite(v)?v:null;
   const display=(n,suffix)=>number(n)===null?'—':String(n)+suffix;
-  const formatDate=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(iso));
+  const formatDay=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric'}).format(new Date(iso));
   const formatKickoffTime=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(new Date(iso));
   const safeLogo=url=>/^https:\/\/a\.espncdn\.com\/i\/teamlogos\/nfl\//.test(url||'')?url:'';
   const logo=team=>safeLogo(team.logo)?'<img class="wx-team-logo" src="'+escape(safeLogo(team.logo))+'" alt="" loading="lazy">':'';
@@ -213,12 +213,15 @@
       '</article>';
   }
 
-  // Group games by their actual ET kickoff time, including 4:05 and 4:25
-  // as separate slots. Never use vague early/late/morning labels.
+  // The kickoff is already visible on every card. Group by ET calendar day
+  // so day headings do not repeat the clock or leave isolated half-empty rows.
   function kickoffGroup(game){
     const kickoff=new Date(game.kickoffUtc);
     if(!Number.isFinite(kickoff.getTime()))return {key:'unknown',label:'Kickoff time pending',sort:Infinity};
-    return {key:kickoff.toISOString(),label:formatDate(game.kickoffUtc),sort:kickoff.getTime()};
+    const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(kickoff);
+    const datePart=part=>parts.find(x=>x.type===part)?.value||'00';
+    const key=datePart('year')+'-'+datePart('month')+'-'+datePart('day');
+    return {key,label:formatDay(game.kickoffUtc),sort:kickoff.getTime()};
   }
 
   function groupedGames(games){

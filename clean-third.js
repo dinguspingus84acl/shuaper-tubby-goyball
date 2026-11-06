@@ -63,6 +63,12 @@
       monogram.textContent=initials(team.textContent);
       monogram.setAttribute('role','img');
       monogram.setAttribute('aria-label',team.textContent+' logo unavailable');
+      // Distinct, stable identity for private fantasy teams with no public logo.
+      // Real team images remain visible whenever they load successfully.
+      const hues=[172,196,218,255,290,32,14,145,205,265,185];
+      const nameHash=[...team.textContent].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0);
+      const hue=hues[nameHash%hues.length];
+      monogram.style.setProperty('--shua-league-hue',String(hue));
       identity.prepend(monogram);
       trigger.prepend(identity);
       const result=document.createElement('span');result.className='shua-league-record';
@@ -177,7 +183,10 @@
     img.insertAdjacentElement('afterend',replacement);
     const fail=()=>{img.style.display='none';replacement.hidden=false;};
     img.addEventListener('error',fail);
-    if(img.complete&&img.naturalWidth===0)fail();
+    // Some provider placeholders resolve as transparent 1x1 images rather
+    // than a network error. Show initials for those too.
+    img.addEventListener('load',()=>{if(img.naturalWidth<=2||img.naturalHeight<=2)fail();});
+    if(img.complete&&(img.naturalWidth<=2||img.naturalHeight<=2))fail();
   }
   function decoratePortraits(){
     if(!isClean())return;

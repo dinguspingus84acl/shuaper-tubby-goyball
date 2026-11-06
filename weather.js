@@ -188,11 +188,11 @@
     // Keep unavailable forecasts explicit; never invent temperature or wind.
     if(isPending)return '<article class="wx-game wx-pending-game" data-weather-game="'+escape(game.id)+'" aria-label="'+escape(game.away.name+' at '+game.home.name+', forecast pending')+'">'+
       '<div class="wx-pending-fixture"><div class="wx-pending-matchup">'+logo(game.away)+'<strong>'+escape(game.away.abbr)+'</strong><span class="wx-pending-at">at</span>'+logo(game.home)+'<strong>'+escape(game.home.abbr)+'</strong></div>'+
-      '<div class="wx-pending-context"><strong>Week '+escape(game.week??'—')+' · '+escape(formatDate(game.kickoffUtc))+'</strong><small>'+escape(game.venue||'Venue TBA')+'</small></div></div>'+
+      '<div class="wx-pending-context"><small>'+escape(game.venue||'Venue TBA')+'</small></div></div>'+
       '<span class="wx-impact wx-impact-pending">Forecast pending</span></article>';
     const fixture='<div class="wx-matchup"><div class="wx-team">'+logo(game.away)+'<span><b>'+escape(game.away.abbr)+'</b><small>'+escape(game.away.name)+'</small></span></div><span class="wx-versus">AT</span><div class="wx-team">'+logo(game.home)+'<span><b>'+escape(game.home.abbr)+'</b><small>'+escape(game.home.name)+'</small></span></div></div>';
     const venue='<div class="wx-venue">'+escape(game.venue||'Venue TBA')+(game.city?' · '+escape(game.city):'')+'</div>';
-    const header='<div class="wx-game-top"><div class="wx-kick">Week '+escape(game.week??'—')+' <span>·</span> '+escape(formatDate(game.kickoffUtc))+'</div><div class="wx-game-conditions">'+gameSkyIcon(game)+'<span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div></div>';
+    const header='<div class="wx-game-top"><div class="wx-game-conditions">'+gameSkyIcon(game)+'<span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div></div>';
     // All fixed-roof venues, including the Saints at Caesars Superdome, use
     // the identical compact indoor layout regardless of stray forecast fields.
     if(game.indoor)return '<article class="wx-game wx-indoor-game" data-weather-game="'+escape(game.id)+'">'+
@@ -212,34 +212,33 @@
       '</article>';
   }
 
-  // Kickoff buckets are derived from the actual ET kickoff, not from weather
-  // forecast availability. Grouping must never invent a missing forecast.
+  // Group games by their actual ET kickoff time, including 4:05 and 4:25
+  // as separate slots. Never use vague early/late/morning labels.
   function kickoffGroup(game){
     const kickoff=new Date(game.kickoffUtc);
     if(!Number.isFinite(kickoff.getTime()))return {key:'unknown',label:'Kickoff time pending',sort:Infinity};
-    const timezone='America/New_York';
-    const parts=new Intl.DateTimeFormat('en-US',{timeZone:timezone,weekday:'long',year:'numeric',month:'short',day:'numeric',hour:'numeric',hourCycle:'h23'}).formatToParts(kickoff);
-    const part=name=>parts.find(item=>item.type===name)?.value||'';
-    const weekday=part('weekday'),hour=Number(part('hour'));
-    const bucket=weekday==='Sunday'?(hour<12?'Sunday Morning':hour<15?'Sunday Early':hour<19?'Sunday Late':'Sunday Night'):
-      weekday==='Thursday'?(hour>=17?'Thursday Night':'Thursday'):
-      weekday==='Monday'?(hour>=17?'Monday Night':'Monday'):
-      weekday==='Saturday'?(hour>=17?'Saturday Night':'Saturday'):
-      weekday+(hour>=17?' Night':'');
-    const date=[part('year'),part('month'),part('day')].join('-');
-    return {key:game.week+'-'+date+'-'+bucket,label:'Week '+(game.week??'—')+' · '+bucket+' · '+part('month')+' '+part('day'),sort:kickoff.getTime()};
+    return {key:kickoff.toISOString(),label:formatDate(game.kickoffUtc),sort:kickoff.getTime()};
   }
 
   function groupedGames(games){
-    const buckets=new Map();
-    games.slice().sort((a,b)=>new Date(a.kickoffUtc)-new Date(b.kickoffUtc)).forEach(game=>{
-      const group=kickoffGroup(game);
-      if(!buckets.has(group.key))buckets.set(group.key,{...group,games:[]});
-      buckets.get(group.key).games.push(game);
+    const weeks=new Map();
+    games.slice().sort((a,b)=>Date.parse(a.kickoffUtc)-Date.parse(b.kickoffUtc)).forEach(game=>{
+      const week=String(game.week??'—');
+      if(!weeks.has(week))weeks.set(week,[]);
+      weeks.get(week).push(game);
     });
-    return [...buckets.values()].map(group=>'<section class="wx-kickoff-group" aria-label="'+escape(group.label)+'">'+
-      '<header class="wx-kickoff-heading"><h3>'+escape(group.label)+'</h3><span>'+group.games.length+' game'+(group.games.length===1?'':'s')+'</span></header>'+
-      '<div class="wx-day-games">'+group.games.map(gameCard).join('')+'</div></section>').join('');
+    return [...weeks].map(([week,weekGames])=>{
+      const buckets=new Map();
+      weekGames.forEach(game=>{
+        const group=kickoffGroup(game);
+        if(!buckets.has(group.key))buckets.set(group.key,{...group,games:[]});
+        buckets.get(group.key).games.push(game);
+      });
+      const grouped=[...buckets.values()].map(group=>'<section class="wx-kickoff-group" aria-label="'+escape(group.label)+'">'+
+        '<header class="wx-kickoff-heading"><h3>'+escape(group.label)+'</h3></header>'+
+        '<div class="wx-day-games">'+group.games.map(gameCard).join('')+'</div></section>').join('');
+      return '<div class="wx-week-bar" role="heading" aria-level="2">Week '+escape(week)+'</div>'+grouped;
+    }).join('');
   }
 
   function renderList(){

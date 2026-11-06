@@ -154,3 +154,29 @@ body.phone-mode #shuaWeatherSection .wx-hourly-block{padding:0 5px 10px}
 body.phone-mode #shuaWeatherSection .wx-hourly-table th,body.phone-mode #shuaWeatherSection .wx-hourly-table td{padding:7px 2px;font-size:10px}
 body.phone-mode #shuaWeatherSection .wx-hourly-table th:first-child{width:64px}
 body.phone-mode #shuaWeatherSection .wx-hour-emoji{font-size:21px;min-height:27px}
+
+/* One prominent week banner; kickoff details live in group headings only. */
+body.shua-clean #shuaWeatherSection .wx-week-bar{
+  grid-column:1/-1;
+  width:100%;
+  background:linear-gradient(105deg,#14533f,#0d3446 78%);
+  border:1px solid #39826f;
+  border-radius:13px;
+  color:#f1fff9;
+  font-size:clamp(22px,4vw,29px);
+  font-weight:950;
+  letter-spacing:.015em;
+  line-height:1.2;
+  padding:15px 18px;
+  margin:3px 0 2px;
+  box-shadow:0 7px 20px #00000025;
+}
+body.shua-clean #shuaWeatherSection .wx-game-top{
+  justify-content:flex-end;
+}
+@media(max-width:700px){
+  body.shua-clean #shuaWeatherSection .wx-week-bar{
+    font-size:23px;
+    padding:13px 15px;
+  }
+}

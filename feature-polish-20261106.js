@@ -15,7 +15,7 @@
     rankings:'Rankings',analytics:'Analytics',teams:'My Teams',tools:'Tools',
     usage:'Usage',intelligence:'Fantasy Intelligence',consistency:'Consistency',
     teamsAnalytics:'Team Shares',injury:'Injury Impact',schedule:'Schedule',
-    startsit:'Compare',weekly:'Weekly Report',
+    startsit:'Start / Sit',weekly:'Weekly Report',
     HOME:'Home',ALL:'Overall',QB:'Quarterbacks',RB:'Running Backs',
     WR:'Wide Receivers',TE:'Tight Ends',MYGUYS:'My Guys',DND:'Do Not Draft',
     MOCK:'Mock Draft',DEPTH:'Depth Chart',TRADE:'Trade Chart',

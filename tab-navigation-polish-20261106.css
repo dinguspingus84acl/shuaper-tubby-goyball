@@ -62,54 +62,6 @@ body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-groups
   text-overflow:clip;
 }
 
-/* Compare has precisely two player searches and balanced result cards. */
-body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-simple {
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-  margin:6px 0 14px;
-  position:relative;
-  z-index:20;
-}
-body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-simple .st-compare-picker {
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-  gap:8px;
-  min-width:0;
-}
-body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-simple input[type="search"] {
-  height:45px!important;
-  min-height:45px;
-  border:1px solid #48758a!important;
-  border-radius:11px!important;
-  background:#112d40!important;
-  font-size:15px!important;
-  font-weight:650;
-  padding:10px 12px!important;
-  outline-offset:2px;
-}
-body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-simple .st-compare-picked {
-  min-height:54px;
-  background:#103243;
-  border-color:rgba(109,163,180,.3);
-  padding:7px 10px;
-}
-body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-simple .st-compare-picked > span {
-  font-size:14px;
-  line-height:1.2;
-}
-body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-simple .st-compare-picked small {
-  margin-top:3px;
-  font-size:11px;
-}
-body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison {
-  margin-top:0;
-}
-body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-compare-metric {
-  padding:8px 0;
-}
-
 /* Injury chips show the official compact letters, with no redundant caption. */
 body.shua-clean #shuaAnalyticsSection[data-active-view="injury"] .st-injury-select {
   min-width:35px;
@@ -143,17 +95,5 @@ body.shua-clean #shuaAnalyticsSection[data-active-view="injury"] .st-injury-tag 
   }
   body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-controls select {
     font-size:13px!important;
-  }
-  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-simple {
-    gap:9px;
-    grid-template-columns:minmax(0,1fr);
-  }
-  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-simple .st-compare-picked {
-    min-height:45px;
-    padding:5px 8px;
-  }
-  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-simple input[type="search"] {
-    height:43px!important;
-    min-height:43px;
   }
 }

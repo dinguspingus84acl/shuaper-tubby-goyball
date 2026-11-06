@@ -22,11 +22,9 @@
   const number=v=>typeof v==='number'&&Number.isFinite(v)?v:null;
   const display=(n,suffix)=>number(n)===null?'—':String(n)+suffix;
   const formatDate=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(iso));
-  const formatUpdated=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(iso));
   const safeLogo=url=>/^https:\/\/a\.espncdn\.com\/i\/teamlogos\/nfl\//.test(url||'')?url:'';
   const logo=team=>safeLogo(team.logo)?'<img class="wx-team-logo" src="'+escape(safeLogo(team.logo))+'" alt="" loading="lazy">':'';
-  const filters=[['all','All games'],['watch','Weather watch'],['ready','Forecasts'],['pending','Pending']];
-  let snapshot=null,loading=false,visible=false,filter='all',search='',error='',lastFetchedAt=0,refreshTimer=null;
+  let snapshot=null,loading=false,visible=false,error='',lastFetchedAt=0,refreshTimer=null;
 
   // Independent fantasy-football guidance. These thresholds are OUR heuristic,
   // not a forecast or a betting recommendation from MySportsWeather/Kevin Roth.
@@ -247,48 +245,22 @@
   function renderList(){
     if(!snapshot)return;
     const all=snapshot.games||[];
-    const ready=all.filter(game=>game.forecast),indoor=all.filter(game=>game.indoor);
-    const pending=all.filter(game=>!game.forecast&&!game.indoor);
-    const watch=all.filter(game=>['watch','high'].includes(risk(game).level));
-    const stats=section.querySelector('#wxOverview');
-    stats.innerHTML=[['Games',all.length],[ready.length===1?'Forecast available':'Forecasts available',ready.length],['Indoor',indoor.length],['Pending',pending.length],...(watch.length?[['Weather watch',watch.length]]:[])].map(([label,n])=>'<span class="wx-status-item"><strong>'+n+'</strong> '+escape(label)+'</span>').join('<span class="wx-status-divider" aria-hidden="true">·</span>');
-    const hoursOld=(Date.now()-Date.parse(snapshot.generatedAt))/3600000;
-    section.querySelector('#wxFreshness').innerHTML='<span>MySportsWeather · Source checked '+escape(formatUpdated(snapshot.generatedAt))+(hoursOld>6?' · Forecast snapshot overdue for refresh':' · Scheduled updates approximately every two hours')+'</span>';
-    const buttons=section.querySelector('#wxFilters');
-    buttons.innerHTML=filters.map(([value,label])=>'<button type="button" data-wx-filter="'+value+'" aria-pressed="'+(filter===value)+'">'+label+'</button>').join('');
-    const query=search.trim().toLowerCase();
-    const matches=all.filter(game=>{
-      if(filter==='watch'&&!['watch','high'].includes(risk(game).level))return false;
-      if(filter==='ready'&&!game.forecast)return false;
-      if(filter==='pending'&&(game.forecast||game.indoor))return false;
-      if(!query)return true;
-      return [game.away.name,game.away.abbr,game.home.name,game.home.abbr,game.venue,game.city].some(value=>String(value||'').toLowerCase().includes(query));
-    });
-    section.querySelector('#wxResultCount').textContent=matches.length+' matchup'+(matches.length===1?'':'s');
     // A game can last longer than three hours; retain it in the active slate
     // until four hours after scheduled kickoff. Past games remain one tap away.
-    const now=Date.now(),previous=matches.filter(game=>{
+    const now=Date.now(),previous=all.filter(game=>{
       const kickoff=Date.parse(game.kickoffUtc);
       return Number.isFinite(kickoff)&&kickoff+4*60*60*1000<now;
     });
-    const upcoming=matches.filter(game=>!previous.includes(game));
-    section.querySelector('#wxGames').innerHTML=matches.length?groupedGames(upcoming)+
+    const upcoming=all.filter(game=>!previous.includes(game));
+    section.querySelector('#wxGames').innerHTML=all.length?groupedGames(upcoming)+
       (previous.length?'<details class="wx-past-games"><summary>Previous Games <span>'+previous.length+' matchup'+(previous.length===1?'':'s')+'</span></summary><div class="wx-past-content">'+groupedGames(previous)+'</div></details>':''):
-      '<p class="wx-empty">No matchups match this search and filter.</p>';
+      '<p class="wx-empty">No games are available yet.</p>';
   }
 
   function renderShell(){
-    section.innerHTML='<div class="wx-container">'+
-      '<header class="wx-hero"><div><p class="wx-eyebrow">NFL · GAME DAY CONDITIONS</p><h2>Weather</h2><p class="wx-sub">Game-by-game weather impact for fantasy football, based on MySportsWeather forecasts.</p></div><button type="button" class="wx-refresh" id="wxRefresh">↻ Refresh</button></header>'+
-      '<div class="wx-overview" id="wxOverview"></div>'+
-      '<div class="wx-freshness" id="wxFreshness" role="status"></div>'+
-      '<div class="wx-controls"><label class="wx-search"><span aria-hidden="true">⌕</span><input id="wxSearch" type="search" placeholder="Search team or stadium" aria-label="Search NFL matchups" autocomplete="off"></label><div class="wx-filters" id="wxFilters"></div></div>'+
-      '<div class="wx-game-count" id="wxResultCount"></div><div class="wx-games" id="wxGames"></div>'+
-      '<footer class="wx-footer"><p><strong>Game schedule and forecasts:</strong> <a href="https://mysportsweather.com/nfl" target="_blank" rel="noopener noreferrer">MySportsWeather by Kevin Roth</a>, including its NWS and NBM hourly data. Fantasy impact labels and analysis are our own weather-based estimates, not Kevin Roth’s recommendations.</p><p id="wxUpdated"></p><p>Forecasts change as kickoff approaches. Pending games have no MySportsWeather prediction yet—no weather conditions are assumed for them.</p></footer></div>';
-    section.querySelector('#wxSearch').value=search;
-    section.querySelector('#wxSearch').addEventListener('input',event=>{search=event.target.value;renderList();});
-    section.querySelector('#wxFilters').addEventListener('click',event=>{const target=event.target.closest('[data-wx-filter]');if(target){filter=target.dataset.wxFilter;renderList();}});
-    section.querySelector('#wxRefresh').addEventListener('click',()=>load(true));
+    section.innerHTML='<div class="wx-container wx-games-only">'+
+      '<div class="wx-games" id="wxGames"></div>'+
+      '<footer class="wx-footer"><p>Forecasts: <a href="https://mysportsweather.com/nfl" target="_blank" rel="noopener noreferrer">MySportsWeather by Kevin Roth</a>. Fantasy impact labels are our own estimates; conditions can change before kickoff.</p></footer></div>';
   }
 
   async function load(force=false){
@@ -305,7 +277,6 @@
       if(!Array.isArray(data.games))throw new Error('Invalid NFL weather data');
       snapshot=data;error='';lastFetchedAt=Date.now();
       renderList();
-      section.querySelector('#wxUpdated').textContent='Weather data updated '+formatUpdated(data.generatedAt)+'. The source is scheduled to be checked about every two hours.';
     }catch(err){
       error=err.message;
       if(!snapshot)section.querySelector('#wxGames').innerHTML='<p class="wx-empty">Weather data is temporarily unavailable. Please try Refresh. You can also check <a href="https://mysportsweather.com/nfl" target="_blank" rel="noopener noreferrer">MySportsWeather</a> directly.</p>';

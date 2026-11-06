@@ -19,12 +19,12 @@
     {view:'teams',label:'Team Shares'},
     {view:'injury',label:'Injury Impact'},
     {view:'schedule',label:'Schedule'},
-    {view:'startsit',label:'Start / Sit'},
+    {view:'startsit',label:'Compare'},
     {view:'weekly',label:'Weekly Report'}
   ];
   const groups=[
     {id:'rankings',label:'Rankings',items:['HOME','ALL','QB','RB','WR','TE','MYGUYS','DND']},
-    {id:'analytics',label:'Analytics',items:[...analyticsViews,'ESPN','COMPARE']},
+    {id:'analytics',label:'Analytics',items:[...analyticsViews,'ESPN']},
     {id:'teams',label:'My Teams',items:['MYTEAMS','STOCK']},
     {id:'tools',label:'Tools',items:['SEARCH','MOCK','DEPTH','TRADE','COMMAND','WEATHER']}
   ];

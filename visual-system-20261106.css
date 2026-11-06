@@ -35,12 +35,8 @@ body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell)>td{
   border-top-color:rgba(145,182,205,.13)!important;
   transition:background-color .16s ease;
 }
-body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell)>td:first-child{
-  box-shadow:inset 3px 0 0 var(--shua-row-accent,#2d6470);
-}
 body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell):hover>td{background:rgba(57,125,125,.14)!important}
 body.shua-clean #tableCard td.rank{font-size:16px!important;font-weight:950!important;color:#e2f3fa!important}
-body.shua-clean #tableCard tbody tr:not(.tag-group):nth-child(-n+3)>td.rank{color:var(--shua-v2-gold)!important}
 body.shua-clean #tableCard .photo{width:43px!important;height:43px!important;flex-basis:43px!important;border-width:2px}
 body.shua-clean #tableCard .rank-player-copy>b,
 body.shua-clean #tableCard .tagged-player-copy>b{

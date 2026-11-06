@@ -128,12 +128,6 @@ body.shua-clean .espn-game-log-table tbody tr:nth-child(even) {
 body.shua-clean .espn-game-log-table tbody tr:hover {
   background:rgba(60,119,126,.17)!important;
 }
-body.shua-clean .espn-game-log-table tbody tr:has(.gl-pts-high) td:first-child {
-  box-shadow:inset 3px 0 #39d9a0;
-}
-body.shua-clean .espn-game-log-table tbody tr:has(.gl-pts-low) td:first-child {
-  box-shadow:inset 3px 0 #e17c89;
-}
 body.shua-clean .espn-game-log-table tbody tr.is-selected-week {
   background:rgba(36,121,101,.27)!important;
   outline:1px solid rgba(71,196,156,.38);

@@ -1,0 +1,201 @@
+/* Visual recommendations 2–7: type, rankings, navigation, analytics,
+   palette and My Teams. Intentionally does not modify the player-card hero. */
+
+body.shua-clean{
+  --shua-accent:#4be0b3;
+  --shua-border:rgba(151,190,210,.18);
+  --shua-surface:#0b2234;
+  --shua-muted:#a7bdcb;
+  --shua-v2-raised:#102a3e;
+  --shua-v2-line:rgba(155,191,212,.14);
+  --shua-v2-gold:#e6bf69;
+  background:linear-gradient(155deg,#061625 0%,#081b2d 58%,#061725 100%);
+  color:#f1f7fc;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+body.shua-clean :is(main,.tools,#shuaCleanNav){font-feature-settings:'tnum' 1,'kern' 1}
+body.shua-clean :is(main>.head h2,#shuaMyTeams h2,#shuaStock h2,#shuaAnalyticsSection .st-heading h2){
+  color:#f5fbff;font-size:clamp(22px,2.5vw,28px);font-weight:900;line-height:1.13;
+  letter-spacing:-.035em;text-wrap:balance;
+}
+body.shua-clean :is(.head small,#shuaStock .stock-sub,#shuaMyTeams .myteams-subtitle,#shuaAnalyticsSection .st-heading p){
+  color:#a0bacc;font-size:12px;line-height:1.45;
+}
+body.shua-clean :is(#tableCard td.rank,#shuaStock .stock-rank,#shuaAnalyticsSection .st-big-value){font-variant-numeric:tabular-nums}
+
+/* Ranking lists: restrained team-color rail, generous player names and soft row cadence. */
+body.shua-clean #tableCard{background:#0a2032;border-color:var(--shua-v2-line);border-radius:14px}
+body.shua-clean #tableCard thead th{
+  background:#112b3f!important;color:#b4cbd9!important;font-size:10.5px!important;
+  letter-spacing:.07em;border-bottom:1px solid rgba(148,193,215,.2)!important;
+}
+body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell):nth-child(even)>td{background:rgba(59,93,116,.055)}
+body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell)>td{
+  border-top-color:rgba(145,182,205,.13)!important;
+  transition:background-color .16s ease;
+}
+body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell)>td:first-child{
+  box-shadow:inset 3px 0 0 var(--shua-row-accent,#2d6470);
+}
+body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell):hover>td{background:rgba(57,125,125,.14)!important}
+body.shua-clean #tableCard td.rank{font-size:16px!important;font-weight:950!important;color:#e2f3fa!important}
+body.shua-clean #tableCard tbody tr:not(.tag-group):nth-child(-n+3)>td.rank{color:var(--shua-v2-gold)!important}
+body.shua-clean #tableCard .photo{width:43px!important;height:43px!important;flex-basis:43px!important;border-width:2px}
+body.shua-clean #tableCard .rank-player-copy>b,
+body.shua-clean #tableCard .tagged-player-copy>b{
+  font-size:clamp(14px,1.2vw,17px)!important;font-weight:900!important;line-height:1.2!important;
+  letter-spacing:-.016em;
+}
+body.shua-clean #tableCard .phone-rank-meta,
+body.shua-clean #tableCard .tagged-player-team-line{color:#acc1cf!important;font-size:10.5px!important}
+body.shua-clean #tableCard td.notes{color:#b7c8d3;font-size:12px;line-height:1.48}
+body.shua-clean #tableCard .shua-note-toggle{color:var(--shua-accent)}
+
+/* Four equally sized native-feeling navigation buttons, without changing their
+   existing press-and-slide behavior or the pop-up option lists. */
+body.shua-clean #shuaCleanNav .shua-clean-groups{gap:6px}
+body.shua-clean #shuaCleanNav .shua-clean-trigger{
+  position:relative;border:1px solid transparent;border-radius:11px;
+  color:#c5d5e2;background:transparent;
+  transition:background-color .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease!important;
+}
+body.shua-clean #shuaCleanNav .shua-clean-group-name{font-weight:880;letter-spacing:-.01em}
+body.shua-clean #shuaCleanNav .shua-line-icon{color:#8da9ba!important;transition:color .18s ease!important}
+body.shua-clean #shuaCleanNav .shua-clean-group.is-active>.shua-clean-trigger{
+  color:#e7fff5!important;background:linear-gradient(155deg,#174c41,#103a3b)!important;
+  border-color:#347a65!important;box-shadow:inset 0 1px 0 #ffffff13!important;
+}
+body.shua-clean #shuaCleanNav .shua-clean-group.is-active .shua-line-icon{color:#74e9bd!important}
+body.shua-clean #shuaCleanNav .shua-clean-group.is-open>.shua-clean-trigger{
+  border-color:#4ac99d!important;background:#173c4b!important;
+}
+body.shua-clean #shuaCleanNav .shua-clean-group.is-active>.shua-clean-trigger::after{
+  content:'';position:absolute;bottom:3px;left:29%;width:42%;height:2px;
+  border-radius:20px;background:var(--shua-accent);pointer-events:none;
+}
+body.shua-clean #shuaCleanNav .shua-clean-popup{
+  background:#0b2538;border-color:#426678;border-radius:13px;box-shadow:0 20px 50px #0009;
+}
+body.shua-clean #shuaCleanNav .shua-clean-popup button{font-size:12px;font-weight:800;border-radius:8px}
+body.shua-clean #shuaCleanNav .shua-clean-popup button.is-selected{background:#174d41;color:#d7fff0}
+
+/* Analytics charts share card, axis, filter and metric styling. */
+body.shua-clean #shuaAnalyticsSection .st-panel{
+  background:#0b2235!important;border:1px solid var(--shua-v2-line)!important;
+  border-radius:14px!important;box-shadow:0 6px 22px #0000001e!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-panel-head h3{
+  font-size:clamp(15px,1.4vw,18px)!important;font-weight:900;letter-spacing:-.025em;color:#f1faff;
+}
+body.shua-clean #shuaAnalyticsSection .st-panel-head p{color:#a9c1d0;font-size:11.5px;line-height:1.45}
+body.shua-clean #shuaAnalyticsSection :is(.st-metric,.st-feature,.st-comparison,.st-timeline){
+  border-color:var(--shua-v2-line)!important;border-radius:10px!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-metric{background:#112d40!important}
+body.shua-clean #shuaAnalyticsSection .st-gridline{stroke:#83a8be!important;stroke-opacity:.22;stroke-dasharray:3 5}
+body.shua-clean #shuaAnalyticsSection .st-axis-line{stroke:#90b4c8!important;stroke-opacity:.38}
+body.shua-clean #shuaAnalyticsSection .st-axis{fill:#b1c6d4!important;font-size:11px}
+body.shua-clean #shuaAnalyticsSection .st-bar-value{fill:#eef9ff!important;font-size:12px;font-weight:850}
+body.shua-clean #shuaAnalyticsSection .st-chart-unit{color:#aec5d3;font-size:10.5px}
+body.shua-clean #shuaAnalyticsSection :is(.st-controls select,.st-injury-filters select,.st-dashboard-picker select){
+  background:#102b3e!important;color:#e7f7ff!important;border:1px solid #3a6274!important;
+  border-radius:9px!important;box-shadow:inset 0 1px 0 #ffffff09;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-tab[aria-selected="true"],.st-button[aria-pressed="true"]){
+  background:#174e41!important;color:#ddfff0!important;border-color:#3b9d79!important;
+}
+
+/* My Teams: clearer team identity, starter/bench/IR grouping and projections. */
+body.shua-clean #shuaMyTeams .myteams-grid{gap:7px!important}
+body.shua-clean #shuaMyTeams .myteams-card{
+  background:#0b2336!important;border-color:var(--shua-v2-line)!important;
+  border-radius:12px!important;box-shadow:0 3px 13px #00000020;
+}
+body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])){
+  border-color:#3ca687!important;box-shadow:0 0 0 1px #3ca68720,0 8px 28px #0003!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card-trigger{
+  min-height:64px!important;padding:10px 13px!important;
+  transition:background-color .16s ease!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card-trigger[aria-expanded="true"]{
+  background:linear-gradient(110deg,#17453f,#113244)!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card-identity .myteams-team-logo,
+body.shua-clean #shuaMyTeams .shua-league-monogram{
+  width:43px!important;height:43px!important;flex-basis:43px!important;border-radius:10px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-name{
+  color:#f4fcff!important;font-size:15px!important;font-weight:900!important;letter-spacing:-.02em;
+}
+body.shua-clean #shuaMyTeams .myteams-league{color:#a6c0cf!important;font-size:10.5px!important}
+body.shua-clean #shuaMyTeams .shua-league-record{
+  background:#153b43;border-color:#3b7370;color:#c4f6e5;font-size:11px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-roster{background:#0a2032;border-top:1px solid #315b64!important}
+body.shua-clean #shuaMyTeams .myteams-roster-head{
+  padding:9px 7px!important;background:#102b3e;color:#aac5d5;
+  font-size:10px;font-weight:900;letter-spacing:.055em;
+}
+body.shua-clean #shuaMyTeams .myteams-roster-row{
+  min-height:57px!important;padding:8px 7px!important;
+  border-top:1px solid rgba(148,186,207,.12)!important;
+  transition:background-color .16s ease;
+}
+body.shua-clean #shuaMyTeams .myteams-roster-row:nth-child(even){background:rgba(63,99,120,.045)}
+body.shua-clean #shuaMyTeams .myteams-roster-row:hover{background:rgba(67,133,128,.13)!important}
+body.shua-clean #shuaMyTeams .myteams-slot{
+  color:#c2d9e6!important;font-size:10px!important;font-weight:900!important;
+  letter-spacing:.01em;
+}
+body.shua-clean #shuaMyTeams .myteams-player-open{gap:10px}
+body.shua-clean #shuaMyTeams .myteams-player-open b{
+  color:#f2f9fd;font-size:14px!important;font-weight:870;line-height:1.22;
+}
+body.shua-clean #shuaMyTeams .myteams-player-open small{color:#aec3d1;font-size:10.5px!important;line-height:1.35}
+body.shua-clean #shuaMyTeams .myteams-roster-row>strong{
+  color:#f1faff!important;font-size:13.5px!important;font-weight:900;font-variant-numeric:tabular-nums;
+}
+body.shua-clean #shuaMyTeams .myteams-roster-row[data-shua-lineup-group="bench"]{background:rgba(22,46,65,.4)}
+body.shua-clean #shuaMyTeams .myteams-roster-row[data-shua-lineup-group="ir"]{background:rgba(108,59,64,.15)}
+body.shua-clean #shuaMyTeams .myteams-roster-row.shua-lineup-group-start{
+  border-top:2px solid #3b776d!important;margin-top:5px;padding-top:12px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-subnav{gap:5px;padding-bottom:11px}
+body.shua-clean #shuaMyTeams .myteams-subnav button{
+  background:#102b3e;color:#b9d0dd;border:1px solid #284d60;
+  border-radius:8px;min-height:34px;
+}
+body.shua-clean #shuaMyTeams .myteams-subnav button[aria-selected="true"]{
+  background:#174b3f;color:#e3fff3;border-color:#3ba17c;
+}
+
+@media(max-width:700px){
+  body.shua-clean #tableCard .photo{width:38px!important;height:38px!important;flex-basis:38px!important}
+  body.shua-clean #tableCard td.rank{font-size:15px!important}
+  body.shua-clean #tableCard .rank-player-copy>b,
+  body.shua-clean #tableCard .tagged-player-copy>b{font-size:14px!important}
+  body.shua-clean #shuaCleanNav{
+    background:rgba(5,19,32,.97)!important;border-top:1px solid #426b79!important;
+    box-shadow:0 -7px 28px #0007!important;backdrop-filter:blur(12px);
+  }
+  body.shua-clean #shuaCleanNav .shua-clean-groups{gap:4px}
+  body.shua-clean #shuaCleanNav .shua-clean-trigger{min-height:49px!important;padding:7px 3px!important}
+  body.shua-clean #shuaCleanNav .shua-line-icon{width:17px!important;height:17px!important;flex-basis:17px!important}
+  body.shua-clean #shuaAnalyticsSection .st-panel{padding:12px!important}
+  body.shua-clean #shuaMyTeams .myteams-card-trigger{min-height:59px!important;padding:8px 9px!important}
+  body.shua-clean #shuaMyTeams .myteams-card-identity .myteams-team-logo,
+  body.shua-clean #shuaMyTeams .shua-league-monogram{width:37px!important;height:37px!important;flex-basis:37px!important}
+  body.shua-clean #shuaMyTeams .myteams-name{font-size:13.5px!important}
+  body.shua-clean #shuaMyTeams .myteams-league{font-size:9.5px!important}
+  body.shua-clean #shuaMyTeams .myteams-roster-row{min-height:55px!important;padding:7px 3px!important}
+  body.shua-clean #shuaMyTeams .myteams-roster-row>strong{font-size:12.5px!important}
+  body.shua-clean #shuaMyTeams .myteams-player-open b{font-size:12.5px!important}
+  body.shua-clean #shuaMyTeams .myteams-player-open small{font-size:9.5px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean #shuaCleanNav .shua-clean-trigger,
+  body.shua-clean #tableCard tbody tr>td,
+  body.shua-clean #shuaMyTeams .myteams-roster-row{transition:none!important}
+}

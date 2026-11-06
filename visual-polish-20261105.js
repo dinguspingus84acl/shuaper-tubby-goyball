@@ -27,7 +27,23 @@
   document.querySelectorAll(selector).forEach(node=>{
    if(node.classList.contains('shua-accent-ready'))return;
    const code=findCode(node),color=colors[code];
-   if(color){node.style.setProperty('--shua-player-color',color);node.classList.add('shua-accent-ready');}
+   if(color){
+    node.style.setProperty('--shua-player-color',color);
+    if(node.matches('#rows .photo-cell'))node.closest('tr')?.style.setProperty('--shua-row-accent',color);
+    node.classList.add('shua-accent-ready');
+   }
+  });
+  // Lineup slots already identify position. A restrained divider marks where
+  // the bench and IR begin, without adding new labels or changing roster data.
+  document.querySelectorAll('#shuaMyTeams .myteams-roster').forEach(roster=>{
+   let previous='starter';
+   roster.querySelectorAll('.myteams-roster-row').forEach(row=>{
+    const slot=(row.querySelector('.myteams-slot')?.textContent||'').trim().toLowerCase();
+    const group=slot==='bench'?'bench':slot==='ir'?'ir':'starter';
+    row.dataset.shuaLineupGroup=group;
+    row.classList.toggle('shua-lineup-group-start',group!==previous);
+    previous=group;
+   });
   });
  }
  let frame=0;

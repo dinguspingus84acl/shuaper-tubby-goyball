@@ -1,0 +1,222 @@
+/* Follow-up visual pass: #1, #2, #4, #5, #7, #8, #9, #10.
+   The micrographs and Stock percentage-bar proposals remain unchanged. */
+
+/* 1. Context stays visible after the large section title scrolls away. */
+#shuaVisualContext{
+  position:fixed;z-index:54;top:63px;left:50%;width:min(100%,1500px);
+  transform:translate(-50%,-8px);display:flex;align-items:center;gap:8px;
+  height:35px;padding:0 22px;border-bottom:1px solid #41677a77;
+  background:#071f30ed;backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);
+  color:#a9becd;font-size:11px;letter-spacing:.02em;
+  opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;
+}
+#shuaVisualContext.is-visible{opacity:1;transform:translate(-50%,0)}
+#shuaVisualContext .shua-context-dot{height:6px;width:6px;flex:none;border-radius:50%;background:#4be0b3;box-shadow:0 0 11px #4be0b383}
+#shuaVisualContext strong{font-size:12px;font-weight:880;color:#f1faff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#shuaVisualContext .shua-context-parent{font-weight:780;white-space:nowrap}
+#shuaVisualContext .shua-context-divider{color:#608295}
+body:has(#modal.open) #shuaVisualContext{display:none}
+@media(max-width:700px){
+  #shuaVisualContext{top:env(safe-area-inset-top,0px);height:37px;padding:0 12px;z-index:42;background:#071b2de8;
+    border-bottom:1px solid #3860718c;border-radius:0 0 10px 10px}
+}
+
+/* 2. Incoming player cards share the exact same canvas, dimensions and motion. */
+.phone-mode #modal .player-swipe-preview,
+.phone-mode #modal .profile.featured-player-profile{backface-visibility:hidden;-webkit-backface-visibility:hidden;transform-style:flat}
+.phone-mode #modal .player-swipe-preview{width:100vw;height:100dvh;contain:layout paint}
+.phone-mode #modal .player-swipe-preview .featured-player-card{
+  min-height:254px;max-height:254px;box-sizing:border-box;
+}
+.phone-mode #modal .player-swipe-preview .preview-profile-content{
+  width:100%;min-width:0;max-width:100%;overflow:hidden;
+}
+
+/* 4. Depth chart: position-led roster ladders, with distinct starter and backup tiers. */
+body.shua-clean #depthSection .depth-grid{gap:12px!important;align-items:stretch}
+body.shua-clean #depthSection .depth-card{
+  position:relative;min-width:0;overflow:hidden;padding:0!important;border-radius:14px!important;
+  border:1px solid #31566c!important;background:#0a2337!important;
+  box-shadow:0 7px 24px #00000024;
+}
+body.shua-clean #depthSection .depth-card h3{
+  display:flex;align-items:center;justify-content:space-between;min-height:49px;
+  margin:0!important;padding:11px 13px!important;background:linear-gradient(110deg,#173c54,#0e293e);
+  color:#f1faff;font-size:17px!important;letter-spacing:-.02em;
+  border-bottom:1px solid #34566d;
+}
+body.shua-clean #depthSection .depth-card.qb h3{box-shadow:inset 4px 0 #b997df}
+body.shua-clean #depthSection .depth-card.rb h3{box-shadow:inset 4px 0 #78d8b8}
+body.shua-clean #depthSection .depth-card.wr h3{box-shadow:inset 4px 0 #6dbbe6}
+body.shua-clean #depthSection .depth-card.te h3{box-shadow:inset 4px 0 #e5ae66}
+#depthSection .shua-depth-group-label{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 12px 5px;color:#8daabc;font-size:10px;font-weight:850;
+  letter-spacing:.075em;text-transform:uppercase;
+}
+body.shua-clean #depthSection .depth-player{
+  display:grid!important;grid-template-columns:19px 38px minmax(0,1fr) auto!important;
+  gap:9px!important;align-items:center!important;min-height:57px;
+  margin:0 7px!important;padding:7px 8px!important;
+  border-top:1px solid #ffffff12!important;border-radius:8px;
+  transition:background .14s ease;
+}
+body.shua-clean #depthSection .depth-player[data-depth-order="1"]{
+  background:linear-gradient(90deg,#17453e94,#0e2a3d66);
+  box-shadow:inset 3px 0 #45dba6;
+}
+body.shua-clean #depthSection .depth-player>b{
+  color:#8fb3c7!important;font-weight:900;font-size:12px;
+}
+body.shua-clean #depthSection .depth-player .photo{
+  width:36px!important;height:36px!important;flex-basis:36px!important;
+  border-radius:50%!important;border:1px solid #7aabc577!important;
+}
+body.shua-clean #depthSection .depth-player>span:not(.photo):not(.depth-player-photo-spacer){
+  color:#eef7fc;font-weight:850;font-size:12px;line-height:1.25;min-width:0;
+}
+#depthSection .shua-depth-tier{
+  flex:none;font-size:9px;font-weight:900;line-height:1;
+  color:#a9c2d2;border:1px solid #3e5b70;border-radius:999px;
+  padding:6px 7px;background:#112d43;
+}
+#depthSection [data-depth-order="1"] .shua-depth-tier{
+  border-color:#378a6c;color:#aaffd9;background:#14523c;
+}
+@media(max-width:700px){body.shua-clean #depthSection .depth-player{min-height:55px}}
+
+/* 5. Live/saved-score comparison above each My Teams roster, never synthetic points. */
+#shuaMyTeams .myteams-scoreboard{
+  border:1px solid #32657a;border-radius:12px;padding:10px 12px 12px;
+  background:linear-gradient(120deg,#0d3441,#0b253a);margin:4px 2px 13px;
+}
+#shuaMyTeams .myteams-scoreboard-top{display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:4px;color:#91b3c6;font-size:10px;font-weight:790;margin-bottom:11px}
+#shuaMyTeams .myteams-scoreboard-top span:first-child{color:#71e6b5;text-transform:uppercase;letter-spacing:.06em;font-weight:900}
+#shuaMyTeams .myteams-scoreboard-teams{display:grid;grid-template-columns:minmax(0,1fr) 27px minmax(0,1fr);gap:7px;align-items:center}
+#shuaMyTeams .myteams-score-side{display:grid;grid-template-columns:25px minmax(0,1fr);gap:3px 7px;align-items:center;min-width:0}
+#shuaMyTeams .myteams-score-side .myteams-team-logo{grid-row:1/3;width:25px!important;height:25px!important;object-fit:contain!important}
+#shuaMyTeams .myteams-score-initials{grid-row:1/3;width:25px;height:25px;display:grid;place-items:center;
+  border-radius:7px;background:#19475a;border:1px solid #386d7e;color:#c9f2ff;font-size:9px;font-weight:950}
+#shuaMyTeams .myteams-score-side .myteams-score-label{color:#c9e0ed;font-size:10px;font-weight:800;line-height:1.2;
+  overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#shuaMyTeams .myteams-score-side strong{color:#fff;font-size:clamp(17px,2.2vw,23px);font-weight:950;font-variant-numeric:tabular-nums}
+#shuaMyTeams .myteams-score-side.is-opponent{grid-template-columns:minmax(0,1fr) 25px;text-align:right;justify-items:end}
+#shuaMyTeams .myteams-score-side.is-opponent .myteams-team-logo{grid-column:2;grid-row:1/3}
+#shuaMyTeams .myteams-score-side.is-opponent .myteams-score-initials{grid-column:2;grid-row:1/3}
+#shuaMyTeams .myteams-score-side.is-opponent .myteams-score-label,
+#shuaMyTeams .myteams-score-side.is-opponent strong{grid-column:1}
+#shuaMyTeams .myteams-score-vs{font-size:10px;font-weight:900;color:#7299ab;text-align:center}
+#shuaMyTeams .myteams-score-comparison{display:flex;gap:3px;height:6px;margin-top:12px;border-radius:99px;overflow:hidden;background:#19394a}
+#shuaMyTeams .myteams-score-comparison span:first-child{background:#42d9a5;min-width:0}
+#shuaMyTeams .myteams-score-comparison span:last-child{background:#7598b7;min-width:0}
+#shuaMyTeams .myteams-score-comparison.is-unscored span:first-child{background:#487b73}
+#shuaMyTeams .myteams-score-comparison.is-unscored span:last-child{background:#46647b}
+
+/* 7. Distinct but readable schedule difficulty colors with NFL logos. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-table{border-spacing:5px!important}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell{
+  border-radius:9px!important;min-height:61px;box-shadow:inset 0 1px 0 #ffffff13;
+  transition:filter .12s,transform .12s;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.easy{
+  background:linear-gradient(150deg,#165843,#123b36)!important;border-color:#399979!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.neutral{
+  background:linear-gradient(150deg,#625026,#3d352c)!important;border-color:#b39855!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.tough{
+  background:linear-gradient(150deg,#743746,#4d2b3b)!important;border-color:#b06b7d!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell small{font-size:11px!important;font-weight:850;color:#f1f8fb}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-week-opponent-logo{
+  width:29px!important;height:29px!important;object-fit:contain;
+}
+@media(hover:hover){body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell:hover{filter:brightness(1.23);transform:translateY(-1px)}}
+
+/* 8. Weather as compact stadium scoreboards; forecasts remain source-backed. */
+body.shua-clean #shuaWeatherSection .wx-day-games{gap:9px}
+body.shua-clean #shuaWeatherSection .wx-game{padding:12px!important;border-radius:12px!important;
+  background:linear-gradient(142deg,#102e42,#092034)!important;box-shadow:0 5px 15px #0003!important}
+body.shua-clean #shuaWeatherSection .wx-game-top{margin-bottom:9px}
+body.shua-clean #shuaWeatherSection .wx-team-logo{width:38px;height:38px;flex-basis:38px}
+body.shua-clean #shuaWeatherSection .wx-team b{font-size:18px}
+body.shua-clean #shuaWeatherSection .wx-venue{margin:8px 0 9px;color:#a4bcca}
+body.shua-clean #shuaWeatherSection .wx-metrics{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:6px 0 7px}
+body.shua-clean #shuaWeatherSection .wx-metric{background:#071c2b;border-color:#2a4b5c;padding:7px 4px;border-radius:8px}
+body.shua-clean #shuaWeatherSection .wx-metric span{font-size:9px;margin-bottom:3px}
+body.shua-clean #shuaWeatherSection .wx-metric strong{font-size:15px}
+body.shua-clean #shuaWeatherSection .wx-indoor-note{display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+  padding:9px 10px!important;background:#132c45;border:1px solid #426b89;border-radius:8px;color:#b8d6ea;font-size:10px}
+body.shua-clean #shuaWeatherSection .wx-indoor-note strong{font-size:11px;letter-spacing:.07em;color:#c7deff}
+body.shua-clean #shuaWeatherSection .wx-indoor-mark{font-size:17px;line-height:1}
+body.shua-clean #shuaWeatherSection .wx-pending-game{border-style:dashed!important;opacity:.86}
+
+/* 9. A true shared horizontal scroller for mobile Stats; names and faces stay pinned. */
+@media(max-width:700px){
+  body.shua-clean #espnLiveSection .espn-live-card{
+    overflow-x:auto!important;overflow-y:visible!important;max-width:100%!important;
+    overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;
+  }
+  body.shua-clean #espnLiveSection .espn-live-head,
+  body.shua-clean #espnLiveSection .espn-live-row{
+    display:grid!important;width:650px!important;min-width:650px!important;
+    grid-template-columns:34px 171px 50px 55px 70px 165px 65px!important;
+    gap:6px!important;padding-left:7px!important;padding-right:7px!important;
+  }
+  body.shua-clean #espnLiveSection .espn-live-head>:nth-child(n),
+  body.shua-clean #espnLiveSection .espn-live-row>:nth-child(n){display:block!important}
+  body.shua-clean #espnLiveSection .espn-live-row>.espn-player{display:flex!important;min-width:0!important}
+  body.shua-clean #espnLiveSection .espn-live-head>:nth-child(1),
+  body.shua-clean #espnLiveSection .espn-live-row>:nth-child(1){
+    position:sticky!important;left:0!important;z-index:5!important;
+    align-self:stretch;display:flex!important;align-items:center;
+    background:#0b2436;box-shadow:5px 0 7px #04111c75;
+  }
+  body.shua-clean #espnLiveSection .espn-live-head>:nth-child(2),
+  body.shua-clean #espnLiveSection .espn-live-row>:nth-child(2){
+    position:sticky!important;left:40px!important;z-index:4!important;
+    min-width:0!important;background:#0b2436;box-shadow:5px 0 9px #04111c80;
+  }
+  body.shua-clean #espnLiveSection .espn-live-head>:nth-child(-n+2){background:#112e40!important;z-index:6!important}
+  body.shua-clean #espnLiveSection #espnLiveRows>.espn-live-row:nth-child(even){background:#0f273a!important}
+  body.shua-clean #espnLiveSection #espnLiveRows>.espn-live-row:nth-child(even)>:nth-child(-n+2){background:#0f273a}
+  body.shua-clean #espnLiveSection .espn-name-btn{white-space:normal!important;line-height:1.15!important;font-size:12px!important}
+  body.shua-clean #espnLiveSection .espn-headshot{width:33px;height:33px;flex-basis:33px}
+  body.shua-clean #espnLiveSection .espn-selected-stat{
+    width:auto!important;padding:7px 3px!important;text-align:center!important;
+    color:#abffe0!important;background:#13493b!important;border-radius:6px;font-size:13px!important;
+  }
+  body.shua-clean #espnLiveSection .espn-stat-bar-head{font-size:9px!important}
+  body.shua-clean #espnLiveSection .espn-metric-track{display:block!important;width:100%;height:8px}
+  body.shua-clean #espnLiveSection .espn-live-head{position:sticky;top:0;z-index:8}
+}
+
+/* 10. Loading states occupy the same widths as their final components. */
+@keyframes shuaFeatureShimmer{to{background-position:-200% 0}}
+.shua-feature-skeleton-row,.shua-feature-skeleton-bar,
+body.shua-clean #shuaAnalyticsSection .st-skeleton{
+  background:linear-gradient(96deg,#173549 10%,#28516a 44%,#173549 80%);
+  background-size:200% 100%;animation:shuaFeatureShimmer 1.35s linear infinite;
+}
+.shua-feature-skeleton-list{display:grid;gap:8px;padding:9px 12px}
+.shua-feature-skeleton-row{height:55px;width:100%;border-radius:10px}
+.shua-feature-skeleton-row:nth-child(even){opacity:.7}
+#espnLiveRows>.espn-status+.shua-feature-skeleton-list{margin-top:3px}
+body.shua-clean #modal .unified-profile-loading[data-shua-loading="true"]{min-height:135px;padding:12px}
+body.shua-clean #modal .unified-profile-loading[data-shua-loading="true"]:after{
+  content:'';display:block;height:70px;margin-top:16px;border-radius:10px;
+  background:linear-gradient(96deg,#173549 10%,#28516a 44%,#173549 80%);
+  background-size:200% 100%;animation:shuaFeatureShimmer 1.35s linear infinite;
+}
+body.shua-clean #myTeamsLiveStatus.shua-espn-checking:after{
+  content:'';display:block;height:5px;width:75px;border-radius:8px;
+  background:linear-gradient(96deg,#173549 10%,#58bca0 44%,#173549 80%);
+  background-size:200% 100%;animation:shuaFeatureShimmer 1.35s linear infinite;
+}
+@media(prefers-reduced-motion:reduce){
+  #shuaVisualContext,.shua-feature-skeleton-row,.shua-feature-skeleton-bar,
+  body.shua-clean #modal .unified-profile-loading[data-shua-loading="true"]:after,
+  body.shua-clean #myTeamsLiveStatus.shua-espn-checking:after,
+  body.shua-clean #shuaAnalyticsSection .st-skeleton{animation:none!important;transition:none!important}
+}

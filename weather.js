@@ -198,7 +198,7 @@
     // All fixed-roof venues, including the Saints at Caesars Superdome, use
     // the identical compact indoor layout regardless of stray forecast fields.
     if(game.indoor)return '<article class="wx-game wx-indoor-game" data-weather-game="'+escape(game.id)+'">'+
-      header+fixture+venue+'<div class="wx-indoor-note"><span class="wx-indoor-mark" aria-hidden="true">⌂</span> Indoor game · Weather is not expected to affect play</div></article>';
+      header+fixture+venue+'<div class="wx-indoor-note"><span class="wx-indoor-mark" aria-hidden="true">⌂</span><strong>INDOORS</strong><span>Controlled conditions · No weather impact expected</span></div></article>';
     const conditions=[
       ['Temperature',display(f.tempF,'°F'),'temp'],
       ['Wind',display(f.windMph,' mph'),'wind'],

@@ -615,12 +615,33 @@ function transactionsHtml(item){
 }
 function panelHtml(item,tab){
  if(item.year!==2026){const archive=historicalData.find(x=>x.id===item.id&&x.year===item.year&&x.teamId===String(item.teamId));if(tab==='roster')return rosterHtml(-1,archive);if(tab==='standings')return archive?.standings?.length?standingsTable(archive.standings):'<p class="myteams-empty">Historical standings unavailable.</p>';return '<p class="myteams-empty">Historical matchup and waiver snapshots not available for this year.</p>';}
- if(tab==='roster')return rosterHtml(item.index);
+ if(tab==='roster')return matchupScoreboard(item)+rosterHtml(item.index);
  if(tab==='standings')return standingHtml(item.id);
  if(tab==='schedule')return scheduleHtml(item);
  if(tab==='transactions')return transactionsHtml(item);
  if(tab==='matchups')return matchupHtml(item.id);
  return wireHtml(item.id);
+}
+function matchupScoreboard(item){
+ const league=leagueFor(item.id);
+ const match=(league?.matchups||[]).find(m=>[m.home,m.away].some(t=>String(t?.teamId)===String(item.teamId)));
+ if(!match)return '';
+ const own=String(match.home?.teamId)===String(item.teamId)?match.home:match.away;
+ const opp=own===match.home?match.away:match.home;
+ const standing=team=>league.standings?.find(t=>String(t.teamId)===String(team?.teamId));
+ const score=team=>{const raw=team?.currentPoints??team?.totalPoints;return raw===null||raw===undefined||raw===''||!Number.isFinite(Number(raw))?null:Number(raw)};
+ const mine=score(own),theirs=score(opp),total=Math.max((mine||0)+(theirs||0),1);
+ const hasScored=(mine||0)+(theirs||0)>0;
+ const side=(team,value,sideClass)=>{
+  const badge=fantasyLogo(standing(team))||'<span class="myteams-score-initials">'+escapeHtml(String(team?.teamName||'Team').trim().slice(0,2).toUpperCase())+'</span>';
+  return '<div class="myteams-score-side '+sideClass+'">'+badge+'<span class="myteams-score-label">'+escapeHtml(team?.teamName||'—')+'</span><strong>'+ (value===null?'—':fmt(value)) +'</strong></div>';
+ };
+ return '<section class="myteams-scoreboard" aria-label="Week '+escapeHtml(league.week||'—')+' fantasy matchup">'+
+  '<div class="myteams-scoreboard-top"><span>Week '+escapeHtml(league.week||'—')+' matchup</span><span>'+(hasScored?'ESPN snapshot · points scored':'Upcoming · no points scored yet')+'</span></div>'+
+  '<div class="myteams-scoreboard-teams">'+side(own,mine,'is-mine')+'<span class="myteams-score-vs">VS</span>'+side(opp,theirs,'is-opponent')+'</div>'+
+  '<div class="myteams-score-comparison'+(hasScored?'':' is-unscored')+'" aria-label="Score comparison">'+
+   '<span style="width:'+(hasScored?Math.max(0,Math.min(100,(mine||0)/total*100)):50).toFixed(2)+'%"></span>'+
+   '<span style="width:'+(hasScored?Math.max(0,Math.min(100,(theirs||0)/total*100)):50).toFixed(2)+'%"></span></div></section>';
 }
 function leagueGlance(item){
  if(item.year!==2026)return '';
@@ -693,7 +714,7 @@ button.addEventListener('click',()=>{if(!document.body.classList.contains('my-te
 <link rel="stylesheet" href="portfolio.css?v=20261026-3">
 <script src="portfolio-data.js?v=20261026-2"></script>
 <script src="stock-data.js?v=20261026-2"></script><script src="stock.js?v=20261106-unified1"></script>
-<script src="portfolio.js?v=20261026-2"></script><link rel="stylesheet" href="weather.css?v=20261104-indoor3"><script src="weather.js?v=20261104-game-emoji1"></script>
+<script src="portfolio.js?v=20261026-2"></script><link rel="stylesheet" href="weather.css?v=20261104-indoor3"><script src="weather.js?v=20261106-scoreboard1"></script>
 <script src="player-face-fix.js?v=20261102-face1"></script>
 <link rel="stylesheet" href="rb-rankings.css?v=20261103-2">
 <link rel="stylesheet" href="clean-design.css?v=20261105-touch-slide2">
@@ -718,4 +739,6 @@ button.addEventListener('click',()=>{if(!document.body.classList.contains('my-te
 <link rel="stylesheet" href="lineup-and-rank-polish-20261106.css?v=20261106-v1">
 <link rel="stylesheet" href="visual-system-20261106.css?v=20261106-v1">
 <script src="rank-display-20261106.js?v=20261106-v1"></script>
+<link rel="stylesheet" href="feature-polish-20261106.css?v=20261106-v1">
+<script src="feature-polish-20261106.js?v=20261106-v1"></script>
 </body></html>

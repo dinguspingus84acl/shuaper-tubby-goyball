@@ -1550,12 +1550,13 @@ function installPhoneSwipeDismiss(){
  let gesture=null,settling=false;
  const ignore='button,input,select,textarea,a,svg,.st-chart,.st-table-wrap,[data-st-chart-host]';
  const width=()=>sheet.clientWidth||window.innerWidth||375;
+ const reducedMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  const restoreHorizontal=dx=>{
-  sheet.style.transition='transform .2s ease-out';
+  sheet.style.transition=reducedMotion()?'none':'transform .2s cubic-bezier(.2,.8,.25,1)';
   sheet.style.transform='translate3d(0,0,0)';
   const preview=document.getElementById('playerSwipePreview');
   if(preview){
-   preview.style.transition='transform .2s ease-out';
+   preview.style.transition=reducedMotion()?'none':'transform .2s cubic-bezier(.2,.8,.25,1)';
    preview.style.transform='translate3d('+(dx>0?-width():width())+'px,0,0)';
   }
   setTimeout(()=>{
@@ -1584,7 +1585,9 @@ function installPhoneSwipeDismiss(){
    const dir=dx<0?'next':'prev';
    const id=document.getElementById('modal')?.dataset.id||'';
    const target=adjacentPlayerId(id,dir);
-   const shift=Math.max(-width()*.98,Math.min(width()*.98,target?dx:dx*.12));
+   // The outgoing sheet and incoming preview track the exact same finger offset.
+   // Clamp only at the end of a page, where there is no adjacent player.
+   const shift=Math.max(-width(),Math.min(width(),target?dx:dx*.12));
    sheet.style.transition='none';
    sheet.style.transform='translate3d('+shift+'px,0,0)';
    const preview=target?ensurePlayerSwipePreview(target):null;
@@ -1604,16 +1607,17 @@ function installPhoneSwipeDismiss(){
    const id=document.getElementById('modal')?.dataset.id||'';
    const dir=dx<0?'next':'prev';
    const target=adjacentPlayerId(id,dir);
-   if(target&&Math.abs(dx)>=55&&Math.abs(dx)>Math.abs(dy)*1.25){
+   const velocity=Math.abs(dx)/dt;
+   if(target&&(Math.abs(dx)>=width()*.24||(Math.abs(dx)>=42&&velocity>.42))&&Math.abs(dx)>Math.abs(dy)*1.25){
     settling=true;
     const edge=dir==='next'?-width():width();
-    sheet.style.transition='transform .17s ease-out';
+    sheet.style.transition=reducedMotion()?'none':'transform .17s cubic-bezier(.2,.8,.25,1)';
     sheet.style.transform='translate3d('+edge+'px,0,0)';
     const preview=document.getElementById('playerSwipePreview');
-    if(preview){preview.style.transition='transform .17s ease-out';preview.style.transform='translate3d(0,0,0)'}
+    if(preview){preview.style.transition=reducedMotion()?'none':'transform .17s cubic-bezier(.2,.8,.25,1)';preview.style.transform='translate3d(0,0,0)'}
     setTimeout(()=>{
-     clearPlayerSwipePreview();
      if(isPhoneProfileSheet())openAdjacentPlayer(target,dir,false);
+     else clearPlayerSwipePreview();
      settling=false;
     },180);
    }else restoreHorizontal(dx);

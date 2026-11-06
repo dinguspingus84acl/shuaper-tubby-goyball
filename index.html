@@ -634,18 +634,24 @@ function matchupScoreboard(item){
  const opp=own===match.home?match.away:match.home;
  const standing=team=>league.standings?.find(t=>String(t.teamId)===String(team?.teamId));
  const score=team=>{const raw=team?.currentPoints??team?.totalPoints;return raw===null||raw===undefined||raw===''||!Number.isFinite(Number(raw))?null:Number(raw)};
- const mine=score(own),theirs=score(opp),total=Math.max((mine||0)+(theirs||0),1);
+ const projection=team=>{const raw=team?.totalProjectedPoints;return raw===null||raw===undefined||raw===''||!Number.isFinite(Number(raw))?null:Number(raw)};
+ const mine=score(own),theirs=score(opp),mineProjected=projection(own),theirProjected=projection(opp);
  const hasScored=(mine||0)+(theirs||0)>0;
- const side=(team,value,sideClass)=>{
+ const hasProjection=mineProjected!==null&&theirProjected!==null;
+ const comparisonTotal=hasProjection?Math.max(mineProjected+theirProjected,1):Math.max((mine||0)+(theirs||0),1);
+ const firstShare=hasProjection?mineProjected/comparisonTotal:hasScored?(mine||0)/comparisonTotal:.5;
+ const share=Math.max(0,Math.min(100,firstShare*100));
+ const side=(team,value,projected,sideClass)=>{
   const badge=fantasyLogo(standing(team))||'<span class="myteams-score-initials">'+escapeHtml(String(team?.teamName||'Team').trim().slice(0,2).toUpperCase())+'</span>';
-  return '<div class="myteams-score-side '+sideClass+'">'+badge+'<span class="myteams-score-label">'+escapeHtml(team?.teamName||'—')+'</span><strong>'+ (value===null?'—':fmt(value)) +'</strong></div>';
+  return '<div class="myteams-score-side '+sideClass+'">'+badge+'<span class="myteams-score-label">'+escapeHtml(team?.teamName||'—')+'</span><div class="myteams-score-current"><strong>'+(value===null?'—':fmt(value))+'</strong><small>Live</small></div>'+
+   '<span class="myteams-score-projected">Proj <b>'+(projected===null?'—':fmt(projected))+'</b></span></div>';
  };
  return '<section class="myteams-scoreboard" aria-label="Week '+escapeHtml(league.week||'—')+' fantasy matchup">'+
-  '<div class="myteams-scoreboard-top"><span>Week '+escapeHtml(league.week||'—')+' matchup</span><span>'+(hasScored?'ESPN snapshot · points scored':'Upcoming · no points scored yet')+'</span></div>'+
-  '<div class="myteams-scoreboard-teams">'+side(own,mine,'is-mine')+'<span class="myteams-score-vs">VS</span>'+side(opp,theirs,'is-opponent')+'</div>'+
-  '<div class="myteams-score-comparison'+(hasScored?'':' is-unscored')+'" aria-label="Score comparison">'+
-   '<span style="width:'+(hasScored?Math.max(0,Math.min(100,(mine||0)/total*100)):50).toFixed(2)+'%"></span>'+
-   '<span style="width:'+(hasScored?Math.max(0,Math.min(100,(theirs||0)/total*100)):50).toFixed(2)+'%"></span></div></section>';
+  '<div class="myteams-scoreboard-top"><span>Week '+escapeHtml(league.week||'—')+'</span><span>'+(hasProjection?'ESPN projected matchup':hasScored?'ESPN points scored':'Matchup')+'</span></div>'+
+  '<div class="myteams-scoreboard-teams">'+side(own,mine,mineProjected,'is-mine')+'<span class="myteams-score-vs">VS</span>'+side(opp,theirs,theirProjected,'is-opponent')+'</div>'+
+  '<div class="myteams-score-comparison'+(!hasProjection&&!hasScored?' is-unscored':'')+'" aria-label="'+(hasProjection?'Projected':'Actual')+' score comparison">'+
+   '<span style="width:'+share.toFixed(2)+'%"></span>'+
+   '<span style="width:'+(100-share).toFixed(2)+'%"></span></div></section>';
 }
 function leagueGlance(item){
  if(item.year!==2026)return '';
@@ -718,7 +724,7 @@ button.addEventListener('click',()=>{if(!document.body.classList.contains('my-te
 <link rel="stylesheet" href="portfolio.css?v=20261026-3">
 <script src="portfolio-data.js?v=20261026-2"></script>
 <script src="stock-data.js?v=20261026-2"></script><script src="stock.js?v=20261106-unified1"></script>
-<script src="portfolio.js?v=20261026-2"></script><link rel="stylesheet" href="weather.css?v=20261106-cardtime1"><script src="weather.js?v=20261106-visualday1"></script>
+<script src="portfolio.js?v=20261026-2"></script><link rel="stylesheet" href="weather.css?v=20261106-cardtime1"><script src="weather.js?v=20261106-visualday2"></script>
 <script src="player-face-fix.js?v=20261102-face1"></script>
 <link rel="stylesheet" href="rb-rankings.css?v=20261103-2">
 <link rel="stylesheet" href="clean-design.css?v=20261105-touch-slide2">
@@ -750,4 +756,5 @@ button.addEventListener('click',()=>{if(!document.body.classList.contains('my-te
 <link rel="stylesheet" href="tab-navigation-polish-20261106.css?v=20261106-v2">
 <script src="tab-navigation-polish-20261106.js?v=20261106-v1"></script>
 <link rel="stylesheet" href="visual-refinement-20261106.css?v=20261106-v2">
+<link rel="stylesheet" href="visual-upgrade-20261106.css?v=20261106-a1">
 </body></html>

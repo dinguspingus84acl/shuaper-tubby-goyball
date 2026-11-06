@@ -1,0 +1,183 @@
+/* Selected visual upgrades 1, 4, 5, 6, 8, 9 and 10.
+   Presentation-only except for the real ESPN projections rendered in My Teams. */
+body.shua-clean {
+  --shua-upgrade-base:#071827;
+  --shua-upgrade-panel:#0d2537;
+  --shua-upgrade-inset:#133044;
+  --shua-upgrade-border:rgba(125,174,195,.21);
+  --shua-upgrade-accent:#47d9b1;
+  --shua-upgrade-muted:#a2bdcd;
+  --shua-upgrade-radius:13px;
+}
+
+/* 1. The same identity proportions on rankings, Stats, Usage, Stock and teams. */
+body.shua-clean #tableCard .photo:not(.lg),
+body.shua-clean .espn-live-row .espn-headshot,
+body.shua-clean #shuaStock .stock-face,
+body.shua-clean #shuaAnalyticsSection .st-person .st-face,
+body.shua-clean #shuaMyTeams .myteams-roster-row .myteams-player-open>img:not(.myteams-nfl-logo){
+  width:40px!important;height:40px!important;min-width:40px!important;
+  flex:0 0 40px!important;border-radius:50%!important;
+  object-fit:cover;object-position:center top;
+  border:1.5px solid #67899e!important;background:#132e40;
+}
+body.shua-clean #shuaStock .stock-person,
+body.shua-clean #shuaAnalyticsSection .st-person,
+body.shua-clean #tableCard .photo-cell,
+body.shua-clean #shuaMyTeams .myteams-player-open {align-items:center;gap:9px;min-width:0}
+body.shua-clean #shuaStock .stock-name,
+body.shua-clean #shuaAnalyticsSection .st-person strong,
+body.shua-clean .espn-live-row .espn-player-name,
+body.shua-clean #shuaMyTeams .myteams-player-open b {
+  color:#eef7fc;font-weight:850;line-height:1.25;
+}
+body.shua-clean #shuaStock .stock-meta,
+body.shua-clean #shuaAnalyticsSection .st-person small,
+body.shua-clean #shuaMyTeams .myteams-player-open small {color:var(--shua-upgrade-muted)}
+body.shua-clean #shuaStock .stock-row,
+body.shua-clean #shuaAnalyticsSection .st-rank-row,
+body.shua-clean .espn-live-row {min-height:55px;align-items:center}
+body.shua-clean #shuaStock .stock-rank,
+body.shua-clean #shuaAnalyticsSection .st-rank-num {color:#a8bdcc!important;font-variant-numeric:tabular-nums}
+
+/* 4. A stable chart language across Analytics: soft axes and clear series. */
+body.shua-clean #shuaAnalyticsSection .st-gridline {
+  stroke:#9fb9c6!important;stroke-opacity:.15!important;
+  stroke-width:.8!important;stroke-dasharray:2 5!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-axis-line {stroke:#99b4c4!important;stroke-opacity:.28!important;stroke-width:1!important}
+body.shua-clean #shuaAnalyticsSection .st-axis {fill:#b6ccda!important;font-size:11.5px!important;font-weight:650}
+body.shua-clean #shuaAnalyticsSection .st-series-line.is-primary {stroke-width:2.8}
+body.shua-clean #shuaAnalyticsSection .st-series-line.is-comparison {stroke-width:2.3}
+body.shua-clean #shuaAnalyticsSection .st-legend {gap:10px 17px;align-items:center}
+body.shua-clean #shuaAnalyticsSection .st-legend-btn {font-size:11.5px;color:#c7dae4;font-weight:750}
+body.shua-clean #shuaAnalyticsSection .st-legend-btn i {box-shadow:none;width:9px;height:9px}
+body.shua-clean #shuaAnalyticsSection .st-chart-tools {border-bottom:1px solid rgba(118,161,185,.12);padding-bottom:7px;margin-bottom:6px}
+
+/* 5. Three explicit surfaces, one border/radius system, no decorative glare. */
+body.shua-clean :is(#shuaAnalyticsSection .st-panel,#shuaWeatherSection .wx-game,#shuaMyTeams .myteams-card,#shuaStock .stock-group) {
+  background:var(--shua-upgrade-panel)!important;
+  border-color:var(--shua-upgrade-border)!important;
+  border-radius:var(--shua-upgrade-radius)!important;
+  box-shadow:0 5px 16px rgba(0,0,0,.10)!important;
+}
+body.shua-clean :is(#shuaAnalyticsSection .st-metric,#shuaAnalyticsSection .st-callout,#shuaWeatherSection .wx-metric) {
+  background:var(--shua-upgrade-inset)!important;
+  border-color:rgba(120,164,185,.13)!important;
+  border-radius:10px!important;
+  box-shadow:none!important;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-panel-head,.st-controls) {color:#deeff8}
+
+/* 6. Keep names visible while scrolling data horizontally and headings while scrolling vertically. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table,
+body.shua-clean #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table {
+  isolation:isolate;overscroll-behavior-x:contain;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table thead th:first-child,
+body.shua-clean #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table thead th:first-child {
+  position:sticky!important;top:0!important;left:0!important;
+  z-index:9!important;background:#153248!important;
+  box-shadow:3px 0 8px rgba(1,13,25,.34);
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table tbody td:first-child,
+body.shua-clean #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table tbody td:first-child {
+  position:sticky!important;left:0!important;z-index:5!important;
+  background:#0e293c!important;box-shadow:3px 0 8px rgba(1,13,25,.32);
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table thead th {
+  position:sticky!important;top:0!important;z-index:6;background:#153248!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table tbody tr:nth-child(even) td:first-child,
+body.shua-clean #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table tbody tr:nth-child(even) td:first-child {background:#122e41!important}
+
+/* 8. Actual ESPN scores and full-week projections, without made-up values. */
+body.shua-clean #shuaMyTeams .myteams-scoreboard {
+  margin:4px 2px 12px;padding:12px 14px 13px;
+  border-radius:var(--shua-upgrade-radius);border:1px solid #37657a;
+  background:var(--shua-upgrade-inset);box-shadow:none;
+}
+body.shua-clean #shuaMyTeams .myteams-scoreboard-top {margin-bottom:12px;color:#a8c5d5;letter-spacing:.015em}
+body.shua-clean #shuaMyTeams .myteams-scoreboard-teams {grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);gap:11px}
+body.shua-clean #shuaMyTeams .myteams-score-side {grid-template-columns:36px minmax(0,1fr);gap:2px 9px}
+body.shua-clean #shuaMyTeams .myteams-score-side.is-opponent {grid-template-columns:minmax(0,1fr) 36px}
+body.shua-clean #shuaMyTeams .myteams-score-side .myteams-team-logo,
+body.shua-clean #shuaMyTeams .myteams-score-side .myteams-score-initials {
+  width:36px!important;height:36px!important;grid-row:1/4;object-fit:contain!important;
+}
+body.shua-clean #shuaMyTeams .myteams-score-side.is-opponent .myteams-team-logo,
+body.shua-clean #shuaMyTeams .myteams-score-side.is-opponent .myteams-score-initials {grid-column:2;grid-row:1/4}
+body.shua-clean #shuaMyTeams .myteams-score-label {font-size:11px;font-weight:850}
+body.shua-clean #shuaMyTeams .myteams-score-current {display:flex;gap:6px;align-items:baseline;min-width:0}
+body.shua-clean #shuaMyTeams .myteams-score-current strong {font-size:clamp(22px,3vw,29px);font-variant-numeric:tabular-nums;letter-spacing:-.025em}
+body.shua-clean #shuaMyTeams .myteams-score-current small {color:#a5bbcb;font-size:9px;font-weight:750;text-transform:uppercase}
+body.shua-clean #shuaMyTeams .myteams-score-projected {color:#bfd2df;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+body.shua-clean #shuaMyTeams .myteams-score-projected b {color:#fff;font-weight:900;margin-left:3px}
+body.shua-clean #shuaMyTeams .is-opponent :is(.myteams-score-label,.myteams-score-current,.myteams-score-projected) {grid-column:1}
+body.shua-clean #shuaMyTeams .is-opponent .myteams-score-current {justify-content:flex-end}
+body.shua-clean #shuaMyTeams .myteams-score-vs {font-size:10px;color:#89a7b7;letter-spacing:.12em}
+body.shua-clean #shuaMyTeams .myteams-score-comparison {height:8px;gap:3px;margin-top:14px}
+body.shua-clean #shuaMyTeams .myteams-score-comparison span:first-child {background:#43d5ac}
+body.shua-clean #shuaMyTeams .myteams-score-comparison span:last-child {background:#72add9}
+
+/* 9. Weather: one balanced fixture, prominent conditions and compact domes. */
+body.shua-clean #shuaWeatherSection .wx-day-games {align-items:start;gap:11px}
+body.shua-clean #shuaWeatherSection .wx-game {padding:13px 14px!important;min-width:0}
+body.shua-clean #shuaWeatherSection .wx-game-top {margin-bottom:12px;gap:8px}
+body.shua-clean #shuaWeatherSection .wx-matchup {align-items:center;justify-content:space-between;gap:8px}
+body.shua-clean #shuaWeatherSection .wx-team {flex:1 1 0;gap:8px;min-width:0}
+body.shua-clean #shuaWeatherSection .wx-team:last-child {justify-content:flex-end}
+body.shua-clean #shuaWeatherSection .wx-team-logo {width:48px!important;height:48px!important;flex:0 0 48px!important;object-fit:contain}
+body.shua-clean #shuaWeatherSection .wx-team b {font-size:20px;line-height:1.08}
+body.shua-clean #shuaWeatherSection .wx-versus {flex:0 0 auto;color:#829eae;font-size:10px;letter-spacing:.1em}
+body.shua-clean #shuaWeatherSection .wx-venue {color:#9fbacb;font-size:10.5px;margin-top:10px}
+body.shua-clean #shuaWeatherSection .wx-game-time {font-weight:900;font-variant-numeric:tabular-nums}
+body.shua-clean #shuaWeatherSection .wx-metric.wx-temp strong,
+body.shua-clean #shuaWeatherSection .wx-metric.wx-wind strong {font-size:19px!important;letter-spacing:-.015em}
+body.shua-clean #shuaWeatherSection .wx-indoor-game {padding-bottom:12px!important}
+body.shua-clean #shuaWeatherSection .wx-indoor-note {margin-top:10px;padding:7px 9px}
+body.shua-clean #shuaWeatherSection .wx-indoor-note span:last-child {font-size:10px}
+
+/* 10. Lightweight feedback, no moving layout or animation of data-heavy lists. */
+@media(prefers-reduced-motion:no-preference){
+  body.shua-clean :is(.pos,.st-nav-button,.st-button,.st-legend-btn,.myteams-card-trigger,.wx-game,.stock-row,.st-rank-row) {
+    transition:background-color 170ms ease,border-color 170ms ease,color 170ms ease,opacity 170ms ease!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-score-comparison>span {transition:width 190ms ease}
+  body.shua-clean :is(.modal.open .profile,.st-chart-dialog[open]) {animation:shua-upgrade-enter 180ms ease-out both}
+  @keyframes shua-upgrade-enter {from{opacity:.6;translate:0 5px}to{opacity:1;translate:0 0}}
+}
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean *,body.shua-clean *::before,body.shua-clean *::after {
+    transition-duration:.01ms!important;animation-duration:.01ms!important;scroll-behavior:auto!important;
+  }
+}
+
+@media(max-width:750px){
+  body.shua-clean #tableCard .photo:not(.lg),
+  body.shua-clean .espn-live-row .espn-headshot,
+  body.shua-clean #shuaStock .stock-face,
+  body.shua-clean #shuaAnalyticsSection .st-person .st-face,
+  body.shua-clean #shuaMyTeams .myteams-roster-row .myteams-player-open>img:not(.myteams-nfl-logo) {
+    width:34px!important;height:34px!important;min-width:34px!important;flex-basis:34px!important;
+  }
+  body.shua-clean #shuaStock .stock-row,
+  body.shua-clean #shuaAnalyticsSection .st-rank-row,
+  body.shua-clean .espn-live-row {min-height:50px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table tbody td:first-child {min-width:154px!important;max-width:178px!important}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table tbody td:first-child,
+  body.shua-clean #shuaAnalyticsSection[data-active-view="intelligence"] .st-intel-table thead th:first-child {min-width:148px!important}
+  body.shua-clean #shuaMyTeams .myteams-scoreboard {padding:10px 9px 11px}
+  body.shua-clean #shuaMyTeams .myteams-scoreboard-teams {gap:5px;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr)}
+  body.shua-clean #shuaMyTeams .myteams-score-side {grid-template-columns:28px minmax(0,1fr);gap:2px 5px}
+  body.shua-clean #shuaMyTeams .myteams-score-side.is-opponent {grid-template-columns:minmax(0,1fr) 28px}
+  body.shua-clean #shuaMyTeams .myteams-score-side .myteams-team-logo,
+  body.shua-clean #shuaMyTeams .myteams-score-side .myteams-score-initials {width:28px!important;height:28px!important}
+  body.shua-clean #shuaMyTeams .myteams-score-current strong {font-size:20px}
+  body.shua-clean #shuaMyTeams .myteams-score-current small {font-size:8px}
+  body.shua-clean #shuaMyTeams .myteams-score-projected {font-size:10px}
+  body.shua-clean #shuaWeatherSection .wx-game {padding:12px!important}
+  body.shua-clean #shuaWeatherSection .wx-team-logo {width:43px!important;height:43px!important;flex-basis:43px!important}
+  body.shua-clean #shuaWeatherSection .wx-team b {font-size:19px}
+  body.shua-clean #shuaWeatherSection .wx-team small {font-size:9px}
+}

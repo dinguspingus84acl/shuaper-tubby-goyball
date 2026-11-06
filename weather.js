@@ -314,9 +314,9 @@
     if(visible&&document.visibilityState==='visible'&&Date.now()-lastFetchedAt>120000)void load();
   });
   document.addEventListener('click',event=>{
-    const target=event.target.closest?.('.positions [data-pos],#phoneMenuItems [data-target]');
+    const target=event.target.closest?.('.positions [data-pos],#phoneMenuItems [data-target],#shuaCleanNav [data-shua-target],#shuaCleanNav [data-shua-studio]');
     if(!target||!visible)return;
-    const destination=target.dataset.pos||target.dataset.target;
+    const destination=target.dataset.pos||target.dataset.target||target.dataset.shuaTarget||(target.dataset.shuaStudio?'ANALYTICS':null);
     if(destination!=='WEATHER')hide();
   },true);
   nav.addEventListener('click',event=>{

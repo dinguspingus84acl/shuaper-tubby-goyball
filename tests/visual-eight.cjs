@@ -9,14 +9,14 @@ const css=read('visual-eight-20261107.css');
 const js=read('visual-eight-20261107.js');
 
 test('new assets are loaded after the previous presentation layer',()=>{
-  assert.match(html,/visual-seven-20261107\.js\?v=20261107-a1[\s\S]*visual-eight-20261107\.css\?v=20261107-a1[\s\S]*visual-eight-20261107\.js\?v=20261107-a1/);
+  assert.match(html,/visual-seven-20261107\.js\?v=20261107-a1[\s\S]*visual-eight-20261107\.css\?v=20261107-a2[\s\S]*visual-eight-20261107\.js\?v=20261107-a1/);
 });
-test('history timeline selects a single season while preserving the game log',()=>{
+test('history returns to the season list without the timeline strip',()=>{
   const history=read('player-history.js');
-  assert.match(history,/player-history-timeline/);
-  assert.match(history,/data-history-season/);
-  assert.match(history,/toggleSeasonDetail\(row,good\[index\]\)/);
-  assert.match(css,/player-history-season\.is-selected/);
+  assert.doesNotMatch(history,/player-history-timeline|data-history-season/);
+  assert.doesNotMatch(css,/player-history-timeline|player-history-season/);
+  assert.match(history,/toggleSeasonDetail\(el,row\)/);
+  assert.match(history,/player-history-row/);
   assert.match(history,/r\.ppg!=null/);
 });
 test('depth chart emphasizes existing first-string players without changing data',()=>{

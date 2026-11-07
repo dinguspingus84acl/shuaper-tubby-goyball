@@ -7,6 +7,7 @@ if(!nav||!main||document.getElementById('tradeSection'))return;
 
 const TEAM_SLUGS={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',DAL:'dal',DEN:'den',DET:'det',GNB:'gb',GB:'gb',HOU:'hou',IND:'ind',JAX:'jax',KAN:'kc',KC:'kc',LAC:'lac',LAR:'lar',LVR:'lv',LV:'lv',MIA:'mia',MIN:'min',NWE:'ne',NE:'ne',NOR:'no',NO:'no',NYG:'nyg',NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SFO:'sf',SF:'sf',TAM:'tb',TB:'tb',TEN:'ten',WAS:'wsh',WSH:'wsh'};
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state={left:[],right:[]};
 let tradeMode='PRESEASON',tradePlayers=[],preseasonPlayers=[],rosPlayers=[];
 // Share the existing calculator's numbers with the chart; one source of truth.
@@ -97,6 +98,7 @@ section.innerHTML=
         '<div class="trade-comparison-labels"><span>Top Side <strong id="tradeCompareLeft">0.0</strong></span><b id="tradeCenterDelta">Add players</b><span>Bottom Side <strong id="tradeCompareRight">0.0</strong></span></div>'+
         '<div class="trade-meter" id="tradeComparisonMeter"><div id="tradeMeterLeft" class="trade-meter-left" style="width:50%"></div><div id="tradeMeterRight" class="trade-meter-right" style="width:50%"></div></div>'+
       '</div>'+
+      '<div id="tradeBalanceSuggestion" class="trade-balance-suggestion" aria-live="polite" hidden></div>'+
       '<div id="tradeWhy" class="trade-why"></div>'+
     '</div>'+
     '<div class="trade-actions"><button type="button" id="tradeClear" class="trade-clear">Clear Trade</button></div>'+
@@ -173,15 +175,15 @@ function packageWeight(p,index){
   if(index===3)return q*.40;
   return q*.25;
 }
-function packageBase(side){
+function packageBaseFor(players){
   // The best asset counts fully. Extra assets are discounted by roster cost,
   // but elite secondary pieces retain much more value than mid/depth pieces.
-  return [...state[side]]
+  return [...players]
     .sort((a,b)=>b.value-a.value)
     .reduce((total,p,i)=>total+p.value*packageWeight(p,i),0);
 }
-function consolidationInfo(){
-  const topCount=state.left.length,bottomCount=state.right.length;
+function packageBase(side){return packageBaseFor(state[side]);}
+function consolidationInfo(topCount=state.left.length,bottomCount=state.right.length){
   let premiumSide=null,premium=0,label='';
   if(topCount===1&&bottomCount===2){premiumSide='left';premium=.06;label='2-for-1 stud premium'}
   else if(bottomCount===1&&topCount===2){premiumSide='right';premium=.06;label='2-for-1 stud premium'}
@@ -192,6 +194,58 @@ function consolidationInfo(){
 function adjustedSum(side){
   const base=packageBase(side),c=consolidationInfo();
   return c.premiumSide===side?base*(1+c.premium):base;
+}
+function projectedScores(side,player){
+  // Recalculate both packages: an extra player can change the 2-for-1 / 3-for-1 premium.
+  const top=side==='left'?[...state.left,player]:state.left;
+  const bottom=side==='right'?[...state.right,player]:state.right;
+  const premium=consolidationInfo(top.length,bottom.length);
+  return {
+    left:packageBaseFor(top)*(premium.premiumSide==='left'?1+premium.premium:1),
+    right:packageBaseFor(bottom)*(premium.premiumSide==='right'?1+premium.premium:1)
+  };
+}
+function differencePercent(left,right){
+  const total=Math.max(left,right);
+  return total>0?Math.abs(left-right)/total*100:0;
+}
+function renderBalanceSuggestion(){
+  const box=document.getElementById('tradeBalanceSuggestion');
+  if(!box)return;
+  if(!state.left.length||!state.right.length||!tradePlayers.length){box.hidden=true;box.innerHTML='';return;}
+  const left=adjustedSum('left'),right=adjustedSum('right');
+  const gap=differencePercent(left,right);
+  box.hidden=false;
+  if(gap<=5){
+    box.innerHTML='<div class="trade-balance-ready">This trade is already within 5% of even. No extra player needed.</div>';
+    return;
+  }
+  const side=left<right?'left':'right';
+  const sideLabel=side==='left'?'Top Side':'Bottom Side';
+  const selected=allSelected();
+  let best=null;
+  for(const player of tradePlayers){
+    if(selected.has(norm(player.name)))continue;
+    const scores=projectedScores(side,player);
+    const nextGap=differencePercent(scores.left,scores.right);
+    if(nextGap>=gap-.05)continue;
+    if(!best||nextGap<best.gap-.001||(Math.abs(nextGap-best.gap)<=.001&&player.value<best.player.value)){
+      best={player,gap:nextGap,scores};
+    }
+  }
+  if(!best){
+    box.innerHTML='<div class="trade-balance-ready">No single unselected player improves this trade. Try removing an asset from the stronger side.</div>';
+    return;
+  }
+  const p=best.player;
+  const outcome=best.gap<=5?'Makes it even':'Closest available fit';
+  box.innerHTML='<div class="trade-balance-head"><span>MAKE THIS TRADE EVEN</span><small>Using '+activeModeLabel()+' values</small></div>'+
+    '<div class="trade-balance-recommendation">'+
+      '<div class="trade-balance-player">'+tradeHeadshot(p)+teamLogo(p.team)+
+        '<div><strong>'+escapeHtml(p.name)+'</strong><small>'+escapeHtml(p.position)+' · '+escapeHtml(p.team||'FA')+' · Value '+p.value.toFixed(1)+'</small></div></div>'+
+      '<div class="trade-balance-outcome"><strong>'+outcome+'</strong><small>Add to '+sideLabel+' · '+best.gap.toFixed(1)+'% gap (was '+gap.toFixed(1)+'%)</small></div>'+
+      '<button type="button" class="trade-balance-add" data-add="'+side+'" data-name="'+encodeURIComponent(p.name)+'">Add to '+sideLabel+'</button>'+
+    '</div>';
 }
 function adjustmentText(side){
   const c=consolidationInfo();
@@ -250,6 +304,7 @@ function updateVerdict(){
   const mr=document.getElementById('tradeMeterRight');
   const total=a+b;
   updateWhy();
+  renderBalanceSuggestion();
   const lp=total?a/total*100:50;
   ml.style.width=lp+'%';mr.style.width=(100-lp)+'%';
   document.getElementById('tradeCompareLeft').textContent=a.toFixed(1);

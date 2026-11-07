@@ -621,11 +621,6 @@ function renderRows(player,rows,target){
     return;
   }
   target.innerHTML=
-    '<nav class="player-history-timeline" aria-label="Choose a fantasy season">'+
-      good.map((r,i)=>'<button type="button" class="player-history-season" data-history-season="'+i+'" aria-pressed="false" aria-label="View '+r.year+' season">'+
-        '<span>'+r.year+'</span>'+teamLogoHtml(r.teamAbbr||r.team)+
-        '<small>'+(r.ppg!=null&&r.ppg!==''&&Number.isFinite(Number(r.ppg))?Number(r.ppg).toFixed(1)+' PPG':'Season stats')+'</small></button>').join('')+
-    '</nav>'+
     '<div class="player-history-card">'+
       '<div class="player-history-head"><div>Year</div><div>Team</div><div>Finish</div><div style="text-align:center">GP</div><div style="text-align:right">PPG</div><div style="text-align:right">PPR Pts</div></div>'+
       good.map((r,i)=>{
@@ -644,36 +639,9 @@ function renderRows(player,rows,target){
   target.querySelectorAll('[data-history-index]').forEach(el=>{
     const row=good[Number(el.dataset.historyIndex)];
     el.setAttribute('aria-expanded','false');
-    const open=()=>selectSeason(Number(el.dataset.historyIndex),true);
+    const open=()=>{void toggleSeasonDetail(el,row);el.setAttribute('aria-expanded',String(el.classList.contains('open')))};
     el.addEventListener('click',open);
     el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
-  });
-  function selectSeason(index,allowToggle=false){
-    const row=target.querySelector('[data-history-index="'+index+'"]');
-    const detail=row?.nextElementSibling;
-    if(!row||!detail)return;
-    const opening=!detail.classList.contains('open')||!allowToggle;
-    target.querySelectorAll('.player-history-row.open').forEach(other=>{
-      if(other===row)return;
-      other.classList.remove('open');other.setAttribute('aria-expanded','false');
-      other.nextElementSibling?.classList.remove('open');
-    });
-    if(detail.classList.contains('open')&&!opening){
-      row.classList.remove('open');detail.classList.remove('open');
-    }else if(!detail.classList.contains('open')){
-      void toggleSeasonDetail(row,good[index]);
-    }
-    const isOpen=detail.classList.contains('open');
-    row.setAttribute('aria-expanded',String(isOpen));
-    target.querySelectorAll('[data-history-season]').forEach(button=>{
-      const chosen=Number(button.dataset.historySeason)===index&&isOpen;
-      button.classList.toggle('is-selected',chosen);
-      button.setAttribute('aria-pressed',String(chosen));
-    });
-    if(isOpen)row.scrollIntoView?.({block:'nearest',inline:'nearest'});
-  }
-  target.querySelectorAll('[data-history-season]').forEach(button=>{
-    button.addEventListener('click',()=>selectSeason(Number(button.dataset.historySeason)));
   });
 }
 function mergeHistoryYears(...lists){

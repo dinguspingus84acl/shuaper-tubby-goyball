@@ -79,7 +79,7 @@ body.shua-clean #tradeSection .trade-why-player .trade-headshot{border-color:#4c
   margin:11px 0 5px;padding:0;border:0;background:none;text-align:center;
 }
 .trade-balance-suggestion[hidden]{display:none!important}
-.trade-balance-heading{margin:0 0 8px;text-align:left;color:#c5e8dc;font-size:12px;font-weight:900}
+.trade-balance-heading{margin:0 0 8px;text-align:center;color:#c5e8dc;font-size:12px;font-weight:900}
 .trade-balance-recommendations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .trade-balance-card{
   display:flex;min-width:0;min-height:115px;flex-direction:column;align-items:center;justify-content:center;

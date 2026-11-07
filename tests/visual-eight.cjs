@@ -9,7 +9,7 @@ const css=read('visual-eight-20261107.css');
 const js=read('visual-eight-20261107.js');
 
 test('new assets are loaded after the previous presentation layer',()=>{
-  assert.match(html,/visual-seven-20261107\.js\?v=20261107-a1[\s\S]*visual-eight-20261107\.css\?v=20261107-a3[\s\S]*visual-eight-20261107\.js\?v=20261107-a1/);
+  assert.match(html,/visual-seven-20261107\.js\?v=20261107-a1[\s\S]*visual-eight-20261107\.css\?v=20261107-a4[\s\S]*visual-eight-20261107\.js\?v=20261107-a1/);
 });
 test('history returns to the season list without the timeline strip',()=>{
   const history=read('player-history.js');

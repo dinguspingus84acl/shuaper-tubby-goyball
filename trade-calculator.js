@@ -231,7 +231,8 @@ function renderBalanceSuggestion(){
   const top=suggestions.slice(0,3);
   if(!top.length){box.hidden=true;box.innerHTML='';return;}
   box.hidden=false;
-  box.innerHTML='<div class="trade-balance-recommendations" role="group" aria-label="Players to balance this trade">'+
+  box.innerHTML='<div class="trade-balance-heading">To make the trade even</div>'+
+    '<div class="trade-balance-recommendations" role="group" aria-label="Players to balance this trade">'+
     top.map(({player:p})=>'<button type="button" class="trade-balance-card" data-add="'+side+'" data-name="'+encodeURIComponent(p.name)+'" aria-label="Add '+escapeHtml(p.name)+' to '+sideLabel+'">'+
       tradeHeadshot(p)+'<strong>'+escapeHtml(p.name)+'</strong>'+
       '<span class="trade-balance-team">'+teamLogo(p.team)+'<small>'+escapeHtml(p.team||'FA')+'</small></span>'+

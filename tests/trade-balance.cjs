@@ -40,10 +40,11 @@ test('shows three closest players and recalculates the consolidation premium',()
   testCase.renderBalanceSuggestion();
   assert.equal(testCase.box.hidden,false);
   assert.equal((testCase.box.innerHTML.match(/class="trade-balance-card"/g)||[]).length,3);
+  assert.match(testCase.box.innerHTML,/To make the trade even[\s\S]*trade-balance-recommendations/);
   assert.match(testCase.box.innerHTML,/Closest Fit[\s\S]*Next Fit[\s\S]*Third Fit/);
   assert.match(testCase.box.innerHTML,/data-add="right"/);
   assert.doesNotMatch(testCase.box.innerHTML,/Poor Fit/);
-  assert.doesNotMatch(testCase.box.innerHTML,/trade-balance-head|trade-balance-outcome|trade-balance-add|trade-balance-ready/);
+  assert.doesNotMatch(testCase.box.innerHTML,/class="trade-balance-(?:head|outcome|add|ready)"/);
   assert.equal(testCase.state.right.length,1,'Preview does not modify the trade');
 });
 

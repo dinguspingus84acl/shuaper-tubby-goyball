@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-06T21:38:20Z",
+  "generatedAt": "2026-11-07T02:02:18Z",
   "weatherSource": "https://mysportsweather.com/nfl",
   "scheduleSource": "MySportsWeather",
   "games": [
@@ -632,7 +632,7 @@
             "inGame": false,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 60,
+            "tempF": 59,
             "windMph": 10,
             "gustMph": 18,
             "windDirection": "W"
@@ -830,7 +830,7 @@
             "tempF": 62,
             "windMph": 4,
             "gustMph": 6,
-            "windDirection": "W"
+            "windDirection": "WNW"
           },
           {
             "time": "3 PM",
@@ -839,7 +839,7 @@
             "tempF": 64,
             "windMph": 4,
             "gustMph": 6,
-            "windDirection": "W"
+            "windDirection": "WNW"
           },
           {
             "time": "4 PM",
@@ -848,7 +848,7 @@
             "tempF": 64,
             "windMph": 4,
             "gustMph": 6,
-            "windDirection": "W"
+            "windDirection": "WNW"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-nyj-kc"
@@ -966,6 +966,15 @@
             "windMph": 7,
             "gustMph": 10,
             "windDirection": "W"
+          },
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "precipPct": 0,
+            "tempF": 81,
+            "windMph": 8,
+            "gustMph": 12,
+            "windDirection": "W"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-hou-lac"
@@ -1080,6 +1089,15 @@
             "inGame": true,
             "precipPct": 0,
             "tempF": 70,
+            "windMph": 8,
+            "gustMph": 15,
+            "windDirection": "NW"
+          },
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "precipPct": 0,
+            "tempF": 69,
             "windMph": 8,
             "gustMph": 15,
             "windDirection": "NW"
@@ -1200,6 +1218,15 @@
             "windMph": 7,
             "gustMph": 12,
             "windDirection": "SSW"
+          },
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "precipPct": 28,
+            "tempF": 54,
+            "windMph": 6,
+            "gustMph": 10,
+            "windDirection": "SSW"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-ari-sea"
@@ -1317,6 +1344,15 @@
             "windMph": 6,
             "gustMph": 13,
             "windDirection": "W"
+          },
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "precipPct": 0,
+            "tempF": 48,
+            "windMph": 5,
+            "gustMph": 12,
+            "windDirection": "W"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-gb-ne"
@@ -1398,7 +1434,53 @@
             "windDirection": "WNW"
           }
         ],
-        "nbmHourly": [],
+        "nbmHourly": [
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "precipPct": 0,
+            "tempF": 52,
+            "windMph": 8,
+            "gustMph": 16,
+            "windDirection": "WNW"
+          },
+          {
+            "time": "8 PM",
+            "inGame": true,
+            "precipPct": 0,
+            "tempF": 50,
+            "windMph": 8,
+            "gustMph": 15,
+            "windDirection": "WNW"
+          },
+          {
+            "time": "9 PM",
+            "inGame": true,
+            "precipPct": 0,
+            "tempF": 50,
+            "windMph": 8,
+            "gustMph": 14,
+            "windDirection": "WNW"
+          },
+          {
+            "time": "10 PM",
+            "inGame": true,
+            "precipPct": 0,
+            "tempF": 49,
+            "windMph": 7,
+            "gustMph": 14,
+            "windDirection": "WNW"
+          },
+          {
+            "time": "11 PM",
+            "inGame": false,
+            "precipPct": 0,
+            "tempF": 48,
+            "windMph": 7,
+            "gustMph": 13,
+            "windDirection": "WNW"
+          }
+        ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-tb-chi"
       }
     },

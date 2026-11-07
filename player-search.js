@@ -4,6 +4,23 @@
 if(window.ShuaPlayerSearch||!document.getElementById('search'))return;
 const key=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Match on normalized characters but highlight the corresponding original
+// letters, so searching ONeal also highlights O'Neal correctly.
+function highlightedName(name,query){
+ const text=String(name||''),needle=key(query);
+ if(!needle)return esc(text);
+ let normalized='',offsets=[];
+ for(let i=0;i<text.length;i++){
+  const chars=key(text[i]);
+  if(!chars)continue;
+  normalized+=chars;
+  for(let j=0;j<chars.length;j++)offsets.push(i);
+ }
+ const found=normalized.indexOf(needle);
+ if(found<0)return esc(text);
+ const start=offsets[found],end=offsets[found+needle.length-1]+1;
+ return esc(text.slice(0,start))+'<mark class="shua-search-match">'+esc(text.slice(start,end))+'</mark>'+esc(text.slice(end));
+}
 const teamSlugs={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',DAL:'dal',DEN:'den',DET:'det',GB:'gb',GNB:'gb',HOU:'hou',IND:'ind',JAX:'jax',KC:'kc',KAN:'kc',LV:'lv',LVR:'lv',LAC:'lac',LAR:'lar',MIA:'mia',MIN:'min',NE:'ne',NWE:'ne',NO:'no',NOR:'no',NYG:'nyg',NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SF:'sf',SFO:'sf',TB:'tb',TAM:'tb',TEN:'ten',WAS:'wsh',WSH:'wsh'};
 const teamLogo=team=>teamSlugs[String(team||'').toUpperCase()]?
  '<img class="shua-search-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/'+teamSlugs[String(team).toUpperCase()]+'.png" alt="" loading="lazy">':'';
@@ -105,7 +122,7 @@ function render(){
  results.innerHTML=found.length?found.map((p,i)=>
   (q&&i===0&&prefixCount?'<div class="shua-search-group-header">Closest matches</div>':'')+
   (q&&i===prefixCount&&prefixCount<found.length?'<div class="shua-search-group-header">Other matches</div>':'')+
-  '<button type="button" class="shua-search-result" data-search-player="'+i+'">'+faceHtml(p)+'<span class="shua-search-result-copy"><strong>'+esc(p.name)+'</strong><small class="shua-search-result-meta">'+
+  '<button type="button" class="shua-search-result" data-search-player="'+i+'">'+faceHtml(p)+'<span class="shua-search-result-copy"><strong>'+highlightedName(p.name,q)+'</strong><small class="shua-search-result-meta">'+
   (p.team?teamLogo(p.team):'')+esc(p.position||'')+(p.team?' · '+esc(p.team):'')+(p.rank?' · Rank #'+p.rank:'')+(p.lastYear?' · Last season '+p.lastYear:'')+
   '</small></span><span class="shua-search-chevron" aria-hidden="true">›</span></button>').join(''):
   '<p class="shua-search-empty">No players found in this list.</p>';

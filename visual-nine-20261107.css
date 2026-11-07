@@ -1,0 +1,174 @@
+/* Selected visual improvements 1, 2 and 4–10. The Stats leaderboard (#3)
+   stays unchanged. Preserve colored game-log TEXT without colored cells. */
+
+/* 1. Consistent, easy-to-scan rankings with aligned faces and numbers. */
+body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell){height:69px}
+body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell)>td{
+  height:69px;box-sizing:border-box;vertical-align:middle!important;
+  border-bottom:1px solid rgba(150,192,213,.12)!important;
+}
+body.shua-clean #tableCard tbody tr:has(.photo-cell) .photo-cell{align-items:center!important;gap:10px!important}
+body.shua-clean #tableCard tbody tr:has(.photo-cell) .photo:not(.lg){
+  width:48px!important;height:48px!important;min-width:48px!important;flex-basis:48px!important;
+}
+body.shua-clean #tableCard tbody tr:has(.photo-cell) .rank-player-copy>b,
+body.shua-clean #tableCard tbody tr:has(.photo-cell) .tagged-player-copy>b{
+  font-size:clamp(15px,1.3vw,18px)!important;font-weight:950!important;
+}
+body.shua-clean #tableCard tbody tr:has(.photo-cell)>td.rank{
+  text-align:center;font-variant-numeric:tabular-nums;
+}
+
+/* 2 + 4. Team-colored hairline and tighter portrait-led card; the centered
+   watermark, jersey number and four-metric footer remain in their positions. */
+body.shua-clean #modal .featured-player-card.broadcast-card,
+body.shua-clean.phone-mode #modal .player-swipe-preview .featured-player-card.broadcast-card{
+  border:1px solid color-mix(in srgb,var(--featured-accent,#3085df) 83%,#a6cadb)!important;
+  box-shadow:inset 3px 0 0 var(--featured-accent,#3085df),0 13px 30px #0008!important;
+  aspect-ratio:1.96;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-right{
+  padding-top:clamp(12px,2.5vw,33px)!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box .featured-photo{
+  height:117%!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-team-strip{
+  margin-bottom:clamp(4px,.8vw,8px)!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-bio{
+  border-top:1px solid color-mix(in srgb,var(--featured-accent,#3085df) 64%,#112d3f)!important;
+}
+
+/* 5. Clear numerical columns and restrained separators, not cell fills. */
+body.shua-clean #modal .espn-game-log-table{
+  border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums;
+}
+body.shua-clean #modal .espn-game-log-table thead th{
+  border-bottom:1px solid #406078!important;
+}
+body.shua-clean #modal .espn-game-log-table tbody tr+tr>td{
+  border-top:1px solid rgba(150,190,215,.12)!important;
+}
+body.shua-clean #modal .espn-game-log-table .gl-stat,
+body.shua-clean #modal .espn-game-log-table .gl-pts{
+  text-align:right!important;font-variant-numeric:tabular-nums;
+  padding-right:12px!important;background:transparent!important;
+}
+body.shua-clean #modal .espn-game-log-table tbody td:first-child{
+  border-left:0!important;box-shadow:none!important;
+}
+
+/* 6. Compact, honest 0–100% meters alongside the actual percentages. */
+body.shua-clean #shuaAnalyticsSection .shua-usage-cell{
+  display:inline-flex;align-items:center;justify-content:flex-end;gap:7px;
+  width:100%;font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+body.shua-clean #shuaAnalyticsSection .shua-usage-number{min-width:42px;text-align:right}
+body.shua-clean #shuaAnalyticsSection .shua-usage-meter{
+  display:block;position:relative;width:44px;min-width:44px;height:5px;
+  border-radius:999px;overflow:hidden;background:#45617670;
+}
+body.shua-clean #shuaAnalyticsSection .shua-usage-meter::after{
+  content:"";position:absolute;inset:0 auto 0 0;
+  width:var(--shua-usage-pct,0%);border-radius:inherit;
+  background:linear-gradient(90deg,#218b82,#63e7b9);
+}
+
+/* 7. ESPN-style collapsed league list; expanded league layout is untouched. */
+body.shua-clean #shuaMyTeams .myteams-card:not(:has(>.myteams-roster:not([hidden])))>.myteams-card-trigger{
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto 16px;
+  grid-template-rows:auto auto;gap:2px 10px!important;
+  min-height:72px!important;padding:9px 12px!important;align-items:center;
+}
+body.shua-clean #shuaMyTeams .myteams-card:not(:has(>.myteams-roster:not([hidden]))) .myteams-card-identity{
+  grid-column:1;grid-row:1;min-width:0;gap:10px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card:not(:has(>.myteams-roster:not([hidden]))) .myteams-glance{
+  grid-column:1;grid-row:2;min-width:0;max-width:100%!important;
+  margin:0 0 0 59px!important;text-align:left!important;
+  white-space:nowrap;text-overflow:ellipsis;overflow:hidden;
+}
+body.shua-clean #shuaMyTeams .myteams-card:not(:has(>.myteams-roster:not([hidden]))) .shua-league-record{
+  grid-column:2;grid-row:1/3;align-self:center;margin:0!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card:not(:has(>.myteams-roster:not([hidden]))) .shua-line-icon{
+  grid-column:3;grid-row:1/3;align-self:center;
+}
+body.shua-clean #shuaMyTeams .myteams-card:not(:has(>.myteams-roster:not([hidden]))) :is(.myteams-platform,.myteams-finish){display:none!important}
+body.shua-clean #shuaMyTeams .myteams-card:not(:has(>.myteams-roster:not([hidden]))) .myteams-name{
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+
+/* 8. Shared control dimensions and a clear active state outside of Stats. */
+body.shua-clean #shuaAnalyticsSection :is(.st-controls,.st-usage-controls,.st-injury-filters) select,
+body.shua-clean #shuaMyTeams #myTeamsYear{
+  min-height:37px;border-radius:9px!important;border:1px solid #3e6678!important;
+  background:#102b3f!important;color:#f0f9ff!important;
+  box-shadow:inset 0 1px 0 #ffffff0d;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-controls,.st-usage-controls,.st-injury-filters) select:focus-visible,
+body.shua-clean #shuaMyTeams #myTeamsYear:focus-visible{
+  outline:2px solid #61e7b9;outline-offset:2px;
+}
+body.shua-clean #shuaAnalyticsSection .st-usage-groups button{
+  min-height:36px;border-radius:8px!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-usage-groups button[aria-pressed="true"]{
+  background:#165544!important;border-color:#54d7ab!important;color:#eefff9!important;
+}
+
+/* 9. Name query highlighting, regular logo sizes and larger faces. */
+#shuaExpandedSearch .shua-search-match{
+  background:transparent;color:#77f1c5;
+  text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;
+}
+#shuaExpandedSearch .shua-search-avatar{width:48px;height:48px;flex:0 0 48px}
+#shuaExpandedSearch .shua-search-result{min-height:66px;align-items:center}
+#shuaExpandedSearch .shua-search-team-logo{
+  width:18px;height:18px;flex:0 0 18px;object-fit:contain;
+}
+
+/* 10. Responsive feedback without moving the viewport on tab switches. */
+body.shua-clean :is(#tableCard tbody tr,#shuaMyTeams .myteams-card-trigger,
+  #shuaAnalyticsSection .st-usage-groups button,
+  #shuaAnalyticsSection .st-button,
+  #shuaExpandedSearch .shua-search-result){
+  transition:background-color 150ms ease,border-color 150ms ease,
+    box-shadow 150ms ease,color 150ms ease!important;
+}
+body.shua-clean #modal .espn-game-log-controls button{
+  transition:background-color 150ms ease,color 150ms ease,border-color 150ms ease;
+}
+
+@media(max-width:760px){
+  body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell),
+  body.shua-clean #tableCard tbody tr:not(.tag-group):has(.photo-cell)>td{height:63px}
+  body.shua-clean #tableCard tbody tr:has(.photo-cell) .photo:not(.lg){
+    width:43px!important;height:43px!important;min-width:43px!important;flex-basis:43px!important;
+  }
+  body.shua-clean #modal .featured-player-card.broadcast-card,
+  body.shua-clean.phone-mode #modal .player-swipe-preview .featured-player-card.broadcast-card{
+    aspect-ratio:1.71;
+  }
+  body.shua-clean #modal .featured-player-card.broadcast-card .featured-right{
+    padding-top:clamp(17px,5vw,28px)!important;
+  }
+  body.shua-clean #shuaAnalyticsSection .shua-usage-cell{gap:4px}
+  body.shua-clean #shuaAnalyticsSection .shua-usage-number{min-width:36px}
+  body.shua-clean #shuaAnalyticsSection .shua-usage-meter{width:28px;min-width:28px;height:4px}
+  body.shua-clean #shuaMyTeams .myteams-card:not(:has(>.myteams-roster:not([hidden])))>.myteams-card-trigger{
+    gap:2px 5px!important;min-height:67px!important;padding:8px!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-card:not(:has(>.myteams-roster:not([hidden]))) .myteams-glance{
+    margin-left:46px!important;font-size:10px!important;
+  }
+  #shuaExpandedSearch .shua-search-avatar{width:43px;height:43px;flex-basis:43px}
+  #shuaExpandedSearch .shua-search-result{min-height:60px}
+}
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean :is(#tableCard tbody tr,#shuaMyTeams .myteams-card-trigger,
+    #shuaAnalyticsSection .st-usage-groups button,#shuaAnalyticsSection .st-button,
+    #shuaExpandedSearch .shua-search-result),
+  body.shua-clean #modal .espn-game-log-controls button{transition:none!important}
+}

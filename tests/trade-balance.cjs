@@ -41,6 +41,7 @@ test('shows three closest players and recalculates the consolidation premium',()
   assert.equal(testCase.box.hidden,false);
   assert.equal((testCase.box.innerHTML.match(/class="trade-balance-card"/g)||[]).length,3);
   assert.match(testCase.box.innerHTML,/To make the trade even[\s\S]*trade-balance-recommendations/);
+  assert.match(testCase.box.innerHTML,/text-align:center!important/);
   assert.match(testCase.box.innerHTML,/Closest Fit[\s\S]*Next Fit[\s\S]*Third Fit/);
   assert.match(testCase.box.innerHTML,/data-add="right"/);
   assert.doesNotMatch(testCase.box.innerHTML,/Poor Fit/);

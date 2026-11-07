@@ -1,0 +1,187 @@
+/* Seven approved presentation improvements. Existing data, rank movement,
+   injury labels and statistical-highlight rules are deliberately unchanged. */
+
+/* 1. A single sliding marker follows the active navigation group. */
+body.shua-clean #shuaCleanNav .shua-clean-groups{position:relative}
+body.shua-clean #shuaCleanNav .shua-nav-indicator{
+  position:absolute;left:0;bottom:0;z-index:3;pointer-events:none;
+  height:3px;width:var(--shua-indicator-width,0px);
+  border-radius:10px;background:#54e2b8;
+  transform:translate3d(var(--shua-indicator-x,0px),0,0);
+  box-shadow:0 0 12px #39cda45e;
+  transition:transform 240ms cubic-bezier(.22,.8,.22,1),width 240ms cubic-bezier(.22,.8,.22,1),opacity 160ms ease;
+  opacity:0;
+}
+body.shua-clean #shuaCleanNav .shua-nav-indicator.is-ready{opacity:1}
+body.shua-clean #shuaCleanNav .shua-clean-group.is-active>.shua-clean-trigger::after{display:none!important}
+
+/* 2. More readable ESPN-style ranking identity without adding columns. */
+body.shua-clean #tableCard tbody tr:has(.photo-cell)>td{vertical-align:middle!important}
+body.shua-clean #tableCard tbody tr:has(.photo-cell) .photo-cell{gap:12px!important;min-width:0}
+body.shua-clean #tableCard tbody tr:has(.photo-cell) .photo:not(.lg){
+  width:46px!important;height:46px!important;min-width:46px!important;flex:0 0 46px!important;
+  object-fit:cover;object-position:center top;
+}
+body.shua-clean #tableCard .rank-player-copy{gap:4px;min-width:0}
+body.shua-clean #tableCard .rank-player-copy>b,
+body.shua-clean #tableCard .tagged-player-copy>b{
+  font-size:clamp(15px,1.25vw,17px)!important;line-height:1.18!important;
+  letter-spacing:-.022em!important;
+}
+body.shua-clean #tableCard .phone-rank-meta,
+body.shua-clean #tableCard .tagged-player-team-line{
+  align-items:center;gap:5px;color:#b5cbd9!important;line-height:1.24;
+}
+body.shua-clean #tableCard tbody tr:has(.photo-cell)>td.rank{
+  font-variant-numeric:tabular-nums;font-size:16px!important;
+}
+
+/* 4. Higher-end broadcast lighting, retaining the centered watermark,
+   four-stat footer and the carefully aligned name/number layout. */
+body.shua-clean #modal .featured-player-card.broadcast-card{
+  background:
+    radial-gradient(ellipse at 23% 44%,color-mix(in srgb,var(--featured-accent,#387cc1) 18%,transparent),transparent 53%),
+    linear-gradient(116deg,#0b2236 0%,#071728 51%,#030c17 100%)!important;
+  box-shadow:inset 0 1px 0 #ffffff20,0 18px 37px #0008!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-bg-logo{
+  opacity:.23!important;filter:saturate(.85) brightness(.72)!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-photo{
+  filter:drop-shadow(0 8px 15px #000b)!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-name{
+  text-shadow:0 2px 12px #0008;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-bio{
+  background:linear-gradient(180deg,#0b2130fa,#06121ffc)!important;
+}
+
+/* 5. Softer chart series, a visible point guide and a small movable tooltip. */
+body.shua-clean #shuaAnalyticsSection .st-chart .st-series-line{
+  stroke-linecap:round;stroke-linejoin:round;
+  vector-effect:non-scaling-stroke;
+}
+body.shua-clean #shuaAnalyticsSection .st-chart .st-series-line.is-primary{stroke-width:3.15}
+body.shua-clean #shuaAnalyticsSection .st-chart .st-chart-hit:focus-visible{
+  stroke:#71efd0;stroke-opacity:.72;stroke-width:1.5;fill:#50dfb010;
+}
+body.shua-clean #shuaAnalyticsSection .st-chart .shua-chart-guide{
+  stroke:#c1f9e6;stroke-width:1.3;stroke-opacity:.7;stroke-dasharray:4 5;
+  vector-effect:non-scaling-stroke;pointer-events:none;
+}
+body.shua-clean #shuaAnalyticsSection .st-chart .st-tooltip{
+  left:var(--shua-tooltip-left,8px)!important;
+  top:var(--shua-tooltip-top,52px)!important;
+  right:auto!important;max-width:min(224px,calc(100% - 16px));
+  background:#071b2af5;border-color:#538f9c;
+  box-shadow:0 10px 28px #0009;backdrop-filter:blur(7px);
+}
+
+/* 6. Keep the player label in sight as advanced tables move sideways. */
+body.shua-clean #shuaAnalyticsSection :is(.st-usage-table,.st-intel-table,.st-data .st-table-wrap) table{
+  border-collapse:separate;border-spacing:0;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-usage-table,.st-intel-table,.st-data .st-table-wrap) thead th:first-child{
+  position:sticky;left:0;z-index:8;background:#153247!important;
+  box-shadow:3px 0 8px #04152272;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-usage-table,.st-intel-table,.st-data .st-table-wrap) tbody :is(th,td):first-child{
+  position:sticky;left:0;z-index:4;background:#102c3f!important;
+  box-shadow:3px 0 8px #04152272;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-usage-table,.st-intel-table) tbody tr:nth-child(even) td:first-child{
+  background:#153246!important;
+}
+/* The game-log Week column retains its neutral coloring and button layout. */
+
+/* 8. Sports-broadcast fixtures, with only real scores and published weather. */
+body.shua-clean #shuaWeatherSection .wx-game:not(.wx-pending-game){
+  background:linear-gradient(146deg,#112d40 0%,#0b2435 53%,#0b1d2c 100%)!important;
+  border-top:2px solid #559cb5!important;
+}
+body.shua-clean #shuaWeatherSection .wx-game-top{
+  padding-bottom:9px;margin-bottom:10px!important;
+  border-bottom:1px solid #ffffff17;
+}
+body.shua-clean #shuaWeatherSection .wx-game-time{
+  font-size:12px!important;letter-spacing:.025em;color:#edfcff!important;
+}
+body.shua-clean #shuaWeatherSection .wx-matchup{
+  grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);
+  gap:5px;align-items:center;
+}
+body.shua-clean #shuaWeatherSection .wx-team{
+  min-width:0;padding:7px 6px;border-radius:9px;background:#ffffff07;
+}
+body.shua-clean #shuaWeatherSection .wx-team:last-child{justify-content:flex-end}
+body.shua-clean #shuaWeatherSection .wx-versus{font-size:10px;color:#9fbacd}
+body.shua-clean #shuaWeatherSection .wx-team b{font-weight:1000;letter-spacing:-.02em}
+body.shua-clean #shuaMyTeams .myteams-scoreboard{
+  background:linear-gradient(108deg,#103647,#0b293d 48%,#102f41)!important;
+  border-top:2px solid #4ec8ab!important;
+}
+body.shua-clean #shuaMyTeams .myteams-scoreboard-top{
+  border-bottom:1px solid #ffffff18;padding-bottom:8px;
+}
+body.shua-clean #shuaMyTeams .myteams-score-current strong{
+  letter-spacing:-.045em!important;font-variant-numeric:tabular-nums;
+}
+body.shua-clean #shuaMyTeams .myteams-schedule-game{
+  border-bottom:1px solid #ffffff13;
+}
+body.shua-clean #shuaMyTeams .myteams-schedule-toggle:hover,
+body.shua-clean #shuaMyTeams .myteams-schedule-toggle[aria-expanded="true"]{
+  background:#153c4c;border-radius:8px;
+}
+body.shua-clean #shuaMyTeams .myteams-schedule-row strong{
+  font-variant-numeric:tabular-nums;font-size:12px;
+}
+
+/* 9. Full filter labels, compact rows and a consistent selection state. */
+body.shua-clean #shuaAnalyticsSection :is(.st-controls,.st-injury-filters,.st-schedule-filters .st-controls){
+  display:flex;flex-wrap:wrap;align-items:flex-end;gap:7px 9px;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-controls,.st-usage-controls) label{min-width:0}
+body.shua-clean #shuaAnalyticsSection :is(.st-controls,.st-usage-controls) select{
+  max-width:100%;min-width:0;text-overflow:ellipsis;
+}
+body.shua-clean #shuaAnalyticsSection .st-usage-groups{max-width:100%;flex-wrap:wrap!important}
+body.shua-clean #shuaAnalyticsSection .st-usage-groups>button{
+  white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-position button,.st-usage-groups button)[aria-pressed="true"]{
+  box-shadow:inset 0 -2px 0 #67e8be!important;
+}
+
+@media(max-width:700px){
+  body.shua-clean #tableCard tbody tr:has(.photo-cell) .photo-cell{gap:8px!important}
+  body.shua-clean #tableCard tbody tr:has(.photo-cell) .photo:not(.lg){
+    width:38px!important;height:38px!important;min-width:38px!important;flex-basis:38px!important;
+  }
+  body.shua-clean #tableCard .rank-player-copy>b,
+  body.shua-clean #tableCard .tagged-player-copy>b{font-size:clamp(14px,3.8vw,16px)!important}
+  body.shua-clean #shuaWeatherSection .wx-team{padding:6px 3px;gap:5px}
+  body.shua-clean #shuaWeatherSection .wx-team-logo{width:38px!important;height:38px!important;flex-basis:38px!important}
+  body.shua-clean #shuaWeatherSection .wx-team b{font-size:18px!important}
+  body.shua-clean #shuaAnalyticsSection .st-usage-controls{
+    grid-template-columns:minmax(88px,.35fr) minmax(0,1fr)!important;
+    align-items:end;
+  }
+  body.shua-clean #shuaAnalyticsSection .st-usage-groups{
+    grid-column:1/-1!important;width:100%!important;justify-content:flex-start;
+  }
+  body.shua-clean #shuaAnalyticsSection .st-usage-groups>button{
+    flex:1 1 auto!important;min-width:0!important;padding:7px 8px!important;
+    min-height:35px;
+  }
+  body.shua-clean #shuaAnalyticsSection .st-controls label{
+    flex:1 1 100px;max-width:100%;min-width:0!important;
+  }
+  body.shua-clean #shuaAnalyticsSection .st-controls select{width:100%;font-size:13px!important}
+  body.shua-clean #shuaWeatherSection .wx-filters{flex-wrap:wrap;overflow:visible}
+  body.shua-clean #shuaWeatherSection .wx-filters button{flex:0 1 auto;min-height:34px}
+}
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean #shuaCleanNav .shua-nav-indicator{transition:none!important}
+}

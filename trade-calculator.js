@@ -93,7 +93,10 @@ section.innerHTML=
       '<div id="tradeVerdict" class="trade-verdict">Add players to both sides</div>'+
       '<div id="tradeEdge" class="trade-edge">Trade values are calculated directly from your overall ranks.</div>'+
       '<div id="tradeHockey" class="trade-hockey"></div>'+
-      '<div class="trade-meter"><div id="tradeMeterLeft" class="trade-meter-left" style="width:50%"></div><div id="tradeMeterRight" class="trade-meter-right" style="width:50%"></div></div>'+
+      '<div class="trade-comparison" role="group" aria-label="Trade value comparison">'+
+        '<div class="trade-comparison-labels"><span>Top Side <strong id="tradeCompareLeft">0.0</strong></span><b id="tradeCenterDelta">Add players</b><span>Bottom Side <strong id="tradeCompareRight">0.0</strong></span></div>'+
+        '<div class="trade-meter" id="tradeComparisonMeter"><div id="tradeMeterLeft" class="trade-meter-left" style="width:50%"></div><div id="tradeMeterRight" class="trade-meter-right" style="width:50%"></div></div>'+
+      '</div>'+
       '<div id="tradeWhy" class="trade-why"></div>'+
     '</div>'+
     '<div class="trade-actions"><button type="button" id="tradeClear" class="trade-clear">Clear Trade</button></div>'+
@@ -249,6 +252,12 @@ function updateVerdict(){
   updateWhy();
   const lp=total?a/total*100:50;
   ml.style.width=lp+'%';mr.style.width=(100-lp)+'%';
+  document.getElementById('tradeCompareLeft').textContent=a.toFixed(1);
+  document.getElementById('tradeCompareRight').textContent=b.toFixed(1);
+  const center=document.getElementById('tradeCenterDelta');
+  const comparison=document.getElementById('tradeComparisonMeter');
+  comparison.setAttribute('aria-label','Top side '+a.toFixed(1)+' versus bottom side '+b.toFixed(1));
+  center.textContent=state.left.length&&state.right.length?(Math.abs(a-b)<=.05?'Even':'Difference '+Math.abs(a-b).toFixed(1)):'Add players';
   if(!state.left.length||!state.right.length){
     verdict.textContent='Add players to both sides';
     edge.textContent='';

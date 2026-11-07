@@ -4,6 +4,9 @@
 if(window.ShuaPlayerSearch||!document.getElementById('search'))return;
 const key=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const teamSlugs={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',DAL:'dal',DEN:'den',DET:'det',GB:'gb',GNB:'gb',HOU:'hou',IND:'ind',JAX:'jax',KC:'kc',KAN:'kc',LV:'lv',LVR:'lv',LAC:'lac',LAR:'lar',MIA:'mia',MIN:'min',NE:'ne',NWE:'ne',NO:'no',NOR:'no',NYG:'nyg',NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SF:'sf',SFO:'sf',TB:'tb',TAM:'tb',TEN:'ten',WAS:'wsh',WSH:'wsh'};
+const teamLogo=team=>teamSlugs[String(team||'').toUpperCase()]?
+ '<img class="shua-search-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/'+teamSlugs[String(team).toUpperCase()]+'.png" alt="" loading="lazy">':'';
 let mode='current',historical=null,historicalPromise=null,visible=false,shown=[],version=0;
 let headshots=null,headshotsPromise=null;
 const pictureUrl=value=>{
@@ -98,9 +101,12 @@ function render(){
  syncInputAvatar(found[0]);
  shown=found;
  status.textContent=(mode==='historical'?'Archived NFL players (1999–2025)':'Current ranked players')+' · '+found.length+' results shown';
+ const prefixCount=q?found.filter(p=>key(p.name).startsWith(q)).length:0;
  results.innerHTML=found.length?found.map((p,i)=>
-  '<button type="button" class="shua-search-result" data-search-player="'+i+'">'+faceHtml(p)+'<span class="shua-search-result-copy"><strong>'+esc(p.name)+'</strong><small>'+
-  esc(p.position||'')+(p.team?' · '+esc(p.team):'')+(p.rank?' · Rank #'+p.rank:'')+(p.lastYear?' · Last indexed season '+p.lastYear:'')+
+  (q&&i===0&&prefixCount?'<div class="shua-search-group-header">Closest matches</div>':'')+
+  (q&&i===prefixCount&&prefixCount<found.length?'<div class="shua-search-group-header">Other matches</div>':'')+
+  '<button type="button" class="shua-search-result" data-search-player="'+i+'">'+faceHtml(p)+'<span class="shua-search-result-copy"><strong>'+esc(p.name)+'</strong><small class="shua-search-result-meta">'+
+  (p.team?teamLogo(p.team):'')+esc(p.position||'')+(p.team?' · '+esc(p.team):'')+(p.rank?' · Rank #'+p.rank:'')+(p.lastYear?' · Last season '+p.lastYear:'')+
   '</small></span><span class="shua-search-chevron" aria-hidden="true">›</span></button>').join(''):
   '<p class="shua-search-empty">No players found in this list.</p>';
 }

@@ -1,0 +1,233 @@
+/* Approved round: 1 History, 2 Depth, 3 Trades, 6 My Teams,
+   7 Search, 8 Mobile charts, 9 Schedule, 10 unavailable data.
+   Stock exposure and Weekly Report feature cards remain untouched. */
+
+/* 1. A selectable, horizontally scrolling season timeline. */
+.player-history-timeline{
+  display:flex;gap:7px;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;
+  padding:7px 2px 11px;margin:0 0 5px;scroll-snap-type:x proximity;
+  scrollbar-width:thin;scrollbar-color:#48778a transparent;
+}
+.player-history-season{
+  flex:0 0 90px;min-height:70px;scroll-snap-align:start;
+  display:grid;grid-template-columns:minmax(0,1fr) 23px;grid-template-rows:auto auto;
+  align-items:center;gap:2px 5px;padding:9px;border:1px solid #35576c;
+  border-radius:11px;background:#0d293d;color:#e8f6fd;text-align:left;cursor:pointer;
+}
+.player-history-season>span{font-size:17px;font-weight:950;font-variant-numeric:tabular-nums}
+.player-history-season .player-history-team-logo{
+  grid-column:2;grid-row:1;width:23px;height:23px;object-fit:contain;
+}
+.player-history-season>small{grid-column:1/-1;font-size:10px;font-weight:800;color:#acc7d5;white-space:nowrap}
+.player-history-season:hover,.player-history-season:focus-visible{
+  border-color:#60c6a3;outline:none;background:#164239;
+}
+.player-history-season.is-selected{
+  border-color:#5fe1b4;background:#174a3f;box-shadow:inset 0 -3px 0 #5fe1b4;
+}
+.player-history-card .player-history-row.open{
+  background:#133b3e!important;box-shadow:inset 3px 0 #46d8ac;
+}
+.player-history-card .player-history-year{font-size:15px;font-variant-numeric:tabular-nums}
+.player-history-card .player-history-finish{color:#eaf9ff;font-size:18px}
+.player-history-card .player-history-detail-grid{gap:7px}
+.player-history-card .player-history-detail-stat b{font-size:16px}
+
+/* 2. Genuine starter/backup scale in the existing clickable depth ladder. */
+body.shua-clean #depthSection .depth-player{
+  grid-template-columns:22px 39px minmax(0,1fr) auto!important;
+  min-height:52px;gap:8px!important;
+}
+body.shua-clean #depthSection .depth-player[data-depth-order="1"]{
+  grid-template-columns:22px 50px minmax(0,1fr) auto!important;
+  min-height:76px;margin:5px 7px 7px!important;
+  border:1px solid #328d71!important;border-radius:10px;
+  background:linear-gradient(95deg,#1b5449,#112e40 75%)!important;
+}
+body.shua-clean #depthSection .depth-player[data-depth-order="1"] .photo{
+  width:48px!important;height:48px!important;flex-basis:48px!important;
+  border:2px solid #55d2aa!important;
+}
+body.shua-clean #depthSection .depth-player[data-depth-order="1"]>span:not(.photo):not(.depth-player-photo-spacer){
+  font-size:15px!important;font-weight:950!important;line-height:1.22;
+}
+body.shua-clean #depthSection .depth-player[data-depth-order="2"] .photo{
+  width:36px!important;height:36px!important;
+}
+body.shua-clean #depthSection .depth-player[data-depth-order="3"],
+body.shua-clean #depthSection .depth-player[data-depth-order="4"]{opacity:.87}
+body.shua-clean #depthSection .depth-player[data-depth-order="3"] .photo,
+body.shua-clean #depthSection .depth-player[data-depth-order="4"] .photo{
+  width:32px!important;height:32px!important;flex-basis:32px!important;
+}
+body.shua-clean #depthSection .depth-player:focus-visible{
+  outline:2px solid #5fe2bb;outline-offset:-2px;
+}
+
+/* 3. An explicit scoreboard for actual trade values and their difference. */
+body.shua-clean #tradeSection .trade-comparison{
+  width:min(100%,650px);margin:14px auto 12px;padding:12px 13px;
+  border:1px solid #335c70;border-radius:13px;
+  background:linear-gradient(110deg,#10384a,#0a2637 55%,#14364b);
+}
+body.shua-clean #tradeSection .trade-comparison-labels{
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;gap:7px;text-align:left;
+}
+body.shua-clean #tradeSection .trade-comparison-labels span{
+  display:flex;flex-direction:column;min-width:0;gap:4px;
+  font-size:10px;color:#b5cdda;font-weight:850;
+}
+body.shua-clean #tradeSection .trade-comparison-labels span:last-child{text-align:right;align-items:flex-end}
+body.shua-clean #tradeSection .trade-comparison-labels strong{
+  color:#fff;font-size:clamp(21px,2.9vw,28px);font-weight:1000;
+  font-variant-numeric:tabular-nums;line-height:1;
+}
+body.shua-clean #tradeSection #tradeCenterDelta{
+  display:block;max-width:125px;min-width:72px;text-align:center;
+  padding:8px 9px;border:1px solid #446a78;border-radius:99px;
+  background:#082637;color:#cceaf2;font-size:11px;line-height:1.25;
+  font-weight:900;font-variant-numeric:tabular-nums;
+}
+body.shua-clean #tradeSection .trade-comparison .trade-meter{
+  width:100%;max-width:none;height:12px;margin:13px auto 0;
+  border:1px solid #2a5467;background:#082233;
+}
+body.shua-clean #tradeSection .trade-meter-left{background:#46d2a5}
+body.shua-clean #tradeSection .trade-meter-right{background:#69aee5}
+body.shua-clean #tradeSection .trade-result-card{border-color:#315268;border-radius:14px}
+body.shua-clean #tradeSection .trade-why-player .trade-headshot{border-color:#4c7b91!important}
+@media(min-width:780px){
+  body.shua-clean #tradeSection .trade-sides{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+}
+
+/* 6. The expanded fantasy league keeps one compact identity/record/matchup header. */
+body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden]))>.myteams-card-trigger{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto 20px;
+  grid-template-rows:auto auto;
+  align-items:center;gap:3px 10px!important;
+  padding:12px 14px!important;
+  background:linear-gradient(105deg,#17453f,#102e42)!important;
+  border-bottom:1px solid #398773;
+}
+body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])) .myteams-card-identity{
+  grid-column:1;grid-row:1;min-width:0;gap:10px;
+}
+body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])) .shua-league-record{
+  grid-column:2;grid-row:1;align-self:center;white-space:nowrap;
+}
+body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])) .myteams-glance{
+  grid-column:1/3;grid-row:2;margin:0 0 0 52px!important;
+  color:#bad7e1!important;text-align:left!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])) .shua-line-icon{
+  grid-column:3;grid-row:1/3;align-self:center;
+}
+body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])) .myteams-platform{display:none!important}
+body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])) .myteams-name{
+  font-size:clamp(15px,1.6vw,20px)!important;font-weight:950;
+}
+
+/* 7. Search groups and team badges with legible, consistently aligned names. */
+#shuaExpandedSearch .shua-search-group-header{
+  padding:9px 5px 5px;margin:5px 0 1px;
+  border-bottom:1px solid #31536b;color:#93b7c9;
+  text-transform:uppercase;letter-spacing:.095em;font-size:10px;font-weight:950;
+}
+#shuaExpandedSearch .shua-search-result{min-height:63px;gap:11px;border-radius:10px}
+#shuaExpandedSearch .shua-search-avatar{
+  flex:0 0 44px;width:44px;height:44px;
+}
+#shuaExpandedSearch .shua-search-result-copy strong{
+  font-size:15px;font-weight:900;line-height:1.2;white-space:normal;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;
+}
+#shuaExpandedSearch .shua-search-result-meta{
+  display:flex!important;align-items:center;gap:3px;min-height:17px;white-space:normal!important;
+}
+#shuaExpandedSearch .shua-search-team-logo{
+  flex:0 0 16px;width:16px;height:16px;object-fit:contain;margin-right:3px;
+}
+#shuaExpandedSearch .shua-search-result:focus-visible{
+  outline:2px solid #57e4b8;outline-offset:1px;
+}
+
+/* 9. Smaller, quieter schedule tiles still show real NFL opponent logos and OPRK. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell{
+  min-width:67px;min-height:58px;height:58px;border-radius:9px;
+  border:1px solid #376076;gap:2px;background:#143044;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.easy{
+  background:linear-gradient(145deg,#174c41,#103a36)!important;border-color:#3c9473!important;color:#e0fff2;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.neutral{
+  background:linear-gradient(145deg,#594a2d,#423b2b)!important;border-color:#9b8955!important;color:#fff3d1;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.tough{
+  background:linear-gradient(145deg,#57303e,#432936)!important;border-color:#aa5d74!important;color:#ffe6e9;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.bye{
+  background:#10293a!important;color:#92aebd;border-style:dashed;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-week-opponent-logo{
+  width:27px;height:27px;min-width:27px;max-width:27px;object-fit:contain;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell small{
+  display:block;font-variant-numeric:tabular-nums;font-weight:950;
+  font-size:11px;line-height:1.2;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell:focus-visible{
+  outline:2px solid #7ee5c1;outline-offset:1px;
+}
+
+/* 10. Unavailable observations are intentional, aligned and never turned into zeroes. */
+body.shua-clean .shua-unavailable{
+  color:#829eaf!important;font-variant-numeric:tabular-nums;
+  font-weight:700!important;text-shadow:none!important;
+  background-image:none!important;
+}
+body.shua-clean .player-history-detail-stat:has(>.shua-unavailable){border-color:#ffffff13}
+
+@media(max-width:700px){
+  .player-history-timeline{gap:5px;padding:4px 1px 9px}
+  .player-history-season{flex-basis:78px;min-height:64px;padding:7px}
+  .player-history-season>span{font-size:15px}
+  .player-history-season>small{font-size:9px}
+  .player-history-card .player-history-year{font-size:13px}
+  .player-history-card .player-history-finish{font-size:15px}
+  body.shua-clean #depthSection .depth-player[data-depth-order="1"]{
+    grid-template-columns:19px 44px minmax(0,1fr) auto!important;min-height:69px;
+  }
+  body.shua-clean #depthSection .depth-player[data-depth-order="1"] .photo{
+    width:43px!important;height:43px!important;flex-basis:43px!important;
+  }
+  body.shua-clean #depthSection .depth-player[data-depth-order="1"]>span:not(.photo):not(.depth-player-photo-spacer){font-size:13px!important}
+  body.shua-clean #tradeSection .trade-comparison{padding:10px 8px}
+  body.shua-clean #tradeSection #tradeCenterDelta{max-width:89px;min-width:60px;font-size:10px;padding:7px 4px}
+  body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden]))>.myteams-card-trigger{
+    grid-template-columns:minmax(0,1fr) auto 14px;gap:2px 5px!important;padding:9px!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])) .myteams-glance{margin-left:41px!important;font-size:10px}
+  body.shua-clean #shuaMyTeams .myteams-card:has(>.myteams-roster:not([hidden])) .myteams-name{font-size:14px!important}
+  #shuaExpandedSearch .shua-search-avatar{width:39px;height:39px;flex-basis:39px}
+  #shuaExpandedSearch .shua-search-result{min-height:57px;padding:8px 9px}
+  #shuaExpandedSearch .shua-search-result-copy strong{font-size:14px}
+  /* 8. Maximize chart plotting area without widening the page or hiding tooltips. */
+  body.shua-clean #shuaAnalyticsSection .st-panel:has(.st-chart){
+    padding:8px 7px!important;margin-inline:-2px;width:calc(100% + 4px);
+  }
+  body.shua-clean #shuaAnalyticsSection .st-panel:has(.st-chart) .st-panel-head{
+    padding-inline:5px;margin-bottom:8px;
+  }
+  body.shua-clean #shuaAnalyticsSection .st-chart{max-width:100%;min-width:0}
+  body.shua-clean #shuaAnalyticsSection .st-chart-scroll{max-width:100%;overflow-x:auto}
+  body.shua-clean #shuaAnalyticsSection .st-chart .st-axis{font-size:10.2px!important}
+  body.shua-clean #shuaAnalyticsSection .st-chart-tools{gap:5px;margin-bottom:5px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell{
+    min-width:64px;min-height:55px;height:55px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean #tradeSection .trade-meter>div{transition:none!important}
+}

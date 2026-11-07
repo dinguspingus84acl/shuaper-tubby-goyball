@@ -215,37 +215,27 @@ function renderBalanceSuggestion(){
   if(!state.left.length||!state.right.length||!tradePlayers.length){box.hidden=true;box.innerHTML='';return;}
   const left=adjustedSum('left'),right=adjustedSum('right');
   const gap=differencePercent(left,right);
-  box.hidden=false;
-  if(gap<=5){
-    box.innerHTML='<div class="trade-balance-ready">This trade is already within 5% of even. No extra player needed.</div>';
-    return;
-  }
+  if(gap<=5){box.hidden=true;box.innerHTML='';return;}
   const side=left<right?'left':'right';
   const sideLabel=side==='left'?'Top Side':'Bottom Side';
   const selected=allSelected();
-  let best=null;
+  const suggestions=[];
   for(const player of tradePlayers){
     if(selected.has(norm(player.name)))continue;
     const scores=projectedScores(side,player);
     const nextGap=differencePercent(scores.left,scores.right);
     if(nextGap>=gap-.05)continue;
-    if(!best||nextGap<best.gap-.001||(Math.abs(nextGap-best.gap)<=.001&&player.value<best.player.value)){
-      best={player,gap:nextGap,scores};
-    }
+    suggestions.push({player,gap:nextGap});
   }
-  if(!best){
-    box.innerHTML='<div class="trade-balance-ready">No single unselected player improves this trade. Try removing an asset from the stronger side.</div>';
-    return;
-  }
-  const p=best.player;
-  const outcome=best.gap<=5?'Makes it even':'Closest available fit';
-  box.innerHTML='<div class="trade-balance-head"><span>MAKE THIS TRADE EVEN</span><small>Using '+activeModeLabel()+' values</small></div>'+
-    '<div class="trade-balance-recommendation">'+
-      '<div class="trade-balance-player">'+tradeHeadshot(p)+teamLogo(p.team)+
-        '<div><strong>'+escapeHtml(p.name)+'</strong><small>'+escapeHtml(p.position)+' · '+escapeHtml(p.team||'FA')+' · Value '+p.value.toFixed(1)+'</small></div></div>'+
-      '<div class="trade-balance-outcome"><strong>'+outcome+'</strong><small>Add to '+sideLabel+' · '+best.gap.toFixed(1)+'% gap (was '+gap.toFixed(1)+'%)</small></div>'+
-      '<button type="button" class="trade-balance-add" data-add="'+side+'" data-name="'+encodeURIComponent(p.name)+'">Add to '+sideLabel+'</button>'+
-    '</div>';
+  suggestions.sort((a,b)=>a.gap-b.gap||a.player.value-b.player.value);
+  const top=suggestions.slice(0,3);
+  if(!top.length){box.hidden=true;box.innerHTML='';return;}
+  box.hidden=false;
+  box.innerHTML='<div class="trade-balance-recommendations" role="group" aria-label="Players to balance this trade">'+
+    top.map(({player:p})=>'<button type="button" class="trade-balance-card" data-add="'+side+'" data-name="'+encodeURIComponent(p.name)+'" aria-label="Add '+escapeHtml(p.name)+' to '+sideLabel+'">'+
+      tradeHeadshot(p)+'<strong>'+escapeHtml(p.name)+'</strong>'+
+      '<span class="trade-balance-team">'+teamLogo(p.team)+'<small>'+escapeHtml(p.team||'FA')+'</small></span>'+
+    '</button>').join('')+'</div>';
 }
 function adjustmentText(side){
   const c=consolidationInfo();

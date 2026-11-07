@@ -26,21 +26,24 @@ function setup(left,right,pool){
   return {...functions,box,state};
 }
 
-test('suggests the closest player and recalculates the consolidation premium',()=>{
+test('shows three closest players and recalculates the consolidation premium',()=>{
   const elite=player('Elite',1,100);
   const weaker=player('Weaker',6,60);
   const closest=player('Closest Fit',5,48);
+  const next=player('Next Fit',4,44);
+  const third=player('Third Fit',3,36);
   const poorFit=player('Poor Fit',50,15);
-  const testCase=setup([elite],[weaker],[elite,weaker,poorFit,closest]);
+  const testCase=setup([elite],[weaker],[elite,weaker,poorFit,third,next,closest]);
   const projected=testCase.projectedScores('right',closest);
   assert.ok(Math.abs(projected.left-106)<.00001,'Strong-side 2-for-1 premium applied');
   assert.ok(Math.abs(projected.right-105.6)<.00001,'Weak-side package discount applied');
   testCase.renderBalanceSuggestion();
   assert.equal(testCase.box.hidden,false);
-  assert.match(testCase.box.innerHTML,/Closest Fit/);
-  assert.match(testCase.box.innerHTML,/Makes it even/);
+  assert.equal((testCase.box.innerHTML.match(/class="trade-balance-card"/g)||[]).length,3);
+  assert.match(testCase.box.innerHTML,/Closest Fit[\s\S]*Next Fit[\s\S]*Third Fit/);
   assert.match(testCase.box.innerHTML,/data-add="right"/);
   assert.doesNotMatch(testCase.box.innerHTML,/Poor Fit/);
+  assert.doesNotMatch(testCase.box.innerHTML,/trade-balance-head|trade-balance-outcome|trade-balance-add|trade-balance-ready/);
   assert.equal(testCase.state.right.length,1,'Preview does not modify the trade');
 });
 
@@ -54,8 +57,8 @@ test('does not recommend duplicate players from either selected side',()=>{
 test('suppresses additions when an existing trade is within five percent',()=>{
   const testCase=setup([player('Top',1,100)],[player('Bottom',2,98)],[player('Spare',5,48)]);
   testCase.renderBalanceSuggestion();
-  assert.match(testCase.box.innerHTML,/already within 5% of even/);
-  assert.doesNotMatch(testCase.box.innerHTML,/data-add=/);
+  assert.equal(testCase.box.hidden,true);
+  assert.equal(testCase.box.innerHTML,'');
 });
 
 test('keeps recommendation hidden until both trade sides contain players',()=>{

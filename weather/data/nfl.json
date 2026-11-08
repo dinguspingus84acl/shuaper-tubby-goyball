@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-07T22:03:24Z",
+  "generatedAt": "2026-11-08T01:32:17Z",
   "weatherSource": "https://mysportsweather.com/nfl",
   "scheduleSource": "MySportsWeather",
   "games": [
@@ -256,7 +256,7 @@
             "precipPct": 0,
             "tempF": 62,
             "windMph": 3,
-            "gustMph": 8,
+            "gustMph": 9,
             "windDirection": "WSW"
           },
           {
@@ -296,7 +296,7 @@
             "precipPct": 0,
             "tempF": 65,
             "windMph": 6,
-            "gustMph": 13,
+            "gustMph": 12,
             "windDirection": "WSW"
           }
         ],
@@ -308,7 +308,7 @@
             "tempF": 61,
             "windMph": 4,
             "gustMph": 8,
-            "windDirection": "WSW"
+            "windDirection": "SW"
           },
           {
             "time": "1 PM",
@@ -430,47 +430,47 @@
           {
             "time": "12 PM",
             "inGame": false,
-            "precipPct": 5,
+            "precipPct": 1,
             "tempF": 82,
             "windMph": 4,
             "gustMph": 8,
-            "windDirection": "NNE"
+            "windDirection": "N"
           },
           {
             "time": "1 PM",
             "inGame": true,
-            "precipPct": 5,
+            "precipPct": 2,
             "tempF": 83,
             "windMph": 4,
             "gustMph": 8,
-            "windDirection": "NNE"
+            "windDirection": "N"
           },
           {
             "time": "2 PM",
             "inGame": true,
-            "precipPct": 5,
+            "precipPct": 1,
             "tempF": 83,
             "windMph": 5,
             "gustMph": 9,
-            "windDirection": "NNE"
+            "windDirection": "N"
           },
           {
             "time": "3 PM",
             "inGame": true,
-            "precipPct": 4,
+            "precipPct": 1,
             "tempF": 82,
             "windMph": 6,
             "gustMph": 9,
-            "windDirection": "NNE"
+            "windDirection": "N"
           },
           {
             "time": "4 PM",
             "inGame": false,
-            "precipPct": 4,
+            "precipPct": 1,
             "tempF": 82,
             "windMph": 6,
             "gustMph": 10,
-            "windDirection": "N"
+            "windDirection": "NNE"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-det-mia"
@@ -596,7 +596,7 @@
             "tempF": 62,
             "windMph": 7,
             "gustMph": 13,
-            "windDirection": "SW"
+            "windDirection": "WSW"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-lar-was"
@@ -686,7 +686,7 @@
             "tempF": 59,
             "windMph": 9,
             "gustMph": 18,
-            "windDirection": "WNW"
+            "windDirection": "W"
           },
           {
             "time": "1 PM",
@@ -722,7 +722,7 @@
             "tempF": 60,
             "windMph": 6,
             "gustMph": 13,
-            "windDirection": "WSW"
+            "windDirection": "W"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-nyg-phi"
@@ -812,7 +812,7 @@
             "tempF": 57,
             "windMph": 4,
             "gustMph": 8,
-            "windDirection": "W"
+            "windDirection": "WNW"
           },
           {
             "time": "1 PM",
@@ -821,7 +821,7 @@
             "tempF": 60,
             "windMph": 4,
             "gustMph": 7,
-            "windDirection": "W"
+            "windDirection": "WNW"
           },
           {
             "time": "2 PM",
@@ -830,7 +830,7 @@
             "tempF": 62,
             "windMph": 4,
             "gustMph": 7,
-            "windDirection": "WNW"
+            "windDirection": "NW"
           },
           {
             "time": "3 PM",
@@ -839,7 +839,7 @@
             "tempF": 64,
             "windMph": 4,
             "gustMph": 6,
-            "windDirection": "WNW"
+            "windDirection": "NW"
           },
           {
             "time": "4 PM",
@@ -938,7 +938,7 @@
             "tempF": 85,
             "windMph": 1,
             "gustMph": 4,
-            "windDirection": "SSE"
+            "windDirection": "ENE"
           },
           {
             "time": "4 PM",
@@ -947,7 +947,7 @@
             "tempF": 86,
             "windMph": 2,
             "gustMph": 4,
-            "windDirection": "SSW"
+            "windDirection": "SW"
           },
           {
             "time": "5 PM",
@@ -965,7 +965,7 @@
             "tempF": 83,
             "windMph": 7,
             "gustMph": 10,
-            "windDirection": "WSW"
+            "windDirection": "W"
           },
           {
             "time": "7 PM",
@@ -1064,7 +1064,7 @@
             "tempF": 69,
             "windMph": 4,
             "gustMph": 8,
-            "windDirection": "NW"
+            "windDirection": "NNW"
           },
           {
             "time": "4 PM",
@@ -1073,7 +1073,7 @@
             "tempF": 70,
             "windMph": 6,
             "gustMph": 11,
-            "windDirection": "NW"
+            "windDirection": "NNW"
           },
           {
             "time": "5 PM",
@@ -1082,7 +1082,7 @@
             "tempF": 71,
             "windMph": 7,
             "gustMph": 12,
-            "windDirection": "NW"
+            "windDirection": "NNW"
           },
           {
             "time": "6 PM",
@@ -1091,7 +1091,7 @@
             "tempF": 71,
             "windMph": 7,
             "gustMph": 13,
-            "windDirection": "NW"
+            "windDirection": "NNW"
           },
           {
             "time": "7 PM",
@@ -1186,7 +1186,7 @@
           {
             "time": "3 PM",
             "inGame": false,
-            "precipPct": 6,
+            "precipPct": 3,
             "tempF": 56,
             "windMph": 12,
             "gustMph": 18,
@@ -1195,7 +1195,7 @@
           {
             "time": "4 PM",
             "inGame": true,
-            "precipPct": 19,
+            "precipPct": 3,
             "tempF": 56,
             "windMph": 10,
             "gustMph": 15,
@@ -1204,7 +1204,7 @@
           {
             "time": "5 PM",
             "inGame": true,
-            "precipPct": 7,
+            "precipPct": 4,
             "tempF": 56,
             "windMph": 9,
             "gustMph": 14,
@@ -1213,7 +1213,7 @@
           {
             "time": "6 PM",
             "inGame": true,
-            "precipPct": 7,
+            "precipPct": 4,
             "tempF": 56,
             "windMph": 7,
             "gustMph": 12,
@@ -1222,11 +1222,11 @@
           {
             "time": "7 PM",
             "inGame": false,
-            "precipPct": 9,
+            "precipPct": 2,
             "tempF": 55,
             "windMph": 6,
             "gustMph": 10,
-            "windDirection": "S"
+            "windDirection": "SSW"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-ari-sea"
@@ -1253,7 +1253,7 @@
         "tempF": 58,
         "precipPct": 1,
         "precipType": "Rain",
-        "windMph": 13,
+        "windMph": 10,
         "gustMph": 20,
         "windDirection": "W",
         "hourly": [
@@ -1263,7 +1263,7 @@
             "sky": "sun",
             "precipPct": 1,
             "tempF": 57,
-            "windMph": 14,
+            "windMph": 12,
             "gustMph": 23,
             "windDirection": "W"
           },
@@ -1273,7 +1273,7 @@
             "sky": "sun",
             "precipPct": 1,
             "tempF": 58,
-            "windMph": 13,
+            "windMph": 10,
             "gustMph": 20,
             "windDirection": "W"
           },
@@ -1283,8 +1283,8 @@
             "sky": "sun",
             "precipPct": 1,
             "tempF": 54,
-            "windMph": 10,
-            "gustMph": 18,
+            "windMph": 9,
+            "gustMph": 17,
             "windDirection": "W"
           },
           {
@@ -1294,7 +1294,7 @@
             "precipPct": 1,
             "tempF": 51,
             "windMph": 9,
-            "gustMph": 16,
+            "gustMph": 15,
             "windDirection": "W"
           },
           {
@@ -1352,7 +1352,7 @@
             "tempF": 47,
             "windMph": 4,
             "gustMph": 11,
-            "windDirection": "WSW"
+            "windDirection": "W"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-gb-ne"
@@ -1451,7 +1451,7 @@
             "tempF": 50,
             "windMph": 8,
             "gustMph": 14,
-            "windDirection": "NW"
+            "windDirection": "WNW"
           },
           {
             "time": "9 PM",
@@ -1478,7 +1478,7 @@
             "tempF": 47,
             "windMph": 6,
             "gustMph": 12,
-            "windDirection": "NW"
+            "windDirection": "NNW"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-tb-chi"

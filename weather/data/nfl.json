@@ -1,859 +1,9 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-08T16:43:55Z",
+  "generatedAt": "2026-11-08T22:17:03Z",
   "weatherSource": "https://mysportsweather.com/nfl",
   "scheduleSource": "MySportsWeather",
   "games": [
-    {
-      "id": "401873038",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T14:35:00Z",
-      "away": {
-        "abbr": "CIN",
-        "name": "Cincinnati Bengals",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/cin.png"
-      },
-      "home": {
-        "abbr": "ATL",
-        "name": "Atlanta Falcons",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/atl.png"
-      },
-      "venue": "Estadio Santiago Bernabeu",
-      "city": "Madrid, ES",
-      "indoor": true,
-      "forecast": {
-        "tempF": 62,
-        "precipPct": 13,
-        "precipType": "Rain",
-        "windMph": 4,
-        "gustMph": null,
-        "windDirection": "ENE",
-        "hourly": [
-          {
-            "time": "8 AM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 13,
-            "tempF": 60,
-            "windMph": 9,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "9 AM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 13,
-            "tempF": 61,
-            "windMph": 4,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "10 AM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 12,
-            "tempF": 63,
-            "windMph": 3,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "11 AM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 12,
-            "tempF": 62,
-            "windMph": 7,
-            "windDirection": "NE"
-          },
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 13,
-            "tempF": 61,
-            "windMph": 4,
-            "windDirection": "NE"
-          }
-        ],
-        "nbmHourly": [],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-cin-atl"
-      }
-    },
-    {
-      "id": "401873039",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T18:00:00Z",
-      "away": {
-        "abbr": "CLE",
-        "name": "Cleveland Browns",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/cle.png"
-      },
-      "home": {
-        "abbr": "NO",
-        "name": "New Orleans Saints",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/no.png"
-      },
-      "venue": "Caesars Superdome",
-      "city": "New Orleans, LA",
-      "indoor": true,
-      "forecast": null
-    },
-    {
-      "id": "401873040",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T18:00:00Z",
-      "away": {
-        "abbr": "DAL",
-        "name": "Dallas Cowboys",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/dal.png"
-      },
-      "home": {
-        "abbr": "IND",
-        "name": "Indianapolis Colts",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ind.png"
-      },
-      "venue": "Lucas Oil Stadium",
-      "city": "Indianapolis, IN",
-      "indoor": true,
-      "forecast": {
-        "tempF": 54,
-        "precipPct": 0,
-        "precipType": "Rain",
-        "windMph": 12,
-        "gustMph": 23,
-        "windDirection": "SW",
-        "hourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 49,
-            "windMph": 10,
-            "gustMph": 22,
-            "windDirection": "SW"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 54,
-            "windMph": 12,
-            "gustMph": 23,
-            "windDirection": "SW"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 54,
-            "windMph": 13,
-            "gustMph": 24,
-            "windDirection": "SW"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 56,
-            "windMph": 13,
-            "gustMph": 24,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 57,
-            "windMph": 12,
-            "gustMph": 22,
-            "windDirection": "WSW"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 51,
-            "windMph": 12,
-            "gustMph": 22,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 54,
-            "windMph": 13,
-            "gustMph": 23,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 56,
-            "windMph": 13,
-            "gustMph": 24,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 57,
-            "windMph": 12,
-            "gustMph": 24,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 58,
-            "windMph": 12,
-            "gustMph": 22,
-            "windDirection": "WSW"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-dal-ind"
-      }
-    },
-    {
-      "id": "401873041",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T18:00:00Z",
-      "away": {
-        "abbr": "DEN",
-        "name": "Denver Broncos",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/den.png"
-      },
-      "home": {
-        "abbr": "CAR",
-        "name": "Carolina Panthers",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/car.png"
-      },
-      "venue": "Bank of America Stadium",
-      "city": "Charlotte, NC",
-      "indoor": false,
-      "forecast": {
-        "tempF": 64,
-        "precipPct": 0,
-        "precipType": "Rain",
-        "windMph": 6,
-        "gustMph": 13,
-        "windDirection": "WSW",
-        "hourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 62,
-            "windMph": 5,
-            "gustMph": 9,
-            "windDirection": "SW"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 64,
-            "windMph": 6,
-            "gustMph": 13,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 65,
-            "windMph": 7,
-            "gustMph": 14,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 65,
-            "windMph": 7,
-            "gustMph": 14,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 65,
-            "windMph": 7,
-            "gustMph": 14,
-            "windDirection": "WSW"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 62,
-            "windMph": 4,
-            "gustMph": 9,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 64,
-            "windMph": 6,
-            "gustMph": 13,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 66,
-            "windMph": 7,
-            "gustMph": 14,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 67,
-            "windMph": 8,
-            "gustMph": 15,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 66,
-            "windMph": 8,
-            "gustMph": 14,
-            "windDirection": "WSW"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-den-car"
-      }
-    },
-    {
-      "id": "401873042",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T18:00:00Z",
-      "away": {
-        "abbr": "DET",
-        "name": "Detroit Lions",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/det.png"
-      },
-      "home": {
-        "abbr": "MIA",
-        "name": "Miami Dolphins",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/mia.png"
-      },
-      "venue": "Hard Rock Stadium",
-      "city": "Miami Gardens, FL",
-      "indoor": false,
-      "forecast": {
-        "tempF": 83,
-        "precipPct": 2,
-        "precipType": "Rain",
-        "windMph": 6,
-        "gustMph": 9,
-        "windDirection": "NE",
-        "hourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 2,
-            "tempF": 83,
-            "windMph": 6,
-            "gustMph": 9,
-            "windDirection": "NE"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 1,
-            "tempF": 83,
-            "windMph": 6,
-            "gustMph": 9,
-            "windDirection": "NE"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 1,
-            "tempF": 83,
-            "windMph": 6,
-            "gustMph": 10,
-            "windDirection": "NE"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 2,
-            "tempF": 84,
-            "windMph": 7,
-            "gustMph": 10,
-            "windDirection": "NE"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 3,
-            "tempF": 83,
-            "windMph": 7,
-            "gustMph": 12,
-            "windDirection": "NE"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 83,
-            "windMph": 6,
-            "gustMph": 10,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "precipPct": 1,
-            "tempF": 83,
-            "windMph": 6,
-            "gustMph": 9,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "precipPct": 1,
-            "tempF": 83,
-            "windMph": 6,
-            "gustMph": 10,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "precipPct": 2,
-            "tempF": 83,
-            "windMph": 7,
-            "gustMph": 10,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "precipPct": 3,
-            "tempF": 83,
-            "windMph": 7,
-            "gustMph": 11,
-            "windDirection": "ENE"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-det-mia"
-      }
-    },
-    {
-      "id": "401873043",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T18:00:00Z",
-      "away": {
-        "abbr": "LAR",
-        "name": "Los Angeles Rams",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/lar.png"
-      },
-      "home": {
-        "abbr": "WAS",
-        "name": "Washington Commanders",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/wsh.png"
-      },
-      "venue": "Northwest Stadium",
-      "city": "Landover, MD",
-      "indoor": false,
-      "forecast": {
-        "tempF": 61,
-        "precipPct": 0,
-        "precipType": "Rain",
-        "windMph": 9,
-        "gustMph": 13,
-        "windDirection": "W",
-        "hourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 59,
-            "windMph": 10,
-            "gustMph": 15,
-            "windDirection": "W"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 61,
-            "windMph": 9,
-            "gustMph": 13,
-            "windDirection": "W"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 62,
-            "windMph": 9,
-            "gustMph": 12,
-            "windDirection": "W"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 62,
-            "windMph": 8,
-            "gustMph": 12,
-            "windDirection": "SW"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 63,
-            "windMph": 7,
-            "gustMph": 10,
-            "windDirection": "SW"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 58,
-            "windMph": 9,
-            "gustMph": 16,
-            "windDirection": "W"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 60,
-            "windMph": 9,
-            "gustMph": 16,
-            "windDirection": "W"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 61,
-            "windMph": 9,
-            "gustMph": 16,
-            "windDirection": "W"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 61,
-            "windMph": 8,
-            "gustMph": 15,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 61,
-            "windMph": 7,
-            "gustMph": 14,
-            "windDirection": "SW"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-lar-was"
-      }
-    },
-    {
-      "id": "401873044",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T18:00:00Z",
-      "away": {
-        "abbr": "NYG",
-        "name": "New York Giants",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/nyg.png"
-      },
-      "home": {
-        "abbr": "PHI",
-        "name": "Philadelphia Eagles",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/phi.png"
-      },
-      "venue": "Lincoln Financial Field",
-      "city": "Philadelphia, PA",
-      "indoor": false,
-      "forecast": {
-        "tempF": 61,
-        "precipPct": 0,
-        "precipType": "Rain",
-        "windMph": 10,
-        "gustMph": 17,
-        "windDirection": "W",
-        "hourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 60,
-            "windMph": 10,
-            "gustMph": 18,
-            "windDirection": "W"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 61,
-            "windMph": 10,
-            "gustMph": 17,
-            "windDirection": "W"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 61,
-            "windMph": 10,
-            "gustMph": 17,
-            "windDirection": "W"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 61,
-            "windMph": 10,
-            "gustMph": 16,
-            "windDirection": "W"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 60,
-            "windMph": 5,
-            "gustMph": 13,
-            "windDirection": "W"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 59,
-            "windMph": 9,
-            "gustMph": 18,
-            "windDirection": "W"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 59,
-            "windMph": 9,
-            "gustMph": 19,
-            "windDirection": "W"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 60,
-            "windMph": 9,
-            "gustMph": 18,
-            "windDirection": "W"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 60,
-            "windMph": 8,
-            "gustMph": 17,
-            "windDirection": "W"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 60,
-            "windMph": 7,
-            "gustMph": 14,
-            "windDirection": "W"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-nyg-phi"
-      }
-    },
-    {
-      "id": "401873045",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T18:00:00Z",
-      "away": {
-        "abbr": "NYJ",
-        "name": "New York Jets",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/nyj.png"
-      },
-      "home": {
-        "abbr": "KC",
-        "name": "Kansas City Chiefs",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/kc.png"
-      },
-      "venue": "GEHA Field at Arrowhead Stadium",
-      "city": "Kansas City, MO",
-      "indoor": false,
-      "forecast": {
-        "tempF": 61,
-        "precipPct": 0,
-        "precipType": "Rain",
-        "windMph": 6,
-        "gustMph": 7,
-        "windDirection": "WNW",
-        "hourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 58,
-            "windMph": 6,
-            "gustMph": 7,
-            "windDirection": "W"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 61,
-            "windMph": 6,
-            "gustMph": 7,
-            "windDirection": "WNW"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 63,
-            "windMph": 6,
-            "gustMph": 7,
-            "windDirection": "WNW"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 64,
-            "windMph": 6,
-            "gustMph": 8,
-            "windDirection": "WNW"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 65,
-            "windMph": 6,
-            "gustMph": 9,
-            "windDirection": "NW"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "12 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 56,
-            "windMph": 5,
-            "gustMph": 8,
-            "windDirection": "W"
-          },
-          {
-            "time": "1 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 58,
-            "windMph": 4,
-            "gustMph": 7,
-            "windDirection": "W"
-          },
-          {
-            "time": "2 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 60,
-            "windMph": 4,
-            "gustMph": 6,
-            "windDirection": "W"
-          },
-          {
-            "time": "3 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 62,
-            "windMph": 4,
-            "gustMph": 6,
-            "windDirection": "NW"
-          },
-          {
-            "time": "4 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 63,
-            "windMph": 4,
-            "gustMph": 6,
-            "windDirection": "NW"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-nyj-kc"
-      }
-    },
     {
       "id": "401873046",
       "week": 9,
@@ -872,7 +22,7 @@
       "city": "Inglewood, CA",
       "indoor": false,
       "forecast": {
-        "tempF": 85,
+        "tempF": 86,
         "precipPct": 0,
         "precipType": "Rain",
         "windMph": 10,
@@ -880,21 +30,11 @@
         "windDirection": "WNW",
         "hourly": [
           {
-            "time": "3 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 84,
-            "windMph": 5,
-            "gustMph": 6,
-            "windDirection": "NE"
-          },
-          {
             "time": "4 PM",
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 85,
+            "tempF": 86,
             "windMph": 10,
             "gustMph": 9,
             "windDirection": "WNW"
@@ -904,7 +44,7 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 83,
+            "tempF": 84,
             "windMph": 10,
             "gustMph": 9,
             "windDirection": "WNW"
@@ -914,7 +54,7 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 84,
+            "tempF": 81,
             "windMph": 10,
             "gustMph": 9,
             "windDirection": "WNW"
@@ -924,9 +64,9 @@
             "inGame": false,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 80,
+            "tempF": 79,
             "windMph": 5,
-            "gustMph": 13,
+            "gustMph": 8,
             "windDirection": "W"
           }
         ],
@@ -938,7 +78,7 @@
             "tempF": 86,
             "windMph": 2,
             "gustMph": 4,
-            "windDirection": "SE"
+            "windDirection": "ESE"
           },
           {
             "time": "4 PM",
@@ -953,19 +93,19 @@
             "time": "5 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 84,
+            "tempF": 85,
             "windMph": 5,
             "gustMph": 7,
-            "windDirection": "W"
+            "windDirection": "WSW"
           },
           {
             "time": "6 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 82,
-            "windMph": 7,
-            "gustMph": 9,
-            "windDirection": "W"
+            "tempF": 83,
+            "windMph": 6,
+            "gustMph": 10,
+            "windDirection": "WSW"
           },
           {
             "time": "7 PM",
@@ -1006,16 +146,6 @@
         "windDirection": "NNW",
         "hourly": [
           {
-            "time": "3 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 69,
-            "windMph": 5,
-            "gustMph": 7,
-            "windDirection": "NW"
-          },
-          {
             "time": "4 PM",
             "inGame": true,
             "sky": "sun",
@@ -1030,10 +160,10 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 71,
+            "tempF": 70,
             "windMph": 6,
             "gustMph": 10,
-            "windDirection": "NNW"
+            "windDirection": "NW"
           },
           {
             "time": "6 PM",
@@ -1043,16 +173,16 @@
             "tempF": 71,
             "windMph": 7,
             "gustMph": 12,
-            "windDirection": "NNW"
+            "windDirection": "NW"
           },
           {
             "time": "7 PM",
             "inGame": false,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 69,
-            "windMph": 7,
-            "gustMph": 12,
+            "tempF": 70,
+            "windMph": 6,
+            "gustMph": 13,
             "windDirection": "NW"
           }
         ],
@@ -1064,7 +194,7 @@
             "tempF": 68,
             "windMph": 4,
             "gustMph": 7,
-            "windDirection": "NNW"
+            "windDirection": "NW"
           },
           {
             "time": "4 PM",
@@ -1098,7 +228,7 @@
             "inGame": false,
             "precipPct": 0,
             "tempF": 69,
-            "windMph": 6,
+            "windMph": 7,
             "gustMph": 12,
             "windDirection": "NW"
           }
@@ -1125,27 +255,17 @@
       "indoor": false,
       "forecast": {
         "tempF": 55,
-        "precipPct": 10,
+        "precipPct": 7,
         "precipType": "Rain",
         "windMph": 10,
         "gustMph": 15,
         "windDirection": "SSW",
         "hourly": [
           {
-            "time": "3 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 9,
-            "tempF": 55,
-            "windMph": 12,
-            "gustMph": 18,
-            "windDirection": "SSW"
-          },
-          {
             "time": "4 PM",
             "inGame": true,
             "sky": "sun",
-            "precipPct": 10,
+            "precipPct": 7,
             "tempF": 55,
             "windMph": 10,
             "gustMph": 15,
@@ -1155,7 +275,7 @@
             "time": "5 PM",
             "inGame": true,
             "sky": "sun",
-            "precipPct": 5,
+            "precipPct": 3,
             "tempF": 56,
             "windMph": 9,
             "gustMph": 14,
@@ -1167,7 +287,7 @@
             "sky": "sun",
             "precipPct": 2,
             "tempF": 55,
-            "windMph": 7,
+            "windMph": 8,
             "gustMph": 12,
             "windDirection": "SSW"
           },
@@ -1178,7 +298,7 @@
             "precipPct": 0,
             "tempF": 54,
             "windMph": 6,
-            "gustMph": 9,
+            "gustMph": 10,
             "windDirection": "SSW"
           }
         ],
@@ -1186,16 +306,16 @@
           {
             "time": "3 PM",
             "inGame": false,
-            "precipPct": 3,
-            "tempF": 55,
+            "precipPct": 5,
+            "tempF": 56,
             "windMph": 11,
-            "gustMph": 18,
+            "gustMph": 17,
             "windDirection": "SSW"
           },
           {
             "time": "4 PM",
             "inGame": true,
-            "precipPct": 4,
+            "precipPct": 3,
             "tempF": 56,
             "windMph": 10,
             "gustMph": 15,
@@ -1215,7 +335,7 @@
             "inGame": true,
             "precipPct": 1,
             "tempF": 56,
-            "windMph": 8,
+            "windMph": 7,
             "gustMph": 12,
             "windDirection": "SSW"
           },
@@ -1257,16 +377,6 @@
         "gustMph": 26,
         "windDirection": "W",
         "hourly": [
-          {
-            "time": "3 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 1,
-            "tempF": 57,
-            "windMph": 14,
-            "gustMph": 28,
-            "windDirection": "W"
-          },
           {
             "time": "4 PM",
             "inGame": true,
@@ -1313,7 +423,7 @@
             "time": "3 PM",
             "inGame": false,
             "precipPct": 0,
-            "tempF": 56,
+            "tempF": 55,
             "windMph": 9,
             "gustMph": 21,
             "windDirection": "W"
@@ -1348,7 +458,7 @@
           {
             "time": "7 PM",
             "inGame": false,
-            "precipPct": 1,
+            "precipPct": 0,
             "tempF": 46,
             "windMph": 4,
             "gustMph": 11,
@@ -1391,7 +501,7 @@
             "tempF": 54,
             "windMph": 10,
             "gustMph": 18,
-            "windDirection": "WNW"
+            "windDirection": "W"
           },
           {
             "time": "8 PM",
@@ -1410,8 +520,8 @@
             "precipPct": 0,
             "tempF": 50,
             "windMph": 10,
-            "gustMph": 16,
-            "windDirection": "NW"
+            "gustMph": 15,
+            "windDirection": "WNW"
           },
           {
             "time": "10 PM",
@@ -1420,7 +530,7 @@
             "precipPct": 0,
             "tempF": 49,
             "windMph": 10,
-            "gustMph": 16,
+            "gustMph": 14,
             "windDirection": "NW"
           },
           {
@@ -1430,7 +540,7 @@
             "precipPct": 0,
             "tempF": 48,
             "windMph": 10,
-            "gustMph": 16,
+            "gustMph": 14,
             "windDirection": "NW"
           }
         ],
@@ -1457,7 +567,7 @@
             "time": "9 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 50,
+            "tempF": 51,
             "windMph": 7,
             "gustMph": 13,
             "windDirection": "WNW"
@@ -1466,16 +576,16 @@
             "time": "10 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 48,
+            "tempF": 49,
             "windMph": 7,
-            "gustMph": 13,
-            "windDirection": "NW"
+            "gustMph": 12,
+            "windDirection": "WNW"
           },
           {
             "time": "11 PM",
             "inGame": false,
             "precipPct": 0,
-            "tempF": 47,
+            "tempF": 48,
             "windMph": 6,
             "gustMph": 12,
             "windDirection": "NW"

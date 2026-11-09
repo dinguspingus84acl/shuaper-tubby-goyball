@@ -1,477 +1,13 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-08T22:17:03Z",
+  "generatedAt": "2026-11-09T01:46:44Z",
   "weatherSource": "https://mysportsweather.com/nfl",
   "scheduleSource": "MySportsWeather",
   "games": [
     {
-      "id": "401873046",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T21:05:00Z",
-      "away": {
-        "abbr": "HOU",
-        "name": "Houston Texans",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/hou.png"
-      },
-      "home": {
-        "abbr": "LAC",
-        "name": "Los Angeles Chargers",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/lac.png"
-      },
-      "venue": "SoFi Stadium",
-      "city": "Inglewood, CA",
-      "indoor": false,
-      "forecast": {
-        "tempF": 86,
-        "precipPct": 0,
-        "precipType": "Rain",
-        "windMph": 10,
-        "gustMph": 9,
-        "windDirection": "WNW",
-        "hourly": [
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 86,
-            "windMph": 10,
-            "gustMph": 9,
-            "windDirection": "WNW"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 84,
-            "windMph": 10,
-            "gustMph": 9,
-            "windDirection": "WNW"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 81,
-            "windMph": 10,
-            "gustMph": 9,
-            "windDirection": "WNW"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 79,
-            "windMph": 5,
-            "gustMph": 8,
-            "windDirection": "W"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "3 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 86,
-            "windMph": 2,
-            "gustMph": 4,
-            "windDirection": "ESE"
-          },
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 86,
-            "windMph": 3,
-            "gustMph": 5,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 85,
-            "windMph": 5,
-            "gustMph": 7,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 83,
-            "windMph": 6,
-            "gustMph": 10,
-            "windDirection": "WSW"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 80,
-            "windMph": 8,
-            "gustMph": 12,
-            "windDirection": "W"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-hou-lac"
-      }
-    },
-    {
-      "id": "401873047",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T21:25:00Z",
-      "away": {
-        "abbr": "LV",
-        "name": "Las Vegas Raiders",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/lv.png"
-      },
-      "home": {
-        "abbr": "SF",
-        "name": "San Francisco 49ers",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/sf.png"
-      },
-      "venue": "Levi's Stadium",
-      "city": "Santa Clara, CA",
-      "indoor": false,
-      "forecast": {
-        "tempF": 70,
-        "precipPct": 0,
-        "precipType": "Rain",
-        "windMph": 6,
-        "gustMph": 9,
-        "windDirection": "NNW",
-        "hourly": [
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 70,
-            "windMph": 6,
-            "gustMph": 9,
-            "windDirection": "NNW"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 70,
-            "windMph": 6,
-            "gustMph": 10,
-            "windDirection": "NW"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 71,
-            "windMph": 7,
-            "gustMph": 12,
-            "windDirection": "NW"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 70,
-            "windMph": 6,
-            "gustMph": 13,
-            "windDirection": "NW"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "3 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 68,
-            "windMph": 4,
-            "gustMph": 7,
-            "windDirection": "NW"
-          },
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 70,
-            "windMph": 6,
-            "gustMph": 9,
-            "windDirection": "NNW"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 70,
-            "windMph": 6,
-            "gustMph": 10,
-            "windDirection": "NNW"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 70,
-            "windMph": 7,
-            "gustMph": 12,
-            "windDirection": "NW"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 69,
-            "windMph": 7,
-            "gustMph": 12,
-            "windDirection": "NW"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-lv-sf"
-      }
-    },
-    {
-      "id": "401873048",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T21:25:00Z",
-      "away": {
-        "abbr": "ARI",
-        "name": "Arizona Cardinals",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ari.png"
-      },
-      "home": {
-        "abbr": "SEA",
-        "name": "Seattle Seahawks",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/sea.png"
-      },
-      "venue": "Lumen Field",
-      "city": "Seattle, WA",
-      "indoor": false,
-      "forecast": {
-        "tempF": 55,
-        "precipPct": 7,
-        "precipType": "Rain",
-        "windMph": 10,
-        "gustMph": 15,
-        "windDirection": "SSW",
-        "hourly": [
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 7,
-            "tempF": 55,
-            "windMph": 10,
-            "gustMph": 15,
-            "windDirection": "SSW"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 3,
-            "tempF": 56,
-            "windMph": 9,
-            "gustMph": 14,
-            "windDirection": "SSW"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 2,
-            "tempF": 55,
-            "windMph": 8,
-            "gustMph": 12,
-            "windDirection": "SSW"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 54,
-            "windMph": 6,
-            "gustMph": 10,
-            "windDirection": "SSW"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "3 PM",
-            "inGame": false,
-            "precipPct": 5,
-            "tempF": 56,
-            "windMph": 11,
-            "gustMph": 17,
-            "windDirection": "SSW"
-          },
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "precipPct": 3,
-            "tempF": 56,
-            "windMph": 10,
-            "gustMph": 15,
-            "windDirection": "SW"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "precipPct": 3,
-            "tempF": 56,
-            "windMph": 9,
-            "gustMph": 14,
-            "windDirection": "SW"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "precipPct": 1,
-            "tempF": 56,
-            "windMph": 7,
-            "gustMph": 12,
-            "windDirection": "SSW"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "precipPct": 1,
-            "tempF": 55,
-            "windMph": 6,
-            "gustMph": 10,
-            "windDirection": "SSW"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-ari-sea"
-      }
-    },
-    {
-      "id": "401873049",
-      "week": 9,
-      "kickoffUtc": "2026-11-08T21:25:00Z",
-      "away": {
-        "abbr": "GB",
-        "name": "Green Bay Packers",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/gb.png"
-      },
-      "home": {
-        "abbr": "NE",
-        "name": "New England Patriots",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ne.png"
-      },
-      "venue": "Gillette Stadium",
-      "city": "Foxborough, MA",
-      "indoor": false,
-      "forecast": {
-        "tempF": 56,
-        "precipPct": 2,
-        "precipType": "Rain",
-        "windMph": 13,
-        "gustMph": 26,
-        "windDirection": "W",
-        "hourly": [
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 56,
-            "windMph": 13,
-            "gustMph": 26,
-            "windDirection": "W"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 1,
-            "tempF": 53,
-            "windMph": 10,
-            "gustMph": 23,
-            "windDirection": "W"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 2,
-            "tempF": 51,
-            "windMph": 8,
-            "gustMph": 18,
-            "windDirection": "W"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 3,
-            "tempF": 48,
-            "windMph": 6,
-            "gustMph": 15,
-            "windDirection": "W"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "3 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 55,
-            "windMph": 9,
-            "gustMph": 21,
-            "windDirection": "W"
-          },
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 54,
-            "windMph": 7,
-            "gustMph": 17,
-            "windDirection": "W"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 51,
-            "windMph": 6,
-            "gustMph": 15,
-            "windDirection": "W"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 48,
-            "windMph": 5,
-            "gustMph": 13,
-            "windDirection": "W"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 46,
-            "windMph": 4,
-            "gustMph": 11,
-            "windDirection": "W"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-gb-ne"
-      }
-    },
-    {
       "id": "401873050",
       "week": 9,
-      "kickoffUtc": "2026-11-09T01:20:00Z",
+      "kickoffUtc": "2026-11-09T01:23:00Z",
       "away": {
         "abbr": "TB",
         "name": "Tampa Bay Buccaneers",
@@ -486,11 +22,11 @@
       "city": "Chicago, IL",
       "indoor": false,
       "forecast": {
-        "tempF": 51,
+        "tempF": 53,
         "precipPct": 0,
         "precipType": "Rain",
         "windMph": 10,
-        "gustMph": 17,
+        "gustMph": 12,
         "windDirection": "WNW",
         "hourly": [
           {
@@ -498,9 +34,9 @@
             "inGame": false,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 54,
+            "tempF": 55,
             "windMph": 10,
-            "gustMph": 18,
+            "gustMph": 12,
             "windDirection": "W"
           },
           {
@@ -508,9 +44,9 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 51,
+            "tempF": 54,
             "windMph": 10,
-            "gustMph": 17,
+            "gustMph": 12,
             "windDirection": "WNW"
           },
           {
@@ -518,9 +54,9 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 50,
+            "tempF": 53,
             "windMph": 10,
-            "gustMph": 15,
+            "gustMph": 12,
             "windDirection": "WNW"
           },
           {
@@ -528,9 +64,9 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 49,
+            "tempF": 50,
             "windMph": 10,
-            "gustMph": 14,
+            "gustMph": 12,
             "windDirection": "NW"
           },
           {
@@ -540,7 +76,7 @@
             "precipPct": 0,
             "tempF": 48,
             "windMph": 10,
-            "gustMph": 14,
+            "gustMph": 10,
             "windDirection": "NW"
           }
         ],

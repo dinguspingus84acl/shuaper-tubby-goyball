@@ -1,0 +1,253 @@
+/* Requested recommendations #2–#8 and #10. Position colors (#1) and injury
+   status presentation (#9) are intentionally left alone. */
+
+/* 2. Trade result: obvious winner, readable edge, balanced recommendations. */
+body.shua-clean #tradeSection .trade-result-card{
+  position:relative;transition:border-color .16s ease,box-shadow .16s ease;
+}
+body.shua-clean #tradeSection .trade-result-card.shua-trade-decided{
+  border-color:#488f79!important;box-shadow:0 0 0 1px #42c99e24,0 8px 24px #0004;
+}
+body.shua-clean #tradeSection .trade-side.shua-trade-leading{
+  border-color:#55daa9!important;
+  box-shadow:inset 0 3px 0 #52dba9,0 0 17px #2abb8750;
+  background:linear-gradient(150deg,#113d3b,#091d30 77%)!important;
+}
+body.shua-clean #tradeSection .trade-result-card.shua-trade-decided #tradeVerdict{
+  color:#8bf4c6!important;text-shadow:0 0 13px #28a87e42;
+}
+body.shua-clean #tradeSection #tradeCenterDelta{
+  min-width:90px!important;padding:8px 10px!important;
+  border-color:#558f8c!important;font-size:clamp(11px,1.4vw,13px)!important;
+  color:#f0fcff!important;font-variant-numeric:tabular-nums;
+}
+body.shua-clean #tradeSection .trade-comparison-labels strong{
+  font-size:clamp(23px,3.15vw,31px)!important;
+}
+body.shua-clean #tradeSection .trade-balance-heading{
+  width:100%!important;text-align:center!important;margin-inline:auto!important;
+}
+body.shua-clean #tradeSection .trade-balance-recommendations{
+  width:min(100%,620px);margin:0 auto;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+/* 3. Clear, compact player legends; selected series stay prominent. */
+body.shua-clean #shuaAnalyticsSection .st-chart-tools .st-legend{
+  display:flex;flex-wrap:wrap;gap:5px 7px;align-items:center;
+}
+body.shua-clean #shuaAnalyticsSection .st-legend-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  min-height:34px;padding:5px 8px!important;border-radius:9px!important;
+  transition:opacity .16s ease,border-color .16s ease,background-color .16s ease;
+}
+body.shua-clean #shuaAnalyticsSection .st-legend-btn i{
+  flex:0 0 8px;width:8px;height:8px;border-radius:50%;
+}
+body.shua-clean #shuaAnalyticsSection .shua-legend-face{
+  display:block;flex:0 0 26px;width:26px;height:26px;
+  border-radius:50%;border:1px solid #668ba0;
+  background:#0c2537;object-fit:cover;object-position:center top;
+}
+body.shua-clean #shuaAnalyticsSection .st-legend-btn[aria-pressed="false"]{opacity:.43}
+body.shua-clean #shuaAnalyticsSection .st-chart.shua-chart-emphasizing [data-series-group]{
+  opacity:.2;transition:opacity .15s ease;
+}
+body.shua-clean #shuaAnalyticsSection .st-chart.shua-chart-emphasizing [data-series-group].shua-chart-in-focus{
+  opacity:1!important;
+}
+
+/* 4. Swipe game-log stats while Week and Opponent stay in view. The top
+   header is also sticky when a long log needs its own vertical scrolling. */
+body.shua-clean #modal .espn-game-log-table-wrap,
+body.shua-clean.phone-mode #modal .espn-game-log-table-wrap{
+  position:relative;width:100%!important;max-width:100%!important;
+  overflow-x:auto!important;overflow-y:auto!important;
+  overscroll-behavior-x:contain;touch-action:pan-x pan-y!important;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin;
+}
+body.shua-clean #modal .espn-game-log-table-wrap:has(tbody tr:nth-child(10)){
+  max-height:min(56dvh,550px);
+}
+body.shua-clean #modal .espn-game-log-table,
+body.shua-clean.phone-mode #modal .espn-game-log-table{
+  width:max(100%,660px)!important;min-width:660px!important;max-width:none!important;
+  table-layout:auto!important;border-collapse:separate!important;border-spacing:0;
+}
+body.shua-clean #modal .espn-game-log-table th,
+body.shua-clean #modal .espn-game-log-table td,
+body.shua-clean.phone-mode #modal .espn-game-log-table th,
+body.shua-clean.phone-mode #modal .espn-game-log-table td{
+  box-sizing:border-box!important;width:auto!important;
+  padding:9px 7px!important;white-space:nowrap!important;
+}
+body.shua-clean #modal .espn-game-log-table thead th{
+  position:sticky!important;top:0!important;z-index:3;
+  background:#112c40!important;border-bottom:1px solid #54728a!important;
+}
+body.shua-clean #modal .espn-game-log-table :is(th,td):first-child,
+body.shua-clean.phone-mode #modal .espn-game-log-table :is(th,td):first-child{
+  position:sticky!important;left:0!important;z-index:4;
+  width:49px!important;min-width:49px!important;max-width:49px!important;
+  background:#0b2436!important;
+}
+body.shua-clean #modal .espn-game-log-table :is(th,td):nth-child(2),
+body.shua-clean.phone-mode #modal .espn-game-log-table :is(th,td):nth-child(2){
+  position:sticky!important;left:49px!important;z-index:4;
+  width:117px!important;min-width:117px!important;max-width:117px!important;
+  padding-left:6px!important;background:#0b2436!important;
+  box-shadow:5px 0 11px #0006!important;
+}
+body.shua-clean #modal .espn-game-log-table thead th:first-child,
+body.shua-clean #modal .espn-game-log-table thead th:nth-child(2){
+  z-index:6;background:#112c40!important;
+}
+body.shua-clean #modal .espn-game-log-table tbody tr:nth-child(even) :is(td:first-child,td:nth-child(2)){
+  background:#0d293b!important;
+}
+body.shua-clean #modal .espn-game-log-table .gl-pts,
+body.shua-clean #modal .espn-game-log-table .gl-stat{
+  background:transparent!important;
+}
+
+/* 5. Weather: easy-to-spot conditions, fixed kickoff placement, clear roof. */
+body.shua-clean #shuaWeatherSection .wx-game-top{
+  min-height:42px;align-items:center;gap:8px;margin-bottom:10px;
+}
+body.shua-clean #shuaWeatherSection .wx-game-time{
+  flex:0 0 auto;min-width:75px;text-align:left;align-self:center;
+  font-size:clamp(15px,1.6vw,17px)!important;font-weight:950;
+}
+body.shua-clean #shuaWeatherSection .wx-game-conditions{
+  margin-left:auto;gap:7px;justify-content:flex-end;
+}
+body.shua-clean #shuaWeatherSection .wx-game-sky{
+  display:inline-grid;place-items:center;
+  width:42px!important;height:42px!important;flex:0 0 42px!important;
+  font-size:33px!important;line-height:1!important;
+}
+body.shua-clean #shuaWeatherSection .wx-game.wx-indoor-game{
+  border-color:#4e628f!important;
+  background:linear-gradient(155deg,#162c48,#0c2038 74%)!important;
+  box-shadow:inset 0 2px 0 #6886c26b,0 7px 20px #0002;
+}
+body.shua-clean #shuaWeatherSection .wx-game:not(.wx-indoor-game):not(.wx-pending-game){
+  box-shadow:inset 0 2px 0 #39a78b47,0 7px 20px #0002;
+}
+body.shua-clean #shuaWeatherSection .wx-pending-game .wx-pending-fixture{
+  display:grid;grid-template-rows:auto auto;gap:8px;
+}
+body.shua-clean #shuaWeatherSection .wx-pending-game .wx-pending-context{
+  grid-row:1;display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+body.shua-clean #shuaWeatherSection .wx-pending-game .wx-pending-context strong{
+  font-size:16px;color:#e8f8ff;font-variant-numeric:tabular-nums;
+}
+body.shua-clean #shuaWeatherSection .wx-pending-game .wx-pending-matchup{
+  grid-row:2;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+
+/* 6. Underlined tab selection, without adding extra rows to player cards. */
+body.shua-clean #modal .unified-profile-tabs{
+  gap:4px!important;margin-top:5px!important;padding:5px 0 4px!important;
+  border-bottom:1px solid #365267!important;
+}
+body.shua-clean #modal .unified-profile-tab{
+  position:relative;min-height:35px;
+  border:1px solid transparent!important;border-radius:7px 7px 0 0!important;
+  padding:7px 10px 9px!important;background:transparent!important;
+  color:#8fa9bc!important;box-shadow:none!important;
+}
+body.shua-clean #modal .unified-profile-tab.active{
+  color:#f5fffb!important;background:#143b40!important;
+  font-weight:950!important;
+}
+body.shua-clean #modal .unified-profile-tab.active::after{
+  content:"";position:absolute;left:7px;right:7px;bottom:0;
+  height:3px;border-radius:9px 9px 0 0;background:#57e2b4;
+}
+body.shua-clean #modal .unified-profile-panel{padding-top:7px!important}
+
+/* 7. Distinct position sections with starter hierarchy and team identity. */
+body.shua-clean #depthSection .depth-card h3{
+  display:flex;align-items:center;justify-content:space-between;gap:7px;
+  margin:0 0 8px!important;padding:0 0 10px!important;
+  border-bottom:1px solid #b0d0da36;
+  font-weight:1000!important;letter-spacing:.03em;
+}
+body.shua-clean #depthSection .shua-depth-team-logo{
+  display:block;flex:0 0 26px;width:26px;height:26px;object-fit:contain;
+}
+body.shua-clean #depthSection .depth-player:not([data-depth-order="1"]){
+  border-top:1px solid #a8c3cf21;
+}
+body.shua-clean #depthSection .depth-player[data-depth-order="1"] span{
+  font-weight:950!important;letter-spacing:-.015em;
+}
+
+/* 8. Face-led Start/Sit matchup; line and headline colors follow NFL teams. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-players{
+  gap:8px!important;margin:0 0 10px!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-player{
+  border-top:3px solid var(--compare-series-color,#5cd6bd)!important;
+  background:linear-gradient(115deg,#15374a,#0b263a 80%)!important;
+  gap:8px!important;padding:9px!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-player .st-face{
+  flex:0 0 55px!important;width:55px!important;height:55px!important;min-width:55px!important;
+  border:2px solid var(--compare-series-color,#5cd6bd)!important;
+  object-fit:cover;object-position:center top;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-copy b{
+  font-size:clamp(12px,1.5vw,15px)!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-average strong{
+  color:var(--compare-series-color,#59d9ba)!important;
+}
+
+/* 10. Content-shaped placeholders, not extra layout jumps or invented data. */
+@keyframes shua-skeleton-pulse{
+  0%,100%{opacity:.45}50%{opacity:.87}
+}
+body.shua-clean .shua-skeleton-stack{
+  display:grid;gap:7px;padding:10px 3px;min-height:156px;
+}
+body.shua-clean .shua-skeleton-row{
+  display:grid;grid-template-columns:36px minmax(0,1fr) 50px;
+  align-items:center;gap:10px;min-height:39px;padding:5px 9px;
+  border:1px solid #36576c55;border-radius:9px;background:#0e293c;
+}
+body.shua-clean .shua-skeleton-avatar,
+body.shua-clean .shua-skeleton-line,
+body.shua-clean .shua-skeleton-score{
+  display:block;background:linear-gradient(110deg,#345269,#4f7083,#345269);
+  animation:shua-skeleton-pulse 1.35s ease-in-out infinite;
+}
+body.shua-clean .shua-skeleton-avatar{width:29px;height:29px;border-radius:50%}
+body.shua-clean .shua-skeleton-line{height:9px;width:68%;border-radius:5px}
+body.shua-clean .shua-skeleton-line+.shua-skeleton-line{height:7px;width:43%;margin-top:6px;opacity:.6}
+body.shua-clean .shua-skeleton-score{height:15px;width:44px;border-radius:5px}
+body.shua-clean #modal .espn-game-log-empty:has(.shua-skeleton-stack){min-height:240px}
+body.shua-clean #shuaAnalyticsSection .st-loading:has(.shua-skeleton-stack){min-height:220px}
+body.shua-clean #shuaWeatherSection .wx-loading-card>span,
+body.shua-clean #espnLiveSection .espn-loading-row i{animation:shua-skeleton-pulse 1.35s ease-in-out infinite}
+
+@media(max-width:700px){
+  body.shua-clean #tradeSection #tradeCenterDelta{min-width:72px!important;padding:6px 5px!important;font-size:10px!important}
+  body.shua-clean #shuaAnalyticsSection .shua-legend-face{width:23px;height:23px;flex-basis:23px}
+  body.shua-clean #modal .espn-game-log-table,
+  body.shua-clean.phone-mode #modal .espn-game-log-table{width:660px!important;min-width:660px!important}
+  body.shua-clean #shuaWeatherSection .wx-game-sky{width:38px!important;height:38px!important;flex-basis:38px!important;font-size:30px!important}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-player .st-face{
+    width:46px!important;height:46px!important;min-width:46px!important;flex-basis:46px!important;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .shua-compare-graph-player{padding:7px!important;gap:5px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean .shua-skeleton-avatar,
+  body.shua-clean .shua-skeleton-line,
+  body.shua-clean .shua-skeleton-score,
+  body.shua-clean #shuaWeatherSection .wx-loading-card>span,
+  body.shua-clean #espnLiveSection .espn-loading-row i{animation:none!important}
+}

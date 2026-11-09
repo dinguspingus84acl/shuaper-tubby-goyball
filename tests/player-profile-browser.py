@@ -296,8 +296,13 @@ def check_browser(browser,phone):
     assert abs(font_sizes[0]-font_sizes[1])<.1,('All numbers should have the same size',font_sizes)
     assert min(font_sizes)>=14,('Game Log numbers are too small',font_sizes)
     if phone:
-        dims=page.locator('#unifiedGameLogPanel .espn-game-log-table-wrap').evaluate('(el)=>({total:el.scrollWidth,visible:el.clientWidth})')
-        assert dims['total']<=dims['visible']+2,('Game log should fit without horizontal swiping',dims)
+        dims=page.locator('#unifiedGameLogPanel .espn-game-log-table-wrap').evaluate('''el=>({
+            total:el.scrollWidth,visible:el.clientWidth,
+            first:getComputedStyle(el.querySelector('tbody td:first-child')).position,
+            second:getComputedStyle(el.querySelector('tbody td:nth-child(2)')).position
+        })''')
+        assert dims['total']>dims['visible']+10,('Game log should support horizontal swiping',dims)
+        assert dims['first']==dims['second']=='sticky',('Week and opponent columns must remain frozen',dims)
     page.locator('#unifiedGameLogPanel [data-gl-mode="snaps"]').click()
     snap=page.locator('#unifiedGameLogPanel [data-embedded-snap-rates]')
     snap.locator('.espn-game-log-table.espn-snap-game-log').wait_for(state='visible',timeout=30000)
@@ -306,7 +311,7 @@ def check_browser(browser,phone):
     assert snap.locator('tbody tr').count()>0,'Snap Rates button has no weekly records'
     if phone:
         snap_width=snap.locator('.espn-game-log-table-wrap').evaluate('(el)=>({total:el.scrollWidth,visible:el.clientWidth})')
-        assert snap_width['total']<=snap_width['visible']+2,('Snap Rates should not swipe horizontally',snap_width)
+        assert snap_width['total']>snap_width['visible']+10,('Snap Rates should support horizontal swiping',snap_width)
     # Short and long surnames stay on one line; jersey is now below the surname.
     for full_name,last_piece in [('Ladd McConkey','McConkey'),('Jaxon Smith-Njigba','Smith-Njigba'),('Amon-Ra St. Brown','St. Brown')]:
         page.evaluate('(name)=>window.openUnifiedPlayerProfileByName(name)',full_name)

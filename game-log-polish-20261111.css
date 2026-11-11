@@ -1,0 +1,50 @@
+/* Game-log readability and natural phone scrolling. The profile sheet is the
+   only vertical scroller; the table itself never traps the final weeks. */
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table-wrap,
+body.shua-clean.phone-mode #modal #unifiedGameLogPanel .espn-game-log-table-wrap {
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+  touch-action:pan-y!important;
+}
+
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table thead th,
+body.shua-clean.phone-mode #modal #unifiedGameLogPanel .espn-game-log-table thead th {
+  text-align:center!important;
+  vertical-align:middle!important;
+  font-size:clamp(10px,2.65vw,12px)!important;
+  line-height:1.2!important;
+  padding:10px 2px!important;
+  letter-spacing:0!important;
+}
+
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table tbody td,
+body.shua-clean.phone-mode #modal #unifiedGameLogPanel .espn-game-log-table tbody td {
+  font-size:clamp(16px,4.3vw,18px)!important;
+  line-height:1.2!important;
+  font-weight:950!important;
+  text-align:center!important;
+  font-variant-numeric:tabular-nums;
+  padding:11px 2px!important;
+}
+
+/* Leave team badges aligned with their labels; center only the column header. */
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table tbody td:nth-child(2) {
+  text-align:left!important;
+}
+
+/* Keep the final week reachable above the iPhone home indicator. */
+body.shua-clean.phone-mode #modal .profile.featured-player-profile {
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-y!important;
+}
+body.shua-clean #modal #unifiedGameLogPanel {
+  padding-bottom:calc(52px + env(safe-area-inset-bottom, 0px))!important;
+}
+
+@media(max-width:370px){
+  body.shua-clean.phone-mode #modal #unifiedGameLogPanel .espn-game-log-table tbody td {
+    font-size:clamp(15px,4.35vw,16px)!important;
+  }
+}

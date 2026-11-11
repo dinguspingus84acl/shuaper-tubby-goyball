@@ -1548,7 +1548,7 @@ function installPhoneSwipeDismiss(){
  if(!sheet||sheet.dataset.phoneSwipeDismiss==='4')return;
  sheet.dataset.phoneSwipeDismiss='4';
  let gesture=null,settling=false;
- const ignore='button,input,select,textarea,a,svg,.st-chart,.st-table-wrap,[data-st-chart-host]';
+ const ignore='button,input,select,textarea,a,svg,.st-chart,.st-table-wrap,[data-st-chart-host],.espn-game-log-table-wrap,.espn-game-log-table';
  const width=()=>sheet.clientWidth||window.innerWidth||375;
  const reducedMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  const restoreHorizontal=dx=>{
@@ -1572,6 +1572,8 @@ function installPhoneSwipeDismiss(){
  },{passive:true});
  sheet.addEventListener('touchmove',e=>{
   if(!gesture||e.touches.length!==1)return;
+  // Allow normal native scrolling inside game logs, including all 18 weeks.
+  if(gesture.blocked){gesture=null;return;}
   const t=e.touches[0],dx=t.clientX-gesture.x,dy=t.clientY-gesture.y;
   gesture.lastX=t.clientX;gesture.lastY=t.clientY;
   if(!gesture.mode){

@@ -1,0 +1,91 @@
+/* Requested visual polish: 1,2,3,6,8,9,10 only. No ownership/projection/share bars. */
+
+/* 1. Standings: consistent rows, numeric alignment, own-team outline. */
+#shuaMyTeams .myteams-standings-line:not(.is-heading){min-height:45px;padding-block:8px;border-bottom:1px solid #7dabc01c}
+#shuaMyTeams .myteams-standings-line>span:nth-child(n+3){text-align:right!important;font-variant-numeric:tabular-nums}
+#shuaMyTeams .myteams-standings-line.shua-my-own-standing{
+  background:#15513c36;box-shadow:inset 2px 0 #46d69a,inset 0 0 0 1px #46d69a44;
+  border-radius:6px;padding-inline:6px;
+}
+#shuaMyTeams .myteams-standings-line.shua-my-own-standing .myteams-team-open{color:#e3fff1}
+
+/* 2. Starter / bench distinction without adding vertical height. */
+#shuaMyTeams .myteams-roster-row[data-shua-roster-group="starter"]{background:linear-gradient(90deg,#1c47382c,transparent 78%)}
+#shuaMyTeams .myteams-roster-row[data-shua-roster-group="bench"]{background:#7996ab10;color:#c1d5e3}
+#shuaMyTeams .myteams-roster-row[data-shua-roster-group="ir"]{background:#af7f8515}
+#shuaMyTeams .myteams-roster-row>strong{justify-self:end;text-align:right;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums;color:#ecf9ff;white-space:nowrap}
+#shuaMyTeams .myteams-player-open>img:not(.myteams-nfl-logo){width:33px;height:33px;flex:0 0 33px;object-fit:cover;border-radius:50%}
+
+/* 3. Flat ESPN-like waiver list with an emphasized projection column. */
+#shuaMyTeams .myteams-wire-line:not(.is-heading){min-height:47px;background:transparent!important;border:0;border-bottom:1px solid #86acc01e!important;border-radius:0!important;box-shadow:none!important}
+#shuaMyTeams .myteams-wire-line:not(.is-heading)>span:nth-child(4){font-size:14px;font-weight:950;color:#edfdff;font-variant-numeric:tabular-nums}
+#shuaMyTeams .myteams-wire-line .myteams-player-open>img{width:32px;height:32px}
+#shuaMyTeams .myteams-wire-line .myteams-player-open b{font-size:12px}
+#shuaMyTeams .myteams-wire-line.is-heading{border-bottom:1px solid #446478;padding-bottom:7px}
+
+/* 6. Injury Impact: measured side-by-side values, preserving the existing chart. */
+#shuaAnalyticsSection .shua-injury-measured{border:1px solid #35536a;border-radius:9px;overflow:hidden;margin:10px 0 13px;background:#0c253a}
+#shuaAnalyticsSection .shua-injury-measured-line{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(75px,.8fr) minmax(75px,.8fr);gap:8px;align-items:stretch;padding:8px 11px;border-top:1px solid #7899a61a}
+#shuaAnalyticsSection .shua-injury-measured-line.is-heading{background:#16354b;border-top:0;color:#a5c6d9;font-size:10px;font-weight:850}
+#shuaAnalyticsSection .shua-injury-measured-line.is-heading>span:not(:first-child){text-align:right}
+#shuaAnalyticsSection .shua-injury-measured-line>strong{font-size:11px;line-height:1.25;align-self:center;min-width:0;overflow-wrap:anywhere}
+#shuaAnalyticsSection .shua-injury-measure{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:flex-end;min-height:27px;padding:3px 6px;font-size:12px;font-variant-numeric:tabular-nums}
+#shuaAnalyticsSection .shua-injury-measure b{position:relative;z-index:1;color:#ecf9ff}
+#shuaAnalyticsSection .shua-injury-measure-bar{position:absolute;right:0;top:2px;bottom:2px;z-index:-1;max-width:100%;border-radius:4px;background:#88a8c044}
+#shuaAnalyticsSection .shua-injury-measure.is-out .shua-injury-measure-bar{background:#38c7a94d}
+
+/* 8. Schedule grid: identical tile sizes, soft difficulty palette, compact legend above. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell{
+  width:66px;min-width:66px;min-height:57px;height:57px;border-radius:8px;
+  box-sizing:border-box;box-shadow:none!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.easy{background:#1b4a3f!important;border-color:#357b67!important;color:#e0fff0!important}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.neutral{background:#55492e!important;border-color:#7c6942!important;color:#fff4d4!important}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.tough{background:#57343e!important;border-color:#81515e!important;color:#ffeaf0!important}
+body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell.bye{background:#1d3443!important;border-color:#34566a!important;color:#95aebd!important}
+#shuaAnalyticsSection .st-schedule-heatmap-panel .shua-difficulty-legend{display:flex;gap:13px;align-items:center;margin:0 0 9px;padding:0 1px;font-size:10px}
+#shuaAnalyticsSection .shua-difficulty-key{display:inline-block;width:9px;height:9px;border-radius:3px;border:1px solid #ffffff25}
+#shuaAnalyticsSection .shua-difficulty-key.easy{background:#2c826a}
+#shuaAnalyticsSection .shua-difficulty-key.neutral{background:#987d3e}
+#shuaAnalyticsSection .shua-difficulty-key.tough{background:#a65a6b}
+#shuaAnalyticsSection .shua-difficulty-key.bye{background:#39556a}
+
+/* 9. Trade-value ladder: player portraits, aligned values, gentle tier dividers. */
+#tradeChartPanel .tcc-player{grid-template-columns:35px minmax(0,1fr) 37px 32px 33px 33px;min-height:40px;gap:3px;padding-block:4px;font-variant-numeric:tabular-nums}
+#tradeChartPanel .shua-tcc-avatar{display:block;position:relative;width:32px;height:32px;align-self:center;flex:none;border-radius:50%;background:#e1e7ec}
+#tradeChartPanel .shua-tcc-avatar>.shua-tcc-face{display:block;width:32px;height:32px;border-radius:50%;object-fit:cover;object-position:top center}
+#tradeChartPanel .shua-tcc-avatar>.tcc-logo{position:absolute;right:-2px;bottom:-2px;width:16px;height:16px;object-fit:contain;border:1px solid #d4dbe1;border-radius:50%;background:#fff}
+#tradeChartPanel .shua-tcc-avatar.no-photo>.tcc-logo{width:27px;height:27px;right:2px;bottom:2px;border:0;background:transparent}
+#tradeChartPanel .tcc-player-name{font-size:11px;line-height:1.2}
+#tradeChartPanel .tcc-amount{font-size:12px;font-variant-numeric:tabular-nums}
+#tradeChartPanel .tcc-number{font-variant-numeric:tabular-nums}
+#tradeChartPanel .tcc-band{border-top:1px solid #dde4e9}
+#tradeChartPanel .tcc-band:first-of-type{border-top:0}
+#tradeChartPanel .tcc-lane{padding-inline:4px}
+#tradeChartPanel .tcc-table.tcc-one{min-width:370px;--tcc-grid:76px minmax(290px,1fr)}
+
+/* 10. Consistent section heading rhythm, with filters kept close to the content. */
+#shuaMyTeams h2,#shuaStock h2,#shuaAnalyticsSection .st-heading h2{
+  font-size:clamp(22px,2.5vw,28px);line-height:1.14;letter-spacing:-.022em;font-weight:900;
+}
+#shuaMyTeams .myteams-header,#shuaStock .stock-top{margin-bottom:12px;align-items:center}
+#shuaAnalyticsSection .st-heading{margin-bottom:10px}
+#shuaAnalyticsSection .st-controls{column-gap:8px;row-gap:7px}
+#tradeChartPanel .tcc-tools{margin-top:6px;margin-bottom:10px}
+
+@media(max-width:600px){
+  #shuaMyTeams .myteams-standings-line:not(.is-heading){min-height:40px;padding-block:6px}
+  #shuaMyTeams .myteams-standings-line.shua-my-own-standing{padding-inline:3px}
+  #shuaMyTeams .myteams-roster-row>strong{font-size:12px}
+  #shuaMyTeams .myteams-player-open>img:not(.myteams-nfl-logo){width:32px;height:32px;flex-basis:32px}
+  #shuaMyTeams .myteams-wire-line:not(.is-heading)>span:nth-child(4){font-size:12px}
+  #shuaMyTeams .myteams-wire-line .myteams-player-open>img{width:29px;height:29px}
+  #shuaMyTeams .myteams-wire-line .myteams-player-open b{font-size:11px}
+  #shuaAnalyticsSection .shua-injury-measured-line{grid-template-columns:minmax(0,1fr) minmax(62px,.65fr) minmax(62px,.65fr);gap:4px;padding:7px 6px}
+  #shuaAnalyticsSection .shua-injury-measured-line>strong{font-size:10px}
+  #shuaAnalyticsSection .shua-injury-measured-line.is-heading{font-size:9px}
+  #shuaAnalyticsSection .shua-injury-measure{font-size:11px;padding-inline:4px}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="schedule"] .st-heat-cell{width:61px;min-width:61px;min-height:55px;height:55px}
+  #tradeChartPanel .tcc-paper{padding-inline:7px}
+  #tradeChartPanel .tcc-table.tcc-one{min-width:368px}
+}

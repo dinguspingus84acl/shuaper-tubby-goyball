@@ -1,0 +1,63 @@
+/* Restore the original full-width game-log tables.
+   No locked Week/Opp columns, sticky header, inner vertical scroll or sideways swipe. */
+body.shua-clean #modal .espn-game-log-table-wrap,
+body.shua-clean.phone-mode #modal .espn-game-log-table-wrap,
+body.shua-clean #modal .espn-game-log-table-wrap:has(tbody tr:nth-child(10)){
+  width:100%!important;max-width:100%!important;
+  height:auto!important;max-height:none!important;
+  overflow:visible!important;overscroll-behavior:auto!important;
+  touch-action:pan-y!important;
+}
+body.shua-clean #modal .espn-game-log-table,
+body.shua-clean.phone-mode #modal .espn-game-log-table{
+  display:table!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  table-layout:fixed!important;border-collapse:separate!important;border-spacing:0;
+}
+body.shua-clean #modal .espn-game-log-table th,
+body.shua-clean #modal .espn-game-log-table td,
+body.shua-clean.phone-mode #modal .espn-game-log-table th,
+body.shua-clean.phone-mode #modal .espn-game-log-table td{
+  position:static!important;top:auto!important;left:auto!important;
+  z-index:auto!important;min-width:0!important;max-width:none!important;
+  width:auto!important;padding:8px 3px!important;
+  white-space:nowrap!important;box-shadow:none!important;
+}
+body.shua-clean #modal .espn-game-log-table :is(th,td):first-child,
+body.shua-clean.phone-mode #modal .espn-game-log-table :is(th,td):first-child{
+  position:static!important;left:auto!important;z-index:auto!important;
+  width:9%!important;min-width:0!important;max-width:none!important;
+  background:transparent!important;box-shadow:none!important;
+}
+body.shua-clean #modal .espn-game-log-table :is(th,td):nth-child(2),
+body.shua-clean.phone-mode #modal .espn-game-log-table :is(th,td):nth-child(2){
+  position:static!important;left:auto!important;z-index:auto!important;
+  width:23%!important;min-width:0!important;max-width:none!important;
+  padding-left:2px!important;background:transparent!important;box-shadow:none!important;
+}
+body.shua-clean #modal .espn-game-log-table thead th{
+  position:static!important;top:auto!important;z-index:auto!important;
+  background:#112c40!important;
+}
+body.shua-clean #modal .espn-game-log-table .espn-game-log-opponent{
+  width:100%;max-width:100%;min-width:0;gap:3px;
+}
+body.shua-clean #modal .espn-game-log-table .espn-game-log-opponent>span{
+  min-width:0;overflow:hidden;text-overflow:clip;
+}
+@media(max-width:700px){
+  body.shua-clean #modal .espn-game-log-table th,
+  body.shua-clean.phone-mode #modal .espn-game-log-table th{
+    font-size:clamp(.49rem,2.15vw,.58rem)!important;
+    letter-spacing:0!important;padding:8px 1px!important;
+  }
+  body.shua-clean #modal .espn-game-log-table td,
+  body.shua-clean.phone-mode #modal .espn-game-log-table td{
+    font-size:clamp(.63rem,2.7vw,.78rem)!important;
+    padding:8px 1px!important;
+  }
+  body.shua-clean #modal .espn-game-log-table :is(th,td):first-child,
+  body.shua-clean.phone-mode #modal .espn-game-log-table :is(th,td):first-child{width:9%!important}
+  body.shua-clean #modal .espn-game-log-table :is(th,td):nth-child(2),
+  body.shua-clean.phone-mode #modal .espn-game-log-table :is(th,td):nth-child(2){width:23%!important}
+}

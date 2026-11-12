@@ -1579,7 +1579,7 @@ function installPhoneSwipeDismiss(){
   if(!gesture.mode){
    if(Math.max(Math.abs(dx),Math.abs(dy))<12)return;
    if(!gesture.blocked&&Math.abs(dx)>Math.abs(dy)*1.35)gesture.mode='horizontal';
-   else if(dy>0&&sheet.scrollTop<=1&&Math.abs(dy)>Math.abs(dx)*1.25)gesture.mode='vertical';
+   else if(dy>0&&sheet.scrollTop<=1&&Math.abs(dy)>Math.abs(dx)*1.25&&document.getElementById('unifiedOverviewPanel')?.hidden)gesture.mode='vertical';
    else{gesture=null;return;}
   }
   if(gesture.mode==='horizontal'){

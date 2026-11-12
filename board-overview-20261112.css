@@ -1,0 +1,104 @@
+/* A single Board Settings button instead of the five always-visible draft controls. */
+body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden])){
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;gap:9px 14px!important;
+  margin:9px 0 12px!important;padding:11px 13px!important;
+  border:1px solid #2b5167!important;border-radius:13px!important;
+  background:linear-gradient(120deg,#102c40 0%,#0b2337 72%)!important;
+  box-shadow:inset 0 1px #ffffff12,0 5px 20px #00101a2a;
+}
+body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden]))>div:first-child{
+  min-width:0;margin:0!important;
+}
+body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden])) #title{
+  margin:0!important;font-size:clamp(19px,2.3vw,25px)!important;
+  font-weight:900!important;letter-spacing:-.035em;line-height:1.15;
+}
+body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden])) #sub{
+  display:block;margin-top:3px!important;font-size:11px;color:#a1bac8!important;
+}
+body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden])) #shuaBoardOptions{
+  display:flex!important;align-items:center;justify-content:space-between;gap:9px;
+  min-width:158px;min-height:42px;padding:7px 11px!important;
+  margin:0!important;border:1px solid #477388!important;border-radius:10px!important;
+  background:#15384a!important;color:#eaf8ff!important;
+  box-shadow:inset 0 1px #ffffff18;font:800 12px/1.15 system-ui,sans-serif;
+  cursor:pointer;
+}
+body.shua-clean main>.head #shuaBoardOptions>span:first-child{white-space:nowrap}
+body.shua-clean main>.head #shuaBoardSummary{
+  display:block;font:650 10px/1.15 system-ui,sans-serif;color:#91c7d3;
+  white-space:nowrap;
+}
+body.shua-clean main>.head #shuaBoardOptions:focus-visible{
+  outline:2px solid #8ce8cd!important;outline-offset:3px;
+}
+body.shua-clean main>.head #shuaBoardOptions[aria-expanded="true"]{
+  border-color:#58cbad!important;background:#16493f!important;
+}
+/* The previous full-width buttons remain functional within this disclosure. */
+body.shua-clean main>.head .shua-board-settings-panel{
+  display:none!important;grid-column:1 / -1!important;
+  padding:11px!important;margin-top:2px;
+  background:#091d2d;border:1px solid #35566b;border-radius:10px;
+}
+body.shua-clean.shua-board-options-open main>.head:has(#teamControls:not([hidden])) .shua-board-settings-panel{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)!important;
+  gap:12px!important;
+}
+body.shua-clean main>.head .shua-board-setting-group{display:flex;flex-direction:column;gap:6px;min-width:0}
+body.shua-clean main>.head .shua-board-setting-label{
+  color:#86aabc;font:800 10px/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;
+}
+body.shua-clean main>.head.shua-board-controls-inline #shuaBoardSettingsPanel #teamControls,
+body.shua-clean main>.head.shua-board-controls-inline #shuaBoardSettingsPanel #overallToggle{
+  display:flex!important;justify-content:flex-start!important;align-items:center!important;
+  flex-wrap:wrap!important;gap:5px!important;margin:0!important;
+}
+body.shua-clean main>.head #shuaBoardSettingsPanel [hidden]{display:none!important}
+body.shua-clean main>.head #shuaBoardSettingsPanel button{
+  min-height:35px!important;border-radius:8px!important;padding:7px 10px!important;
+  font-size:11px!important;
+}
+@media(max-width:680px){
+  body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden])){
+    grid-template-columns:minmax(0,1fr) auto!important;gap:6px!important;
+    padding:10px!important;margin:6px 0 10px!important;
+  }
+  body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden])) #title{font-size:20px!important}
+  body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden])) #sub{font-size:10px!important}
+  body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden])) #shuaBoardOptions{
+    min-width:132px;min-height:40px;padding:6px 8px!important;gap:4px;font-size:11px;
+  }
+  body.shua-clean main>.head #shuaBoardSummary{font-size:9px}
+  body.shua-clean.shua-board-options-open main>.head:has(#teamControls:not([hidden])) .shua-board-settings-panel{
+    grid-template-columns:minmax(0,1fr)!important;gap:11px!important;
+  }
+}
+
+/* Overview must scroll all the way through even long scouting notes. */
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden])){
+  overflow-y:auto!important;overflow-x:hidden!important;
+  overscroll-behavior-y:auto!important;touch-action:pan-y!important;
+  -webkit-overflow-scrolling:touch;
+  scroll-padding-bottom:48px;
+}
+body.shua-clean #modal #unifiedOverviewPanel:not([hidden]){
+  height:auto!important;max-height:none!important;overflow:visible!important;
+  padding-bottom:calc(54px + env(safe-area-inset-bottom,0px))!important;
+}
+body.shua-clean #modal #unifiedOverviewPanel:not([hidden]) .note-box,
+body.shua-clean #modal #unifiedOverviewPanel:not([hidden]) #playerNotes{
+  height:auto!important;max-height:none!important;min-height:0!important;
+  overflow:visible!important;white-space:normal!important;
+  text-overflow:clip!important;overflow-wrap:anywhere;
+  -webkit-line-clamp:unset!important;line-clamp:unset!important;
+}
+@media(max-width:700px){
+  body.shua-clean.phone-mode #modal .featured-player-profile #unifiedProfilePanels{
+    height:auto!important;max-height:none!important;overflow:visible!important;
+  }
+  body.shua-clean.phone-mode #modal #unifiedOverviewPanel:not([hidden]){
+    padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))!important;
+  }
+}

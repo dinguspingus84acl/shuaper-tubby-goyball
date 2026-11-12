@@ -10,7 +10,9 @@
   function update(){
     queued=false;
     if(document.body.classList.contains('shua-clean')){
-      if(overall.parentNode!==heading)heading.append(overall);
+      // A later polish layer may group these controls inside Board Settings.
+      // Preserve that group when body classes change (including menu toggles).
+      if(overall.parentNode!==heading&&!overall.closest('#shuaBoardSettingsPanel'))heading.append(overall);
       heading.classList.add('shua-board-controls-inline');
     }else{
       heading.classList.remove('shua-board-controls-inline');

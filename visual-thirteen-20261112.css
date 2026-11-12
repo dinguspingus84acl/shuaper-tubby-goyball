@@ -1,0 +1,212 @@
+/* Next visual pass: all ten requested visual improvements. No scores, ranks,
+   player records, or Game Log scrolling are modified. */
+
+/* 1. Draft rounds have restrained bands and small round markers. */
+body.shua-clean #board .pick[data-draft-round-tone="even"]{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--draft-accent,#72b7da) 17%,#14314a),#0c263b 78%)!important;
+  border-top-color:color-mix(in srgb,var(--draft-accent,#72b7da) 63%,#4e748d)!important;
+}
+body.shua-clean #board .pick[data-draft-round]{position:relative}
+body.shua-clean #board .pick[data-draft-round]::before{
+  content:"RD " attr(data-draft-round);position:absolute;top:7px;left:9px;
+  font:850 9px/1 system-ui,sans-serif;letter-spacing:.055em;color:#b6cbd6;
+  pointer-events:none;
+}
+
+/* 2. Make board options one coherent rail beside the page heading. */
+body.shua-clean main>.head.shua-board-controls-inline:has(#overallToggle:not([hidden])){
+  justify-content:flex-start;align-items:center;flex-wrap:nowrap;column-gap:8px;row-gap:5px;
+}
+body.shua-clean main>.head.shua-board-controls-inline:has(#overallToggle:not([hidden]))>div:first-child{margin-right:auto}
+body.shua-clean main>.head.shua-board-controls-inline #teamControls,
+body.shua-clean main>.head.shua-board-controls-inline #overallToggle{
+  margin:0!important;flex:0 0 auto;align-items:center;gap:5px;
+}
+body.shua-clean main>.head.shua-board-controls-inline #teamControls button,
+body.shua-clean main>.head.shua-board-controls-inline #overallToggle button{
+  min-height:35px;padding:7px 10px;font-size:12px;white-space:nowrap;
+}
+
+/* 3. Stats controls occupy one tidy desktop rail, wrapping gracefully. */
+@media(min-width:1000px){
+  body.shua-clean.stats-mode #espnLiveSection .espn-sticky-controls{
+    display:flex!important;flex-flow:row wrap!important;align-items:center;gap:7px!important;
+    padding:8px 11px!important;background:#091e30;border:1px solid #35536a;border-radius:11px;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-toolbar,
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-bar{display:contents!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-filters{order:1;flex-wrap:nowrap;gap:4px}
+  body.shua-clean.stats-mode #espnLiveSection .espn-team-filter-wrap{order:2;margin:0!important}
+  body.shua-clean.stats-mode #espnLiveSection #espnStatsYear{order:3;margin:0!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-primary{order:4;gap:5px;flex-wrap:nowrap}
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-label{display:none!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-stats-right-controls{
+    order:5;display:flex!important;align-items:center!important;gap:6px;
+    width:auto!important;justify-self:auto!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-stats-right-controls label{white-space:nowrap;font-size:11px}
+  body.shua-clean.stats-mode #espnLiveSection .espn-column-stat-select{width:166px!important;max-width:166px!important;height:35px}
+  body.shua-clean.stats-mode #espnLiveSection #espnStatsCount{order:6;margin-left:auto;white-space:nowrap}
+  body.shua-clean.stats-mode #espnLiveSection #espnStatsFetched{order:7}
+  body.shua-clean.stats-mode #espnLiveSection .espn-filter,
+  body.shua-clean.stats-mode #espnLiveSection .espn-view-btn{min-height:35px;padding:6px 8px}
+}
+@media(max-width:999px){
+  body.shua-clean.stats-mode #espnLiveSection .espn-sticky-controls{gap:5px!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-bar{padding:5px 7px!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-toolbar{gap:5px!important}
+}
+
+/* 4. Comparison bars remain secondary to the larger point totals. */
+body.shua-clean.stats-mode #espnLiveSection .espn-metric-track{
+  height:11px!important;border-radius:999px!important;background:#d0e6fb12!important;
+  border:1px solid #86b6d622!important;box-shadow:inset 0 1px 3px #0008;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-metric-track span{
+  position:relative;border-radius:999px!important;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--shua-stat-accent,#58bda5) 80%,#143c51),var(--shua-stat-accent,#58bda5) 72%,color-mix(in srgb,var(--shua-stat-accent,#58bda5) 60%,white))!important;
+  box-shadow:0 0 10px color-mix(in srgb,var(--shua-stat-accent,#58bda5) 22%,transparent)!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-metric-track span::after{
+  content:"";position:absolute;right:0;top:1px;bottom:1px;width:2px;background:#ffffffb7;border-radius:2px;
+}
+
+/* 5. Usage flows with the page through all players, never an inner height lock.
+   Horizontal scrolling remains available only when columns need more width. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table{
+  max-height:none!important;height:auto!important;overscroll-behavior-y:auto!important;
+  overflow-y:visible!important;
+}
+@media(min-width:851px){
+  body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table{overflow:visible!important}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table thead th{
+    position:sticky!important;top:var(--shua-ranking-sticky-top,60px)!important;
+  }
+}
+@media(max-width:850px){
+  body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table{
+    overflow-x:auto!important;overflow-y:hidden!important;max-height:none!important;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+
+/* 6. The selected sort metric gains one quiet, easy-to-follow column. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th.st-usage-focused{
+  background:#17433f!important;border-bottom:2px solid #62dbb0!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td.st-usage-focused{
+  background:linear-gradient(180deg,#17413c88,#123837aa)!important;
+  color:#f0fff8!important;font-size:15px!important;font-weight:900!important;
+  box-shadow:inset 1px 0 #70e3b320,inset -1px 0 #70e3b320;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td.st-usage-focused.st-usage-losing{color:#ffb3b5!important}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td.st-usage-focused.st-usage-gaining{color:#8ff5cb!important}
+
+/* 7. ESPN-provided logos remain dominant; initials are intentional fallbacks. */
+body.shua-clean #shuaMyTeams .myteams-card-identity>.myteams-team-logo{
+  display:block;object-fit:contain!important;padding:3px;
+  background:#10283b!important;border:1px solid #50738b!important;
+  border-radius:9px!important;filter:drop-shadow(0 2px 4px #0004);
+}
+body.shua-clean #shuaMyTeams .myteams-card-identity>.shua-league-monogram{
+  box-shadow:inset 0 1px #ffffff22;
+}
+
+/* 8. Standing is distinct from record; only first place gets an accent. */
+body.shua-clean #shuaMyTeams .shua-league-record{
+  display:inline-flex!important;align-items:center;gap:4px!important;
+  background:transparent!important;border:0!important;padding:0!important;white-space:nowrap;
+}
+body.shua-clean #shuaMyTeams .shua-league-record .shua-league-place,
+body.shua-clean #shuaMyTeams .shua-league-record .shua-league-wins{
+  display:inline-flex;align-items:center;justify-content:center;min-height:26px;
+  border-radius:7px;padding:4px 7px;font:850 11px/1 system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;
+}
+body.shua-clean #shuaMyTeams .shua-league-record .shua-league-place{
+  color:#c0d6e2;background:#182f42;border:1px solid #46647a;
+}
+body.shua-clean #shuaMyTeams .shua-league-record .shua-league-place.is-first{
+  color:#b4f7dc;background:#174b3c;border-color:#4abf92;
+}
+body.shua-clean #shuaMyTeams .shua-league-record .shua-league-wins{
+  color:#e0eef6;background:#0c2537;border:1px solid #2f4e62;
+}
+
+/* 9. The existing accessible previous/next buttons sit in the compact hero,
+   freeing the entire row formerly occupied above the Game Log tabs. */
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #rankingPlayerNav:not([hidden]){
+  position:absolute!important;z-index:15;top:67px;right:44px;
+  display:flex!important;width:70px!important;height:29px!important;
+  margin:0!important;padding:0!important;gap:4px!important;background:transparent!important;
+  border:0!important;box-shadow:none!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #rankingPlayerNav button:not([hidden]){
+  width:32px!important;min-width:32px!important;height:29px!important;min-height:29px!important;
+  padding:2px!important;display:grid!important;place-items:center!important;
+  border-radius:7px!important;background:#071c2eea!important;border:1px solid #6a92a788!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #rankingPlayerNav .ranking-nav-copy{display:none!important}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #rankingPlayerNav .ranking-nav-arrow{
+  font-size:18px!important;line-height:1!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-right{
+  padding-right:120px!important;
+}
+
+/* 10. Loading displays deliberate card/table skeletons; errors stay readable. */
+.shua-profile-skeleton{min-height:170px!important;padding:15px!important;color:#a9c4d5!important}
+.shua-profile-skeleton::before,
+.shua-profile-skeleton::after,
+#shuaAnalyticsSection .st-loading .st-skeleton::before,
+#shuaAnalyticsSection .st-loading .st-skeleton::after{
+  content:"";display:block;border-radius:8px;margin-top:13px;
+  background:linear-gradient(95deg,#173347 0%,#20435a 36%,#315c71 50%,#20435a 65%,#173347 100%);
+  background-size:210% 100%;animation:shua-skeleton-sweep 1.4s ease-in-out infinite;
+}
+.shua-profile-skeleton::before{width:100%;height:48px}
+.shua-profile-skeleton::after{width:83%;height:48px}
+#shuaAnalyticsSection .st-loading .st-skeleton{min-height:162px;display:block}
+#shuaAnalyticsSection .st-loading .st-skeleton::before{height:44px;width:100%}
+#shuaAnalyticsSection .st-loading .st-skeleton::after{height:44px;width:89%}
+#shuaStudioLoading:not(:has(button))::after{
+  content:"";display:block;height:80px;margin-top:14px;border-radius:9px;
+  background:linear-gradient(90deg,#1b3a4d,#365970,#1b3a4d);background-size:210% 100%;
+  animation:shua-skeleton-sweep 1.4s ease-in-out infinite;
+}
+@keyframes shua-skeleton-sweep{0%{background-position:110% 0}100%{background-position:-110% 0}}
+
+@media(max-width:760px){
+  body.shua-clean main>.head.shua-board-controls-inline:has(#overallToggle:not([hidden])){
+    flex-wrap:wrap!important;gap:5px!important;
+  }
+  body.shua-clean main>.head.shua-board-controls-inline>div:first-child{flex:1 1 100%;width:100%}
+  body.shua-clean main>.head.shua-board-controls-inline #teamControls,
+  body.shua-clean main>.head.shua-board-controls-inline #overallToggle{flex:0 1 auto!important;gap:3px!important}
+  body.shua-clean main>.head.shua-board-controls-inline #teamControls button,
+  body.shua-clean main>.head.shua-board-controls-inline #overallToggle button{
+    padding:7px 6px!important;font-size:10px!important;min-height:34px!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #rankingPlayerNav:not([hidden]){
+    top:61px;right:35px;width:60px!important;height:26px!important;gap:2px!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #rankingPlayerNav button:not([hidden]){
+    width:29px!important;min-width:29px!important;height:26px!important;min-height:26px!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-right{
+    padding-right:68px!important;
+  }
+  body.shua-clean #shuaMyTeams .shua-league-record .shua-league-place,
+  body.shua-clean #shuaMyTeams .shua-league-record .shua-league-wins{
+    min-height:23px;padding:4px 5px;font-size:10px;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td.st-usage-focused{
+    font-size:13px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .shua-profile-skeleton::before,.shua-profile-skeleton::after,
+  #shuaAnalyticsSection .st-loading .st-skeleton::before,
+  #shuaAnalyticsSection .st-loading .st-skeleton::after,
+  #shuaStudioLoading:not(:has(button))::after{animation:none!important}
+}

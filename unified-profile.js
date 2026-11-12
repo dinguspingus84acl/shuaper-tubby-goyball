@@ -1321,7 +1321,7 @@ async function loadHistory(name){
   if(panel.dataset.loadedFor===norm(name)&&panel.dataset.ready==='1')return;
   panel.dataset.loadedFor=norm(name);
   panel.dataset.ready='0';
-  panel.innerHTML='<div class="unified-profile-loading">Loading ESPN history…</div>';
+  panel.innerHTML='<div class="unified-profile-loading shua-profile-skeleton" role="status">Loading ESPN history…</div>';
   if(activeSeed?.position==='K'&&activeSeed?.id){
     await window.ShuaKickerProfile?.renderHistory?.(name,activeSeed.id,panel);
     panel.dataset.ready='1';return;
@@ -1343,7 +1343,7 @@ async function loadGameLog(name){
   if(panel.dataset.loadedFor===norm(name)&&panel.dataset.ready==='1')return;
   panel.dataset.loadedFor=norm(name);
   panel.dataset.ready='0';
-  panel.innerHTML='<div class="unified-profile-loading">Loading game log…</div>';
+  panel.innerHTML='<div class="unified-profile-loading shua-profile-skeleton" role="status">Loading game log…</div>';
   if(activeSeed?.position==='K'&&activeSeed?.id){
     await window.ShuaKickerProfile?.renderGameLog?.(name,activeSeed.id,panel);
     panel.dataset.ready='1';return;
@@ -1413,7 +1413,7 @@ async function paintSwipeProfilePanel(player,view,panel,preview,targetId){
     catch(e){panel.innerHTML='<div class="unified-profile-loading">Player overview will load when the card opens.</div>'}
     return;
   }
-  panel.innerHTML='<div class="unified-profile-loading">Loading '+(view==='gamelog'?'game log':view==='history'?'player history':'analytics')+'…</div>';
+  panel.innerHTML='<div class="unified-profile-loading shua-profile-skeleton" role="status">Loading '+(view==='gamelog'?'game log':view==='history'?'player history':'analytics')+'…</div>';
   try{
     if(view==='gamelog'){
       if(player.position==='K'&&window.ShuaKickerProfile?.renderGameLog)

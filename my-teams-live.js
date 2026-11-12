@@ -60,8 +60,9 @@ function parseLeague(data,leagueId,teamId){
  const period=Number(data.status?.currentMatchupPeriod||data.status?.currentScoringPeriod||0);
  // ESPN includes user-customized fantasy team logos in the public mTeam view.
  // Keep a verified URL only; private leagues continue using their initials.
- const rawLogo=typeof team.logo==='string'?team.logo:typeof team.logoUrl==='string'?team.logoUrl:'';
- const logoUrl=/^https:\/\//i.test(rawLogo)?rawLogo:'';
+ const logoCandidates=[team.logo,team.logoUrl,team.logoURL,team.teamLogo,team.image?.url,team.logo?.url];
+ const rawLogo=logoCandidates.find(value=>typeof value==='string'&&/^https:\/\//i.test(value.trim()))||'';
+ const logoUrl=rawLogo.trim();
  return {roster:result,period:Number.isInteger(period)&&period>=1&&period<=18?period:null,logoUrl};
 }
 async function fetchLeague(id,teamId){

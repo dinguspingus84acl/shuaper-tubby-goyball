@@ -3,16 +3,20 @@
  'use strict';
  const clean=()=>document.body.classList.contains('shua-clean');
  const heading=document.querySelector('main>.head');
+ const headingTitle=heading?.querySelector(':scope>div:first-child');
  const overall=document.getElementById('overallToggle');
  const positionToggle=document.getElementById('positionToggle');
+ const draftButton=positionToggle?.querySelector('[data-posview="PRESEASON"]');
+ if(draftButton)draftButton.textContent='Draft';
 
  // Move the REAL toggle, so its existing event listeners and state continue
  // to work. Restore its original position if the saved classic theme is used.
  function alignRankHeading(){
-   if(!heading||!positionToggle||!overall)return;
+   if(!heading||!headingTitle||!positionToggle||!overall)return;
    if(clean()){
-     if(positionToggle.parentElement!==heading)heading.append(positionToggle);
-   }else if(positionToggle.parentElement===heading){
+     // Keep ROS / Draft on a second line directly underneath the rank title.
+     if(positionToggle.parentElement!==headingTitle)headingTitle.append(positionToggle);
+   }else if(heading.contains(positionToggle)){
      overall.after(positionToggle);
    }
  }

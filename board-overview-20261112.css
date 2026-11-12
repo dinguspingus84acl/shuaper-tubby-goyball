@@ -102,3 +102,55 @@ body.shua-clean #modal #unifiedOverviewPanel:not([hidden]) #playerNotes{
     padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))!important;
   }
 }
+
+/* Position rankings: place only ROS and Draft below the heading. */
+body.shua-clean main>.head:has(>div:first-child>#positionToggle:not([hidden])){
+  align-items:flex-start!important;
+  justify-content:flex-start!important;
+  margin-bottom:10px!important;
+}
+body.shua-clean main>.head>div:first-child:has(>#positionToggle:not([hidden])){
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  min-width:0!important;
+  width:100%!important;
+}
+body.shua-clean main>.head>div:first-child>#positionToggle:not([hidden]){
+  display:inline-flex!important;
+  align-items:center!important;
+  flex-wrap:nowrap!important;
+  width:auto!important;
+  gap:4px!important;
+  margin:9px 0 1px!important;
+  padding:4px!important;
+  border:1px solid #284c61!important;
+  border-radius:11px!important;
+  background:#0b2739!important;
+}
+body.shua-clean main>.head>div:first-child>#positionToggle button{
+  min-height:34px!important;
+  padding:7px 16px!important;
+  border:0!important;
+  border-radius:8px!important;
+  background:transparent!important;
+  color:#a9becd!important;
+  font-size:12px!important;
+  font-weight:850!important;
+  white-space:nowrap;
+}
+body.shua-clean main>.head>div:first-child>#positionToggle button.active{
+  background:#17664e!important;
+  color:#f2fff9!important;
+  box-shadow:0 1px 5px #00181355!important;
+}
+@media(max-width:600px){
+  body.shua-clean.phone-mode main>.head>div:first-child>#positionToggle:not([hidden]){
+    margin-top:7px!important;
+  }
+  body.shua-clean.phone-mode main>.head>div:first-child>#positionToggle button{
+    min-height:33px!important;
+    padding:6px 14px!important;
+    font-size:11px!important;
+  }
+}

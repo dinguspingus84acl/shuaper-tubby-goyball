@@ -19,10 +19,11 @@ test('Big Board controls remain functional inside a disclosure rather than five 
   assert.match(css,/shua-board-options-open[\s\S]*\.shua-board-settings-panel\{[\s\S]*?display:grid!important/);
   assert.doesNotMatch(js,/removeChild|replaceChildren|teams\.remove\(|modes\.remove\(/);
 });
-test('ROS and Pre Season controls on positional rankings remain untouched',()=>{
+test('ROS and Draft keep their original ranking modes below the heading',()=>{
   const html=source('index.html');
   assert.match(html,/id="positionToggle"[\s\S]*?data-posview="ROS"[\s\S]*?data-posview="PRESEASON"/);
-  assert.doesNotMatch(css,/#positionToggle/);
+  assert.match(source('clean-sixth.js'),/draftButton\.textContent='Draft'/);
+  assert.match(css,/div:first-child>#positionToggle:not\(\[hidden\]\)/);
 });
 test('earlier round decoration cannot pull controls out of the disclosure',()=>{
   assert.match(source('visual-thirteen-20261112.js'),/!overall\.closest\('#shuaBoardSettingsPanel'\)/);

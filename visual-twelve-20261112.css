@@ -1,0 +1,250 @@
+/* November 12 visual pass: recommendations 1,2,4,5,6,7,8,9,10.
+   Explicitly do not add headshots to draft tiles (#3). Data and game-log
+   scrolling are untouched. This layer is appended after prior refinements. */
+
+/* 1–2. Position identity without the pastel wall; pick number has its own
+   reserved corner so long surnames never collide with it. */
+body.shua-clean #board .pick,
+body.shua-clean #draftBoard .drafted:not(.empty-slot){
+  --draft-accent:#72b7da;
+  min-height:101px;padding:9px 9px 18px;
+  color:#effaff!important;
+  border:1px solid color-mix(in srgb,var(--draft-accent) 55%,#284457)!important;
+  border-radius:10px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--draft-accent) 12%,#102b3f),#091d2f 76%)!important;
+  box-shadow:inset 3px 0 var(--draft-accent),inset 0 1px #ffffff12!important;
+}
+body.shua-clean #board .pick.rb,body.shua-clean #draftBoard .drafted.rb{--draft-accent:#64d1a5}
+body.shua-clean #board .pick.wr,body.shua-clean #draftBoard .drafted.wr{--draft-accent:#6dbfea}
+body.shua-clean #board .pick.qb,body.shua-clean #draftBoard .drafted.qb{--draft-accent:#bd9bee}
+body.shua-clean #board .pick.te,body.shua-clean #draftBoard .drafted.te{--draft-accent:#e5ad62}
+body.shua-clean #board .pick .name,
+body.shua-clean #draftBoard .drafted:not(.empty-slot) .name{
+  display:-webkit-box;overflow:hidden;min-width:0;
+  padding-top:18px;padding-right:0;max-height:calc(2.6em + 18px);
+  -webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;
+  white-space:normal!important;overflow-wrap:anywhere;
+  font-size:13px;line-height:1.23;letter-spacing:-.015em;
+}
+body.shua-clean #board .pick .slot,
+body.shua-clean #draftBoard .drafted .slot{
+  position:absolute;right:7px;top:7px;left:auto;
+  min-width:39px;padding:4px 5px;
+  text-align:center;font:900 10px/1.1 system-ui,sans-serif;
+  color:#effaff;background:#071929e8;
+  border:1px solid color-mix(in srgb,var(--draft-accent,#829eb5) 45%,#456078);
+  border-radius:6px;font-variant-numeric:tabular-nums;
+}
+body.shua-clean #board .pick .meta,
+body.shua-clean #draftBoard .drafted .team{
+  color:#b7d0dd;font-size:11px;font-weight:700;
+}
+body.shua-clean #board .pick .arrow,
+body.shua-clean #draftBoard .drafted .arrow{color:var(--draft-accent,#a3cbd9);opacity:.65}
+
+/* 4. Keep the broadcast hero on Overview; other tabs show a compact identity
+   strip and immediately reveal the Game Log/History/Analytics content. */
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard{
+  height:91px!important;min-height:91px!important;max-height:91px!important;
+  aspect-ratio:auto!important;
+  grid-template-columns:79px minmax(0,1fr)!important;
+  grid-template-rows:91px!important;
+  border-radius:12px 12px 0 0!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-left{
+  grid-column:1;grid-row:1;min-width:0;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-portrait-box{
+  inset:4px!important;border-radius:50%!important;
+  overflow:hidden;background:#153348!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-photo{
+  bottom:-8%!important;height:108%!important;max-width:180%!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-right{
+  grid-column:2;grid-row:1;
+  display:flex!important;flex-direction:column!important;
+  align-items:stretch!important;justify-content:center!important;
+  padding:5px 44px 5px 9px!important;gap:4px!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-name{
+  order:1;flex:0 0 auto!important;margin:0!important;
+  line-height:1.02!important;max-height:43px;overflow:hidden;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-first{
+  font-size:12px!important;line-height:1.1!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-last,
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard.featured-name-long .featured-last,
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard.featured-name-xlong .featured-last{
+  font-size:clamp(14px,2.2vw,19px)!important;line-height:1.07!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-team-strip{
+  order:2;min-height:20px!important;height:20px!important;
+  margin:0!important;gap:5px!important;
+  grid-template-columns:18px minmax(0,1fr) max-content!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-mini-logo{
+  width:18px!important;height:18px!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-team-name{
+  font-size:10px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-team-meta{
+  font-size:10px!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-bio,
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #playerDepthAction,
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #playerStickyIdentity{
+  display:none!important;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-identity-meta{
+  display:none!important;
+}
+
+/* 5. Hierarchy and equal-height Overview metric cards. */
+body.shua-clean #modal .featured-player-profile #unifiedOverviewPanel #stats .stat{
+  display:flex;flex-direction:column;justify-content:center;
+  min-height:68px!important;padding:9px 11px!important;
+}
+body.shua-clean #modal .featured-player-profile #unifiedOverviewPanel #stats .stat span{
+  color:#afc8d6!important;font-size:10px!important;font-weight:850!important;line-height:1.15!important;
+}
+body.shua-clean #modal .featured-player-profile #unifiedOverviewPanel #stats .stat b{
+  color:#f6fdff!important;font-size:clamp(20px,2.4vw,25px)!important;
+  font-weight:950;line-height:1.08!important;letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums;
+}
+body.shua-clean #modal .featured-player-profile #unifiedOverviewPanel .unified-stat-item b{
+  font-size:16px!important;font-variant-numeric:tabular-nums;
+}
+
+/* 6. Bigger Usage values, tighter gutters, retained sticky player and headers. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th,
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td{
+  padding:8px 7px!important;vertical-align:middle!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table thead th{
+  font-size:12px!important;font-weight:850!important;color:#c5dce9!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table tbody td:not(:first-child){
+  font-size:14px!important;line-height:1.25!important;
+  font-weight:750;font-variant-numeric:tabular-nums;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table td:first-child,
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table th:first-child{
+  position:sticky;left:0;background:#112d42!important;box-shadow:3px 0 9px #0006;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table tbody tr:nth-child(even) td:first-child{
+  background:#173449!important;
+}
+
+/* 7. A single visual language for navigation, filters and section selectors. */
+body.shua-clean :is(
+  #shuaCleanNav .shua-clean-trigger,
+  #shuaAnalyticsSection .st-usage-groups button,
+  #shuaAnalyticsSection .st-button,
+  #shuaMyTeams .myteams-subnav button,
+  #tradeSection .trade-action button
+){
+  border-radius:9px!important;
+  transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease!important;
+}
+body.shua-clean :is(
+  #shuaAnalyticsSection .st-usage-groups button[aria-pressed="true"],
+  #shuaMyTeams .myteams-subnav button[aria-selected="true"],
+  #shuaAnalyticsSection .st-button[aria-pressed="true"]
+){
+  background:#17523f!important;border-color:#54d7a8!important;color:#effff8!important;
+  box-shadow:inset 0 -2px #7cf2c2!important;
+}
+body.shua-clean :is(
+  #shuaAnalyticsSection .st-usage-groups button,
+  #shuaAnalyticsSection .st-button,
+  #shuaMyTeams .myteams-subnav button,
+  #tradeSection button
+):focus-visible{outline:2px solid #68eec1!important;outline-offset:2px!important}
+
+/* 8. One scannable ranking note line by default, still fully expandable. */
+body.shua-clean:not(.phone-mode) #tableCard td.notes{width:44%!important;max-width:none!important;padding-right:40px!important}
+body.shua-clean:not(.phone-mode) #tableCard td.notes:not(.is-expanded) .shua-note-excerpt{
+  display:-webkit-box!important;-webkit-box-orient:vertical!important;
+  -webkit-line-clamp:1!important;line-clamp:1!important;
+  overflow:hidden!important;white-space:normal!important;
+}
+body.shua-clean:not(.phone-mode) #tableCard td.notes.is-expanded .shua-note-excerpt{
+  display:block!important;-webkit-line-clamp:unset!important;line-clamp:unset!important;
+  overflow:visible!important;
+}
+
+/* 9. ESPN-inspired league identity, aligned scores and quiet matchup rows. */
+body.shua-clean #shuaMyTeams .myteams-card{
+  border-color:#335467!important;border-radius:12px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card:has(.myteams-card-trigger[aria-expanded="true"]){
+  border-color:#57b99b!important;box-shadow:inset 3px 0 #54d8aa!important;
+}
+body.shua-clean #shuaMyTeams .myteams-card-trigger .myteams-name{
+  color:#f4fdff!important;font-weight:950!important;letter-spacing:-.01em;
+}
+body.shua-clean #shuaMyTeams .myteams-score-current strong{
+  font-variant-numeric:tabular-nums;letter-spacing:-.04em!important;
+}
+body.shua-clean #shuaMyTeams .myteams-schedule-game,
+body.shua-clean #shuaMyTeams .myteams-roster-row{
+  border-bottom:1px solid #7299ab24!important;
+}
+body.shua-clean #shuaMyTeams .myteams-roster-row>strong{
+  min-width:40px;text-align:right;font-variant-numeric:tabular-nums;
+}
+
+/* 10. Feedback without slow or disruptive page transitions. */
+body.shua-clean :is(
+  #board .pick,
+  #draftBoard .drafted,
+  #tableCard tbody tr,
+  #shuaMyTeams .myteams-card,
+  #shuaMyTeams .myteams-roster-row,
+  #shuaAnalyticsSection .st-usage-table tbody tr
+){transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease!important}
+body.shua-clean #board .pick:hover,
+body.shua-clean #draftBoard .drafted:not(.empty-slot):hover{
+  border-color:var(--draft-accent,#70c6bc)!important;
+  box-shadow:inset 3px 0 var(--draft-accent,#70c6bc),0 0 0 1px #ffffff16!important;
+}
+body.shua-clean #tableCard tbody tr:hover>td{
+  background-color:#15374844!important;
+}
+
+@media(max-width:700px){
+  body.shua-clean #board .pick,body.shua-clean #draftBoard .drafted:not(.empty-slot){min-height:101px}
+  body.shua-clean #board .pick .name,body.shua-clean #draftBoard .drafted:not(.empty-slot) .name{
+    font-size:12px;line-height:1.25;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard{
+    height:86px!important;min-height:86px!important;max-height:86px!important;
+    grid-template-columns:69px minmax(0,1fr)!important;grid-template-rows:86px!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-right{
+    padding:5px 37px 5px 8px!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard .featured-last{
+    font-size:16px!important;
+  }
+  body.shua-clean #modal .featured-player-profile #unifiedOverviewPanel #stats .stat{
+    min-height:63px!important;padding:7px 9px!important;
+  }
+  body.shua-clean #modal .featured-player-profile #unifiedOverviewPanel #stats .stat b{font-size:20px!important}
+  body.shua-clean #shuaAnalyticsSection[data-active-view="usage"] .st-usage-table tbody td:not(:first-child){
+    font-size:13px!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-card-trigger .myteams-name{font-size:13px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean :is(#shuaCleanNav .shua-clean-trigger,
+    #shuaAnalyticsSection .st-usage-groups button,#shuaAnalyticsSection .st-button,
+    #shuaMyTeams .myteams-subnav button,#tradeSection button,
+    #board .pick,#draftBoard .drafted,#tableCard tbody tr,
+    #shuaMyTeams .myteams-card,#shuaMyTeams .myteams-roster-row,
+    #shuaAnalyticsSection .st-usage-table tbody tr){transition:none!important}
+}

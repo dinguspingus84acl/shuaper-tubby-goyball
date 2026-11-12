@@ -7,7 +7,7 @@ const css=fs.readFileSync(path.join(root,'visual-fifteen-20261112.css'),'utf8');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 
 test('final visual stylesheet is loaded after prior Big Board layout',()=>{
-  assert.match(html,/board-overview-20261112\.css[\s\S]*board-overview-20261112\.js[\s\S]*visual-fifteen-20261112\.css\?v=20261112-v2/);
+  assert.match(html,/board-overview-20261112\.css[\s\S]*board-overview-20261112\.js[\s\S]*visual-fifteen-20261112\.css\?v=20261112-v3/);
 });
 test('player hierarchy and draft tiles preserve their actual data elements',()=>{
   assert.match(css,/#tableCard \.rank-player-copy>b/);
@@ -36,5 +36,5 @@ test('My Teams and phone layouts are polished without rewriting functionality',(
   assert.match(css,/#shuaMyTeams \.myteams-roster-row/);
   assert.match(css,/@media\(max-width:700px\)/);
   assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
-  assert.match(css,/main:has\(> :is\([\s\S]*?#shuaMyTeams[\s\S]*?\):not\(\[hidden\]\)\) > \.head\{display:none!important\}/);
+  assert.match(css,/main:has\(> :is\([\s\S]*?#shuaMyTeams[\s\S]*?\):not\(\[hidden\]\)\) > \.head\.shua-board-controls-inline:has\(#teamControls\)\{display:none!important\}/);
 });

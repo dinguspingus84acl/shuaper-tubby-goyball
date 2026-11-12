@@ -174,7 +174,7 @@ body.shua-clean #shuaMyTeams .myteams-roster-row{
 body.shua-clean main:has(> :is(
   #shuaAnalyticsSection,#shuaMyTeams,#shuaStock,#shuaPortfolio,
   #espnLiveSection,#compareSection,#tradeSection,#shuaWeatherSection
-):not([hidden])) > .head{display:none!important}
+):not([hidden])) > .head.shua-board-controls-inline:has(#teamControls){display:none!important}
 
 @media(max-width:700px){
   body.shua-clean #tableCard td{padding:9px 7px!important}

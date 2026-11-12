@@ -76,13 +76,16 @@
       const result=document.createElement('span');result.className='shua-league-record';
       const record=leagueRecord(myTeams._cards?.[i]);
       const finish=trigger.querySelector('.myteams-finish')?.textContent?.trim();
-      const parts=record?.match(/^#(\d+)\s*·\s*(.+)$/);
+      // Saved ESPN snapshots expose the standing through .myteams-finish even
+      // when live ShuaMyTeamsUI has not loaded. Split either source consistently.
+      const displayRecord=record||finish?.replace(/^🏆\s*/u,'')||'';
+      const parts=displayRecord.match(/^#(\d+)\s*[·•]\s*(\d+\s*[–-]\s*\d+(?:\s*[–-]\s*\d+)?)$/);
       if(parts){
         const place=document.createElement('span');place.className='shua-league-place'+(parts[1]==='1'?' is-first':'');
         place.textContent='#'+parts[1];
         const wins=document.createElement('span');wins.className='shua-league-wins';wins.textContent=parts[2];
         result.append(place,wins);
-      }else result.textContent=record||finish?.replace(/^🏆\s*/u,'')||(myTeams._cards?.[i]?.year||2026);
+      }else result.textContent=displayRecord||(myTeams._cards?.[i]?.year||2026);
       result.title=record?'League standing · win–loss record':finish?'Historical finish':'Season';
       trigger.append(result,icon('chevron'));
       trigger.dataset.shuaListReady='1';

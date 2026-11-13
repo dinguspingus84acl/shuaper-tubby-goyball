@@ -7,7 +7,7 @@ const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const html=read('index.html'),css=read('visual-twenty-20261113.css'),js=read('visual-twenty-20261113.js');
 
 test('new assets load after the six previously published enhancements',()=>{
-  assert.match(html,/visual-nineteen-20261113\.js\?v=20261113-v3[\s\S]*visual-twenty-20261113\.css\?v=20261113-v1[\s\S]*visual-twenty-20261113\.js\?v=20261113-v1/);
+  assert.match(html,/visual-nineteen-20261113\.js\?v=20261113-weekly-restore1[\s\S]*visual-twenty-20261113\.css\?v=20261113-weekly-restore1[\s\S]*visual-twenty-20261113\.js\?v=20261113-weekly-restore1/);
   assert.match(html,/weather\.js\?v=20261113-weather-revert-v1/);
 });
 test('mobile navigation stays four sections, is shorter, and retains 44px tap targets',()=>{

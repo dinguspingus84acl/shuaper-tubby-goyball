@@ -44,6 +44,9 @@ test('Weekly Report compares real PPR points to clearly labelled ESPN projection
   assert.match(js,/data\?\.schema === 1 && data\?\.season === 2026/);
   assert.match(js,/not a pregame prediction/);
   assert.match(js,/analytics\?\.dataset\.activeView === 'weekly'/);
+  assert.match(js,/querySelector\('#stSeason'\)/);
+  assert.match(js,/querySelector\('#stWeek'\)/);
+  assert.match(js,/row\.querySelector\('\.st-score'\)/);
   assert.match(js,/\.st-rank-row/);
   assert.match(css,/\.shua-weekly-bar-track\.is-ahead/);
   assert.match(css,/\.shua-weekly-bar-track\.is-behind/);

@@ -25,6 +25,9 @@
   const formatKickoffTime=iso=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(new Date(iso));
   const safeLogo=url=>/^https:\/\/a\.espncdn\.com\/i\/teamlogos\/nfl\//.test(url||'')?url:'';
   const logo=team=>safeLogo(team.logo)?'<img class="wx-team-logo" src="'+escape(safeLogo(team.logo))+'" alt="" loading="lazy">':'';
+  // Fixed NFL club palette: presentation-only, never derived from forecast data.
+  const teamColors={ARI:'#97233F',ATL:'#A71930',BAL:'#241773',BUF:'#00338D',CAR:'#0085CA',CHI:'#C83803',CIN:'#FB4F14',CLE:'#FF3C00',DAL:'#869397',DEN:'#FB4F14',DET:'#0076B6',GB:'#FFB612',GNB:'#FFB612',HOU:'#A71930',IND:'#002C5F',JAX:'#006778',KC:'#E31837',LAC:'#0080C6',LAR:'#003594',LV:'#A5ACAF',MIA:'#008E97',MIN:'#4F2683',NE:'#C60C30',NO:'#D3BC8D',NYG:'#0B2265',NYJ:'#125740',PHI:'#004C54',PIT:'#FFB612',SEA:'#69BE28',SF:'#AA0000',TB:'#D50A0A',TEN:'#4B92DB',WAS:'#5A1414'};
+  const gameTrim=game=>' style="--wx-away-color:'+(teamColors[game.away.abbr]||'#53778f')+';--wx-home-color:'+(teamColors[game.home.abbr]||'#53778f')+'"';
   let snapshot=null,loading=false,visible=false,error='',lastFetchedAt=0,refreshTimer=null;
 
   // Independent fantasy-football guidance. These thresholds are OUR heuristic,
@@ -187,16 +190,16 @@
   function gameCard(game){
     const f=game.forecast,r=risk(game),isPending=!f&&!game.indoor;
     // Keep unavailable forecasts explicit; never invent temperature or wind.
-    if(isPending)return '<article class="wx-game wx-pending-game" data-weather-game="'+escape(game.id)+'" aria-label="'+escape(game.away.name+' at '+game.home.name+', forecast pending')+'">'+
+    if(isPending)return '<article class="wx-game wx-pending-game"'+gameTrim(game)+' data-weather-game="'+escape(game.id)+'" aria-label="'+escape(game.away.name+' at '+game.home.name+', forecast pending')+'">'+
       '<div class="wx-pending-fixture"><div class="wx-pending-matchup">'+logo(game.away)+'<strong>'+escape(game.away.abbr)+'</strong><span class="wx-pending-at">at</span>'+logo(game.home)+'<strong>'+escape(game.home.abbr)+'</strong></div>'+
       '<div class="wx-pending-context"><strong>'+escape(formatKickoffTime(game.kickoffUtc))+'</strong><small>'+escape(game.venue||'Venue TBA')+'</small></div></div>'+
       '<span class="wx-impact wx-impact-pending">Forecast pending</span></article>';
-    const fixture='<div class="wx-matchup"><div class="wx-team">'+logo(game.away)+'<span><b>'+escape(game.away.abbr)+'</b><small>'+escape(game.away.name)+'</small></span></div><span class="wx-versus">AT</span><div class="wx-team">'+logo(game.home)+'<span><b>'+escape(game.home.abbr)+'</b><small>'+escape(game.home.name)+'</small></span></div></div>';
+    const fixture='<div class="wx-matchup"><div class="wx-team">'+logo(game.away)+'<span><b>'+escape(game.away.abbr)+'</b><small>'+escape(game.away.name)+'</small></span></div><span class="wx-match-center"><strong class="wx-game-time">'+escape(formatKickoffTime(game.kickoffUtc))+'</strong><small>ET</small></span><div class="wx-team">'+logo(game.home)+'<span><b>'+escape(game.home.abbr)+'</b><small>'+escape(game.home.name)+'</small></span></div></div>';
     const venue='<div class="wx-venue">'+escape(game.venue||'Venue TBA')+(game.city?' · '+escape(game.city):'')+'</div>';
-    const header='<div class="wx-game-top"><strong class="wx-game-time">'+escape(formatKickoffTime(game.kickoffUtc))+'</strong><div class="wx-game-conditions">'+gameSkyIcon(game)+'<span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div></div>';
+    const header='<div class="wx-game-top"><div class="wx-game-conditions">'+gameSkyIcon(game)+'<span class="wx-impact wx-impact-'+r.level+'">'+escape(r.label)+'</span></div></div>';
     // All fixed-roof venues, including the Saints at Caesars Superdome, use
     // the identical compact indoor layout regardless of stray forecast fields.
-    if(game.indoor)return '<article class="wx-game wx-indoor-game" data-weather-game="'+escape(game.id)+'">'+
+    if(game.indoor)return '<article class="wx-game wx-indoor-game"'+gameTrim(game)+' data-weather-game="'+escape(game.id)+'">'+
       header+fixture+venue+'<div class="wx-indoor-note"><span class="wx-indoor-mark" aria-hidden="true">⌂</span><strong>INDOORS</strong><span>Controlled conditions · No weather impact expected</span></div></article>';
     const conditions=[
       ['Temperature',display(f.tempF,'°F'),'temp'],
@@ -206,7 +209,7 @@
     const summary='<div class="wx-metrics">'+conditions.map(([label,value,klass])=>'<div class="wx-metric wx-'+klass+'"><span>'+escape(label)+'</span><strong>'+escape(value)+'</strong></div>').join('')+'</div>';
     const skyByTime=new Map((f?.hourly||[]).filter(h=>h.sky).map(h=>[h.time,h.sky]));
     const details=f&&(f.hourly?.length||f.nbmHourly?.length)?'<details class="wx-details"><summary>Full hourly weather data <span aria-hidden="true">⌄</span></summary>'+hourTable(f.hourly,'NWS hourly forecast',skyByTime,game)+hourTable(f.nbmHourly,'NBM higher-resolution forecast',skyByTime,game)+'</details>':'';
-    return '<article class="wx-game" data-weather-game="'+escape(game.id)+'">'+
+    return '<article class="wx-game"'+gameTrim(game)+' data-weather-game="'+escape(game.id)+'">'+
       header+fixture+venue+summary+
       '<details class="wx-expanded"><summary>Weather details <span aria-hidden="true">⌄</span></summary>'+
       hourlyPreview(f,game)+'<div class="wx-analysis"><span>FANTASY WEATHER ANALYSIS</span><p>'+escape(analysis(game))+'</p>'+(trend(f)?'<small>'+escape(trend(f))+'</small>':'')+'</div>'+details+'</details>'+

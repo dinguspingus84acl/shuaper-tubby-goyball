@@ -509,7 +509,7 @@ const section=document.createElement('section');
 section.id='shuaMyTeams';section.hidden=true;
 const escapeHtml=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-const teamIndex=leagues.map(([league,team],index)=>({league,team,index,id:rosterSnapshots[index]?.id||'',teamId:rosterSnapshots[index]?.team||''})).filter(x=>!/^diddy party/i.test(x.team.trim()));
+const teamIndex=leagues.map(([league,team],index)=>{const snapshot=rosterSnapshots[index]||{};const standings=leagueData.find(x=>String(x.id)===String(snapshot.id))?.standings||[];const own=standings.find(x=>String(x.teamId)===String(snapshot.team));return {league,team,index,id:snapshot.id||'',teamId:snapshot.team||'',logoUrl:own?.logoUrl||own?.logo||snapshot.logoUrl||''};}).filter(x=>!/^diddy party/i.test(x.team.trim()));
 const nflLogo=team=>{const code={JAX:'jax',LA:'lar',LAR:'lar',LAC:'lac',LV:'lv',OAK:'lv',WAS:'wsh',WSH:'wsh',GB:'gb',GNB:'gb',KC:'kc',KAN:'kc',NO:'no',NOR:'no',NE:'ne',NWE:'ne',TB:'tb',TAM:'tb',SF:'sf',SFO:'sf',NYG:'nyg',NYJ:'nyj'}[String(team||'').toUpperCase()]||String(team||'').toLowerCase();return /^[a-z]{2,3}$/.test(code)?'<img class="myteams-nfl-logo" loading="lazy" src="https://a.espncdn.com/i/teamlogos/nfl/500/'+code+'.png" alt="" onerror="this.style.display=\'none\'">':''};
 const fmt=x=>Number.isFinite(Number(x))?Number(x).toFixed(2):'—';
 const byeWeeks={CAR:5,KC:5,CIN:6,DET:6,MIA:6,MIN:6,BUF:7,JAX:7,LAC:7,WSH:7,WAS:7,HOU:8,NO:8,NYG:8,SF:8,PIT:9,TEN:9,CHI:10,DEN:10,PHI:10,TB:10,ATL:11,CLE:11,GB:11,LAR:11,LA:11,NE:11,SEA:11,BAL:13,IND:13,LV:13,NYJ:13,ARI:14,ARZ:14,DAL:14};
@@ -666,7 +666,7 @@ function leagueGlance(item){
 }
 function renderTeams(year){
  const current=year===2026;
- const cards=current?teamIndex.map(x=>({...x,year:2026})):pastTeams.filter(x=>x.year===year&&x.id!=='646444846'&&!/^diddy party/i.test(String(x.teamName||'').trim())).map(x=>({league:x.leagueName,team:x.teamName,year,id:x.id,teamId:x.teamId,index:-1}));
+ const cards=current?teamIndex.map(x=>({...x,year:2026})):pastTeams.filter(x=>x.year===year&&x.id!=='646444846'&&!/^diddy party/i.test(String(x.teamName||'').trim())).map(x=>({league:x.leagueName,team:x.teamName,year,id:x.id,teamId:x.teamId,index:-1,logoUrl:x.logoUrl||x.logo||''}));
  section.querySelector('.myteams-count').textContent=cards.length+' Teams';
  section.querySelector('.myteams-header p').textContent='Your '+year+' ESPN fantasy football leagues';
  section.querySelector('.myteams-grid').innerHTML=cards.map((item,i)=>'<article class="myteams-card"><button type="button" class="myteams-card-trigger" data-myteams-open="'+i+'" aria-expanded="false"><div class="myteams-league">'+escapeHtml(item.league)+'</div><div class="myteams-card-identity">'+fantasyLogo(item)+'<div class="myteams-name">'+escapeHtml(item.team)+'</div></div>'+leagueGlance(item)+(current?'':'<div class="myteams-finish">'+escapeHtml(historyFinish(item))+'</div>')+'<div class="myteams-platform">ESPN · '+year+'</div></button><div class="myteams-roster" hidden></div></article>').join('');
@@ -777,4 +777,6 @@ button.addEventListener('click',()=>{if(!document.body.classList.contains('my-te
 <link rel="stylesheet" href="board-overview-20261112.css?v=20261112-draft-heading1">
 <script src="board-overview-20261112.js?v=20261112-boardnotes1"></script>
 <link rel="stylesheet" href="visual-fifteen-20261112.css?v=20261112-v3">
+<link rel="stylesheet" href="visual-sixteen-20261113.css?v=20261113-v1">
+<script src="visual-sixteen-20261113.js?v=20261113-v1"></script>
 </body></html>

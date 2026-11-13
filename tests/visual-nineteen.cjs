@@ -8,7 +8,7 @@ const js=read('visual-nineteen-20261113.js');
 const html=read('index.html');
 
 test('new visual code is last and preserves the Weather rollback',()=>{
-  assert.match(html,/visual-eighteen-20261113\.js\?v=20261113-v1[\s\S]*visual-nineteen-20261113\.css\?v=20261113-v1[\s\S]*visual-nineteen-20261113\.js\?v=20261113-v2/);
+  assert.match(html,/visual-eighteen-20261113\.js\?v=20261113-v1[\s\S]*visual-nineteen-20261113\.css\?v=20261113-v1[\s\S]*visual-nineteen-20261113\.js\?v=20261113-v3/);
   assert.match(html,/weather\.js\?v=20261113-weather-revert-v1/);
 });
 test('alternate background shading follows existing four-round data attributes',()=>{
@@ -47,6 +47,8 @@ test('Weekly Report compares real PPR points to clearly labelled ESPN projection
   assert.match(js,/querySelector\('#stSeason'\)/);
   assert.match(js,/querySelector\('#stWeek'\)/);
   assert.match(js,/row\.querySelector\('\.st-score'\)/);
+  assert.match(js,/analyticsSection = \(\) => document\.getElementById\('shuaAnalyticsSection'\)/);
+  assert.match(js,/observe\(document\.body, \{childList: true, subtree: true\}\)/);
   assert.match(js,/\.st-rank-row/);
   assert.match(css,/\.shua-weekly-bar-track\.is-ahead/);
   assert.match(css,/\.shua-weekly-bar-track\.is-behind/);

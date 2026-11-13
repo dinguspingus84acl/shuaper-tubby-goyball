@@ -115,41 +115,7 @@ body.shua-clean #shuaMyTeams .myteams-roster-row>strong{
   font-variant-numeric:tabular-nums;font-size:14px!important;
 }
 
-/* 9. Weather matchup cards: one central kickoff, prominent team marks and club trims. */
-body.shua-clean #shuaWeatherSection .wx-game{
-  border-top:3px solid var(--wx-home-color,#416a80)!important;
-  box-shadow:inset 3px 0 var(--wx-away-color,#416a80),0 6px 22px #00000025!important;
-}
-body.shua-clean #shuaWeatherSection .wx-game-top{
-  justify-content:flex-end!important;min-height:27px!important;
-  margin-bottom:9px!important;
-}
-body.shua-clean #shuaWeatherSection .wx-matchup{
-  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(72px,auto) minmax(0,1fr)!important;
-  gap:6px!important;align-items:center!important;
-}
-body.shua-clean #shuaWeatherSection .wx-match-center{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:7px 4px;border-radius:8px;background:#0b2135;border:1px solid #395e72;
-  min-width:72px;line-height:1.1;white-space:nowrap;
-}
-body.shua-clean #shuaWeatherSection .wx-match-center .wx-game-time{
-  color:#f4fcff!important;font-size:clamp(12px,1.3vw,16px)!important;
-  font-variant-numeric:tabular-nums!important;letter-spacing:-.04em!important;
-}
-body.shua-clean #shuaWeatherSection .wx-match-center small{
-  font-size:9px;letter-spacing:.12em;font-weight:800;color:#92b5c6;margin-top:4px;
-}
-body.shua-clean #shuaWeatherSection .wx-team{
-  border-top:2px solid var(--wx-away-color,#53778f)!important;
-  gap:6px!important;padding:7px 5px!important;
-}
-body.shua-clean #shuaWeatherSection .wx-team:last-child{border-top-color:var(--wx-home-color,#53778f)!important}
-body.shua-clean #shuaWeatherSection .wx-team-logo{
-  width:53px!important;height:53px!important;flex:0 0 53px!important;
-}
-body.shua-clean #shuaWeatherSection .wx-team b{font-size:19px!important}
-body.shua-clean #shuaWeatherSection .wx-venue{margin:8px 0 12px!important}
+/* 9. Keep the compact My Teams schedule refinement; Weather uses its previous card layout. */
 body.shua-clean #shuaMyTeams .myteams-schedule-game{
   background:linear-gradient(90deg,#17304470,#0b2234 70%);
   border:1px solid #41657955!important;border-radius:9px;margin:5px 0;
@@ -195,17 +161,6 @@ body.shua-clean #shuaAnalyticsSection .st-gridline{stroke-opacity:.19!important}
     gap:5px!important;min-height:55px!important;
   }
   body.shua-clean #shuaMyTeams .myteams-roster-row>strong{font-size:12px!important}
-  body.shua-clean #shuaWeatherSection .wx-matchup{
-    grid-template-columns:minmax(0,1fr) 68px minmax(0,1fr)!important;gap:4px!important;
-  }
-  body.shua-clean #shuaWeatherSection .wx-match-center{min-width:68px;padding:7px 2px}
-  body.shua-clean #shuaWeatherSection .wx-match-center .wx-game-time{font-size:12px!important}
-  body.shua-clean #shuaWeatherSection .wx-team-logo{
-    width:42px!important;height:42px!important;flex-basis:42px!important;
-  }
-  body.shua-clean #shuaWeatherSection .wx-team{gap:4px!important;padding:7px 3px!important}
-  body.shua-clean #shuaWeatherSection .wx-team b{font-size:16px!important}
-  body.shua-clean #shuaWeatherSection .wx-team small{font-size:9px!important}
   body.shua-clean #shuaMyTeams .myteams-schedule-toggle{padding:8px!important}
 }
 @media(prefers-reduced-motion:reduce){

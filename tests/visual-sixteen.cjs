@@ -10,8 +10,8 @@ const weather=read('weather.js');
 const charts=read('analytics/charts.js');
 
 test('new visual layer is loaded after existing layout and scripts',()=>{
-  assert.match(html,/visual-fifteen-20261112\.css\?v=20261112-v3[\s\S]*visual-sixteen-20261113\.css\?v=20261113-v1[\s\S]*visual-sixteen-20261113\.js\?v=20261113-v1/);
-  assert.match(html,/weather\.js\?v=20261113-visual16-v1/);
+  assert.match(html,/visual-fifteen-20261112\.css\?v=20261112-v3[\s\S]*visual-sixteen-20261113\.css\?v=20261113-weather-revert-v1[\s\S]*visual-sixteen-20261113\.js\?v=20261113-v1/);
+  assert.match(html,/weather\.js\?v=20261113-weather-revert-v1/);
   assert.match(html,/analytics-dashboard\.js\?v=20261113-visual16-v1/);
   assert.match(read('analytics-dashboard.js'),/const version = '20261113-visual16-v1'/);
 });
@@ -56,12 +56,14 @@ test('roster starters, bench and IR are visually grouped without changes to proj
   assert.match(css,/\.myteams-roster-row>strong/);
   assert.match(html,/weeklyProjection\(p,leagueFor/);
 });
-test('weather cards display one kickoff centered between teams and distinct club trims',()=>{
-  assert.match(weather,/class="wx-match-center"/);
-  assert.match(weather,/const header='<div class="wx-game-top"><div class="wx-game-conditions">'/);
-  assert.match(weather,/const teamColors=/);
-  assert.match(weather,/--wx-away-color:/);
-  assert.match(css,/\.wx-team:last-child\{border-top-color:var\(--wx-home-color/);
+test('weather cards are restored to the former top-left kickoff layout',()=>{
+  assert.match(weather,/class="wx-versus">AT<\/span>/);
+  assert.match(weather,/const header='<div class="wx-game-top"><strong class="wx-game-time">'/);
+  assert.doesNotMatch(weather,/class="wx-match-center"|const teamColors=|--wx-away-color:/);
+  assert.doesNotMatch(css,/#shuaWeatherSection/);
+  assert.match(html,/weather\.css\?v=20261106-cardtime1/);
+});
+test('My Teams schedule styling stays updated when Weather is restored',()=>{
   assert.match(css,/#shuaMyTeams \.myteams-schedule-row/);
 });
 test('line charts preserve data and include subtle comparison fill and marked points',()=>{

@@ -668,6 +668,7 @@ function leagueGlance(item){
  if(mine!==null&&theirs!==null&&mine+theirs>0){
   const pct=(100*mine/(mine+theirs)).toFixed(2);
   const label='Projected: '+item.team+' '+fmt(mine)+'; '+opponent.teamName+' '+fmt(theirs);
+  parts.push('<span class="shua-proj-values" aria-hidden="true"><span>You '+fmt(mine)+'</span><span>Opp '+fmt(theirs)+'</span></span>');
   parts.push('<span class="shua-proj-edge" role="img" aria-label="'+escapeHtml(label)+'" title="'+escapeHtml(label)+'"><span class="shua-proj-own" style="width:'+pct+'%"></span><span class="shua-proj-opponent"></span></span>');
  }
  return parts.length?'<div class="myteams-glance" aria-label="Saved ESPN matchup">'+parts.join('')+'</div>':'';
@@ -792,4 +793,6 @@ button.addEventListener('click',()=>{if(!document.body.classList.contains('my-te
 <script src="visual-eighteen-20261113.js?v=20261113-v1"></script>
 <link rel="stylesheet" href="visual-nineteen-20261113.css?v=20261113-v1">
 <script src="visual-nineteen-20261113.js?v=20261113-v3"></script>
+<link rel="stylesheet" href="visual-twenty-20261113.css?v=20261113-v1">
+<script src="visual-twenty-20261113.js?v=20261113-v1"></script>
 </body></html>

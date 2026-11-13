@@ -40,6 +40,33 @@ body.shua-clean #board .pick[data-shua-round-start]::before{
     padding-top:clamp(10px,1.9vw,24px)!important;
     padding-bottom:0!important;
   }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #featuredPlayerCard.broadcast-card .featured-team-strip{
+    min-height:clamp(28px,3.4vw,47px)!important;margin-bottom:4px!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #featuredPlayerCard.broadcast-card .featured-mini-logo{
+    width:clamp(27px,3.5vw,47px)!important;height:clamp(27px,3.5vw,47px)!important;
+    flex-basis:clamp(27px,3.5vw,47px)!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #featuredPlayerCard.broadcast-card .featured-first{
+    font-size:clamp(1rem,2.5vw,2.1rem)!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #featuredPlayerCard.broadcast-card .featured-last{
+    font-size:clamp(1.8rem,4.8vw,4rem)!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #featuredPlayerCard.broadcast-card .featured-identity-meta{
+    font-size:clamp(.8rem,1.6vw,1.4rem)!important;margin-top:4px!important;
+  }
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+ #featuredPlayerCard.broadcast-card .featured-bio{padding:5px 7px!important}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+ #featuredPlayerCard.broadcast-card .featured-bio-value{
+  font-size:clamp(.86rem,1.65vw,1.3rem)!important;
 }
 
 /* 4. Existing next/previous buttons flank the Overview hero instead of
@@ -65,6 +92,10 @@ body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([h
  #rankingPlayerNav .ranking-nav-copy{display:none!important}
 body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
  #rankingPlayerNav .ranking-nav-arrow{font-size:21px!important;line-height:1!important}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+ #rankingPlayerNav button[data-player-step="next"]{margin-left:auto!important}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+ #rankingPlayerNav button[data-player-step="prev"]{margin-right:auto!important}
 body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
  #featuredPlayerCard.broadcast-card .featured-right{padding-right:40px!important}
 

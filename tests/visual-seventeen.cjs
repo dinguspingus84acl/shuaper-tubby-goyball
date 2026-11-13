@@ -7,7 +7,7 @@ const css=read('visual-seventeen-20261113.css');
 const html=read('index.html');
 
 test('final stylesheet is loaded after the previous refinements',()=>{
-  assert.match(html,/visual-sixteen-20261113\.js\?v=20261113-v1[\s\S]*visual-seventeen-20261113\.css\?v=20261113-v1/);
+  assert.match(html,/visual-sixteen-20261113\.js\?v=20261113-v1[\s\S]*visual-seventeen-20261113\.css\?v=20261113-v2/);
 });
 test('Big Board keeps actual draft pick children and labels rounds in a gutter',()=>{
   assert.match(css,/#board\{padding-left:42px/);
@@ -20,6 +20,7 @@ test('Big Board keeps actual draft pick children and labels rounds in a gutter',
 test('Overview hero is compact but retains player identity and portraits',()=>{
   assert.match(css,/aspect-ratio:2\.64!important/);
   assert.match(css,/aspect-ratio:2\.04!important/);
+  assert.match(css,/#featuredPlayerCard\.broadcast-card \.featured-bio\{padding:5px 7px!important/);
   assert.doesNotMatch(css,/featured-photo\{display:none/);
   assert.doesNotMatch(css,/featured-name\{display:none/);
 });
@@ -27,6 +28,7 @@ test('Overview navigation moves into compact, accessible hero-side arrows',()=>{
   assert.match(css,/#rankingPlayerNav:not\(\[hidden\]\)/);
   assert.match(css,/pointer-events:none/);
   assert.match(css,/#rankingPlayerNav button:not\(\[hidden\]\)/);
+  assert.match(css,/#rankingPlayerNav button\[data-player-step="next"\]\{margin-left:auto!important/);
   assert.match(read('unified-profile.js'),/btn\.setAttribute\('aria-label',\(dir==='prev'\?'Previous':'Next'\)/);
 });
 test('odd Overview stat fills the trailing row and notes are untruncated',()=>{

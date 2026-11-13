@@ -4,7 +4,7 @@
 
   /* 9. Weekly Report comparison: prefer a real saved pregame ESPN projection;
      when none exists, clearly label the existing opportunity model as xFP. */
-  const analytics = document.getElementById('shuaAnalyticsSection');
+  const analyticsSection = () => document.getElementById('shuaAnalyticsSection');
   let expectedModel = null;
   let expectedAttempted = false;
   let expectedLoading = false;
@@ -14,6 +14,7 @@
   const fmt = n => Number(n).toFixed(1);
 
   function weeklyReady() {
+    const analytics = analyticsSection();
     return analytics?.dataset.activeView === 'weekly' && Number(analytics.querySelector('#stSeason')?.value) === 2026 &&
       analytics.querySelector('#stWeeklyMetric')?.value === 'points' &&
       !!analytics.querySelector('#stContent .st-rank-row');
@@ -82,6 +83,7 @@
 
   function decorateWeekly() {
     if (!weeklyReady()) return;
+    const analytics = analyticsSection();
     if (!expectedAttempted) loadExpectedModel();
     const ui = window.ShuaStudio?.UI;
     const week = Number(analytics.querySelector('#stWeek')?.value);
@@ -112,10 +114,10 @@
     }
   }
 
-  if (analytics) {
-    new MutationObserver(scheduleWeekly).observe(analytics, {childList: true, subtree: true});
-    scheduleWeekly();
-  }
+  // Analytics is lazy-loaded, so its section might not exist when this script first executes.
+  new MutationObserver(scheduleWeekly).observe(document.body, {childList: true, subtree: true});
+  window.addEventListener('ShuaStudioReady', scheduleWeekly);
+  scheduleWeekly();
 
   /* 10. An edge fades only when content genuinely extends past that edge.
      Resizing, horizontal scrolling and freshly rendered sections stay in sync. */

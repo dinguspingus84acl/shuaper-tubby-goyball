@@ -32,24 +32,9 @@
     if (stats && !stats.querySelector(':scope > .shua-analytics-titlebar'))
       stats.prepend(titlebar('Season Stats'));
   }
-  function compactWeekly() {
-    const analytics = document.getElementById('shuaAnalyticsSection');
-    if (!analytics || analytics.dataset.activeView !== 'weekly') return;
-    for (const bar of analytics.querySelectorAll('.shua-weekly-bars:not([data-shua-twenty-label])')) {
-      const label = bar.querySelector('.shua-weekly-bar-copy');
-      const raw = bar.getAttribute('aria-label') || '';
-      const match = raw.match(/actual PPR\s+(-?[\d.]+),\s+(xFP|Proj)\s+(-?[\d.]+),\s+difference\s+([+-]?[\d.]+)/);
-      if (!label || !match) continue;
-      const difference = label.querySelector('b');
-      label.textContent = 'Actual ' + match[1] + ' · ' + match[2] + ' ' + match[3] + ' · ';
-      if (difference) label.append(difference);
-      bar.dataset.shuaTwentyLabel = 'true';
-    }
-  }
   function update() {
     queued = false;
     alignTitles();
-    compactWeekly();
   }
   function schedule() {
     if (queued) return;

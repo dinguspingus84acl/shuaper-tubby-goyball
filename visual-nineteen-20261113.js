@@ -14,8 +14,7 @@
   const fmt = n => Number(n).toFixed(1);
 
   function weeklyReady() {
-    const ui = window.ShuaStudio?.UI;
-    return analytics?.dataset.activeView === 'weekly' && ui?.dataset?.year === 2026 &&
+    return analytics?.dataset.activeView === 'weekly' && Number(analytics.querySelector('#stSeason')?.value) === 2026 &&
       analytics.querySelector('#stWeeklyMetric')?.value === 'points' &&
       !!analytics.querySelector('#stContent .st-rank-row');
   }
@@ -84,16 +83,19 @@
   function decorateWeekly() {
     if (!weeklyReady()) return;
     if (!expectedAttempted) loadExpectedModel();
-    const ui = window.ShuaStudio.UI;
-    const week = Number(ui.state.week);
-    const players = new Map(ui.dataset.players.map(p => [p.key, p]));
+    const ui = window.ShuaStudio?.UI;
+    const week = Number(analytics.querySelector('#stWeek')?.value);
+    if (!Number.isInteger(week) || week < 1 || week > 18) return;
+    const players = new Map((ui?.dataset?.players || []).map(p => [p.key, p]));
     let decorated = 0;
     for (const row of analytics.querySelectorAll('#stContent .st-rank-row')) {
       if (row.querySelector('.shua-weekly-bars')) { decorated++; continue; }
       const key = row.querySelector('[data-st-open]')?.dataset.stOpen;
-      const player = players.get(key);
-      if (!player) continue;
-      const game = player.games?.find(g => g.week === week);
+      if (!key) continue;
+      const player = players.get(key) || {key, name: row.querySelector('[data-st-open]')?.textContent?.trim() || key};
+      const score = number(row.querySelector('.st-score')?.firstChild?.textContent?.trim());
+      const game = player.games?.find(g => g.week === week) || (score === null ? null : {points: score});
+      if (!game) continue;
       const baseline = baselineFor(player, game, week);
       if (!baseline) continue;
       const bar = comparisonBar(player, game, baseline);

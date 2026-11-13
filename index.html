@@ -662,6 +662,14 @@ function leagueGlance(item){
  const opponent=matchup?(sameTeam(matchup.home)?matchup.away:matchup.home):null;
  const parts=[];
  if(opponent?.teamName)parts.push('<span class="myteams-next-opponent"><span class="shua-match-week">W'+escapeHtml(league.week||'—')+'</span><span class="shua-match-vs" aria-hidden="true">VS</span><span class="shua-match-opponent">'+escapeHtml(opponent.teamName)+'</span></span>');
+ const own=matchup?(sameTeam(matchup.home)?matchup.home:matchup.away):null;
+ const projected=team=>{const raw=team?.totalProjectedPoints;return raw===null||raw===undefined||raw===''||!Number.isFinite(Number(raw))?null:Math.max(0,Number(raw));};
+ const mine=projected(own),theirs=projected(opponent);
+ if(mine!==null&&theirs!==null&&mine+theirs>0){
+  const pct=(100*mine/(mine+theirs)).toFixed(2);
+  const label='Projected: '+item.team+' '+fmt(mine)+'; '+opponent.teamName+' '+fmt(theirs);
+  parts.push('<span class="shua-proj-edge" role="img" aria-label="'+escapeHtml(label)+'" title="'+escapeHtml(label)+'"><span class="shua-proj-own" style="width:'+pct+'%"></span><span class="shua-proj-opponent"></span></span>');
+ }
  return parts.length?'<div class="myteams-glance" aria-label="Saved ESPN matchup">'+parts.join('')+'</div>':'';
 }
 function renderTeams(year){
@@ -782,4 +790,6 @@ button.addEventListener('click',()=>{if(!document.body.classList.contains('my-te
 <link rel="stylesheet" href="visual-seventeen-20261113.css?v=20261113-v2">
 <link rel="stylesheet" href="visual-eighteen-20261113.css?v=20261113-v1">
 <script src="visual-eighteen-20261113.js?v=20261113-v1"></script>
+<link rel="stylesheet" href="visual-nineteen-20261113.css?v=20261113-v1">
+<script src="visual-nineteen-20261113.js?v=20261113-v1"></script>
 </body></html>

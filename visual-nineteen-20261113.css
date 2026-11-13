@@ -1,0 +1,106 @@
+/* Approved visual improvements 2, 3, 7, 8, 9 and 10.
+   Keep original player rankings, Weather, Draft/ROS controls and compact headers. */
+
+/* 2. Quiet alternating bands every four Big Board rounds. The existing
+   position-color borders, player names and round labels remain untouched. */
+body.shua-clean #board .pick:is(
+ [data-shua-round="5"],[data-shua-round="6"],[data-shua-round="7"],[data-shua-round="8"],
+ [data-shua-round="13"],[data-shua-round="14"],[data-shua-round="15"],[data-shua-round="16"],
+ [data-shua-round="21"],[data-shua-round="22"]):not(.shua-selected-pick)::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:#9adbc906;z-index:0;
+}
+body.shua-clean #board .pick:is([data-shua-round="5"],[data-shua-round="13"],[data-shua-round="21"]){
+  border-top-color:#628897!important;
+}
+
+/* 3. A restrained team-color backlight behind (never over) the portrait. */
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box::before{
+  content:"";position:absolute;left:11%;top:13%;width:80%;height:79%;z-index:0;
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse at center,
+    color-mix(in srgb,var(--featured-accent,#57b7aa) 42%,transparent) 0%,
+    color-mix(in srgb,var(--featured-accent,#57b7aa) 15%,transparent) 45%,
+    transparent 72%);
+  filter:blur(13px);opacity:.70;
+}
+
+/* 7. Reference ticks on the existing normalized comparison track. */
+body.shua-clean.stats-mode #espnLiveSection .espn-metric-track{position:relative!important}
+body.shua-clean.stats-mode #espnLiveSection .espn-metric-track::after{
+  content:"";position:absolute;inset:-2px 0;z-index:2;pointer-events:none;
+  background:
+    linear-gradient(#b6d2dd8a,#b6d2dd8a) 25% center/1px 10px no-repeat,
+    linear-gradient(#b6d2dd8a,#b6d2dd8a) 50% center/1px 10px no-repeat,
+    linear-gradient(#b6d2dd8a,#b6d2dd8a) 75% center/1px 10px no-repeat;
+}
+
+/* 8. Only real league projections produce a thin matchup comparison line. */
+body.shua-clean #shuaMyTeams .myteams-glance:has(.shua-proj-edge){
+  white-space:normal!important;overflow:visible!important;
+}
+body.shua-clean #shuaMyTeams .shua-proj-edge{
+  display:flex;width:100%;height:3px;margin-top:5px;border-radius:999px;
+  background:#1f3f4e;overflow:hidden;pointer-events:none;
+}
+body.shua-clean #shuaMyTeams .shua-proj-own{display:block;flex:0 0 auto;background:#59d5a5}
+body.shua-clean #shuaMyTeams .shua-proj-opponent{display:block;flex:1;background:#6c9abb}
+
+/* 9. Actual PPR against verified, post-game opportunity xFP when present.
+   The model is explicitly labelled, not misrepresented as an ESPN projection. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .st-weekly-model-hint{
+  margin:3px 2px 7px;color:#93b6c4;font-size:10px;line-height:1.35;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row:has(.shua-weekly-bars){
+  grid-template-rows:auto auto!important;row-gap:3px!important;
+  min-height:69px!important;padding-top:7px!important;padding-bottom:7px!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bars{
+  grid-column:2/-1;grid-row:2;min-width:0;width:100%;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:3px;
+  align-items:center;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-pair{
+  min-width:0;display:flex;flex-direction:column;gap:3px;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-track{
+  display:block;width:100%;height:4px;border-radius:999px;background:#6b8ba51b;
+  overflow:hidden;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-track>span{
+  display:block;height:100%;border-radius:inherit;background:#708ba7;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-track.is-ahead>span{background:#5ee0ac}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-track.is-behind>span{background:#f1848b}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-copy{
+  color:#a9c4d2;font-size:9px;font-weight:750;white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-copy b{
+  color:#ebf7ff;font-weight:900;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-copy .is-ahead{color:#70e7b7}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-copy .is-behind{color:#ffa0a6}
+
+/* 10. Reveal horizontal content on phones, and remove fades at the actual ends.
+   The mask never changes size, scrolling, sticky columns or click handling. */
+@media(max-width:700px){
+ body.shua-clean .shua-scroll-cue.shua-scroll-right:not(.shua-scroll-left){
+   -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 calc(100% - 13px),transparent 100%);
+   mask-image:linear-gradient(90deg,#000 0%,#000 calc(100% - 13px),transparent 100%);
+ }
+ body.shua-clean .shua-scroll-cue.shua-scroll-left:not(.shua-scroll-right){
+   -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 13px,#000 100%);
+   mask-image:linear-gradient(90deg,transparent 0%,#000 13px,#000 100%);
+ }
+ body.shua-clean .shua-scroll-cue.shua-scroll-left.shua-scroll-right{
+   -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 13px,#000 calc(100% - 13px),transparent 100%);
+   mask-image:linear-gradient(90deg,transparent 0%,#000 13px,#000 calc(100% - 13px),transparent 100%);
+ }
+ body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bars{column-gap:6px}
+ body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-copy{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.shua-clean #shuaAnalyticsSection .shua-weekly-bars *,
+ body.shua-clean #shuaMyTeams .shua-proj-edge *{transition:none!important;animation:none!important}
+}

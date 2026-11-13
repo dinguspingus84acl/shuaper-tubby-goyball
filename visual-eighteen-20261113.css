@@ -1,0 +1,98 @@
+/* Seven requested November refinements: 2, 3, 4, 6, 7, 9 and 10.
+   No Big Board team headings, sticky Stats headers, Weekly feature cards or Weather changes. */
+
+/* 2. The last selected Big Board pick and rankings row are easy to relocate. */
+body.shua-clean #board .pick.shua-selected-pick{
+  position:relative;z-index:2;
+  outline:2px solid #66dbb3!important;outline-offset:-2px;
+  box-shadow:inset 4px 0 #5defbf,0 0 0 1px #48ae8d88,0 4px 13px #0006!important;
+  background-color:#183d3c!important;
+}
+body.shua-clean #tableCard #rows tr.selected-player-row>td{
+  background-color:#153b3b!important;
+  border-bottom-color:#4fd2a66b!important;
+}
+
+/* 3. The portrait fades into the hero, without washing out the player's face. */
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-left::after{
+  content:"";position:absolute;z-index:4;pointer-events:none;
+  top:0;bottom:0;right:-1px;width:31%;
+  background:linear-gradient(90deg,transparent 0%,#06152273 47%,#04101be8 100%);
+}
+
+/* 4. Distinct, quiet groups within the existing compact Overview stat grid. */
+body.shua-clean #modal #unifiedOverviewPanel #stats>.stat:nth-child(-n+4){
+  background:#10283e!important;border-color:#42617b!important;
+}
+body.shua-clean #modal #unifiedOverviewPanel #stats>.stat:nth-child(n+5):nth-child(-n+6){
+  background:#152b42!important;border-color:#456077!important;
+}
+body.shua-clean #modal #unifiedOverviewPanel #stats>.stat:nth-child(7){
+  background:linear-gradient(90deg,#103e3a,#102b3a)!important;
+  border-color:#417a75!important;
+}
+
+/* 6. A soft, right-aligned selection lane in Stats; points stay prominent. */
+body.shua-clean.stats-mode #espnLiveSection .espn-selected-stat-head{
+  color:#d3f5ee!important;background:#2d918c13!important;
+  border-bottom:1px solid #66c9b842;
+}
+body.shua-clean.stats-mode #espnLiveSection #espnLiveRows .espn-selected-stat{
+  background:linear-gradient(90deg,#62d4b908,#62d4b91b)!important;
+  border-left:1px solid #62d4b927!important;
+  color:#f3fffc!important;
+  border-radius:4px;
+  padding-right:5px!important;
+}
+
+/* 7. The actively sorted Usage metric reads a touch brighter than the rest. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"]
+ .st-usage-table tbody td:not(:first-child):not(.st-usage-focused):not(.st-usage-gaining):not(.st-usage-losing){
+  color:#9fb8c8!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"]
+ .st-usage-table tbody td.st-usage-focused{
+  color:#f5fffb!important;
+  background:linear-gradient(180deg,#1a4f498c,#123d3baa)!important;
+  box-shadow:inset 2px 0 #78e8c245,inset -1px 0 #78e8c227!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"]
+ .st-usage-table tbody td.st-usage-focused.st-usage-gaining{color:#9affd0!important}
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"]
+ .st-usage-table tbody td.st-usage-focused.st-usage-losing{color:#ffc1c3!important}
+
+/* 9. Compact, readable matchup identity: week | VS | actual opponent name. */
+body.shua-clean #shuaMyTeams .myteams-glance .myteams-next-opponent{
+  display:flex!important;align-items:center;gap:6px!important;max-width:100%;min-width:0;
+  font-size:11px!important;line-height:1.25!important;
+}
+body.shua-clean #shuaMyTeams .shua-match-week{
+  flex:0 0 auto;color:#c7e9e5;font-size:10px;font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+body.shua-clean #shuaMyTeams .shua-match-vs{
+  flex:0 0 auto;padding:2px 5px;border:1px solid #4d7878;
+  border-radius:5px;background:#153e44;color:#8fe4cf;
+  font-size:8px;font-weight:900;letter-spacing:.04em;
+}
+body.shua-clean #shuaMyTeams .shua-match-opponent{
+  display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;color:#f0f7ff;font-weight:700;
+}
+
+/* 10. Fast, opacity-only entry; no transforms on scroll or fixed containers. */
+@keyframes shua-eighteen-appear{from{opacity:.90}to{opacity:1}}
+body.shua-clean :is(#board,#tableCard,#espnLiveSection,#shuaAnalyticsSection,#shuaMyTeams):not([hidden]),
+body.shua-clean #modal .featured-player-card.broadcast-card{
+  animation:shua-eighteen-appear 140ms ease-out both;
+}
+body.shua-clean #board .pick,
+body.shua-clean #tableCard #rows tr,
+body.shua-clean #shuaMyTeams .myteams-card{
+  transition:border-color 150ms ease,background-color 150ms ease,box-shadow 150ms ease!important;
+}
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean :is(#board,#tableCard,#espnLiveSection,#shuaAnalyticsSection,#shuaMyTeams):not([hidden]),
+  body.shua-clean #modal .featured-player-card.broadcast-card{animation:none!important}
+  body.shua-clean :is(#board .pick,#tableCard #rows tr,#shuaMyTeams .myteams-card){transition:none!important}
+}

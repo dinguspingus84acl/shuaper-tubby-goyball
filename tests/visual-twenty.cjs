@@ -28,12 +28,10 @@ test('analytics page title is generated lazily with one consistent pattern',()=>
   assert.match(js,/shua-analytics-titlebar/);
   assert.match(js,/window\.addEventListener\('ShuaStudioReady'/);
 });
-test('Weekly Report uses compact comparison bars with explicit actual and xFP labels',()=>{
-  assert.match(css,/max-width:352px!important/);
-  assert.match(css,/max-width:min\(72vw,260px\)/);
-  assert.match(js,/actual PPR/);
-  assert.match(js,/Actual ' \+ match\[1\]/);
-  assert.match(js,/dataset\.shuaTwentyLabel/);
+test('Weekly Report retains its original rows while the shared header remains',()=>{
+  assert.ok(js.includes("weekly: 'Weekly Report'"));
+  assert.doesNotMatch(css,/shua-weekly-bars|shua-weekly-bar-copy/);
+  assert.doesNotMatch(js,/compactWeekly|actual PPR|shuaTwentyLabel/);
 });
 test('matchup projections are visible only if the original sourced projection condition passes',()=>{
   assert.match(html,/if\(mine!==null&&theirs!==null&&mine\+theirs>0\)/);

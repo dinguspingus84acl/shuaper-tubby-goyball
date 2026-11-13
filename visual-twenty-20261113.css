@@ -41,19 +41,6 @@ body.shua-clean #shuaAnalyticsSection .st-panel-head h3{
   font-size:16px!important;line-height:1.25!important;letter-spacing:-.022em!important;
 }
 
-/* 4. The pair stays compact and the labels remain readable, on every width. */
-body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bars{
-  max-width:352px!important;justify-self:end!important;
-  grid-template-columns:minmax(0,1fr) auto!important;gap:9px!important;
-  margin-right:4px!important;
-}
-body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-pair{gap:4px!important}
-body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-track{height:5px!important}
-body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-copy{
-  color:#d1e1ec!important;font-size:10.5px!important;letter-spacing:.005em;
-  line-height:1.25!important;
-}
-
 /* 5. Two source-backed projected point totals, aligned to the comparison. */
 body.shua-clean #shuaMyTeams .shua-proj-values{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -171,12 +158,6 @@ body.shua-clean #shuaMyTeams .myteams-roster:not([hidden]){
     min-height:29px;padding:3px 1px 7px;margin-bottom:7px;
   }
   body.shua-clean .shua-analytics-titlebar h2{font-size:17px}
-  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bars{
-    max-width:min(72vw,260px)!important;gap:6px!important;margin-right:0!important;
-  }
-  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .shua-weekly-bar-copy{
-    font-size:9px!important;
-  }
   body.shua-clean #modal .featured-player-profile .unified-profile-tab{
     min-height:36px!important;font-size:10px!important;padding:6px 2px!important;
   }

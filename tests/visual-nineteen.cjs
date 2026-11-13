@@ -38,20 +38,9 @@ test('My Teams indicator requires two authentic, finite matchup projections',()=
   assert.match(css,/\.shua-proj-own/);
   assert.match(css,/\.shua-proj-opponent/);
 });
-test('Weekly Report compares real PPR points to clearly labelled ESPN projections or xFP',()=>{
-  assert.match(js,/espnProjectedPoints \?\? game\?\.projectedPpr \?\? game\?\.projectedPoints/);
-  assert.match(js,/expected-weekly-2026\.json/);
-  assert.match(js,/data\?\.schema === 1 && data\?\.season === 2026/);
-  assert.match(js,/not a pregame prediction/);
-  assert.match(js,/analytics\?\.dataset\.activeView === 'weekly'/);
-  assert.match(js,/querySelector\('#stSeason'\)/);
-  assert.match(js,/querySelector\('#stWeek'\)/);
-  assert.match(js,/row\.querySelector\('\.st-score'\)/);
-  assert.match(js,/analyticsSection = \(\) => document\.getElementById\('shuaAnalyticsSection'\)/);
-  assert.match(js,/observe\(document\.body, \{childList: true, subtree: true\}\)/);
-  assert.match(js,/\.st-rank-row/);
-  assert.match(css,/\.shua-weekly-bar-track\.is-ahead/);
-  assert.match(css,/\.shua-weekly-bar-track\.is-behind/);
+test('Weekly Report preserves its original point rows without expected-point bars',()=>{
+  assert.doesNotMatch(js,/expected-weekly-2026\.json|comparisonBar|decorateWeekly|baselineFor/);
+  assert.doesNotMatch(css,/shua-weekly-bars|st-weekly-model-hint|shua-weekly-bar-track/);
 });
 test('mobile overflow cues reflect actual scroll position and exclude Weather',()=>{
   assert.match(js,/element\.scrollWidth - element\.clientWidth/);

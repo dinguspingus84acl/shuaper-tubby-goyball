@@ -11,6 +11,9 @@ const charts=read('analytics/charts.js');
 
 test('new visual layer is loaded after existing layout and scripts',()=>{
   assert.match(html,/visual-fifteen-20261112\.css\?v=20261112-v3[\s\S]*visual-sixteen-20261113\.css\?v=20261113-v1[\s\S]*visual-sixteen-20261113\.js\?v=20261113-v1/);
+  assert.match(html,/weather\.js\?v=20261113-visual16-v1/);
+  assert.match(html,/analytics-dashboard\.js\?v=20261113-visual16-v1/);
+  assert.match(read('analytics-dashboard.js'),/const version = '20261113-visual16-v1'/);
 });
 test('round bands and marker depend on existing snake-draft slots',()=>{
   assert.match(js,/slot\.split\('\.'\)\[0\]/);

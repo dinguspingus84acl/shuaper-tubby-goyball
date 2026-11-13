@@ -1,0 +1,189 @@
+/* Final ten-point visual pass. Scoped by section to preserve the restored Weather cards. */
+
+/* 1. Reduce Big Board chrome and let the player name lead. */
+body.shua-clean #board .pick[data-shua-round]{
+  border:1px solid #3b586a!important;
+  border-top-color:#436b7b!important;
+  border-radius:9px!important;
+  box-shadow:inset 3px 0 var(--draft-accent,#72b7da),inset 0 1px #ffffff0b!important;
+}
+body.shua-clean #board .pick .shua-pick-watermark{opacity:.055!important}
+body.shua-clean #board .pick[data-shua-round] .name{
+  color:#f8fcff!important;font-weight:950!important;
+  padding-top:18px!important;letter-spacing:-.02em!important;
+}
+body.shua-clean #board .pick[data-shua-round] .meta{color:#98b2c1!important}
+
+/* 2. Round labels sit in a dedicated visual gutter, not atop first picks.
+   Grid children/order remain untouched for ten-team snake picks and handlers. */
+body.shua-clean #board{padding-left:42px!important;box-sizing:border-box!important}
+body.shua-clean #board .pick[data-shua-round-start]{overflow:visible!important}
+body.shua-clean #board .pick[data-shua-round-start]::before{
+  content:'RD ' attr(data-shua-round)!important;
+  position:absolute!important;left:-40px!important;top:11px!important;
+  width:33px;text-align:center;
+  padding:5px 0;border-radius:5px;
+  background:#12384b;border:1px solid #456d7d;
+  color:#c2e1ec;font:900 9px/1.15 system-ui,sans-serif;
+  letter-spacing:.025em;pointer-events:none;z-index:4;
+}
+
+/* 3. Preserve the broadcast portrait/identity at a more efficient height. */
+@media(min-width:701px){
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #featuredPlayerCard.broadcast-card{
+    aspect-ratio:2.64!important;
+    grid-template-rows:minmax(0,1fr) 18%!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #featuredPlayerCard.broadcast-card .featured-right{
+    padding-top:clamp(10px,1.9vw,24px)!important;
+    padding-bottom:0!important;
+  }
+}
+
+/* 4. Existing next/previous buttons flank the Overview hero instead of
+   consuming a row. Their click handlers and swipe gestures are unchanged. */
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+ #rankingPlayerNav:not([hidden]){
+  position:absolute!important;z-index:15;
+  top:78px;left:18px;right:18px;
+  display:flex!important;justify-content:space-between!important;gap:6px!important;
+  width:auto!important;height:34px!important;margin:0!important;padding:0!important;
+  border:0!important;background:transparent!important;box-shadow:none!important;
+  pointer-events:none;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+ #rankingPlayerNav button:not([hidden]){
+  display:grid!important;place-items:center!important;flex:0 0 32px!important;
+  width:32px!important;height:34px!important;min-width:32px!important;min-height:34px!important;
+  padding:0!important;background:#071e30e9!important;
+  border:1px solid #6b95a7a8!important;border-radius:8px!important;
+  box-shadow:0 3px 10px #00101a88!important;pointer-events:auto;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+ #rankingPlayerNav .ranking-nav-copy{display:none!important}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+ #rankingPlayerNav .ranking-nav-arrow{font-size:21px!important;line-height:1!important}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+ #featuredPlayerCard.broadcast-card .featured-right{padding-right:40px!important}
+
+/* 5. A single final Strength-of-Schedule stat fills the entire last row. */
+body.shua-clean #modal #unifiedOverviewPanel #stats>.stat:last-child:nth-child(3n + 1){
+  grid-column:1/-1!important;
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:space-between!important;gap:15px!important;
+  min-height:65px!important;
+}
+body.shua-clean #modal #unifiedOverviewPanel #stats>.stat:last-child:nth-child(3n + 1) b{
+  margin:0!important;text-align:right;
+}
+
+/* 6. Scouting notes read as a full, scrollable article. */
+body.shua-clean #modal #unifiedOverviewPanel:not([hidden]) .note-box{
+  padding:15px 17px!important;border:1px solid #3a5d70!important;
+  border-radius:11px!important;background:#0b283c!important;
+  color:#dfedf5!important;font-size:14px!important;line-height:1.6!important;
+  max-height:none!important;height:auto!important;overflow:visible!important;
+}
+body.shua-clean #modal #unifiedOverviewPanel:not([hidden]) #playerNotes{
+  font-size:14px!important;line-height:1.65!important;
+  overflow:visible!important;max-height:none!important;
+  white-space:normal!important;overflow-wrap:anywhere!important;
+}
+body.shua-clean #modal #unifiedOverviewPanel:not([hidden]) .note-box :is(h3,h4,strong){color:#f6fcff}
+
+/* 7. Logical Stats groups: player/season filters left, view/ranking right. */
+@media(min-width:1170px){
+  body.shua-clean.stats-mode #espnLiveSection .espn-sticky-controls{
+    display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:stretch!important;gap:8px!important;
+    border:0!important;background:transparent!important;padding:0!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-sticky-controls>.espn-live-toolbar,
+  body.shua-clean.stats-mode #espnLiveSection .espn-sticky-controls>.espn-stat-bar{
+    display:flex!important;align-items:center!important;flex-wrap:wrap!important;
+    gap:7px!important;margin:0!important;padding:8px 10px!important;
+    border:1px solid #355970!important;border-radius:11px!important;
+    background:#0c2739!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-filters{order:1!important;flex-wrap:nowrap!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-team-filter-wrap{order:2!important;margin:0!important;min-width:0!important}
+  body.shua-clean.stats-mode #espnLiveSection #espnStatsYear{order:3!important}
+  body.shua-clean.stats-mode #espnLiveSection #espnStatsCount{order:4!important;margin-left:auto!important}
+  body.shua-clean.stats-mode #espnLiveSection #espnStatsFetched{order:5!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-primary{order:1!important;flex-wrap:nowrap!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-stats-right-controls{
+    order:2!important;display:flex!important;align-items:center!important;
+    width:auto!important;gap:7px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-column-stat-select{width:160px!important}
+}
+@media(min-width:701px) and (max-width:1169px){
+  body.shua-clean.stats-mode #espnLiveSection .espn-sticky-controls{
+    display:grid!important;grid-template-columns:1fr!important;gap:6px!important;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-toolbar,
+  body.shua-clean.stats-mode #espnLiveSection .espn-stat-bar{display:flex!important;flex-wrap:wrap!important;gap:6px!important}
+}
+
+/* 8. Less visual weight in the comparison bar; readable right-aligned values. */
+body.shua-clean.stats-mode #espnLiveSection .espn-metric-track{
+  height:6px!important;background:#8da9bc16!important;
+  border:0!important;border-radius:999px!important;box-shadow:none!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-metric-track span{
+  border-radius:999px!important;box-shadow:none!important;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-metric-track span::after{display:none!important}
+body.shua-clean.stats-mode #espnLiveSection .espn-selected-stat{
+  text-align:right!important;justify-self:end!important;
+  font-size:18px!important;font-weight:950!important;
+  font-variant-numeric:tabular-nums!important;
+}
+
+/* 9. Center the unpaired eleventh My Teams scorecard on desktop. */
+@media(min-width:1020px){
+  body.shua-clean #shuaMyTeams .myteams-grid>.myteams-card:last-child:nth-child(odd):not(:has(>.myteams-roster:not([hidden]))){
+    grid-column:1/-1!important;justify-self:center!important;
+    width:100%!important;max-width:calc((100% - 10px) / 2)!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-name{font-size:15px!important}
+}
+body.shua-clean #shuaMyTeams .myteams-league{color:#8eacbf!important}
+body.shua-clean #shuaMyTeams .myteams-glance{color:#a7c6d4!important}
+
+/* 10. A shared border/radius/spacing rhythm only across non-Weather content. */
+body.shua-clean :is(#tableCard,#espnLiveSection .espn-live-card,
+  #shuaAnalyticsSection .st-panel,#shuaMyTeams .myteams-card){
+  border-color:#36586b!important;border-radius:12px!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-panel,
+body.shua-clean #shuaMyTeams .myteams-card{box-shadow:inset 0 1px #ffffff0c!important}
+
+@media(max-width:700px){
+  body.shua-clean #board{padding-left:36px!important}
+  body.shua-clean #board .pick[data-shua-round-start]::before{
+    left:-34px!important;top:9px!important;width:28px;
+    padding:5px 0;font-size:8px!important;
+  }
+  body.shua-clean #board .pick[data-shua-round] .name{padding-top:20px!important}
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #featuredPlayerCard.broadcast-card{aspect-ratio:2.04!important}
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #featuredPlayerCard.broadcast-card .featured-right{
+    padding-top:12px!important;padding-right:32px!important;
+  }
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #featuredPlayerCard.broadcast-card .featured-team-strip{min-height:27px!important;margin-bottom:4px!important}
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #rankingPlayerNav:not([hidden]){top:56px;left:7px;right:7px;height:28px!important}
+  body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel:not([hidden]))
+  #rankingPlayerNav button:not([hidden]){width:27px!important;height:28px!important;min-width:27px!important;min-height:28px!important;flex-basis:27px!important}
+  body.shua-clean #modal #unifiedOverviewPanel:not([hidden]) .note-box{padding:13px!important;font-size:13px!important}
+  body.shua-clean #modal #unifiedOverviewPanel:not([hidden]) #playerNotes{font-size:13px!important}
+  body.shua-clean.stats-mode #espnLiveSection .espn-selected-stat{font-size:15px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean #modal #rankingPlayerNav button{transition:none!important}
+}

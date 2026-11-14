@@ -7,12 +7,12 @@ const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const html=read('index.html'),css=read('visual-twentyone-20261114.css');
 
 test('latest visual asset follows v20 and preserves all existing views',()=>{
-  assert.match(html,/visual-twenty-20261113\.js\?v=20261113-weekly-restore1[\s\S]*visual-twentyone-20261114\.css\?v=20261114-visual-2to9/);
+  assert.match(html,/visual-twenty-20261113\.js\?v=20261113-weekly-restore1[\s\S]*visual-twentyone-20261114\.css\?v=20261114-bigboard-restore1/);
   assert.doesNotMatch(css,/#shuaWeatherSection|\.wx-|st-injury-status|\.myteams-injury/);
 });
-test('2: Big Board watermark has useful contrast below player names',()=>{
-  assert.match(css,/#board \.pick \.shua-pick-watermark\{[\s\S]*opacity:\.105!important/);
-  assert.match(css,/#board \.pick\[data-shua-round\] :is\(\.name,\.meta,\.slot\)\{[\s\S]*z-index:2/);
+test('2: restores previous Big Board layout and strengthens only its existing logo',()=>{
+  assert.match(css,/#board \.pick \.shua-pick-watermark\{[\s\S]*opacity:\.18!important/);
+  assert.doesNotMatch(css,/#board \.pick\[data-shua-round\] :is\(\.name,\.meta,\.slot\)/);
 });
 test('3: common page gutters do not adjust Big Board dimensions',()=>{
   for(const selector of ['#shuaAnalyticsSection','#shuaMyTeams','#espnLiveSection'])assert.ok(css.includes(selector));

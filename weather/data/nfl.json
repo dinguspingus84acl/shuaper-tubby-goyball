@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-14T06:45:24Z",
+  "generatedAt": "2026-11-14T15:12:50Z",
   "weatherSource": "https://mysportsweather.com/nfl",
   "scheduleSource": "MySportsWeather",
   "games": [
@@ -23,7 +23,7 @@
       "indoor": false,
       "forecast": {
         "tempF": 45,
-        "precipPct": 16,
+        "precipPct": 13,
         "precipType": "Rain",
         "windMph": 4,
         "gustMph": null,
@@ -33,25 +33,25 @@
             "time": "8 AM",
             "inGame": false,
             "sky": "sun",
-            "precipPct": 9,
+            "precipPct": 8,
             "tempF": 48,
-            "windMph": 2,
+            "windMph": 3,
             "windDirection": "SSE"
           },
           {
             "time": "9 AM",
             "inGame": true,
             "sky": "sun",
-            "precipPct": 14,
-            "tempF": 47,
-            "windMph": 3,
+            "precipPct": 9,
+            "tempF": 46,
+            "windMph": 4,
             "windDirection": "SE"
           },
           {
             "time": "10 AM",
             "inGame": true,
             "sky": "sun",
-            "precipPct": 14,
+            "precipPct": 11,
             "tempF": 45,
             "windMph": 4,
             "windDirection": "SE"
@@ -60,8 +60,8 @@
             "time": "11 AM",
             "inGame": true,
             "sky": "sun",
-            "precipPct": 16,
-            "tempF": 44,
+            "precipPct": 13,
+            "tempF": 43,
             "windMph": 4,
             "windDirection": "SE"
           },
@@ -69,9 +69,9 @@
             "time": "12 PM",
             "inGame": false,
             "sky": "sun",
-            "precipPct": 18,
+            "precipPct": 13,
             "tempF": 42,
-            "windMph": 4,
+            "windMph": 5,
             "windDirection": "SE"
           }
         ],
@@ -100,8 +100,8 @@
         "tempF": 50,
         "precipPct": 0,
         "precipType": "Rain",
-        "windMph": 13,
-        "gustMph": 23,
+        "windMph": 14,
+        "gustMph": 24,
         "windDirection": "NW",
         "hourly": [
           {
@@ -109,9 +109,9 @@
             "inGame": false,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 50,
-            "windMph": 13,
-            "gustMph": 23,
+            "tempF": 49,
+            "windMph": 14,
+            "gustMph": 24,
             "windDirection": "NW"
           },
           {
@@ -120,8 +120,8 @@
             "sky": "sun",
             "precipPct": 0,
             "tempF": 50,
-            "windMph": 13,
-            "gustMph": 23,
+            "windMph": 14,
+            "gustMph": 24,
             "windDirection": "NW"
           },
           {
@@ -129,9 +129,9 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 50,
-            "windMph": 13,
-            "gustMph": 22,
+            "tempF": 51,
+            "windMph": 15,
+            "gustMph": 24,
             "windDirection": "NW"
           },
           {
@@ -139,9 +139,9 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 50,
-            "windMph": 13,
-            "gustMph": 21,
+            "tempF": 49,
+            "windMph": 14,
+            "gustMph": 24,
             "windDirection": "NW"
           },
           {
@@ -150,8 +150,8 @@
             "sky": "sun",
             "precipPct": 0,
             "tempF": 49,
-            "windMph": 12,
-            "gustMph": 20,
+            "windMph": 13,
+            "gustMph": 22,
             "windDirection": "NW"
           }
         ],
@@ -160,16 +160,16 @@
             "time": "12 PM",
             "inGame": false,
             "precipPct": 1,
-            "tempF": 49,
+            "tempF": 51,
             "windMph": 12,
-            "gustMph": 22,
-            "windDirection": "NW"
+            "gustMph": 21,
+            "windDirection": "NNW"
           },
           {
             "time": "1 PM",
             "inGame": true,
-            "precipPct": 0,
-            "tempF": 50,
+            "precipPct": 1,
+            "tempF": 51,
             "windMph": 12,
             "gustMph": 22,
             "windDirection": "NW"
@@ -177,28 +177,28 @@
           {
             "time": "2 PM",
             "inGame": true,
-            "precipPct": 0,
-            "tempF": 50,
+            "precipPct": 1,
+            "tempF": 51,
             "windMph": 12,
             "gustMph": 22,
-            "windDirection": "NW"
+            "windDirection": "NNW"
           },
           {
             "time": "3 PM",
             "inGame": true,
-            "precipPct": 0,
-            "tempF": 49,
+            "precipPct": 1,
+            "tempF": 51,
             "windMph": 11,
-            "gustMph": 21,
+            "gustMph": 20,
             "windDirection": "NW"
           },
           {
             "time": "4 PM",
             "inGame": false,
-            "precipPct": 0,
-            "tempF": 48,
+            "precipPct": 1,
+            "tempF": 50,
             "windMph": 10,
-            "gustMph": 19,
+            "gustMph": 18,
             "windDirection": "NW"
           }
         ],
@@ -243,9 +243,9 @@
       "indoor": false,
       "forecast": {
         "tempF": 47,
-        "precipPct": 14,
+        "precipPct": 39,
         "precipType": "Rain",
-        "windMph": 10,
+        "windMph": 12,
         "gustMph": 16,
         "windDirection": "NW",
         "hourly": [
@@ -253,8 +253,8 @@
             "time": "12 PM",
             "inGame": false,
             "sky": "rain",
-            "precipPct": 49,
-            "tempF": 47,
+            "precipPct": 44,
+            "tempF": 48,
             "windMph": 10,
             "gustMph": 16,
             "windDirection": "NW"
@@ -262,41 +262,41 @@
           {
             "time": "1 PM",
             "inGame": true,
-            "sky": "sun",
-            "precipPct": 14,
+            "sky": "partly",
+            "precipPct": 39,
             "tempF": 47,
-            "windMph": 10,
+            "windMph": 12,
             "gustMph": 16,
             "windDirection": "NW"
           },
           {
             "time": "2 PM",
             "inGame": true,
-            "sky": "sun",
-            "precipPct": 14,
-            "tempF": 47,
-            "windMph": 10,
-            "gustMph": 15,
+            "sky": "partly",
+            "precipPct": 39,
+            "tempF": 46,
+            "windMph": 12,
+            "gustMph": 16,
             "windDirection": "NW"
           },
           {
             "time": "3 PM",
             "inGame": true,
-            "sky": "sun",
-            "precipPct": 14,
-            "tempF": 47,
+            "sky": "partly",
+            "precipPct": 39,
+            "tempF": 46,
             "windMph": 10,
-            "gustMph": 15,
+            "gustMph": 16,
             "windDirection": "NW"
           },
           {
             "time": "4 PM",
             "inGame": false,
-            "sky": "sun",
-            "precipPct": 14,
+            "sky": "partly",
+            "precipPct": 39,
             "tempF": 46,
-            "windMph": 9,
-            "gustMph": 14,
+            "windMph": 10,
+            "gustMph": 15,
             "windDirection": "NW"
           }
         ],
@@ -304,7 +304,7 @@
           {
             "time": "12 PM",
             "inGame": false,
-            "precipPct": 8,
+            "precipPct": 16,
             "tempF": 46,
             "windMph": 11,
             "gustMph": 16,
@@ -313,7 +313,7 @@
           {
             "time": "1 PM",
             "inGame": true,
-            "precipPct": 45,
+            "precipPct": 3,
             "tempF": 46,
             "windMph": 11,
             "gustMph": 16,
@@ -322,7 +322,7 @@
           {
             "time": "2 PM",
             "inGame": true,
-            "precipPct": 26,
+            "precipPct": 2,
             "tempF": 46,
             "windMph": 11,
             "gustMph": 15,
@@ -331,20 +331,20 @@
           {
             "time": "3 PM",
             "inGame": true,
-            "precipPct": 26,
+            "precipPct": 2,
             "tempF": 46,
             "windMph": 10,
             "gustMph": 15,
-            "windDirection": "NW"
+            "windDirection": "NNW"
           },
           {
             "time": "4 PM",
             "inGame": false,
-            "precipPct": 26,
-            "tempF": 46,
+            "precipPct": 2,
+            "tempF": 45,
             "windMph": 10,
             "gustMph": 14,
-            "windDirection": "NW"
+            "windDirection": "NNW"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-hou-cle"
@@ -431,16 +431,16 @@
             "time": "12 PM",
             "inGame": false,
             "precipPct": 0,
-            "tempF": 51,
+            "tempF": 53,
             "windMph": 4,
             "gustMph": 8,
-            "windDirection": "ENE"
+            "windDirection": "NE"
           },
           {
             "time": "1 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 54,
+            "tempF": 55,
             "windMph": 5,
             "gustMph": 9,
             "windDirection": "NE"
@@ -452,16 +452,16 @@
             "tempF": 56,
             "windMph": 5,
             "gustMph": 9,
-            "windDirection": "NNE"
+            "windDirection": "NE"
           },
           {
             "time": "3 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 57,
-            "windMph": 6,
+            "tempF": 56,
+            "windMph": 5,
             "gustMph": 10,
-            "windDirection": "NNE"
+            "windDirection": "NE"
           },
           {
             "time": "4 PM",
@@ -469,7 +469,7 @@
             "precipPct": 0,
             "tempF": 56,
             "windMph": 6,
-            "gustMph": 9,
+            "gustMph": 10,
             "windDirection": "NNE"
           }
         ],
@@ -494,7 +494,7 @@
       "city": "Atlanta, GA",
       "indoor": true,
       "forecast": {
-        "tempF": 55,
+        "tempF": 54,
         "precipPct": 0,
         "precipType": "Rain",
         "windMph": 2,
@@ -516,7 +516,7 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 55,
+            "tempF": 54,
             "windMph": 2,
             "gustMph": 5,
             "windDirection": "ENE"
@@ -526,7 +526,7 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 57,
+            "tempF": 55,
             "windMph": 2,
             "gustMph": 5,
             "windDirection": "NNE"
@@ -536,7 +536,7 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 57,
+            "tempF": 56,
             "windMph": 2,
             "gustMph": 5,
             "windDirection": "N"
@@ -546,7 +546,7 @@
             "inGame": false,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 57,
+            "tempF": 56,
             "windMph": 2,
             "gustMph": 5,
             "windDirection": "N"
@@ -557,8 +557,8 @@
             "time": "12 PM",
             "inGame": false,
             "precipPct": 0,
-            "tempF": 52,
-            "windMph": 2,
+            "tempF": 53,
+            "windMph": 3,
             "gustMph": 5,
             "windDirection": "ENE"
           },
@@ -566,16 +566,16 @@
             "time": "1 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 54,
+            "tempF": 55,
             "windMph": 2,
             "gustMph": 4,
-            "windDirection": "NE"
+            "windDirection": "NNE"
           },
           {
             "time": "2 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 55,
+            "tempF": 57,
             "windMph": 2,
             "gustMph": 5,
             "windDirection": "NNE"
@@ -584,7 +584,7 @@
             "time": "3 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 56,
+            "tempF": 58,
             "windMph": 2,
             "gustMph": 5,
             "windDirection": "N"
@@ -593,7 +593,7 @@
             "time": "4 PM",
             "inGame": false,
             "precipPct": 0,
-            "tempF": 55,
+            "tempF": 57,
             "windMph": 2,
             "gustMph": 5,
             "windDirection": "N"
@@ -623,7 +623,7 @@
         "tempF": 50,
         "precipPct": 0,
         "precipType": "Rain",
-        "windMph": 3,
+        "windMph": 5,
         "gustMph": 7,
         "windDirection": "NNW",
         "hourly": [
@@ -633,7 +633,7 @@
             "sky": "sun",
             "precipPct": 0,
             "tempF": 48,
-            "windMph": 2,
+            "windMph": 5,
             "gustMph": 6,
             "windDirection": "NNW"
           },
@@ -643,7 +643,7 @@
             "sky": "sun",
             "precipPct": 0,
             "tempF": 50,
-            "windMph": 3,
+            "windMph": 5,
             "gustMph": 7,
             "windDirection": "NNW"
           },
@@ -653,9 +653,9 @@
             "sky": "sun",
             "precipPct": 0,
             "tempF": 50,
-            "windMph": 3,
+            "windMph": 5,
             "gustMph": 7,
-            "windDirection": "N"
+            "windDirection": "NNW"
           },
           {
             "time": "3 PM",
@@ -674,7 +674,7 @@
             "precipPct": 0,
             "tempF": 52,
             "windMph": 5,
-            "gustMph": 8,
+            "gustMph": 7,
             "windDirection": "N"
           }
         ],
@@ -683,7 +683,7 @@
             "time": "12 PM",
             "inGame": false,
             "precipPct": 0,
-            "tempF": 48,
+            "tempF": 47,
             "windMph": 3,
             "gustMph": 6,
             "windDirection": "N"
@@ -692,25 +692,25 @@
             "time": "1 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 50,
+            "tempF": 48,
             "windMph": 4,
-            "gustMph": 7,
+            "gustMph": 8,
             "windDirection": "N"
           },
           {
             "time": "2 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 51,
+            "tempF": 48,
             "windMph": 4,
             "gustMph": 8,
-            "windDirection": "N"
+            "windDirection": "NNE"
           },
           {
             "time": "3 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 52,
+            "tempF": 49,
             "windMph": 4,
             "gustMph": 8,
             "windDirection": "N"
@@ -719,7 +719,7 @@
             "time": "4 PM",
             "inGame": false,
             "precipPct": 0,
-            "tempF": 52,
+            "tempF": 49,
             "windMph": 4,
             "gustMph": 8,
             "windDirection": "N"
@@ -749,9 +749,9 @@
         "tempF": 45,
         "precipPct": 0,
         "precipType": "Rain",
-        "windMph": 2,
-        "gustMph": 5,
-        "windDirection": "WNW",
+        "windMph": 1,
+        "gustMph": 3,
+        "windDirection": "W",
         "hourly": [
           {
             "time": "12 PM",
@@ -760,7 +760,7 @@
             "precipPct": 0,
             "tempF": 42,
             "windMph": 1,
-            "gustMph": 5,
+            "gustMph": 3,
             "windDirection": "WNW"
           },
           {
@@ -769,18 +769,18 @@
             "sky": "sun",
             "precipPct": 0,
             "tempF": 45,
-            "windMph": 2,
-            "gustMph": 5,
-            "windDirection": "WNW"
+            "windMph": 1,
+            "gustMph": 3,
+            "windDirection": "W"
           },
           {
             "time": "2 PM",
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 47,
-            "windMph": 2,
-            "gustMph": 5,
+            "tempF": 46,
+            "windMph": 1,
+            "gustMph": 3,
             "windDirection": "W"
           },
           {
@@ -788,9 +788,9 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 48,
+            "tempF": 46,
             "windMph": 1,
-            "gustMph": 5,
+            "gustMph": 3,
             "windDirection": "W"
           },
           {
@@ -798,10 +798,10 @@
             "inGame": false,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 48,
+            "tempF": 47,
             "windMph": 1,
-            "gustMph": 5,
-            "windDirection": "WSW"
+            "gustMph": 3,
+            "windDirection": "W"
           }
         ],
         "nbmHourly": [
@@ -809,17 +809,17 @@
             "time": "12 PM",
             "inGame": false,
             "precipPct": 0,
-            "tempF": 42,
+            "tempF": 40,
             "windMph": 1,
             "gustMph": 4,
-            "windDirection": "NNW"
+            "windDirection": "WNW"
           },
           {
             "time": "1 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 45,
-            "windMph": 1,
+            "tempF": 43,
+            "windMph": 2,
             "gustMph": 4,
             "windDirection": "W"
           },
@@ -827,7 +827,7 @@
             "time": "2 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 46,
+            "tempF": 44,
             "windMph": 1,
             "gustMph": 4,
             "windDirection": "W"
@@ -836,7 +836,7 @@
             "time": "3 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 47,
+            "tempF": 45,
             "windMph": 1,
             "gustMph": 4,
             "windDirection": "W"
@@ -845,10 +845,10 @@
             "time": "4 PM",
             "inGame": false,
             "precipPct": 0,
-            "tempF": 47,
+            "tempF": 45,
             "windMph": 1,
             "gustMph": 4,
-            "windDirection": "WSW"
+            "windDirection": "W"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-min-gb"
@@ -872,11 +872,11 @@
       "city": "Glendale, AZ",
       "indoor": true,
       "forecast": {
-        "tempF": 76,
+        "tempF": 75,
         "precipPct": 0,
         "precipType": "Rain",
         "windMph": 5,
-        "gustMph": 8,
+        "gustMph": 7,
         "windDirection": "E",
         "hourly": [
           {
@@ -894,9 +894,9 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 76,
+            "tempF": 75,
             "windMph": 5,
-            "gustMph": 8,
+            "gustMph": 7,
             "windDirection": "E"
           },
           {
@@ -905,16 +905,16 @@
             "sky": "sun",
             "precipPct": 0,
             "tempF": 76,
-            "windMph": 5,
-            "gustMph": 7,
-            "windDirection": "E"
+            "windMph": 2,
+            "gustMph": 6,
+            "windDirection": "ENE"
           },
           {
             "time": "6 PM",
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 75,
+            "tempF": 77,
             "windMph": 2,
             "gustMph": 5,
             "windDirection": "ENE"
@@ -938,43 +938,43 @@
             "tempF": 74,
             "windMph": 4,
             "gustMph": 8,
-            "windDirection": "E"
+            "windDirection": "NE"
           },
           {
             "time": "4 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 75,
+            "tempF": 76,
             "windMph": 3,
             "gustMph": 7,
-            "windDirection": "E"
+            "windDirection": "NNE"
           },
           {
             "time": "5 PM",
             "inGame": true,
             "precipPct": 0,
             "tempF": 76,
-            "windMph": 3,
+            "windMph": 2,
             "gustMph": 6,
-            "windDirection": "E"
+            "windDirection": "N"
           },
           {
             "time": "6 PM",
             "inGame": true,
             "precipPct": 0,
-            "tempF": 75,
+            "tempF": 76,
             "windMph": 2,
-            "gustMph": 4,
-            "windDirection": "ENE"
+            "gustMph": 5,
+            "windDirection": "NNW"
           },
           {
             "time": "7 PM",
             "inGame": false,
             "precipPct": 0,
-            "tempF": 74,
+            "tempF": 73,
             "windMph": 2,
-            "gustMph": 4,
-            "windDirection": "ENE"
+            "gustMph": 3,
+            "windDirection": "NW"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-lar-ari"
@@ -1017,10 +1017,10 @@
       "city": "Arlington, TX",
       "indoor": true,
       "forecast": {
-        "tempF": 50,
-        "precipPct": 40,
+        "tempF": 51,
+        "precipPct": 17,
         "precipType": "Rain",
-        "windMph": 15,
+        "windMph": 10,
         "gustMph": 24,
         "windDirection": "E",
         "hourly": [
@@ -1028,8 +1028,8 @@
             "time": "3 PM",
             "inGame": false,
             "sky": "rain",
-            "precipPct": 40,
-            "tempF": 50,
+            "precipPct": 56,
+            "tempF": 51,
             "windMph": 15,
             "gustMph": 25,
             "windDirection": "E"
@@ -1037,58 +1037,58 @@
           {
             "time": "4 PM",
             "inGame": true,
-            "sky": "rain",
-            "precipPct": 40,
-            "tempF": 50,
-            "windMph": 15,
+            "sky": "sun",
+            "precipPct": 17,
+            "tempF": 51,
+            "windMph": 10,
             "gustMph": 24,
             "windDirection": "E"
           },
           {
             "time": "5 PM",
             "inGame": true,
-            "sky": "rain",
-            "precipPct": 40,
-            "tempF": 49,
-            "windMph": 15,
+            "sky": "sun",
+            "precipPct": 17,
+            "tempF": 51,
+            "windMph": 10,
             "gustMph": 23,
             "windDirection": "E"
           },
           {
             "time": "6 PM",
             "inGame": true,
-            "sky": "rain",
-            "precipPct": 40,
-            "tempF": 49,
+            "sky": "sun",
+            "precipPct": 17,
+            "tempF": 52,
             "windMph": 10,
-            "gustMph": 22,
-            "windDirection": "E"
+            "gustMph": 21,
+            "windDirection": "ENE"
           },
           {
             "time": "7 PM",
             "inGame": false,
-            "sky": "partly",
-            "precipPct": 33,
-            "tempF": 48,
+            "sky": "sun",
+            "precipPct": 18,
+            "tempF": 50,
             "windMph": 10,
             "gustMph": 20,
-            "windDirection": "E"
+            "windDirection": "ENE"
           }
         ],
         "nbmHourly": [
           {
             "time": "3 PM",
             "inGame": false,
-            "precipPct": 61,
+            "precipPct": 13,
             "tempF": 52,
-            "windMph": 12,
-            "gustMph": 25,
+            "windMph": 13,
+            "gustMph": 26,
             "windDirection": "E"
           },
           {
             "time": "4 PM",
             "inGame": true,
-            "precipPct": 61,
+            "precipPct": 7,
             "tempF": 52,
             "windMph": 12,
             "gustMph": 24,
@@ -1097,28 +1097,28 @@
           {
             "time": "5 PM",
             "inGame": true,
-            "precipPct": 61,
+            "precipPct": 3,
+            "tempF": 52,
+            "windMph": 12,
+            "gustMph": 23,
+            "windDirection": "E"
+          },
+          {
+            "time": "6 PM",
+            "inGame": true,
+            "precipPct": 2,
             "tempF": 52,
             "windMph": 11,
             "gustMph": 22,
             "windDirection": "ENE"
           },
           {
-            "time": "6 PM",
-            "inGame": true,
-            "precipPct": 61,
-            "tempF": 51,
-            "windMph": 11,
-            "gustMph": 21,
-            "windDirection": "ENE"
-          },
-          {
             "time": "7 PM",
             "inGame": false,
-            "precipPct": 61,
+            "precipPct": 2,
             "tempF": 50,
             "windMph": 11,
-            "gustMph": 20,
+            "gustMph": 19,
             "windDirection": "ENE"
           }
         ],
@@ -1143,11 +1143,11 @@
       "city": "Cincinnati, OH",
       "indoor": false,
       "forecast": {
-        "tempF": 43,
+        "tempF": 42,
         "precipPct": 0,
         "precipType": "Rain",
         "windMph": 0,
-        "gustMph": 1,
+        "gustMph": 2,
         "windDirection": "—",
         "hourly": [
           {
@@ -1156,18 +1156,18 @@
             "sky": "sun",
             "precipPct": 0,
             "tempF": 44,
-            "windMph": 0,
-            "gustMph": 2,
-            "windDirection": "—"
+            "windMph": 1,
+            "gustMph": 3,
+            "windDirection": "N"
           },
           {
             "time": "8 PM",
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 43,
+            "tempF": 42,
             "windMph": 0,
-            "gustMph": 1,
+            "gustMph": 2,
             "windDirection": "—"
           },
           {
@@ -1205,8 +1205,8 @@
           {
             "time": "7 PM",
             "inGame": false,
-            "precipPct": 0,
-            "tempF": 43,
+            "precipPct": 1,
+            "tempF": 44,
             "windMph": 1,
             "gustMph": 4,
             "windDirection": "N"
@@ -1214,20 +1214,20 @@
           {
             "time": "8 PM",
             "inGame": true,
-            "precipPct": 0,
+            "precipPct": 1,
             "tempF": 42,
             "windMph": 0,
-            "gustMph": 3,
-            "windDirection": "N"
+            "gustMph": 2,
+            "windDirection": "NE"
           },
           {
             "time": "9 PM",
             "inGame": true,
-            "precipPct": 0,
+            "precipPct": 1,
             "tempF": 41,
             "windMph": 0,
             "gustMph": 2,
-            "windDirection": "N"
+            "windDirection": "ENE"
           },
           {
             "time": "10 PM",
@@ -1245,7 +1245,7 @@
             "tempF": 39,
             "windMph": 0,
             "gustMph": 1,
-            "windDirection": "NNE"
+            "windDirection": "NE"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-pit-cin"
@@ -1273,7 +1273,7 @@
         "precipPct": 0,
         "precipType": "Rain",
         "windMph": 2,
-        "gustMph": 7,
+        "gustMph": 8,
         "windDirection": "NW",
         "hourly": [
           {
@@ -1283,7 +1283,7 @@
             "precipPct": 0,
             "tempF": 47,
             "windMph": 3,
-            "gustMph": 7,
+            "gustMph": 10,
             "windDirection": "NW"
           },
           {
@@ -1293,7 +1293,7 @@
             "precipPct": 0,
             "tempF": 44,
             "windMph": 2,
-            "gustMph": 7,
+            "gustMph": 8,
             "windDirection": "NW"
           },
           {
@@ -1303,7 +1303,7 @@
             "precipPct": 0,
             "tempF": 42,
             "windMph": 2,
-            "gustMph": 6,
+            "gustMph": 7,
             "windDirection": "NW"
           },
           {

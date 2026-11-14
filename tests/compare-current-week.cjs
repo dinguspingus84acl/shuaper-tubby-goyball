@@ -74,6 +74,23 @@ test('Compared players only change when a suggestion is selected or cleared',()=
  assert.match(ui,/data-st-compare-results/);
 });
 
+test('touch suggestions select on initial pointer press and keyboard click still works',()=>{
+ assert.match(ui,/function chooseComparedPlayer\(option\)/);
+ assert.match(ui,/section\.addEventListener\('pointerdown',e=>\{/);
+ assert.match(ui,/if\(!option\|\|e\.pointerType==='mouse'\)return;/);
+ assert.match(ui,/e\.preventDefault\(\);\s*chooseComparedPlayer\(option\);/);
+ assert.match(ui,/if\(chooseCompare\)\{chooseComparedPlayer\(chooseCompare\);return;\}/);
+});
+
+test('selected search cards are compact and third search dropdown layers over stats',()=>{
+ const css=read('analytics/studio.css');
+ assert.match(css,/\.st-compare-picker\.is-selected \.st-compare-search-line\{min-height:67px/);
+ assert.match(css,/\.st-compare-selected\{[^}]*min-height:67px/);
+ assert.match(css,/\.st-compare-searches\{position:relative;z-index:1000;overflow:visible!important\}/);
+ assert.match(css,/\.st-compare-picker:focus-within\{position:relative;z-index:1100\}/);
+ assert.match(css,/\.st-compare-picker:focus-within \.st-compare-results\{z-index:1200/);
+});
+
 test('Compare opens blank with no optional labels or introductory clutter',()=>{
  const compare=ui.slice(ui.indexOf('function currentWeekCompare(){'),ui.indexOf('function showCompareSuggestions('));
  assert.match(ui,/if\(state\.view==='startsit'\)\{state\.year=2026;state\.week=currentCompareWeek\(\);state\.compare=\[\];\}/);
@@ -100,6 +117,6 @@ test('Selecting one player immediately displays stats; additional players add a 
 });
 
 test('new Compare assets use fresh cache versions',()=>{
- assert.ok(html.includes('analytics-dashboard.js?v=20261114-compare-clean-search-v3'));
- assert.match(read('analytics-dashboard.js'),/20261114-compare-clean-search-v3/);
+ assert.ok(html.includes('analytics-dashboard.js?v=20261114-compare-tap-layer-v4'));
+ assert.match(read('analytics-dashboard.js'),/20261114-compare-tap-layer-v4/);
 });

@@ -17,10 +17,15 @@
       if (!inline) {
         inline = document.createElement('span');
         inline.className = 'shua-v22-jersey-inline';
-        inline.setAttribute('aria-hidden', 'true');
         row.appendChild(inline);
       }
       if (inline.textContent !== value) inline.textContent = value;
+      const accessibleLabel = 'Jersey number ' + value;
+      if (value && inline.getAttribute('aria-label') !== accessibleLabel) {
+        inline.setAttribute('aria-label', accessibleLabel);
+      } else if (!value && inline.hasAttribute('aria-label')) {
+        inline.removeAttribute('aria-label');
+      }
       const hasValue = Boolean(value);
       if (card.classList.contains('shua-v22-inline-number') !== hasValue) {
         card.classList.toggle('shua-v22-inline-number', hasValue);

@@ -21,14 +21,14 @@ let dataset=null,epoch=0,renderId=0,visible=false,historyData=null,hiddenBefore=
 function linkedView(){const m=location.hash.match(/^#analytics\/([a-z]+)$/);return m&&pages.some(p=>p[0]===m[1])?m[1]:null;}
 const initialView=linkedView();if(initialView){if(state.view==='schedule'&&initialView!=='schedule'&&[2024,2025,2026].includes(+state.scheduleReturnYear)){state.year=+state.scheduleReturnYear;state.scheduleReturnYear=null;}state.view=initialView;state.week=0;}
 if(initialView==='intelligence')state.year=2026;
-if(state.view==='startsit'){state.year=2026;state.week=currentCompareWeek();}
+if(state.view==='startsit'){state.year=2026;state.week=currentCompareWeek();state.compare=[];}
 if(state.view==='schedule'&&+state.year!==2026){state.scheduleReturnYear=+state.year;state.year=2026;}
 function updateLink(){if(!visible)return;try{const u=new URL(location.href);u.hash='analytics/'+state.view;history.replaceState(history.state,'',u);}catch(e){}}
 function navigate(view){if(!pages.some(p=>p[0]===view))view='consistency';
  if(view==='intelligence'&&state.year!==2026){state.intelReturnYear=state.year;state.year=2026;}
  else if(state.view==='intelligence'&&view!=='intelligence'&&[2024,2025,2026].includes(+state.intelReturnYear)){state.year=+state.intelReturnYear;state.intelReturnYear=null;}
  if(view==='schedule'){if(state.view!=='schedule'&&+state.year!==2026)state.scheduleReturnYear=+state.year;state.year=2026;}
- if(view==='startsit')state.year=2026;
+ if(view==='startsit'){state.year=2026;if(state.view!=='startsit')state.compare=[];}
  else if(state.view==='schedule'&&[2024,2025,2026].includes(+state.scheduleReturnYear)){state.year=+state.scheduleReturnYear;state.scheduleReturnYear=null;}
  state.view=view;state.outWeeks=null;if(view==='injury')state.injuryInitialized=0;
  const matching=dataset&&dataset.year===+state.year;
@@ -709,16 +709,20 @@ function currentWeekCompare(){
  const slots=Array.from({length:4},(_,i)=>byKey.get(keys[i])||null);
  const chosen=slots.filter(Boolean);
  const week=state.week;
- const search='<div class="st-compare-heading">Comparing Week '+week+'</div>'+
-  '<div class="st-controls st-compare-searches">'+slots.map((p,i)=>
-   '<div class="st-compare-picker"><label for="stCompareSearch'+i+'">Player '+(i+1)+(i>=2?' · optional':'')+'</label>'+
-   '<div class="st-compare-search-line"><input id="stCompareSearch'+i+'" type="search" data-st-compare-search="'+i+'" '+
+ const search='<div class="st-controls st-compare-searches">'+slots.map((p,i)=>
+   '<div class="st-compare-picker'+(p?' is-selected':'')+'"><label for="stCompareSearch'+i+'">Player '+(i+1)+'</label>'+
+   '<div class="st-compare-search-line">'+
+   (p?'<div class="st-compare-selected" aria-hidden="true">'+face(p,'st-compare-selected-face')+
+    '<div class="st-compare-selected-info"><strong>'+E(p.name)+'</strong><span class="st-compare-selected-team">'+
+    logo(p.team,'st-compare-selected-logo')+E(S.teams[S.canonicalTeam(p.team)]||p.team)+' · '+E(p.position)+
+    '</span></div></div>':'')+
+   '<input id="stCompareSearch'+i+'" type="search" data-st-compare-search="'+i+'" '+
    'role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="stCompareResults'+i+'" '+
    'placeholder="Search players…" autocomplete="off" value="'+E(p?.name||'')+'">'+
    (p?'<button class="st-compare-clear" data-st-compare-clear="'+i+'" type="button" aria-label="Clear Player '+(i+1)+'">×</button>':'')+
    '</div><div id="stCompareResults'+i+'" class="st-compare-results" data-st-compare-results="'+i+'" role="listbox" hidden></div></div>'
   ).join('')+'</div>';
- if(chosen.length<2)return search+note('Search for at least two players to compare their current-week matchups and recent scoring.');
+ if(!chosen.length)return search;
  const through=Math.min(week-1,dataset.latestWeek);
  const defenses=new Map();
  const info=chosen.map(p=>{
@@ -733,7 +737,7 @@ function currentWeekCompare(){
   const estimate=recentPpg===null||opponent?.bye?null:recentPpg*(1+adj);
   return {p,a,d,def,co,recentPpg,estimate,targetShare:m?.targetShare};
  });
- const cards='<div class="st-comparison">'+info.map((x,i)=>feature(x.p,i,F(x.estimate),'Trend-based PPR estimate',
+ const cards='<div class="st-comparison'+(chosen.length===1?' single':'')+'">'+info.map((x,i)=>feature(x.p,i,F(x.estimate),'Trend-based PPR estimate',
   '<p>'+(x.def?opponentHtml(x.p,x.def,week):'<span class="st-tag">Matchup rating unavailable</span>')+'</p>'+
   '<div class="st-compare-metric"><span>Last 3 PPG</span><b>'+F(x.recentPpg)+'</b></div>'+
   '<div class="st-compare-metric"><span>Opportunities / game</span><b>'+F(x.a.workload)+'</b></div>'+
@@ -746,6 +750,7 @@ function currentWeekCompare(){
   '<div class="st-compare-metric"><span>Rushing yards</span><b>'+F(x.a.rushYds,0)+'</b></div>'+
   '<div class="st-compare-metric"><span>Observed P10</span><b>'+F(x.co.floor)+'</b></div>'
  )).join('')+'</div>';
+ if(chosen.length===1)return search+cards;
  const weeks=[...new Set(chosen.flatMap(p=>G(p,through).slice(-5).map(g=>g.week)))].sort((a,b)=>a-b);
  const graph=C.line({title:'Recent scoring comparison',labels:weeks.map(w=>'W'+w),
   series:chosen.map(p=>({name:p.name,values:weeks.map(w=>G(p,through).find(g=>g.week===w)?.points??null)})),area:false});
@@ -844,7 +849,7 @@ function shell(){
 function persist(){updateLink();try{localStorage.setItem('shuaStudioStateV1',JSON.stringify({...state,outWeeks:null}));}catch(e){}}
 function render(){hideUsageTooltip();if(!visible||!dataset)return;const id=++renderId;C.reset();section.dataset.activeView=state.view;shell();const host=document.getElementById('stContent');try{if(state.view==='rankings')rankings(id);else host.innerHTML=renderers[state.view]();}catch(e){host.innerHTML=note('This dashboard could not render. '+E(e.message),true);console.error('SHUA Studio render',e);}
  try{window.ShuaVisualSix?.decorateCompare?.(section);}catch(e){console.warn('SHUA comparison decoration',e);}
- const footer=document.getElementById('stSource');if(footer)footer.hidden=['consistency','weekly','injury','teams'].includes(state.view);if(footer)footer.textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');if(state.view==='teams'&&S.ReceiverEfficiency)S.ReceiverEfficiency.mount(state.team);persist();section.dataset.ready='true';}
+ const footer=document.getElementById('stSource');if(footer)footer.hidden=['consistency','weekly','injury','teams','startsit'].includes(state.view);if(footer)footer.textContent=dataset.source+' · '+dataset.year+' · through recorded Week '+dataset.latestWeek+(dataset.snapshotAt?' · snapshot '+new Date(dataset.snapshotAt).toLocaleString():'');if(state.view==='teams'&&S.ReceiverEfficiency)S.ReceiverEfficiency.mount(state.team);persist();section.dataset.ready='true';}
 function rerenderUsage(){
  hideUsageTooltip();
  const host=section.querySelector('#stContent');

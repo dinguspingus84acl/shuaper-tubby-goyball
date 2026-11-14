@@ -772,6 +772,14 @@ function showCompareSuggestions(input){
   '<div class="st-compare-no-results">No matching players</div>';
  box.hidden=false;input.setAttribute('aria-expanded','true');
 }
+function chooseComparedPlayer(option){
+ if(!option||!dataset)return;
+ const index=Number(option.dataset.stChooseCompare),chosen=option.dataset.stKey;
+ if(!Number.isInteger(index)||index<0||index>3||!dataset.players.some(p=>p.key===chosen))return;
+ section.querySelector('[data-st-compare-search="'+index+'"]')?.blur();
+ state.compare=Array.from({length:4},(_,i)=>i===index?chosen:state.compare[i]===chosen?null:state.compare[i]||null);
+ render();
+}
 function weekly(){
  const week=state.week;
  const position=state.weeklyPos||'ALL';
@@ -931,7 +939,7 @@ section.addEventListener('click',e=>{
   return;
  }
  const compareClear=e.target.closest('[data-st-compare-clear]');if(compareClear){state.compare[Number(compareClear.dataset.stCompareClear)]=null;render();return;}
- const chooseCompare=e.target.closest('[data-st-choose-compare]');if(chooseCompare){const index=Number(chooseCompare.dataset.stChooseCompare),chosen=chooseCompare.dataset.stKey;state.compare=Array.from({length:4},(_,i)=>i===index?chosen:state.compare[i]===chosen?null:state.compare[i]||null);render();return;}
+ const chooseCompare=e.target.closest('[data-st-choose-compare]');if(chooseCompare){chooseComparedPlayer(chooseCompare);return;}
  const suggestion=e.target.closest('[data-st-suggest]');
  if(suggestion&&state.view==='schedule'){openScheduleSuggestion(suggestion);return;}
  const currentSuggestions=section.querySelector('#stScheduleSuggestions');
@@ -1011,6 +1019,14 @@ section.addEventListener('focusin',e=>{
   if(e.target.value)showCompareSuggestions(e.target);
  }
 });
+// A touch on an option should select it before iOS blurs the search field or
+// dismisses the keyboard; click remains the mouse/keyboard fallback.
+section.addEventListener('pointerdown',e=>{
+ const option=e.target.closest('[data-st-choose-compare]');
+ if(!option||e.pointerType==='mouse')return;
+ e.preventDefault();
+ chooseComparedPlayer(option);
+},{passive:false});
 section.addEventListener('click',e=>{
  if(e.target.closest('.st-compare-picker'))return;
  section.querySelectorAll('[data-st-compare-results]').forEach(box=>{box.hidden=true;});

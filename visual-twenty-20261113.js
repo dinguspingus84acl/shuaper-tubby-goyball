@@ -4,7 +4,7 @@
   const titles = {
     weekly: 'Weekly Report', usage: 'Usage', intelligence: 'Fantasy Intelligence',
     consistency: 'Boom / Bust', teams: 'Team Shares', injury: 'Injury Impact',
-    schedule: 'Schedule', startsit: 'Start / Sit'
+    schedule: 'Schedule', startsit: 'Compare'
   };
   let queued = false;
   function titlebar(title) {

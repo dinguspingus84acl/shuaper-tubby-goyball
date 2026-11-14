@@ -1,0 +1,231 @@
+/* Visual polish, approved recommendations 2–9, November 14.
+   Intentionally leave Big Board sizing (#1), injury badges (#10), Weather,
+   source values, Weekly Report metric choices and game-log behavior intact. */
+
+/* 2 — Team watermark is visible enough to identify, behind the player copy. */
+body.shua-clean #board .pick .shua-pick-watermark{
+  opacity:.105!important;
+  filter:drop-shadow(0 0 8px #c3e6f014);
+  pointer-events:none!important;
+}
+body.shua-clean #board .pick[data-shua-round] :is(.name,.meta,.slot){
+  position:relative;z-index:2;
+}
+
+/* 3 — One visual gutter and surface rhythm across existing main views.
+   Do not alter any Big Board grid columns, dimensions, or overflow. */
+body.shua-clean{
+  --shua-v21-gutter:clamp(10px,1.6vw,20px);
+  --shua-v21-rule:rgba(139,187,210,.17);
+}
+body.shua-clean #shuaAnalyticsSection,
+body.shua-clean #shuaMyTeams,
+body.shua-clean #espnLiveSection{
+  box-sizing:border-box;
+  padding-left:var(--shua-v21-gutter)!important;
+  padding-right:var(--shua-v21-gutter)!important;
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-panel,.st-hero,.st-callout),
+body.shua-clean #espnLiveSection :is(.espn-live-card,.espn-sticky-controls),
+body.shua-clean #shuaMyTeams :is(.myteams-card,.myteams-scoreboard){
+  border-radius:12px;
+  border-color:var(--shua-v21-rule);
+}
+body.shua-clean #shuaAnalyticsSection :is(.st-controls,.st-weekly-positions,.st-panel),
+body.shua-clean #shuaMyTeams :is(.myteams-header,.myteams-grid),
+body.shua-clean #espnLiveSection :is(.espn-sticky-controls,.espn-live-card){
+  box-sizing:border-box;
+  max-width:100%;
+}
+
+/* 4 — Season, Week and positions form one compact Weekly Report toolbar. */
+@media(min-width:701px){
+  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] #stContent{
+    display:grid;grid-template-columns:max-content minmax(0,1fr);
+    column-gap:12px;align-items:center;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] #stContent>.st-controls{
+    grid-column:1;display:flex;flex-wrap:nowrap;gap:7px;
+    margin:0!important;min-width:0;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] #stContent>.st-controls label{
+    flex:0 0 115px;width:115px;min-width:0;max-width:115px;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] #stContent>.st-weekly-positions{
+    grid-column:2;display:flex;justify-content:flex-start;gap:5px;
+    width:auto;max-width:none;margin:0!important;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] #stContent>.st-weekly-positions button{
+    min-width:55px;min-height:36px;padding:6px 12px;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] #stContent>.st-panel{
+    grid-column:1/-1;min-width:0;margin-top:9px;
+  }
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .st-controls select{
+  height:36px;min-height:36px;border-color:#466b7d;
+}
+
+/* 5 — Numerical hierarchy, right aligned, without changing score colors. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row .st-score{
+  justify-self:end;min-width:80px;text-align:right!important;
+  padding:5px 10px!important;font-size:clamp(16px,1.55vw,19px)!important;
+  line-height:1.1;font-weight:950;font-variant-numeric:tabular-nums;
+}
+body.shua-clean.stats-mode #espnLiveSection .espn-selected-stat{
+  text-align:right!important;font-size:clamp(17px,1.55vw,21px)!important;
+  line-height:1.15;font-weight:950!important;font-variant-numeric:tabular-nums;
+}
+body.shua-clean #modal #unifiedOverviewPanel .stat b{
+  font-variant-numeric:tabular-nums;letter-spacing:-.025em;
+  font-size:clamp(17px,1.8vw,22px);line-height:1.15;
+}
+body.shua-clean #shuaMyTeams .myteams-roster-row>strong,
+body.shua-clean #shuaMyTeams .myteams-wire-line>strong{
+  text-align:right!important;font-variant-numeric:tabular-nums;
+  font-size:clamp(12px,1.2vw,15px)!important;font-weight:900;
+}
+
+/* 6 — Premium broadcast hero. Keep portrait, logo and physical data visible. */
+body.shua-clean #modal .featured-player-card.broadcast-card:not(.featured-defense-profile){
+  background:
+    radial-gradient(ellipse at 18% 29%,color-mix(in srgb,var(--featured-accent,#6dd7b4) 20%,transparent),transparent 56%),
+    linear-gradient(112deg,color-mix(in srgb,var(--featured-accent,#6dd7b4) 12%,#0c2335),#0a2031 54%,#071623 100%)!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-bg-logo{
+  left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;
+  width:90%!important;height:90%!important;object-fit:contain!important;
+  opacity:.28!important;filter:drop-shadow(0 0 12px #061b2f44)!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-photo{
+  z-index:3!important;filter:drop-shadow(0 11px 15px #010c14aa)!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-name{
+  color:#f7fbff!important;text-shadow:0 1px 10px #0006;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-team-strip{
+  border-color:#ffffff1e!important;
+  background:linear-gradient(90deg,#071521f2,#0c2538e8)!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-bio-value{
+  color:#f7fcff!important;text-shadow:none;
+}
+
+/* 7 — Calm Game Log header, legible aligned columns and subtle dividers.
+   Preserve full-width, no-scroll table and current Rushing/Receiving/Snap tabs. */
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table thead th{
+  background:#193749!important;color:#bbd7e6!important;
+  border-top:1px solid #416278!important;
+  border-bottom:2px solid #52768a!important;
+  font-weight:900!important;letter-spacing:.01em!important;
+}
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table tbody tr+tr>td{
+  border-top:1px solid #99bfd41f!important;
+}
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table :is(th,td){
+  font-variant-numeric:tabular-nums;
+}
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table :is(th,td):first-child{
+  width:10%!important;
+}
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table :is(th,td):nth-child(2){
+  width:22%!important;
+}
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table .gl-pts{
+  font-size:1.09em!important;letter-spacing:-.02em;
+}
+
+/* 8 — Charts: lighter reference lines, legible labels, cohesive markers. */
+body.shua-clean #shuaAnalyticsSection .st-chart .st-gridline{
+  stroke:#6f96a7!important;stroke-opacity:.20!important;
+  stroke-width:.75!important;stroke-dasharray:2 7!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-chart .st-axis-line{
+  stroke:#85adbf!important;stroke-opacity:.36!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-chart .st-axis{
+  fill:#adc9d8!important;font-size:11px!important;font-weight:650;
+}
+body.shua-clean #shuaAnalyticsSection .st-chart .st-series-line{
+  stroke-width:2.7!important;stroke-linejoin:round;stroke-linecap:round;
+}
+body.shua-clean #shuaAnalyticsSection .st-chart .st-series-dot{
+  stroke:#092131!important;stroke-width:2!important;
+}
+body.shua-clean #shuaAnalyticsSection .st-chart .st-radar-grid{
+  stroke:#789aab!important;stroke-opacity:.22!important;
+}
+
+/* 9 — Neutral, balanced matchup scoreboard. Both logos and scores lead. */
+body.shua-clean #shuaMyTeams .myteams-scoreboard{
+  background:linear-gradient(150deg,#103047,#0a2235)!important;
+  border:1px solid #3b6077!important;padding:14px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-scoreboard-teams{
+  display:grid!important;grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)!important;
+  gap:10px!important;align-items:center;
+}
+body.shua-clean #shuaMyTeams .myteams-score-side{
+  align-items:center;min-width:0;row-gap:5px!important;
+  grid-template-columns:44px minmax(0,1fr)!important;
+}
+body.shua-clean #shuaMyTeams .myteams-score-side.is-opponent{
+  grid-template-columns:minmax(0,1fr) 44px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-score-side .myteams-team-logo,
+body.shua-clean #shuaMyTeams .myteams-score-side .myteams-score-initials{
+  width:42px!important;height:42px!important;object-fit:contain!important;
+}
+body.shua-clean #shuaMyTeams .myteams-score-label{
+  color:#e9f5fc!important;font-size:12px!important;font-weight:900!important;
+  line-height:1.25!important;overflow-wrap:anywhere;
+}
+body.shua-clean #shuaMyTeams .myteams-score-current strong{
+  font-size:clamp(25px,3vw,35px)!important;font-weight:950!important;
+  font-variant-numeric:tabular-nums;letter-spacing:-.04em!important;
+  line-height:1.04!important;color:#fff!important;
+}
+body.shua-clean #shuaMyTeams .myteams-score-projected{
+  color:#a9c6d6!important;font-size:11px!important;
+}
+body.shua-clean #shuaMyTeams .myteams-score-vs{
+  color:#99b6c6!important;letter-spacing:.025em!important;
+  font-weight:850!important;
+}
+
+@media(max-width:700px){
+  body.shua-clean #shuaAnalyticsSection,
+  body.shua-clean #shuaMyTeams,
+  body.shua-clean #espnLiveSection{
+    padding-left:9px!important;padding-right:9px!important;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] #stContent>.st-controls{
+    display:flex;flex-wrap:nowrap;gap:7px;margin-bottom:5px!important;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] #stContent>.st-controls label{
+    flex:1 1 0;min-width:0;max-width:180px;
+  }
+  body.shua-clean #shuaAnalyticsSection[data-active-view="weekly"] .st-rank-row .st-score{
+    min-width:66px;padding:5px 7px!important;font-size:16px!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-scoreboard{padding:11px 8px!important}
+  body.shua-clean #shuaMyTeams .myteams-scoreboard-teams{
+    grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr)!important;
+    gap:5px!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-score-side .myteams-team-logo,
+  body.shua-clean #shuaMyTeams .myteams-score-side .myteams-score-initials{
+    width:29px!important;height:29px!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-score-side{
+    grid-template-columns:30px minmax(0,1fr)!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-score-side.is-opponent{
+    grid-template-columns:minmax(0,1fr) 30px!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-score-label{font-size:10px!important}
+  body.shua-clean #shuaMyTeams .myteams-score-current strong{font-size:22px!important}
+  body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table .gl-pts{
+    font-size:1.02em!important;
+  }
+}

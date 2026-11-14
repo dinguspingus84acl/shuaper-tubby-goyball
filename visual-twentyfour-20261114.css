@@ -1,5 +1,6 @@
-/* Visual pass 24: approved recommendations 1, 2, 4–9.
-   Intentionally leaves ranking separators (#3) and Stock (#10) unchanged. */
+/* Visual pass 24: approved recommendations 1, 4–9.
+   Navigation dropdown redesign (#2) reverted to its previous styling.
+   Ranking separators (#3) and Stock (#10) remain unchanged. */
 
 /* 1. A clearer identity without increasing the navigation bar height. */
 body.shua-clean #shuaCleanNav .shua-clean-brand{
@@ -14,26 +15,6 @@ body.shua-clean #shuaCleanNav .shua-clean-brand::before{
   box-shadow:0 0 0 2px #0e2b3b;
 }
 body.shua-clean #shuaCleanNav .shua-brand-dot{color:#67e4b8!important}
-
-/* 2. Uniform, restrained menu icons and better reading rhythm. */
-body.shua-clean #shuaCleanNav .shua-clean-popup{padding:7px!important}
-body.shua-clean #shuaCleanNav .shua-clean-popup button{
-  display:flex!important;align-items:center;gap:10px!important;
-  min-height:40px!important;line-height:1.2!important;padding:8px 11px!important;
-  border-radius:7px!important;letter-spacing:.005em;
-}
-body.shua-clean #shuaCleanNav .shua-clean-popup button::before{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:18px;height:18px;flex:0 0 18px;border-radius:5px;
-  background:#25445888;color:#a7c8d5;font:900 12px/1 system-ui,sans-serif;
-}
-body.shua-clean #shuaCleanNav #shua-menu-rankings button::before{content:"▤"}
-body.shua-clean #shuaCleanNav #shua-menu-analytics button::before{content:"⌁";font-size:17px}
-body.shua-clean #shuaCleanNav #shua-menu-teams button::before{content:"◉"}
-body.shua-clean #shuaCleanNav #shua-menu-tools button::before{content:"◇";font-size:16px}
-body.shua-clean #shuaCleanNav .shua-clean-popup button.is-selected::before{
-  color:#80efc4;background:#2b7b5c66;
-}
 
 /* 4. History: season, games, finish and scoring read at a glance. */
 body.shua-clean .player-history-card{border-color:#50748b68!important;background:#081d2e!important}

@@ -797,25 +797,31 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 }
 /* Compare starts with only search fields; a selection expands inline into a readable identity card. */
 #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-searches{margin-top:4px;gap:12px}
-#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker.is-selected .st-compare-search-line{min-height:91px;border:1px solid #426984;background:linear-gradient(125deg,#102f47,#0a253b);border-radius:12px;box-shadow:0 6px 18px #0003}
-#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected{display:flex;align-items:center;gap:12px;min-height:91px;padding:10px 40px 10px 12px;pointer-events:none}
-#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-face{width:59px;height:65px;flex:0 0 59px;object-fit:contain;object-position:bottom;border-radius:9px;background:#203e54}
-#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-info{display:flex;flex-direction:column;justify-content:center;gap:7px;min-width:0;flex:1}
-#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-info strong{font-size:18px;font-weight:850;line-height:1.15;letter-spacing:-.025em;white-space:normal;overflow-wrap:break-word;color:#f2f9ff}
-#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-team{display:flex;align-items:center;gap:7px;color:#accde3;font-size:12px;font-weight:650;line-height:1.2;white-space:normal}
-#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-logo{width:25px;height:25px;flex:0 0 25px;object-fit:contain}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker.is-selected .st-compare-search-line{min-height:67px;border:1px solid #426984;background:linear-gradient(125deg,#102f47,#0a253b);border-radius:10px;box-shadow:0 4px 12px #0002}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected{display:flex;align-items:center;gap:9px;min-height:67px;padding:6px 38px 6px 10px;pointer-events:none}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-face{width:43px;height:49px;flex:0 0 43px;object-fit:contain;object-position:bottom;border-radius:8px;background:#203e54}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-info{display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0;flex:1}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-info strong{font-size:16px;font-weight:850;line-height:1.15;letter-spacing:-.025em;white-space:normal;overflow-wrap:break-word;color:#f2f9ff}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-team{display:flex;align-items:center;gap:6px;color:#accde3;font-size:11px;font-weight:650;line-height:1.2;white-space:normal}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-logo{width:21px;height:21px;flex:0 0 21px;object-fit:contain}
 #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker.is-selected:not(:focus-within) .st-compare-search-line>input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:text;z-index:2}
 #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker.is-selected:focus-within .st-compare-selected{display:none}
-#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker.is-selected:focus-within .st-compare-search-line>input{position:relative;height:90px;background:#0c2b43;border-color:#52b9e9;font-size:17px;opacity:1;padding-left:14px;padding-right:44px}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker.is-selected:focus-within .st-compare-search-line>input{position:relative;height:67px;background:#0c2b43;border-color:#52b9e9;font-size:17px;opacity:1;padding-left:14px;padding-right:44px}
 #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker.is-selected .st-compare-clear{z-index:4;right:9px;background:#1b465e;border-radius:50%;color:#e2f5ff}
 #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison.single{grid-template-columns:minmax(0,1fr);max-width:560px}
 @media(max-width:700px){
  #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker.is-selected,
  #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker:focus-within{grid-column:1/-1}
  #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected{padding-left:10px;gap:10px}
- #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-info strong{font-size:19px}
- #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-team{font-size:13px}
+ #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-info strong{font-size:16px}
+ #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-selected-team{font-size:11px}
 }
+/* Keep lower-row search results above player cards and neighboring fields. */
+#shuaAnalyticsSection[data-active-view="startsit"] #stContent{overflow:visible!important}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-searches{position:relative;z-index:1000;overflow:visible!important}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker{z-index:1;overflow:visible!important}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker:focus-within{position:relative;z-index:1100}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker:focus-within .st-compare-results{z-index:1200;overflow-y:auto;visibility:visible;max-height:min(310px,42dvh)}
 #shuaAnalyticsSection .st-weekly-search-results{position:absolute;z-index:75;left:4px;top:43px;width:min(480px,calc(100% - 8px));padding:5px;background:#10283b;border:1px solid #436078;border-radius:8px;box-shadow:0 8px 24px #0008;max-height:290px;overflow:auto}
 #shuaAnalyticsSection .st-weekly-search-results>button{display:block;background:transparent;color:white;border:0;width:100%;text-align:left;padding:5px}
 #shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-row{grid-template-columns:18px minmax(160px,1.7fr) minmax(65px,1fr) 46px!important}

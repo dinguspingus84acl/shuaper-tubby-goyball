@@ -1,0 +1,17 @@
+/* Keep gesture-driven mobile player sheets under the finger.
+   The generic visual entry animation fills its final transform and otherwise
+   masks the inline translate3d positions used during horizontal/vertical swipes. */
+body.shua-clean.phone-mode #modal.open .profile.featured-player-profile{
+  animation:none!important;
+  -webkit-animation:none!important;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  will-change:transform;
+}
+body.shua-clean.phone-mode #modal .player-swipe-preview{
+  animation:none!important;
+  -webkit-animation:none!important;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  will-change:transform;
+}

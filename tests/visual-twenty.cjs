@@ -7,7 +7,7 @@ const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const html=read('index.html'),css=read('visual-twenty-20261113.css'),js=read('visual-twenty-20261113.js');
 
 test('new assets load after the six previously published enhancements',()=>{
-  assert.match(html,/visual-nineteen-20261113\.js\?v=20261113-weekly-restore1[\s\S]*visual-twenty-20261113\.css\?v=20261113-weekly-restore1[\s\S]*visual-twenty-20261113\.js\?v=20261113-weekly-restore1/);
+  assert.match(html,/visual-nineteen-20261113\.js\?v=20261113-weekly-restore1[\s\S]*visual-twenty-20261113\.css\?v=20261113-weekly-restore1[\s\S]*visual-twenty-20261113\.js\?v=20261114-compare-current-week-v1/);
   assert.match(html,/weather\.js\?v=20261113-weather-revert-v1/);
 });
 test('mobile navigation stays four sections, is shorter, and retains 44px tap targets',()=>{
@@ -23,7 +23,7 @@ test('board player tile hierarchy preserves names, slots and team context',()=>{
   assert.doesNotMatch(css,/#board \.pick\{display:none/);
 });
 test('analytics page title is generated lazily with one consistent pattern',()=>{
-  for(const name of ['Weekly Report','Usage','Fantasy Intelligence','Boom / Bust','Team Shares','Injury Impact','Schedule','Start / Sit','Season Stats'])assert.ok(js.includes(name));
+  for(const name of ['Weekly Report','Usage','Fantasy Intelligence','Boom / Bust','Team Shares','Injury Impact','Schedule','Compare','Season Stats'])assert.ok(js.includes(name));
   assert.match(js,/document\.querySelector\('#shuaAnalyticsSection'\)/);
   assert.match(js,/shua-analytics-titlebar/);
   assert.match(js,/window\.addEventListener\('ShuaStudioReady'/);

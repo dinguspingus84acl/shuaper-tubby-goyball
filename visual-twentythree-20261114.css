@@ -1,0 +1,139 @@
+/* Visual pass 23: approved recommendations 1–4, 9–10 only.
+   No Team Shares, Weather, Weekly Report, or Injury Impact overrides. */
+body.shua-clean{
+  --v23-text:#f2faff;
+  --v23-subtle:#9fbacb;
+}
+
+/* 1. Whole-round rhythm, independent of tile content and click targets. */
+body.shua-clean #board{position:relative!important;isolation:isolate}
+body.shua-clean #board>.pick{z-index:1}
+body.shua-clean #board>.shua-v23-round-band{
+  position:absolute;z-index:0;box-sizing:border-box;pointer-events:none;
+  border:1px solid rgba(116,164,190,.12);border-radius:10px;
+  background:linear-gradient(90deg,rgba(68,114,143,.09),rgba(20,62,81,.02) 60%,rgba(68,114,143,.08));
+}
+body.shua-clean #board>.shua-v23-round-band.is-even{
+  background:linear-gradient(90deg,rgba(92,150,162,.16),rgba(55,106,127,.065) 60%,rgba(92,150,162,.13));
+  border-color:rgba(122,187,188,.17);
+}
+body.shua-clean #board .pick[data-shua-round-start]::before{
+  width:35px!important;left:-40px!important;padding:6px 0!important;
+  color:#e4f8ff!important;background:#164252!important;
+  border-color:#628b9d!important;font-size:10px!important;
+  box-shadow:0 1px 5px #0004;
+}
+
+/* 2. Player-first hierarchy in standard Rankings, without changing rows. */
+body.shua-clean #tableCard tbody tr:has(.photo-cell) .rank-player-copy>b,
+body.shua-clean #tableCard tbody tr:has(.photo-cell) .tagged-player-copy>b{
+  color:var(--v23-text)!important;line-height:1.16!important;
+  font-weight:950!important;letter-spacing:-.018em!important;
+}
+body.shua-clean #tableCard tbody tr:has(.photo-cell)>td.rank{
+  font-weight:900!important;font-variant-numeric:tabular-nums;
+  color:#bbd3e0!important;
+}
+body.shua-clean #tableCard .phone-rank-meta,
+body.shua-clean #tableCard .team-abbr{
+  color:var(--v23-subtle)!important;
+}
+body.shua-clean #tableCard .phone-rank-meta{font-weight:750!important;letter-spacing:.005em}
+
+/* 3. Identical position-code badges in Rankings, Stats and Analytics. */
+body.shua-clean [data-shua-v23-pos="QB"]{--v23-position:#bf9de8}
+body.shua-clean [data-shua-v23-pos="RB"]{--v23-position:#77d7b1}
+body.shua-clean [data-shua-v23-pos="WR"]{--v23-position:#77c2eb}
+body.shua-clean [data-shua-v23-pos="TE"]{--v23-position:#e8bd79}
+body.shua-clean :is(
+  #tableCard .badge[data-shua-v23-pos],
+  #espnLiveSection .espn-player-meta-pos[data-shua-v23-pos],
+  #shuaAnalyticsSection .shua-v23-position-chip,
+  #shuaExpandedSearch .shua-v23-search-position
+){
+  display:inline-flex!important;align-items:center;justify-content:center;
+  flex:0 0 auto;white-space:nowrap;
+  padding:2px 6px!important;border:1px solid color-mix(in srgb,var(--v23-position) 55%,transparent)!important;
+  border-radius:5px!important;background:color-mix(in srgb,var(--v23-position) 16%,#102739)!important;
+  color:var(--v23-position)!important;
+  font:900 10px/1.1 system-ui,sans-serif!important;letter-spacing:.025em;
+}
+body.shua-clean #shuaAnalyticsSection .st-person-copy small .shua-v23-position-chip{margin-left:5px}
+body.shua-clean #espnLiveSection .espn-player-meta-pos[data-shua-v23-pos]{margin-left:3px}
+
+/* 4. Search names left; team and position right, with crisp row separators. */
+body.shua-clean #shuaExpandedSearch .shua-search-results{gap:0!important}
+body.shua-clean #shuaExpandedSearch .shua-search-result{
+  display:grid!important;grid-template-columns:44px minmax(0,1fr) 12px!important;
+  align-items:center;gap:10px!important;min-height:59px!important;
+  border:0!important;border-bottom:1px solid #638ba329!important;
+  border-radius:7px!important;background:#102e44!important;
+  padding:8px 11px!important;transition:background-color .16s ease,box-shadow .16s ease;
+}
+body.shua-clean #shuaExpandedSearch .shua-search-result:nth-of-type(even){background:#0e293d!important}
+body.shua-clean #shuaExpandedSearch .shua-search-result:is(:hover,:focus-visible){
+  background:#184b63!important;box-shadow:inset 3px 0 #6cddb3!important;
+  outline:none!important;
+}
+body.shua-clean #shuaExpandedSearch .shua-search-result-copy{
+  display:grid!important;grid-template-columns:minmax(0,1fr) max-content!important;
+  align-items:center!important;gap:4px 10px!important;width:100%;min-width:0;
+}
+body.shua-clean #shuaExpandedSearch .shua-search-result-copy strong{
+  color:#f5fbff!important;font-size:14.5px!important;
+  line-height:1.17!important;min-width:0;
+}
+body.shua-clean #shuaExpandedSearch .shua-search-result-meta{
+  display:inline-flex!important;justify-content:flex-end;align-items:center;
+  gap:5px!important;min-width:0;margin:0!important;
+  color:#bed4e0!important;text-align:right;white-space:nowrap!important;
+}
+body.shua-clean #shuaExpandedSearch .shua-search-team-logo{width:17px;height:17px;margin:0}
+body.shua-clean #shuaExpandedSearch .shua-v23-search-team{font:850 11px/1 system-ui,sans-serif;color:#bad0df}
+body.shua-clean #shuaExpandedSearch .shua-v23-search-extra{
+  display:block;grid-column:1/-1;margin-top:1px!important;
+  color:#98b4c5!important;font:750 10px/1.2 system-ui,sans-serif!important;
+}
+body.shua-clean #shuaExpandedSearch .shua-search-chevron{font-size:17px!important;color:#8db9c3!important}
+
+/* 9. Polished motion that never delays navigation or changes the data. */
+@media(prefers-reduced-motion:no-preference){
+  body.shua-clean #modal.open .profile{animation:shua-v23-panel-enter .18s ease-out both}
+  body.shua-clean #shuaExpandedSearch:not([hidden]) .shua-search-dialog{
+    animation:shua-v23-panel-enter .18s ease-out both;
+  }
+  body.shua-clean :is(#shuaAnalyticsSection .st-button,#shuaAnalyticsSection .st-nav-button,
+    #espnLiveSection .espn-filter,#tableCard .view-toggle button,#shuaCleanNav button){
+    transition:background-color .17s ease,border-color .17s ease,color .17s ease,box-shadow .17s ease!important;
+  }
+  @keyframes shua-v23-panel-enter{
+    from{opacity:.72;transform:translateY(7px) scale(.992)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+  }
+}
+
+/* 10. Only actual overflowing controls show a quiet mobile edge cue. */
+@media(max-width:700px){
+  body.shua-clean .shua-v23-scroll-cue.shua-v23-can-right:not(.shua-v23-can-left){
+    -webkit-mask-image:linear-gradient(to right,#000 0%,#000 calc(100% - 15px),transparent 100%);
+    mask-image:linear-gradient(to right,#000 0%,#000 calc(100% - 15px),transparent 100%);
+  }
+  body.shua-clean .shua-v23-scroll-cue.shua-v23-can-left:not(.shua-v23-can-right){
+    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 15px,#000 100%);
+    mask-image:linear-gradient(to right,transparent 0%,#000 15px,#000 100%);
+  }
+  body.shua-clean .shua-v23-scroll-cue.shua-v23-can-left.shua-v23-can-right{
+    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 15px,#000 calc(100% - 15px),transparent 100%);
+    mask-image:linear-gradient(to right,transparent 0%,#000 15px,#000 calc(100% - 15px),transparent 100%);
+  }
+  body.shua-clean #shuaExpandedSearch .shua-search-result{
+    grid-template-columns:38px minmax(0,1fr) 10px!important;gap:8px!important;
+    min-height:55px!important;padding:7px 8px!important;
+  }
+  body.shua-clean #shuaExpandedSearch .shua-search-result-copy{
+    grid-template-columns:minmax(0,1fr) auto!important;gap:4px 6px!important;
+  }
+  body.shua-clean #shuaExpandedSearch .shua-search-result-copy strong{font-size:13px!important}
+  body.shua-clean #shuaExpandedSearch .shua-v23-search-team{font-size:10px}
+  body.shua-clean #tableCard tbody tr:has(.photo-cell)>td.rank{font-size:13px!important}
+}

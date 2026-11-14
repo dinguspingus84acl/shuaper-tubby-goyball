@@ -9,7 +9,7 @@ const js=source('board-overview-20261112.js');
 test('new layout and scripts are versioned after the previous polish layer',()=>{
   const html=source('index.html');
   assert.match(html,/visual-thirteen-20261112\.css[\s\S]*visual-thirteen-20261112\.js[\s\S]*board-overview-20261112\.css[\s\S]*board-overview-20261112\.js/);
-  assert.match(html,/unified-profile\.js\?v=20261112-boardnotes1/);
+  assert.match(html,/unified-profile\.js\?v=20261114-pull-down-5/);
 });
 test('Big Board controls remain functional inside a disclosure rather than five standalone buttons',()=>{
   assert.match(js,/shuaBoardSettingsPanel/);
@@ -32,5 +32,5 @@ test('Overview notes do not have a line clamp or inner vertical scrolling lock',
   assert.match(css,/#unifiedOverviewPanel:not\(\[hidden\]\)\{[\s\S]*?padding-bottom/);
   assert.match(css,/#playerNotes\{[\s\S]*?max-height:none!important/);
   assert.match(css,/overscroll-behavior-y:auto!important;touch-action:pan-y!important/);
-  assert.match(source('unified-profile.js'),/document\.getElementById\('unifiedOverviewPanel'\)\?\.hidden\)gesture\.mode='vertical'/);
+  assert.match(source('unified-profile.js'),/gesture\.startedAtTop&&Math\.abs\(dy\)>Math\.abs\(dx\)\*1\.25\)gesture\.mode='vertical'/);
 });

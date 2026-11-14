@@ -101,6 +101,9 @@
       const node = compare[i]?.firstChild;
       if (node?.nodeType === Node.TEXT_NODE && node.textContent !== label) node.textContent = label;
     }
+    const breakdown = section.querySelectorAll('.trade-why-side h4');
+    if (breakdown[0] && breakdown[0].textContent === 'Top Side') breakdown[0].textContent = 'Your Side';
+    if (breakdown[1] && breakdown[1].textContent === 'Bottom Side') breakdown[1].textContent = 'Their Side';
   }
 
   function decorate() {

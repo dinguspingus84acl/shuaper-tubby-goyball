@@ -9,8 +9,8 @@ const js = fs.readFileSync(path.join(root,'visual-twentyfour-20261114.js'),'utf8
 const html = fs.readFileSync(path.join(root,'index.html'),'utf8');
 
 test('visual 24 assets load after visual 23 with cache keys', () => {
-  const c = html.indexOf('visual-twentyfour-20261114.css?v=20261114-visual-1-2-4to9-v1');
-  const s = html.indexOf('visual-twentyfour-20261114.js?v=20261114-visual-1-2-4to9-v1');
+  const c = html.indexOf('visual-twentyfour-20261114.css?v=20261114-visual-1-2-4to9-v2');
+  const s = html.indexOf('visual-twentyfour-20261114.js?v=20261114-visual-1-2-4to9-v2');
   assert.ok(c > html.indexOf('visual-twentythree-20261114.js'));
   assert.ok(s > c);
 });
@@ -52,6 +52,7 @@ test('standing bars come from each record, not new fantasy data', () => {
 test('Trade sides are renamed while existing trade calculator drives values', () => {
   assert.match(js, /'Your Side'/);
   assert.match(js, /'Their Side'/);
+  assert.match(js, /\.trade-why-side h4/);
   assert.match(css, /#tradeSection:not\(\.trade-chart-view\) \.trade-sides/);
   assert.doesNotMatch(js, /playerValue\(|tradeMeterLeft|tradeMeterRight/);
 });

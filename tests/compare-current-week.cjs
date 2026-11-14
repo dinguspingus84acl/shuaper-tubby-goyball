@@ -74,9 +74,31 @@ test('Compared players only change when a suggestion is selected or cleared',()=
  assert.match(ui,/data-st-compare-results/);
 });
 
+test('Compare opens blank with no optional labels or introductory clutter',()=>{
+ const compare=ui.slice(ui.indexOf('function currentWeekCompare(){'),ui.indexOf('function showCompareSuggestions('));
+ assert.match(ui,/if\(state\.view==='startsit'\)\{state\.year=2026;state\.week=currentCompareWeek\(\);state\.compare=\[\];\}/);
+ assert.match(ui,/if\(view==='startsit'\)\{state\.year=2026;if\(state\.view!=='startsit'\)state\.compare=\[\];\}/);
+ assert.doesNotMatch(compare,/optional|Search for at least two players|Comparing Week/);
+ assert.match(compare,/if\(!chosen\.length\)return search;/);
+ assert.match(ui,/,'startsit'\]\.includes\(state\.view\)/);
+});
+
+test('Selecting one player immediately displays stats; additional players add a graph',()=>{
+ const compare=ui.slice(ui.indexOf('function currentWeekCompare(){'),ui.indexOf('function showCompareSuggestions('));
+ assert.match(compare,/if\(!chosen\.length\)return search;/);
+ assert.match(compare,/const cards=/);
+ assert.match(compare,/if\(chosen\.length===1\)return search\+cards;/);
+ assert.match(compare,/return search\+cards\+panel\('Recent scoring comparison'/);
+ assert.match(compare,/st-compare-selected/);
+ assert.match(compare,/st-compare-selected-logo/);
+ assert.match(compare,/S\.teams\[S\.canonicalTeam\(p\.team\)\]/);
+ const css=read('analytics/studio.css');
+ assert.match(css,/\.st-compare-picker\.is-selected.*\.st-compare-search-line/);
+ assert.match(css,/\.st-compare-selected-info strong/);
+ assert.match(css,/grid-column:1\/-1/);
+});
+
 test('new Compare assets use fresh cache versions',()=>{
- for(const asset of ['analytics-dashboard.js','clean-design.js','feature-polish-20261106.js','visual-twenty-20261113.js']){
-  assert.ok(html.includes(asset+'?v=20261114-compare-current-week-v1'),asset);
- }
- assert.match(read('analytics-dashboard.js'),/20261114-compare-current-week-v1/);
+ assert.ok(html.includes('analytics-dashboard.js?v=20261114-compare-clean-search-v2'));
+ assert.match(read('analytics-dashboard.js'),/20261114-compare-clean-search-v2/);
 });

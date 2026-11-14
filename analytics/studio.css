@@ -779,6 +779,22 @@ body.shua-studio-open:has(#shuaAnalyticsSection[data-active-view="schedule"]) ma
 #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-results[hidden],#shuaAnalyticsSection .st-weekly-search-results[hidden]{display:none!important}
 #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-results button{display:flex;align-items:center;gap:7px;width:100%;padding:7px;text-align:left;border:0;border-bottom:1px solid #ffffff16;color:#fff;background:transparent;cursor:pointer}
 #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-results button:hover{background:#164b51}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-heading{font-size:12px;font-weight:850;color:#b6d9ed;letter-spacing:.04em;margin:3px 0 10px}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-searches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-bottom:14px;align-items:start}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker{min-width:0;width:100%;gap:6px}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-search-line{position:relative}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-search-line>input{display:block;min-width:0;width:100%;height:45px;padding:8px 35px 8px 12px;background:#0d253a;color:#f1f8ff;border:1px solid #4c6c84;border-radius:9px;font-size:16px}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-search-line>input:focus{outline:2px solid #50addd;outline-offset:1px}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-clear{position:absolute;right:7px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#b9cedd;font-size:20px;line-height:1;min-width:30px;min-height:32px;cursor:pointer}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-results{top:calc(100% + 3px);max-height:320px;overscroll-behavior:contain}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-results button{min-height:48px}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-results button:focus-visible{outline:2px solid #50addd;outline-offset:-2px}
+#shuaAnalyticsSection[data-active-view="startsit"] .st-compare-no-results{padding:13px;color:#a4b9c9;font-size:13px}
+@media(max-width:700px){
+ #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-searches{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-picker>label{font-size:10px}
+ #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-search-line>input{font-size:16px}
+}
 #shuaAnalyticsSection .st-weekly-search-results{position:absolute;z-index:75;left:4px;top:43px;width:min(480px,calc(100% - 8px));padding:5px;background:#10283b;border:1px solid #436078;border-radius:8px;box-shadow:0 8px 24px #0008;max-height:290px;overflow:auto}
 #shuaAnalyticsSection .st-weekly-search-results>button{display:block;background:transparent;color:white;border:0;width:100%;text-align:left;padding:5px}
 #shuaAnalyticsSection[data-active-view="teams"] .st-team-snap-row{grid-template-columns:18px minmax(160px,1.7fr) minmax(65px,1fr) 46px!important}

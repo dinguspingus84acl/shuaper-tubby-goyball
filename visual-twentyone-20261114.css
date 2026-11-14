@@ -2,14 +2,11 @@
    Intentionally leave Big Board sizing (#1), injury badges (#10), Weather,
    source values, Weekly Report metric choices and game-log behavior intact. */
 
-/* 2 — Team watermark is visible enough to identify, behind the player copy. */
+/* 2 — Restore the previous Big Board tile styling and layering. Only
+   strengthen the pre-existing NFL team logo watermark. */
 body.shua-clean #board .pick .shua-pick-watermark{
-  opacity:.105!important;
-  filter:drop-shadow(0 0 8px #c3e6f014);
+  opacity:.18!important;
   pointer-events:none!important;
-}
-body.shua-clean #board .pick[data-shua-round] :is(.name,.meta,.slot){
-  position:relative;z-index:2;
 }
 
 /* 3 — One visual gutter and surface rhythm across existing main views.

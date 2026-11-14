@@ -33,6 +33,8 @@ test('covers portrait, team logos, hero, depth, stats, charts, filters, leagues 
 test('jersey number mirror does not remove or overwrite the original field', () => {
   assert.match(js, /\.featured-identity-meta \.featured-jersey-number/);
   assert.match(js, /inline\.textContent = value/);
+  assert.match(js, /Jersey number /);
+  assert.doesNotMatch(js, /aria-hidden/);
   assert.match(js, /MutationObserver/);
   assert.doesNotMatch(js, /remove\(|outerHTML\s*=|replaceWith\(/);
 });

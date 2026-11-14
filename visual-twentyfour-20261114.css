@@ -1,0 +1,148 @@
+/* Visual pass 24: approved recommendations 1, 2, 4–9.
+   Intentionally leaves ranking separators (#3) and Stock (#10) unchanged. */
+
+/* 1. A clearer identity without increasing the navigation bar height. */
+body.shua-clean #shuaCleanNav .shua-clean-brand{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:17px!important;font-weight:1000!important;letter-spacing:.08em!important;
+  text-shadow:0 1px 10px rgba(144,227,211,.16);
+}
+body.shua-clean #shuaCleanNav .shua-clean-brand::before{
+  content:"";display:block;width:13px;height:9px;flex:0 0 13px;
+  border:1.5px solid #72dfbd;border-radius:65%;transform:rotate(-30deg);
+  background:linear-gradient(90deg,transparent 42%,#a6f1da 43%,#a6f1da 55%,transparent 56%);
+  box-shadow:0 0 0 2px #0e2b3b;
+}
+body.shua-clean #shuaCleanNav .shua-brand-dot{color:#67e4b8!important}
+
+/* 2. Uniform, restrained menu icons and better reading rhythm. */
+body.shua-clean #shuaCleanNav .shua-clean-popup{padding:7px!important}
+body.shua-clean #shuaCleanNav .shua-clean-popup button{
+  display:flex!important;align-items:center;gap:10px!important;
+  min-height:40px!important;line-height:1.2!important;padding:8px 11px!important;
+  border-radius:7px!important;letter-spacing:.005em;
+}
+body.shua-clean #shuaCleanNav .shua-clean-popup button::before{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:18px;height:18px;flex:0 0 18px;border-radius:5px;
+  background:#25445888;color:#a7c8d5;font:900 12px/1 system-ui,sans-serif;
+}
+body.shua-clean #shuaCleanNav #shua-menu-rankings button::before{content:"▤"}
+body.shua-clean #shuaCleanNav #shua-menu-analytics button::before{content:"⌁";font-size:17px}
+body.shua-clean #shuaCleanNav #shua-menu-teams button::before{content:"◉"}
+body.shua-clean #shuaCleanNav #shua-menu-tools button::before{content:"◇";font-size:16px}
+body.shua-clean #shuaCleanNav .shua-clean-popup button.is-selected::before{
+  color:#80efc4;background:#2b7b5c66;
+}
+
+/* 4. History: season, games, finish and scoring read at a glance. */
+body.shua-clean .player-history-card{border-color:#50748b68!important;background:#081d2e!important}
+body.shua-clean .player-history-head,
+body.shua-clean .player-history-row{
+  grid-template-columns:66px minmax(125px,1.35fr) 67px 47px 78px 98px;
+  column-gap:9px!important;padding:10px 13px!important;
+}
+body.shua-clean .player-history-head{background:#123047!important;color:#a8c7d7!important;font-size:10px!important}
+body.shua-clean .player-history-row{min-height:51px;border-top-color:#66879a22!important}
+body.shua-clean .player-history-row:nth-of-type(4n){background:#ffffff03}
+body.shua-clean .player-history-row:is(:hover,.open,:focus-visible){background:#154159!important;outline:none}
+body.shua-clean .player-history-year{color:#9fe7ca!important;letter-spacing:.01em;font-weight:1000!important}
+body.shua-clean .player-history-finish{color:#dbedfb!important}
+body.shua-clean .player-history-games{color:#bad0de!important}
+body.shua-clean .player-history-ppg{color:#c3d7e4!important}
+body.shua-clean .player-history-points{color:#f3fcff!important;font-size:1.08rem!important;letter-spacing:-.015em}
+body.shua-clean .player-history-row.open{box-shadow:inset 3px 0 #6be0b4}
+@media(max-width:620px){
+  body.shua-clean .player-history-head,
+  body.shua-clean .player-history-row{
+    grid-template-columns:60px 58px 43px 32px minmax(45px,1fr) minmax(58px,1.1fr);
+    column-gap:4px!important;padding:9px 5px!important;
+  }
+  body.shua-clean .player-history-head{font-size:9px!important;letter-spacing:0!important}
+  body.shua-clean .player-history-row{min-height:48px}
+  body.shua-clean .player-history-year{font-size:.87rem!important}
+  body.shua-clean .player-history-points{font-size:.94rem!important}
+  body.shua-clean .player-history-finish{font-size:.91rem!important}
+}
+
+/* 5. Performance tick BESIDE the total: no week-column color or point badge. */
+body.shua-clean .espn-game-log-table tbody td.gl-pts::before{
+  content:"";display:inline-block;width:3px;height:17px;
+  margin-right:6px;vertical-align:-3px;border-radius:3px;
+  background:#728ca0;opacity:.8;
+}
+body.shua-clean .espn-game-log-table tbody td.gl-pts-high::before{background:#58d99d;opacity:1}
+body.shua-clean .espn-game-log-table tbody td.gl-pts-low::before{background:#ed8293;opacity:1}
+
+/* 6. Keep the full Stats category set inside the existing compact select. */
+body.shua-clean #espnColumnStatSelect{
+  color:#eafaff!important;border-color:#498472!important;
+  background-color:#102c40!important;box-shadow:inset 2px 0 #56d7a8;
+}
+body.shua-clean #espnColumnStatSelect optgroup{color:#89dabc;font-weight:900}
+body.shua-clean #espnColumnStatSelect option{color:#edf7fb;background:#11283c;font-weight:700}
+
+/* 7. Quiet, within-column usage heat; unavailable values receive no tint. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="usage"]
+  .st-usage-table tbody td.shua-v24-heat{
+  background-image:linear-gradient(90deg,rgba(59,180,150,var(--shua-v24-heat-strength,.05)),rgba(59,180,150,.012))!important;
+  background-clip:padding-box;
+}
+
+/* 8. Proportional W/L record strokes, small enough for single-line phone standings. */
+body.shua-clean #shuaMyTeams .myteams-standings-line:not(.is-heading)>span:nth-child(3){
+  display:flex;align-items:center;justify-content:flex-end;gap:4px;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+body.shua-clean #shuaMyTeams .shua-v24-record-bar{
+  width:17px;height:5px;flex:0 0 17px;background:#dc7d8b99;
+  border-radius:3px;overflow:hidden;display:inline-block;
+}
+body.shua-clean #shuaMyTeams .shua-v24-record-bar>i{
+  height:100%;display:block;background:#5fe0aa;border-radius:3px 0 0 3px;
+}
+@media(max-width:620px){
+  body.shua-clean #shuaMyTeams .myteams-standings-line:not(.is-heading)>span:nth-child(3){gap:3px;font-size:9px}
+  body.shua-clean #shuaMyTeams .shua-v24-record-bar{width:11px;flex-basis:11px;height:4px}
+}
+
+/* 9. Symmetric Trade Calculator; value calculation and chart tab are untouched. */
+body.shua-clean #tradeSection:not(.trade-chart-view) .trade-sides{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  position:relative;gap:12px!important;
+}
+body.shua-clean #tradeSection:not(.trade-chart-view) .trade-side{
+  background:linear-gradient(180deg,#102e44,#081d2f 90%)!important;
+  border:1px solid #416c8088!important;border-radius:13px!important;
+  min-width:0;
+}
+body.shua-clean #tradeSection:not(.trade-chart-view) .trade-side-head{
+  background:#17384d;padding:11px 13px!important;border-radius:12px 12px 0 0;
+}
+body.shua-clean #tradeSection:not(.trade-chart-view) .trade-side-head h3{
+  color:#f0fcff;font-size:13px!important;letter-spacing:.01em;
+}
+body.shua-clean #tradeSection:not(.trade-chart-view) .trade-total{
+  color:#8ee9c4!important;font-size:14px!important;font-weight:1000!important;
+}
+body.shua-clean #tradeSection:not(.trade-chart-view) .trade-sides::before{
+  content:"⇄";position:absolute;top:13px;left:50%;transform:translateX(-50%);
+  z-index:3;width:29px;height:29px;display:grid;place-items:center;
+  color:#a3e8cf;background:#0d2b3d;border:1px solid #4a8778;
+  border-radius:50%;font-size:17px;pointer-events:none;
+}
+body.shua-clean #tradeSection:not(.trade-chart-view) .trade-comparison{
+  max-width:700px;margin:11px auto 0;padding:12px;
+  border:1px solid #4c6e804d;border-radius:11px;background:#0c2639;
+}
+body.shua-clean #tradeSection:not(.trade-chart-view) #tradeCenterDelta{
+  display:inline-block;padding:5px 10px;border:1px solid #416e74;
+  border-radius:999px;color:#d9fff0;background:#164436;
+}
+body.shua-clean #tradeSection:not(.trade-chart-view) .trade-meter{height:10px!important;max-width:none!important}
+@media(max-width:620px){
+  body.shua-clean #tradeSection:not(.trade-chart-view) .trade-sides{
+    grid-template-columns:minmax(0,1fr)!important;gap:10px!important;
+  }
+  body.shua-clean #tradeSection:not(.trade-chart-view) .trade-sides::before{display:none!important}
+}

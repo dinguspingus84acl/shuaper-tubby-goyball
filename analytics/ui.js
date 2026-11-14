@@ -4,7 +4,14 @@
 const S=globalThis.ShuaStudio,C=S.Chart,{esc:E,fmt:F,num:N,mean:avg,sum,key,aggregate:A,games:G}=S;
 if(S.UI)return;
 const main=document.querySelector('main'),navigation=document.querySelector('.positions');if(!main||!navigation)return;
-const pages=[['usage','Usage analytics','Snap share, routes, targets and yards per route.'],['intelligence','Fantasy Intelligence','Decision tools based on verified opportunities and disclosed models.'],['consistency','Boom / bust consistency','Hit rates, observed floor and week-to-week variance.'],['teams','Team opportunity','See who controls the offense.'],['injury','Injury impact','Compare teammate usage with and without a starter.'],['schedule','Schedule','Position-specific opponents, week by week.'],['startsit','Start / sit','Compare your options without changing your rankings.'],['weekly','Weekly performance','Scorers, opportunity leaders and changes from recent form.']];
+const pages=[['usage','Usage analytics','Snap share, routes, targets and yards per route.'],['intelligence','Fantasy Intelligence','Decision tools based on verified opportunities and disclosed models.'],['consistency','Boom / bust consistency','Hit rates, observed floor and week-to-week variance.'],['teams','Team opportunity','See who controls the offense.'],['injury','Injury impact','Compare teammate usage with and without a starter.'],['schedule','Schedule','Position-specific opponents, week by week.'],['startsit','Compare','Compare players for the current NFL week.'],['weekly','Weekly performance','Scorers, opportunity leaders and changes from recent form.']];
+// The 2026 regular season opened on Thursday September 10. NFL weeks run
+// Thursday to Wednesday, so recorded Thursday games don't advance Compare.
+function currentCompareWeek(now=new Date()){
+ const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now).filter(p=>p.type!=='literal').map(p=>[p.type,Number(p.value)]));
+ const today=Date.UTC(parts.year,parts.month-1,parts.day);
+ return Math.max(1,Math.min(18,Math.floor((today-Date.UTC(2026,8,10))/604800000)+1));
+}
 let section=document.getElementById('shuaAnalyticsSection');if(!section){section=document.createElement('section');section.id='shuaAnalyticsSection';section.hidden=true;main.append(section);}section.className='st-studio';
 let button=document.querySelector('.positions [data-pos="ANALYTICS"]');if(!button){button=document.createElement('button');button.className='pos';button.dataset.pos='ANALYTICS';button.textContent='Analytics';navigation.append(button);}button.id='studioNav';
 let state={view:'weekly',year:2026,pos:'RB',player:'',team:'DET',week:0,range:0,rankSource:'big-board.json',playoffs:false,compare:[],outWeeks:null};try{const saved=JSON.parse(localStorage.getItem('shuaStudioStateV1')||'null');if(saved){state={...state,...saved};if(!pages.some(p=>p[0]===state.view))state.view='weekly';if(![2024,2025,2026].includes(+state.year))state.year=2026;state.outWeeks=null;}}catch(e){}
@@ -14,16 +21,18 @@ let dataset=null,epoch=0,renderId=0,visible=false,historyData=null,hiddenBefore=
 function linkedView(){const m=location.hash.match(/^#analytics\/([a-z]+)$/);return m&&pages.some(p=>p[0]===m[1])?m[1]:null;}
 const initialView=linkedView();if(initialView){if(state.view==='schedule'&&initialView!=='schedule'&&[2024,2025,2026].includes(+state.scheduleReturnYear)){state.year=+state.scheduleReturnYear;state.scheduleReturnYear=null;}state.view=initialView;state.week=0;}
 if(initialView==='intelligence')state.year=2026;
+if(state.view==='startsit'){state.year=2026;state.week=currentCompareWeek();}
 if(state.view==='schedule'&&+state.year!==2026){state.scheduleReturnYear=+state.year;state.year=2026;}
 function updateLink(){if(!visible)return;try{const u=new URL(location.href);u.hash='analytics/'+state.view;history.replaceState(history.state,'',u);}catch(e){}}
 function navigate(view){if(!pages.some(p=>p[0]===view))view='consistency';
  if(view==='intelligence'&&state.year!==2026){state.intelReturnYear=state.year;state.year=2026;}
  else if(state.view==='intelligence'&&view!=='intelligence'&&[2024,2025,2026].includes(+state.intelReturnYear)){state.year=+state.intelReturnYear;state.intelReturnYear=null;}
  if(view==='schedule'){if(state.view!=='schedule'&&+state.year!==2026)state.scheduleReturnYear=+state.year;state.year=2026;}
+ if(view==='startsit')state.year=2026;
  else if(state.view==='schedule'&&[2024,2025,2026].includes(+state.scheduleReturnYear)){state.year=+state.scheduleReturnYear;state.scheduleReturnYear=null;}
  state.view=view;state.outWeeks=null;if(view==='injury')state.injuryInitialized=0;
  const matching=dataset&&dataset.year===+state.year;
- state.week=matching?Math.min(18,['matchup','schedule','startsit'].includes(view)?dataset.latestWeek+1:dataset.latestWeek):0;
+ state.week=view==='startsit'?currentCompareWeek():matching?Math.min(18,['matchup','schedule'].includes(view)?dataset.latestWeek+1:dataset.latestWeek):0;
  if(visible){if(matching)render();else load();}else open();
 }
 
@@ -690,7 +699,74 @@ function injury(){
 
  return output+'</div></div>';
 }
-function startsit(){const candidates=selectedPlayers();let chosen=state.compare.map(k=>dataset.players.find(p=>p.key===k)).filter(p=>p&&p.position===state.pos);if(chosen.length<2)chosen=candidates.slice(0,2);state.compare=chosen.map(p=>p.key);const through=Math.min(state.week-1,dataset.latestWeek),def=defenseForPosition(state.pos,through,state.range);if(!def)return positions()+controls({week:true})+note('Verified ESPN PPR matchup ratings are temporarily unavailable.',true);const info=chosen.map(p=>{const a=A(p,through),recent=G(p,through).slice(-3),d=def.byTeam[upcoming(p)?.opponent],co=S.consistency(p,through),m=S.teamShares(dataset,p.team,through).find(x=>x.key===p.key),recentPpg=avg(recent.map(g=>g.points)),adj=d&&def.league?Math.max(-.15,Math.min(.15,.2*(d.allowed/def.league-1))):0,estimate=recentPpg===null||upcoming(p)?.bye?null:recentPpg*(1+adj);return {p,a,d,co,recentPpg,estimate,targetShare:m?.targetShare};});const best=[...info].filter(x=>x.estimate!==null).sort((a,b)=>b.estimate-a.estimate)[0],floor=[...info].filter(x=>x.co.floor!==null).sort((a,b)=>b.co.floor-a.co.floor)[0];const metricValues=info.map(x=>[x.recentPpg,x.a.workload,x.d?.score,x.co.floor]),scales=[0,1,2,3].map(i=>Math.max(1,...metricValues.map(x=>x[i]||0)));return positions()+controls({week:true})+`<div class="st-controls">${[0,1,2,3].map(i=>'<div class="st-compare-picker"><label>Player '+(i+1)+(i>=2?' · optional':'')+'</label><div class="st-compare-picked">'+(chosen[i]?face(chosen[i],'st-compare-picked-face')+'<span>'+E(chosen[i].name)+'<small>'+E(chosen[i].position)+' · '+E(chosen[i].team)+'</small></span>'+logo(chosen[i].team,'st-compare-picked-logo'):'<span>Select a player</span>')+'</div><input type="search" data-st-compare-search="'+i+'" placeholder="Search players…" autocomplete="off"><div class="st-compare-results" data-st-compare-results="'+i+'" hidden></div></div>').join('')}</div><div class="st-comparison">${info.map((x,i)=>feature(x.p,i,F(x.estimate),'Trend-based PPR estimate',`<p>${opponentHtml(x.p,def)}</p><div class="st-compare-metric"><span>Last 3 PPG</span><b>${F(x.recentPpg)}</b></div><div class="st-compare-metric"><span>Opportunities / game</span><b>${F(x.a.workload)}</b></div><div class="st-compare-metric"><span>Target share</span><b>${F(x.targetShare,1,'%')}</b></div><div class="st-compare-metric"><span>Your custom rank</span><b>${x.p.customPositionRank?'#'+x.p.customPositionRank:'—'}</b></div><div class="st-compare-metric"><span>Season PPR</span><b>${F(x.a.points)}</b></div><div class="st-compare-metric"><span>Games played</span><b>${F(x.a.n,0)}</b></div><div class="st-compare-metric"><span>Targets</span><b>${F(x.a.targets,0)}</b></div><div class="st-compare-metric"><span>Receiving yards</span><b>${F(x.a.recYds,0)}</b></div><div class="st-compare-metric"><span>Rushing yards</span><b>${F(x.a.rushYds,0)}</b></div><div class="st-compare-metric"><span>Observed P10</span><b>${F(x.co.floor)}</b></div>`)).join('')}</div>`+''+panel('Recent scoring comparison','',(()=>{const ws=[...new Set(chosen.flatMap(p=>G(p,through).slice(-5).map(g=>g.week)))].sort((a,b)=>a-b);return C.line({title:'Recent scoring comparison',labels:ws.map(w=>'W'+w),series:chosen.map(p=>({name:p.name,values:ws.map(w=>G(p,through).find(g=>g.week===w)?.points??null)})),area:false});})());}
+// Compare has no season, week or position
+// selectors, and no separate selected-player panel above each search field.
+function currentWeekCompare(){
+ state.year=2026;
+ state.week=currentCompareWeek();
+ const byKey=new Map(dataset.players.map(p=>[p.key,p]));
+ const keys=Array.isArray(state.compare)?state.compare.slice(0,4):[];
+ const slots=Array.from({length:4},(_,i)=>byKey.get(keys[i])||null);
+ const chosen=slots.filter(Boolean);
+ const week=state.week;
+ const search='<div class="st-compare-heading">Comparing Week '+week+'</div>'+
+  '<div class="st-controls st-compare-searches">'+slots.map((p,i)=>
+   '<div class="st-compare-picker"><label for="stCompareSearch'+i+'">Player '+(i+1)+(i>=2?' · optional':'')+'</label>'+
+   '<div class="st-compare-search-line"><input id="stCompareSearch'+i+'" type="search" data-st-compare-search="'+i+'" '+
+   'role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="stCompareResults'+i+'" '+
+   'placeholder="Search players…" autocomplete="off" value="'+E(p?.name||'')+'">'+
+   (p?'<button class="st-compare-clear" data-st-compare-clear="'+i+'" type="button" aria-label="Clear Player '+(i+1)+'">×</button>':'')+
+   '</div><div id="stCompareResults'+i+'" class="st-compare-results" data-st-compare-results="'+i+'" role="listbox" hidden></div></div>'
+  ).join('')+'</div>';
+ if(chosen.length<2)return search+note('Search for at least two players to compare their current-week matchups and recent scoring.');
+ const through=Math.min(week-1,dataset.latestWeek);
+ const defenses=new Map();
+ const info=chosen.map(p=>{
+  if(!defenses.has(p.position))defenses.set(p.position,defenseForPosition(p.position,through,state.range));
+  const def=defenses.get(p.position);
+  const a=A(p,through),recent=G(p,through).slice(-3),opponent=upcoming(p,week);
+  const d=def?.byTeam?.[opponent?.opponent];
+  const co=S.consistency(p,through);
+  const m=S.teamShares(dataset,p.team,through).find(x=>x.key===p.key);
+  const recentPpg=avg(recent.map(g=>g.points));
+  const adj=d&&def?.league?Math.max(-.15,Math.min(.15,.2*(d.allowed/def.league-1))):0;
+  const estimate=recentPpg===null||opponent?.bye?null:recentPpg*(1+adj);
+  return {p,a,d,def,co,recentPpg,estimate,targetShare:m?.targetShare};
+ });
+ const cards='<div class="st-comparison">'+info.map((x,i)=>feature(x.p,i,F(x.estimate),'Trend-based PPR estimate',
+  '<p>'+(x.def?opponentHtml(x.p,x.def,week):'<span class="st-tag">Matchup rating unavailable</span>')+'</p>'+
+  '<div class="st-compare-metric"><span>Last 3 PPG</span><b>'+F(x.recentPpg)+'</b></div>'+
+  '<div class="st-compare-metric"><span>Opportunities / game</span><b>'+F(x.a.workload)+'</b></div>'+
+  '<div class="st-compare-metric"><span>Target share</span><b>'+F(x.targetShare,1,'%')+'</b></div>'+
+  '<div class="st-compare-metric"><span>Your custom rank</span><b>'+(x.p.customPositionRank?'#'+x.p.customPositionRank:'—')+'</b></div>'+
+  '<div class="st-compare-metric"><span>Season PPR</span><b>'+F(x.a.points)+'</b></div>'+
+  '<div class="st-compare-metric"><span>Games played</span><b>'+F(x.a.n,0)+'</b></div>'+
+  '<div class="st-compare-metric"><span>Targets</span><b>'+F(x.a.targets,0)+'</b></div>'+
+  '<div class="st-compare-metric"><span>Receiving yards</span><b>'+F(x.a.recYds,0)+'</b></div>'+
+  '<div class="st-compare-metric"><span>Rushing yards</span><b>'+F(x.a.rushYds,0)+'</b></div>'+
+  '<div class="st-compare-metric"><span>Observed P10</span><b>'+F(x.co.floor)+'</b></div>'
+ )).join('')+'</div>';
+ const weeks=[...new Set(chosen.flatMap(p=>G(p,through).slice(-5).map(g=>g.week)))].sort((a,b)=>a-b);
+ const graph=C.line({title:'Recent scoring comparison',labels:weeks.map(w=>'W'+w),
+  series:chosen.map(p=>({name:p.name,values:weeks.map(w=>G(p,through).find(g=>g.week===w)?.points??null)})),area:false});
+ return search+cards+panel('Recent scoring comparison','',graph);
+}
+function showCompareSuggestions(input){
+ const index=Number(input.dataset.stCompareSearch);
+ const box=section.querySelector('[data-st-compare-results="'+index+'"]');
+ if(!box||!dataset)return;
+ const q=key(input.value.trim());
+ if(!q){box.replaceChildren();box.hidden=true;input.setAttribute('aria-expanded','false');return;}
+ const matched=dataset.players.filter(p=>p.key.includes(q)).sort((a,b)=>
+  (a.key.startsWith(q)?0:1)-(b.key.startsWith(q)?0:1)||
+  (a.customRank||9999)-(b.customRank||9999)||a.name.localeCompare(b.name)).slice(0,12);
+ box.innerHTML=matched.length?matched.map(p=>
+  '<button type="button" role="option" data-st-choose-compare="'+index+'" data-st-key="'+E(p.key)+'">'+
+  face(p,'st-compare-option-face')+'<span>'+E(p.name)+'<small>'+E(p.position)+' · '+E(p.team)+'</small></span>'+
+  logo(p.team,'st-compare-option-logo')+'</button>').join(''):
+  '<div class="st-compare-no-results">No matching players</div>';
+ box.hidden=false;input.setAttribute('aria-expanded','true');
+}
 function weekly(){
  const week=state.week;
  const position=state.weeklyPos||'ALL';
@@ -723,7 +799,7 @@ function intelligence(){
  }
  return S.IntelligenceView.render({dataset,usage:rankedUsage,state,person,panel,face,logo});
 }
-const renderers={trends,matchup,opportunity,usage,intelligence,consistency,teams,schedule,injury,startsit,weekly};
+const renderers={trends,matchup,opportunity,usage,intelligence,consistency,teams,schedule,injury,startsit:currentWeekCompare,weekly};
 
 function setAnalyticsLeadingAvatar(player){
  const leading=section.querySelector('#stGlobalLeadingAvatar'),magnifier=section.querySelector('.st-global-search-icon');
@@ -849,7 +925,8 @@ section.addEventListener('click',e=>{
   const next=section.querySelector('.st-usage-table');if(next){next.scrollLeft=left;next.scrollTop=top;}
   return;
  }
- const chooseCompare=e.target.closest('[data-st-choose-compare]');if(chooseCompare){state.compare[Number(chooseCompare.dataset.stChooseCompare)]=chooseCompare.dataset.stKey;render();return;}
+ const compareClear=e.target.closest('[data-st-compare-clear]');if(compareClear){state.compare[Number(compareClear.dataset.stCompareClear)]=null;render();return;}
+ const chooseCompare=e.target.closest('[data-st-choose-compare]');if(chooseCompare){const index=Number(chooseCompare.dataset.stChooseCompare),chosen=chooseCompare.dataset.stKey;state.compare=Array.from({length:4},(_,i)=>i===index?chosen:state.compare[i]===chosen?null:state.compare[i]||null);render();return;}
  const suggestion=e.target.closest('[data-st-suggest]');
  if(suggestion&&state.view==='schedule'){openScheduleSuggestion(suggestion);return;}
  const currentSuggestions=section.querySelector('#stScheduleSuggestions');
@@ -886,6 +963,10 @@ section.addEventListener('click',e=>{
   return;
  }const player=e.target.closest('[data-st-open]');if(player){showPlayer(player.dataset.stOpen);return;}const arch=e.target.closest('[data-st-archive]');if(arch){state.year=+arch.dataset.stArchive;state.week=0;load();}if(e.target.closest('[data-st-retry]')){S.Data.clear();load();}});
 section.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.st-schedule-best-row[data-st-open]')){e.preventDefault();showPlayer(e.target.dataset.stOpen);}});
+// Suggestions, rather than blur/change on a text input, own player selection.
+section.addEventListener('change',e=>{
+ if(e.target.matches('[data-st-compare-search]'))e.stopImmediatePropagation();
+},true);
 section.addEventListener('change',e=>{if(e.target.id==='stUsageMetric')state.usageSortDirection=e.target.value==='espnPositionRank'?'asc':'desc';},true);
 section.addEventListener('change',e=>{
  if(e.target.id!=='stTargetShareTeam'||!S.teams[e.target.value])return;
@@ -908,7 +989,7 @@ section.addEventListener('change',e=>{
 });
 section.addEventListener('change',e=>{if(e.target.id==='stWeeklyChartWeek'){state.weeklyChartWeek=Number(e.target.value);render();return;}if(e.target.matches('[data-st-compare-search]')){const idx=Number(e.target.dataset.stCompareSearch),candidate=dataset.players.find(p=>p.position===state.pos&&p.name.toLowerCase()===e.target.value.trim().toLowerCase());if(candidate){state.compare[idx]=candidate.key;render();}return;}if(e.target.id==='stTeamMetric'){state.teamMetric=e.target.value;render();return;}if(e.target.id==='stTeamWindow'){state.teamWindow=e.target.value;render();return;}if(e.target.id==='stWeeklyMetric'){state.weeklyMetric=e.target.value;render();return;}if(e.target.id==='stWeeklyPos'){state.weeklyPos=e.target.value;render();return;}if(e.target.id==='stUsagePos'){state.usagePos=e.target.value;rerenderUsage();return;}if(e.target.id==='stUsageMetric'){state.usageMetric=e.target.value;rerenderUsage();return;}if(e.target.id==='stScheduleDisplay'){state.scheduleDisplay=e.target.value;state.scheduleQuery='';state.scheduleFocusKey='';render();return;}if(e.target.matches('[data-st-hit-filter]')){state.hitFilters=state.hitFilters||[0,0,0,0];state.hitFilters[Number(e.target.dataset.stHitFilter)]=Number(e.target.value);render();return;}const id=e.target.id,v=e.target.value;if(id==='stDashboard'){navigate(v);return;}if(id==='stSchedulePlayer'){state.scheduleFocusKey=v;state.scheduleScrollPending=true;render();return;}if(id==='stInjuryPos'){state.injuryPos=v;state.injuredKey='';render();return;}if(id==='stInjuryStatus'){state.injuryStatus=v;state.injuredKey='';render();return;}if(id==='stSeason'){if(state.view==='schedule'||state.view==='intelligence')return;state.year=+v;state.week=0;state.outWeeks=null;load();return;}if(id==='stPlayer'){state.player=v;state.outWeeks=null;}else if(id==='stTeam'){state.team=v;state.player='';state.outWeeks=null;}else if(id==='stWeek'){state.week=+v;state.outWeeks=null;if(state.view==='schedule'){state.scheduleSortWeek=null;state.scheduleSortDirection=null;}}else if(id==='stRange')state.range=+v;else if(id==='stRankSource')state.rankSource=v;else if(id==='stPlayoffs'){state.playoffs=v==='playoffs';state.scheduleSortWeek=null;state.scheduleSortDirection=null;}else if(id==='stInjuredPlayer'){state.player=v;state.outWeeks=null;}else if(id.startsWith('stCompare')){state.compare=[0,1,2,3].map(i=>document.getElementById('stCompare'+i)?.value).filter(Boolean);state.compare=[...new Set(state.compare)];}else if(e.target.matches('[data-st-out]'))state.outWeeks=[...section.querySelectorAll('[data-st-out]:checked')].map(e=>+e.dataset.stOut);else return;render();});
 section.addEventListener('input',e=>{if(e.target.id==='stGlobalSearch'){state.studioSearch=e.target.value;const clear=section.querySelector('[data-st-clear-search]');if(clear)clear.hidden=!state.studioSearch;showAnalyticsPlayerMatches(state.studioSearch);if(state.view!=='weekly')applyStudioSearch();return;}
- const picker=e.target.closest('[data-st-compare-search]');if(picker){const idx=picker.dataset.stCompareSearch,box=section.querySelector('[data-st-compare-results="'+idx+'"]'),q=picker.value.trim().toLowerCase();if(box){box.innerHTML=q?selectedPlayers().filter(p=>p.name.toLowerCase().includes(q)).slice(0,10).map(p=>'<button type="button" data-st-choose-compare="'+idx+'" data-st-key="'+E(p.key)+'">'+face(p,'st-compare-option-face')+'<span>'+E(p.name)+'<small>'+E(p.position)+' · '+E(p.team)+'</small></span>'+logo(p.team,'st-compare-option-logo')+'</button>').join(''):'';box.hidden=!box.innerHTML;}return;}
+ const picker=e.target.closest('[data-st-compare-search]');if(picker){showCompareSuggestions(picker);return;}
  if(e.target.id!=='stScheduleSearch')return;
  const search=e.target.value.trim().toLowerCase();state.scheduleQuery=search;
  let count=0;
@@ -919,6 +1000,38 @@ section.addEventListener('input',e=>{if(e.target.id==='stGlobalSearch'){state.st
  showScheduleSuggestions(search);
 });
 section.addEventListener('input',e=>{if(e.target.id!=='stInjurySearch')return;const q=e.target.value.toLowerCase().trim();state.injurySearch=q;let count=0;section.querySelectorAll('#stInjuryList .st-injury-item[data-name]').forEach(el=>{el.hidden=!!q&&!el.dataset.name.includes(q);if(!el.hidden)count++;});const counter=document.getElementById('stInjuryCount');if(counter)counter.textContent=count+' players';});
+section.addEventListener('focusin',e=>{
+ if(e.target.matches('[data-st-compare-search]')){
+  e.target.select();
+  if(e.target.value)showCompareSuggestions(e.target);
+ }
+});
+section.addEventListener('click',e=>{
+ if(e.target.closest('.st-compare-picker'))return;
+ section.querySelectorAll('[data-st-compare-results]').forEach(box=>{box.hidden=true;});
+ section.querySelectorAll('[data-st-compare-search]').forEach(input=>input.setAttribute('aria-expanded','false'));
+});
+section.addEventListener('keydown',e=>{
+ const search=e.target.closest('[data-st-compare-search]');
+ const option=e.target.closest('[data-st-choose-compare]');
+ if(search){
+  const suggestions=section.querySelector('[data-st-compare-results="'+search.dataset.stCompareSearch+'"]');
+  if(e.key==='Escape'&&suggestions){suggestions.hidden=true;search.setAttribute('aria-expanded','false');return;}
+  if(e.key==='Enter'&&suggestions&&!suggestions.hidden){
+   const first=suggestions.querySelector('[data-st-choose-compare]');
+   if(first){e.preventDefault();first.click();}return;
+  }
+  if(e.key==='ArrowDown'&&suggestions&&!suggestions.hidden){
+   const first=suggestions.querySelector('[data-st-choose-compare]');
+   if(first){e.preventDefault();first.focus();}return;
+  }
+ }else if(option&&e.key==='Escape'){
+  const searchInput=section.querySelector('[data-st-compare-search="'+option.dataset.stChooseCompare+'"]');
+  e.preventDefault();searchInput?.focus();
+  section.querySelector('[data-st-compare-results="'+option.dataset.stChooseCompare+'"]').hidden=true;
+  searchInput?.setAttribute('aria-expanded','false');
+ }
+});
 section.addEventListener('keydown',e=>{
  if(e.target.id==='stScheduleSearch'){
   const popup=section.querySelector('#stScheduleSuggestions');

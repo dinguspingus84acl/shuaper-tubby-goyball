@@ -1545,12 +1545,22 @@ function dismissPhoneProfile(){
 }
 function installPhoneSwipeDismiss(){
  const sheet=document.querySelector('#modal .profile');
- if(!sheet||sheet.dataset.phoneSwipeDismiss==='4')return;
- sheet.dataset.phoneSwipeDismiss='4';
+ if(!sheet||sheet.dataset.phoneSwipeDismiss==='5')return;
+ sheet.dataset.phoneSwipeDismiss='5';
  let gesture=null,settling=false;
  const ignore='button,input,select,textarea,a,svg,.st-chart,.st-table-wrap,[data-st-chart-host],.espn-game-log-table-wrap,.espn-game-log-table';
  const width=()=>sheet.clientWidth||window.innerWidth||375;
  const reducedMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const settleVertical=dismiss=>{
+  settling=true;
+  sheet.style.transition=reducedMotion()?'none':'transform .19s cubic-bezier(.2,.8,.25,1)';
+  sheet.style.transform=dismiss?'translate3d(0,100dvh,0)':'translate3d(0,0,0)';
+  setTimeout(()=>{
+   if(dismiss&&isPhoneProfileSheet())dismissPhoneProfile();
+   else{sheet.style.transition='';sheet.style.transform='';}
+   settling=false;
+  },reducedMotion()?0:200);
+ };
  const restoreHorizontal=dx=>{
   sheet.style.transition=reducedMotion()?'none':'transform .2s cubic-bezier(.2,.8,.25,1)';
   sheet.style.transform='translate3d(0,0,0)';
@@ -1567,7 +1577,9 @@ function installPhoneSwipeDismiss(){
  sheet.addEventListener('touchstart',e=>{
   if(settling||!isPhoneProfileSheet()||e.touches.length!==1)return;
   const t=e.touches[0];
+  const top=t.clientY-sheet.getBoundingClientRect().top;
   gesture={x:t.clientX,y:t.clientY,lastX:t.clientX,lastY:t.clientY,started:performance.now(),mode:null,
+    startedAtTop:top>=0&&top<=Math.min(136,sheet.clientHeight*.24)&&sheet.scrollTop<=1,
     blocked:!!e.target.closest(ignore)};
  },{passive:true});
  sheet.addEventListener('touchmove',e=>{
@@ -1579,7 +1591,7 @@ function installPhoneSwipeDismiss(){
   if(!gesture.mode){
    if(Math.max(Math.abs(dx),Math.abs(dy))<12)return;
    if(!gesture.blocked&&Math.abs(dx)>Math.abs(dy)*1.35)gesture.mode='horizontal';
-   else if(dy>0&&sheet.scrollTop<=1&&Math.abs(dy)>Math.abs(dx)*1.25&&document.getElementById('unifiedOverviewPanel')?.hidden)gesture.mode='vertical';
+   else if(dy>0&&gesture.startedAtTop&&Math.abs(dy)>Math.abs(dx)*1.25)gesture.mode='vertical';
    else{gesture=null;return;}
   }
   if(gesture.mode==='horizontal'){
@@ -1600,7 +1612,11 @@ function installPhoneSwipeDismiss(){
    }else clearPlayerSwipePreview();
    return;
   }
-  if(gesture.mode==='vertical'){if(e.cancelable)e.preventDefault();sheet.style.transform='translateY('+Math.min(170,dy*.55)+'px)';}
+  if(gesture.mode==='vertical'){
+   if(e.cancelable)e.preventDefault();
+   sheet.style.transition='none';
+   sheet.style.transform='translate3d(0,'+Math.min(window.innerHeight*.7,Math.max(0,dy*.8))+'px,0)';
+  }
  },{passive:false});
  sheet.addEventListener('touchend',()=>{
   const g=gesture;gesture=null;if(!g)return;
@@ -1624,14 +1640,13 @@ function installPhoneSwipeDismiss(){
     },180);
    }else restoreHorizontal(dx);
   }else if(g.mode==='vertical'){
-   sheet.style.transform='';
-   if(dy>=100||(dy>=60&&dy/dt>.5))dismissPhoneProfile();
+   settleVertical(dy>=100||(dy>=60&&dy/dt>.5));
   }
  },{passive:true});
  sheet.addEventListener('touchcancel',()=>{
   const g=gesture;gesture=null;
   if(g?.mode==='horizontal')restoreHorizontal(g.lastX-g.x);
-  else sheet.style.transform='';
+  else if(g?.mode==='vertical')settleVertical(false);
  },{passive:true});
 }
 

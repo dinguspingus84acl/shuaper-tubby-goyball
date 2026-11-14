@@ -10,8 +10,8 @@ const js = fs.readFileSync(path.join(root, 'visual-twentytwo-20261114.js'), 'utf
 
 test('loads polish after the restored Big Board and includes live cache versions', () => {
   const prior = html.indexOf('visual-twentyone-20261114.css?v=20261114-bigboard-restore1');
-  const styles = html.indexOf('visual-twentytwo-20261114.css?v=20261114-polish-2to10-v1');
-  const script = html.indexOf('visual-twentytwo-20261114.js?v=20261114-polish-2to10-v1');
+  const styles = html.indexOf('visual-twentytwo-20261114.css?v=20261114-polish-2to10-v2');
+  const script = html.indexOf('visual-twentytwo-20261114.js?v=20261114-polish-2to10-v2');
   assert.ok(prior > 0 && styles > prior && script > styles);
 });
 

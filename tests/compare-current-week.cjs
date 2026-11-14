@@ -93,12 +93,13 @@ test('Selecting one player immediately displays stats; additional players add a 
  assert.match(compare,/st-compare-selected-logo/);
  assert.match(compare,/S\.teams\[S\.canonicalTeam\(p\.team\)\]/);
  const css=read('analytics/studio.css');
+ assert.match(css,/\.st-compare-searches\{display:grid!important/);
  assert.match(css,/\.st-compare-picker\.is-selected.*\.st-compare-search-line/);
  assert.match(css,/\.st-compare-selected-info strong/);
  assert.match(css,/grid-column:1\/-1/);
 });
 
 test('new Compare assets use fresh cache versions',()=>{
- assert.ok(html.includes('analytics-dashboard.js?v=20261114-compare-clean-search-v2'));
- assert.match(read('analytics-dashboard.js'),/20261114-compare-clean-search-v2/);
+ assert.ok(html.includes('analytics-dashboard.js?v=20261114-compare-clean-search-v3'));
+ assert.match(read('analytics-dashboard.js'),/20261114-compare-clean-search-v3/);
 });

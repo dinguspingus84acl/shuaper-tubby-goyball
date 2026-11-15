@@ -53,6 +53,10 @@ body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compariso
   min-width:0;border:1px solid #527b8c66!important;
   background:linear-gradient(165deg,#102e43,#092137)!important;
 }
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-feature>p{
+  display:flex;align-items:center;min-height:49px;
+  margin:0!important;padding:6px 0!important;
+}
 body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-metric{
   display:grid!important;grid-template-columns:minmax(0,1fr) auto;
   align-items:center;column-gap:8px;min-height:33px;

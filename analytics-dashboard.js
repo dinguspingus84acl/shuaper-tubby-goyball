@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   if (window.ShuaStudioLoader) return;
-  const version = '20261114-compare-tap-layer-v4';
+  const version = '20261115-compare-metrics-visual-v25';
   const base = new URL('.', document.currentScript.src);
   const paths = ['analytics/core.js', 'analytics/data.js', 'analytics/charts.js',
     'analytics/intelligence.js', 'analytics/intelligence-view.js',

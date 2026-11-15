@@ -737,18 +737,30 @@ function currentWeekCompare(){
   const estimate=recentPpg===null||opponent?.bye?null:recentPpg*(1+adj);
   return {p,a,d,def,co,recentPpg,estimate,targetShare:m?.targetShare};
  });
+ // Compare each metric across the selected players. An unavailable number
+ // must never be treated as zero, and lower custom ranks are better.
+ const comparisonMetrics=[
+  ['Last 3 PPG',x=>x.recentPpg,x=>F(x.recentPpg)],
+  ['Opportunities / game',x=>x.a.workload,x=>F(x.a.workload)],
+  ['Target share',x=>x.targetShare,x=>F(x.targetShare,1,'%')],
+  ['Your custom rank',x=>x.p.customPositionRank||null,x=>x.p.customPositionRank?'#'+x.p.customPositionRank:'—',true],
+  ['Season PPR',x=>x.a.points,x=>F(x.a.points)],
+  ['Games played',x=>x.a.n,x=>F(x.a.n,0)],
+  ['Targets',x=>x.a.targets,x=>F(x.a.targets,0)],
+  ['Receiving yards',x=>x.a.recYds,x=>F(x.a.recYds,0)],
+  ['Rushing yards',x=>x.a.rushYds,x=>F(x.a.rushYds,0)],
+  ['Observed P10',x=>x.co.floor,x=>F(x.co.floor)]
+ ];
+ const comparisonRows=x=>comparisonMetrics.map(([label,read,format,lowerIsBetter])=>{
+  const value=N(read(x));
+  const peers=info.map(p=>N(read(p))).filter(v=>v!==null);
+  const leader=info.length>1&&value!==null&&peers.length>1&&
+   peers.every(v=>lowerIsBetter?value<=v:value>=v);
+  return '<div class="st-compare-metric'+(leader?' shua-v25-leader':'')+'"><span>'+label+'</span><b>'+format(x)+'</b></div>';
+ }).join('');
  const cards='<div class="st-comparison'+(chosen.length===1?' single':'')+'">'+info.map((x,i)=>feature(x.p,i,F(x.estimate),'Trend-based PPR estimate',
   '<p>'+(x.def?opponentHtml(x.p,x.def,week):'<span class="st-tag">Matchup rating unavailable</span>')+'</p>'+
-  '<div class="st-compare-metric"><span>Last 3 PPG</span><b>'+F(x.recentPpg)+'</b></div>'+
-  '<div class="st-compare-metric"><span>Opportunities / game</span><b>'+F(x.a.workload)+'</b></div>'+
-  '<div class="st-compare-metric"><span>Target share</span><b>'+F(x.targetShare,1,'%')+'</b></div>'+
-  '<div class="st-compare-metric"><span>Your custom rank</span><b>'+(x.p.customPositionRank?'#'+x.p.customPositionRank:'—')+'</b></div>'+
-  '<div class="st-compare-metric"><span>Season PPR</span><b>'+F(x.a.points)+'</b></div>'+
-  '<div class="st-compare-metric"><span>Games played</span><b>'+F(x.a.n,0)+'</b></div>'+
-  '<div class="st-compare-metric"><span>Targets</span><b>'+F(x.a.targets,0)+'</b></div>'+
-  '<div class="st-compare-metric"><span>Receiving yards</span><b>'+F(x.a.recYds,0)+'</b></div>'+
-  '<div class="st-compare-metric"><span>Rushing yards</span><b>'+F(x.a.rushYds,0)+'</b></div>'+
-  '<div class="st-compare-metric"><span>Observed P10</span><b>'+F(x.co.floor)+'</b></div>'
+  comparisonRows(x)
  )).join('')+'</div>';
  if(chosen.length===1)return search+cards;
  const weeks=[...new Set(chosen.flatMap(p=>G(p,through).slice(-5).map(g=>g.week)))].sort((a,b)=>a-b);

@@ -1,0 +1,209 @@
+/* Visual pass 25: approved #1, #2, #3, #5, #7, #8, #9 and #10.
+   Intentionally no Usage data-bar (#4) or Weekly Report bar (#6) rules. */
+
+/* 1. Let the Big Board's NFL identity read through its existing compact tiles. */
+body.shua-clean #board .pick[data-shua-round]{
+  border-color:#547a8a!important;
+  box-shadow:inset 0 1px #d7efff12,0 2px 8px #0004!important;
+}
+body.shua-clean #board .pick .shua-pick-watermark{
+  width:76px!important;height:76px!important;max-width:61%!important;
+  right:3px!important;bottom:4px!important;
+  opacity:.23!important;
+  filter:drop-shadow(0 2px 3px #020e1a8c);
+}
+body.shua-clean #board .pick[data-shua-round] .name{
+  color:#f5fcff!important;text-shadow:0 1px 5px #051525d9;
+}
+body.shua-clean #tableCard #rows tr:has(.photo-cell){
+  border-bottom:1px solid #87b1c026!important;
+}
+body.shua-clean #tableCard #rows .photo-cell .photo:not(.lg){
+  border-color:#a0cfda!important;
+  box-shadow:0 0 0 2px #0b2538,0 2px 9px #0008!important;
+}
+body.shua-clean #tableCard #rows :is(.rank-player-copy,.tagged-player-copy){
+  min-width:0;line-height:1.18;
+}
+body.shua-clean #tableCard #rows .team-abbr{
+  color:#b9d5e1!important;font-weight:800!important;
+}
+
+/* 2. A trading-card finish, while leaving portrait dimensions and layout intact. */
+body.shua-clean #modal .featured-player-card.broadcast-card{
+  border:1px solid color-mix(in srgb,var(--featured-accent,#6edbb8) 52%,#64889c)!important;
+  box-shadow:inset 0 1px #fff2,0 0 0 2px #071725,0 6px 16px #0007!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box{
+  border-right:1px solid color-mix(in srgb,var(--featured-accent,#6edbb8) 28%,transparent);
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box .featured-bg-logo{
+  opacity:.16!important;filter:drop-shadow(0 1px 5px #020f1f52);
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-bio{
+  border-top:1px solid #ffffff1c!important;padding-top:5px!important;
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-bio-item{
+  border:1px solid #82a9b326!important;background:#051b2b57!important;
+}
+
+/* 3. Aligned Compare metrics; only the best reported value is accented.
+   Source logic adds shua-v25-leader and considers a lower custom rank better. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-comparison .st-feature{
+  min-width:0;border:1px solid #527b8c66!important;
+  background:linear-gradient(165deg,#102e43,#092137)!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-metric{
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;column-gap:8px;min-height:33px;
+  padding:7px 5px!important;border-top-color:#86a9b329!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-metric>span{
+  min-width:0;line-height:1.25;color:#b4cbd9;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-metric>b{
+  min-width:0;justify-self:end;text-align:right;
+  font-variant-numeric:tabular-nums;font-weight:900;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-metric.shua-v25-leader{
+  background:linear-gradient(90deg,#123a3d59,#143b3645)!important;
+}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-compare-metric.shua-v25-leader>b{
+  color:#6ae2ab!important;
+}
+
+/* 5. Keep the selected Stats category in its dropdown. The rank/name columns
+   remain pinned if narrow viewports need horizontal scrolling. */
+@media(max-width:700px){
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-card{
+    position:relative;overflow-x:auto!important;overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head>:first-child,
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-row>.espn-rank{
+    position:sticky;left:0;z-index:2;
+    background:#0c2538;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head>:nth-child(2),
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-row>.espn-player{
+    position:sticky;left:37px;z-index:2;
+    background:#0c2538;
+    box-shadow:6px 0 10px -9px #5b9bb6b2;
+  }
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head>:first-child,
+  body.shua-clean.stats-mode #espnLiveSection .espn-live-head>:nth-child(2){
+    background:#102a3d;
+  }
+}
+
+/* 7. Consistent charts and a clean final-point marker; not Weekly or Usage. */
+body.shua-clean #shuaAnalyticsSection:not([data-active-view="weekly"]):not([data-active-view="usage"])
+  .st-chart .st-series-line{
+  vector-effect:non-scaling-stroke;stroke-width:2.9!important;
+  stroke-linejoin:round!important;stroke-linecap:round!important;
+}
+body.shua-clean #shuaAnalyticsSection:not([data-active-view="weekly"]):not([data-active-view="usage"])
+  .st-chart .st-gridline{
+  stroke:#95b8c4!important;stroke-opacity:.15!important;
+  stroke-dasharray:2 6!important;
+}
+body.shua-clean #shuaAnalyticsSection:not([data-active-view="weekly"]):not([data-active-view="usage"])
+  .st-chart g[data-series-group]>.st-series-dot:last-of-type{
+  r:5.1;stroke:#e0faff!important;stroke-width:1.8!important;
+  filter:drop-shadow(0 0 4px #92e2d8ad);
+}
+body.shua-clean #shuaAnalyticsSection:not([data-active-view="weekly"]):not([data-active-view="usage"])
+  .st-chart .st-tooltip{
+  border:1px solid #8db4be88!important;background:#0c283de8!important;
+  box-shadow:0 6px 16px #00101bc9!important;border-radius:9px!important;
+}
+
+/* 8. ESPN-like league standings: stable team/record/PF/PA columns and logos. */
+body.shua-clean #shuaMyTeams .myteams-standings-line{
+  grid-template-columns:26px minmax(0,1fr) 77px 74px 74px;
+  column-gap:8px!important;align-items:center;min-height:45px;
+  border-bottom-color:#789eb02a!important;
+}
+body.shua-clean #shuaMyTeams .myteams-standings-line.is-heading{
+  background:#1232478c;color:#b6d2df!important;
+  border-bottom:1px solid #7298ab61!important;font-weight:900!important;
+}
+body.shua-clean #shuaMyTeams .myteams-standings-line .myteams-team-open{
+  display:flex;align-items:center;min-width:0;gap:8px;
+  text-align:left;line-height:1.17;
+}
+body.shua-clean #shuaMyTeams .myteams-standings-line .myteams-team-open>img{
+  width:29px!important;height:29px!important;flex:0 0 29px!important;
+  border-radius:5px;object-fit:contain!important;
+}
+body.shua-clean #shuaMyTeams .myteams-standings-line .myteams-team-open>span{
+  min-width:0;overflow-wrap:anywhere;font-weight:800;color:#eaf6ff;
+}
+body.shua-clean #shuaMyTeams .myteams-standings-line>span:nth-child(n+3){
+  font-variant-numeric:tabular-nums;color:#d2e5ef;
+}
+
+/* 9. Clearly separated player-card sections without adding extra labels. */
+body.shua-clean #modal #unifiedProfilePanels{
+  border-top:1px solid #628a9b49;padding-top:8px;
+}
+body.shua-clean #modal #unifiedProfilePanels>.unified-profile-panel:not([hidden]){
+  border:1px solid #577e9140;border-radius:11px;
+  background:linear-gradient(180deg,#0c2638a1,#091d2f6b);
+  padding:clamp(7px,1.6vw,13px)!important;
+}
+body.shua-clean #modal #unifiedOverviewPanel :is(.unified-stat-grid,#stats){
+  gap:8px!important;
+}
+body.shua-clean #modal .unified-profile-tabs{
+  border-bottom:1px solid #6c9aab35!important;padding-bottom:5px;
+}
+body.shua-clean #modal .unified-profile-tab.active{
+  color:#ecfcff!important;box-shadow:inset 0 -2px #65dcb4!important;
+}
+
+/* 10. Short, non-blocking transitions with reduced-motion support.
+   Never animate modal transforms: the player-card swipe gesture owns them. */
+@media(prefers-reduced-motion:no-preference){
+  body.shua-clean #shuaCleanNav button,
+  body.shua-clean #tableCard #rows tr,
+  body.shua-clean #shuaMyTeams .myteams-standings-line,
+  body.shua-clean #shuaAnalyticsSection :is(.st-feature,.st-compare-metric),
+  body.shua-clean #modal .unified-profile-tab{
+    transition:background-color .17s ease,border-color .17s ease,
+      color .17s ease,box-shadow .17s ease!important;
+  }
+  body.shua-clean #modal #unifiedProfilePanels>.unified-profile-panel:not([hidden]){
+    animation:shua-v25-section-enter .17s ease-out both;
+  }
+  @keyframes shua-v25-section-enter{
+    from{opacity:.76}to{opacity:1}
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body.shua-clean #modal #unifiedProfilePanels>.unified-profile-panel{
+    animation:none!important;transition:none!important;
+  }
+}
+@media(max-width:700px){
+  body.shua-clean #board .pick .shua-pick-watermark{
+    width:63px!important;height:63px!important;opacity:.2!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-standings-line{
+    grid-template-columns:19px minmax(0,1fr) 55px 50px 50px;
+    gap:3px!important;min-height:42px!important;
+    font-size:10px!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-standings-line .myteams-team-open{
+    gap:4px;min-width:0;
+  }
+  body.shua-clean #shuaMyTeams .myteams-standings-line .myteams-team-open>img{
+    width:22px!important;height:22px!important;flex-basis:22px!important;
+  }
+  body.shua-clean #shuaMyTeams .myteams-standings-line .myteams-team-open>span{
+    font-size:10px!important;
+  }
+  body.shua-clean #modal #unifiedProfilePanels>.unified-profile-panel:not([hidden]){
+    border-radius:8px;padding:7px!important;
+  }
+}

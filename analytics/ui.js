@@ -18,9 +18,12 @@ let state={view:'weekly',year:2026,pos:'RB',player:'',team:'DET',week:0,range:0,
 state.studioSearch=''; // Previous in-page search must never silently filter the data.
 if(state.usageSortVersion!==3){state.usageGroup='volume';state.usageMetric='espnPositionRank';state.usageSortDirection='asc';state.usageSortVersion=3;}
 let dataset=null,epoch=0,renderId=0,visible=false,historyData=null,hiddenBefore=new Map();
+const WEEKLY_REFRESH_MS=5*60*1000;
+let weeklyReport=null,weeklyRequest=null,weeklyWeekOverride=null;
 function linkedView(){const m=location.hash.match(/^#analytics\/([a-z]+)$/);return m&&pages.some(p=>p[0]===m[1])?m[1]:null;}
 const initialView=linkedView();if(initialView){if(state.view==='schedule'&&initialView!=='schedule'&&[2024,2025,2026].includes(+state.scheduleReturnYear)){state.year=+state.scheduleReturnYear;state.scheduleReturnYear=null;}state.view=initialView;state.week=0;}
 if(initialView==='intelligence')state.year=2026;
+if(state.view==='weekly'){state.year=S.Data.YEAR;state.week=0;}
 if(state.view==='startsit'){state.year=2026;state.week=currentCompareWeek();state.compare=[];}
 if(state.view==='schedule'&&+state.year!==2026){state.scheduleReturnYear=+state.year;state.year=2026;}
 function updateLink(){if(!visible)return;try{const u=new URL(location.href);u.hash='analytics/'+state.view;history.replaceState(history.state,'',u);}catch(e){}}
@@ -30,10 +33,11 @@ function navigate(view){if(!pages.some(p=>p[0]===view))view='consistency';
  if(view==='schedule'){if(state.view!=='schedule'&&+state.year!==2026)state.scheduleReturnYear=+state.year;state.year=2026;}
  if(view==='startsit'){state.year=2026;if(state.view!=='startsit')state.compare=[];}
  else if(state.view==='schedule'&&[2024,2025,2026].includes(+state.scheduleReturnYear)){state.year=+state.scheduleReturnYear;state.scheduleReturnYear=null;}
+ if(view==='weekly'&&state.view!==view){state.year=S.Data.YEAR;weeklyWeekOverride=null;}
  state.view=view;state.outWeeks=null;if(view==='injury')state.injuryInitialized=0;
  const matching=dataset&&dataset.year===+state.year;
  state.week=view==='startsit'?currentCompareWeek():matching?Math.min(18,['matchup','schedule'].includes(view)?dataset.latestWeek+1:dataset.latestWeek):0;
- if(visible){if(matching)render();else load();}else open();
+ if(visible){if(matching){render();refreshWeekly();}else load();}else open();
 }
 
 const color=(rank)=>rank==null?'':rank<=10?'easy':rank<=20?'neutral':'tough';
@@ -50,7 +54,7 @@ function hero(p,items=[],aside){return `<div class="st-hero"><div class="st-hero
 function feature(p,i,value,label,extra=''){return `<article class="st-feature"><button type="button" data-st-open="${E(p.key)}"><div class="st-feature-top">${logo(p.team,'st-watermark')}${face(p)}<span class="st-place">${i+1}</span></div><h4>${E(p.name)}</h4>${meta(p)}<span class="st-big-value">${E(value)}<small>${E(label)}</small></span></button>${extra}</article>`;}
 function spark(a){const v=a.filter(x=>N(x)!==null);if(v.length<2)return '';const lo=Math.min(...v),hi=Math.max(...v),pts=v.map((x,i)=>`${4+i*86/(v.length-1)},${26-(x-lo)/(hi-lo||1)*22}`);return `<svg class="st-spark" viewBox="0 0 94 32" aria-hidden="true"><path d="M${pts.join('L')}" stroke="#24efa0" stroke-width="1.8" fill="none"/>${pts.map(p=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="2" fill="#24efa0"/>`).join('')}</svg>`;}
 function chartName(p){const a=String(p.name||'').trim().split(/\s+/);if(a.length===1)return a[0];const suffix=/^(?:jr\.?|sr\.?|ii|iii|iv|v)$/i.test(a.at(-1));const surname=a.slice(suffix?-2:-1).join(' ');return a[0][0]+'. '+surname;}
-function rankedRows(rows,value,subtitle,limit=10){return rows.slice(0,limit).map((p,i)=>`<div class="st-rank-row"><span class="st-rank-num">${i+1}</span>${person(p)}<div class="st-score ${String(value(p)).startsWith('-')?'negative':''}">${E(value(p))}<small>${E(subtitle)}</small></div>${spark(G(p,state.week||18).slice(-5).map(g=>g.points))}</div>`).join('')||C.empty();}
+function rankedRows(rows,value,subtitle,limit=10,through=state.week||18){return rows.slice(0,limit).map((p,i)=>`<div class="st-rank-row"><span class="st-rank-num">${i+1}</span>${person(p)}<div class="st-score ${String(value(p)).startsWith('-')?'negative':''}">${E(value(p))}<small>${E(subtitle)}</small></div>${spark(G(p,through).slice(-5).map(g=>g.points))}</div>`).join('')||C.empty();}
 function selectedPlayers(){return dataset.players.filter(p=>p.position===state.pos).sort((a,b)=>(A(b).points||0)-(A(a).points||0));}
 function selected(){let list=selectedPlayers(),p=list.find(p=>p.key===state.player)||list[0];if(p)state.player=p.key;return p;}
 function select(id,label,options,value){return `<label class="${id==='stPlayer'||id==='stInjuredPlayer'?'st-player-control':''}"><span class="st-label">${E(label)}</span><select id="${id}">${options.map(([v,n])=>`<option value="${E(v)}" ${String(v)===String(value)?'selected':''}>${E(n)}</option>`).join('')}</select></label>`;}
@@ -792,8 +796,30 @@ function chooseComparedPlayer(option){
  state.compare=Array.from({length:4},(_,i)=>i===index?chosen:state.compare[i]===chosen?null:state.compare[i]||null);
  render();
 }
+function isCurrentWeekly(){
+ return visible&&state.view==='weekly'&&+state.year===S.Data.YEAR&&dataset?.year===S.Data.YEAR;
+}
+function weeklyCurrentWeek(){
+ return weeklyReport?.currentWeek??currentCompareWeek();
+}
+async function refreshWeekly(){
+ if(!isCurrentWeekly()||document.hidden||weeklyRequest)return;
+ weeklyRequest=S.Data.loadWeekly(dataset,weeklyReport);
+ try{
+  weeklyReport=await weeklyRequest;
+  if(isCurrentWeekly()){
+   const host=section.querySelector('#stContent');
+   const focusedId=host?.contains(document.activeElement)&&document.activeElement.id;
+   if(host)host.innerHTML=weekly();
+   if(focusedId)document.getElementById(focusedId)?.focus({preventScroll:true});
+  }
+ }finally{weeklyRequest=null;}
+}
 function weekly(){
- const week=state.week;
+ const live=dataset.year===S.Data.YEAR;
+ const current=live?weeklyCurrentWeek():null;
+ const week=live?(weeklyWeekOverride??current):state.week;
+ const players=live&&weeklyReport?weeklyReport.players:dataset.players;
  const position=state.weeklyPos||'ALL';
  const configs={
   ALL:[['points','PPR Points'],['average','Points Per Game']],
@@ -805,7 +831,7 @@ function weekly(){
  const available=configs[position]||configs.ALL;
  const selected=available.some(([k])=>k===state.weeklyMetric)?state.weeklyMetric:'points';
  const title=available.find(([k])=>k===selected)?.[1]||'PPR Points';
- const candidates=dataset.players.filter(p=>position==='ALL'||p.position===position).map(p=>{
+ const candidates=players.filter(p=>position==='ALL'||p.position===position).map(p=>{
   const g=G(p).find(x=>x.week===week);
   if(!g)return null;
   const appearances=G(p,week);
@@ -814,7 +840,12 @@ function weekly(){
  }).filter(Boolean).sort((a,b)=>b.rankValue-a.rankValue||a.name.localeCompare(b.name));
  const positionFilter='<div class="st-weekly-positions" role="group" aria-label="Weekly positions">'+['ALL','QB','RB','WR','TE'].map(p=>'<button type="button" data-st-weekly-pos="'+p+'" aria-pressed="'+(position===p)+'">'+p+'</button>').join('')+'</div>';
  const metricFilter='<label class="st-weekly-metric-filter">Rank by <select id="stWeeklyMetric">'+available.map(([k,label])=>'<option value="'+k+'"'+(selected===k?' selected':'')+'>'+label+'</option>').join('')+'</select></label>';
- return controls({week:true})+positionFilter+panel('','', '<div class="st-weekly-rank-toolbar"><strong>Top 12 · '+E(title)+'</strong>'+metricFilter+'</div>'+rankedRows(candidates,p=>F(p.rankValue,selected==='points'||selected==='average'?1:0),'',12),'cup');
+ const weeks=live?Array.from({length:current},(_,i)=>i+1):dataset.weeks;
+ const filters='<div class="st-controls">'+select('stSeason','Season',[2026,2025,2024].map(y=>[y,y]),state.year)+
+  select('stWeek','Week',weeks.map(w=>[w,'Week '+w+(w===current?' · Current':'')]),week)+'</div>';
+ const rows=candidates.length?rankedRows(candidates,p=>F(p.rankValue,selected==='points'||selected==='average'?1:0),'',12,week):
+  C.empty(live&&!weeklyReport&&week===current?'Checking ESPN for Week '+week+' scores…':'No scores available for this filter in Week '+week+' yet.');
+ return filters+positionFilter+panel('','', '<div class="st-weekly-rank-toolbar"><strong>Top 12 · '+E(title)+'</strong>'+metricFilter+'</div>'+rows,'cup');
 }
 function intelligence(){
  if(dataset.year!==2026)return note('Fantasy Intelligence uses the verified 2026 expected-points and opportunity snapshot. Choose the current season.',true);
@@ -878,17 +909,19 @@ function rerenderUsage(){
  persist();
 }
 let firstLoad=true;
-async function load(){const id=++epoch;if(firstLoad){firstLoad=false;let saved=null;try{saved=JSON.parse(localStorage.getItem('shuaStudioStateV1')||'null');}catch(e){}if(!saved?.year&&state.view!=='schedule'){state.year=await S.Data.preferredYear();if(id!==epoch)return;}}if(state.view==='schedule')state.year=2026;shell();const host=document.getElementById('stContent');section.dataset.ready='false';host.innerHTML='<div class="st-loading">Loading verified season data…<div class="st-skeleton" aria-hidden="true"></div></div>';try{const data=await S.Data.load(+state.year);if(id!==epoch)return;
+async function load(){const id=++epoch;if(firstLoad){firstLoad=false;let saved=null;try{saved=JSON.parse(localStorage.getItem('shuaStudioStateV1')||'null');}catch(e){}if(!saved?.year&&!['schedule','weekly'].includes(state.view)){state.year=await S.Data.preferredYear();if(id!==epoch)return;}}if(state.view==='schedule')state.year=2026;shell();const host=document.getElementById('stContent');section.dataset.ready='false';host.innerHTML='<div class="st-loading">Loading verified season data…<div class="st-skeleton" aria-hidden="true"></div></div>';try{const data=await S.Data.load(+state.year);if(id!==epoch)return;
 if(data.year===2026){
  try{data.espnRatings=await S.Data.espnMatchups(2026);data.espnRatingsError=null;}
  catch(err){data.espnRatingsError=err.message||String(err);data.espnRatings=null;}
  if(id!==epoch)return;
 }
-dataset=data;state.week=Math.max(1,Math.min(18,state.week||(['matchup','schedule','startsit'].includes(state.view)?dataset.latestWeek+1:dataset.latestWeek)));render();}catch(e){if(id!==epoch)return;host.innerHTML=note(E(e.message),true)+`<button type="button" class="st-button" data-st-archive="2025">Open the 2025 historical dashboards</button> <button type="button" class="st-button" data-st-retry>Retry current season</button>`;section.dataset.ready='error';}}
-function open(){if(state.view==='schedule'&&+state.year!==2026){state.scheduleReturnYear=+state.year;state.year=2026;}visible=true;document.body.classList.add('shua-studio-open');document.body.classList.remove('fantasy-home-mode','stats-mode','compare-mode','trade-mode','mobile-menu-open','my-teams-open','shua-stock-open');for(const child of main.children){if(child===section)continue;if(!hiddenBefore.has(child))hiddenBefore.set(child,child.hidden);child.hidden=true;}section.hidden=false;navigation.querySelectorAll('.pos').forEach(b=>b.classList.toggle('active',b===button));try{localStorage.setItem('shuaPageStateV2',JSON.stringify({section:'ANALYTICS'}));}catch(e){}if(dataset&&dataset.year===+state.year)render();else load();}
+dataset=data;state.week=Math.max(1,Math.min(18,state.week||(['matchup','schedule','startsit'].includes(state.view)?dataset.latestWeek+1:dataset.latestWeek)));render();refreshWeekly();}catch(e){if(id!==epoch)return;host.innerHTML=note(E(e.message),true)+`<button type="button" class="st-button" data-st-archive="2025">Open the 2025 historical dashboards</button> <button type="button" class="st-button" data-st-retry>Retry current season</button>`;section.dataset.ready='error';}}
+function open(){if(!visible&&state.view==='weekly'){state.year=S.Data.YEAR;weeklyWeekOverride=null;}if(state.view==='schedule'&&+state.year!==2026){state.scheduleReturnYear=+state.year;state.year=2026;}visible=true;document.body.classList.add('shua-studio-open');document.body.classList.remove('fantasy-home-mode','stats-mode','compare-mode','trade-mode','mobile-menu-open','my-teams-open','shua-stock-open');for(const child of main.children){if(child===section)continue;if(!hiddenBefore.has(child))hiddenBefore.set(child,child.hidden);child.hidden=true;}section.hidden=false;navigation.querySelectorAll('.pos').forEach(b=>b.classList.toggle('active',b===button));try{localStorage.setItem('shuaPageStateV2',JSON.stringify({section:'ANALYTICS'}));}catch(e){}if(dataset&&dataset.year===+state.year){render();refreshWeekly();}else load();}
 function close(){hideUsageTooltip();visible=false;try{if(linkedView()){const u=new URL(location.href);u.hash='';history.replaceState(history.state,'',u);}}catch(e){}document.body.classList.remove('shua-studio-open');epoch++;renderId++;section.hidden=true;for(const [el,hidden] of hiddenBefore){if(el.isConnected)el.hidden=hidden;}hiddenBefore.clear();}
-function showPlayer(k){hideUsageTooltip();const searchResults=section.querySelector('#stGlobalPlayerMatches');if(searchResults)searchResults.hidden=true;const p=dataset?.players.find(x=>x.key===k)||Object.values(dataset?.scheduleRoster||{}).flat().find(x=>x.key===k);if(!p)return;let found=null;try{const candidates=[...(typeof board!=='undefined'?board:[]),...(typeof players!=='undefined'?players:[])];found=candidates.find(x=>key(x.name)===p.key);}catch(e){}if(found&&typeof window.profile==='function'){window.profile(found.id);document.getElementById('modal').dataset.studioProfile='1';return;}if(window.ShuaEspnLive?.openStatsPlayerByName?.(p.name)){document.getElementById('modal').dataset.studioProfile='1';return;}if(window.openUnifiedPlayerProfileByName){window.openUnifiedPlayerProfileByName(p.name);return;}state.view='trends';state.pos=p.position;state.player=p.key;state.week=dataset.latestWeek;render();}
+function showPlayer(k){hideUsageTooltip();const searchResults=section.querySelector('#stGlobalPlayerMatches');if(searchResults)searchResults.hidden=true;const p=(isCurrentWeekly()?weeklyReport?.players.find(x=>x.key===k):null)||dataset?.players.find(x=>x.key===k)||Object.values(dataset?.scheduleRoster||{}).flat().find(x=>x.key===k);if(!p)return;let found=null;try{const candidates=[...(typeof board!=='undefined'?board:[]),...(typeof players!=='undefined'?players:[])];found=candidates.find(x=>key(x.name)===p.key);}catch(e){}if(found&&typeof window.profile==='function'){window.profile(found.id);document.getElementById('modal').dataset.studioProfile='1';return;}if(window.ShuaEspnLive?.openStatsPlayerByName?.(p.name)){document.getElementById('modal').dataset.studioProfile='1';return;}if(window.openUnifiedPlayerProfileByName){window.openUnifiedPlayerProfileByName(p.name);return;}state.view='trends';state.pos=p.position;state.player=p.key;state.week=dataset.latestWeek;render();}
 button.onclick=()=>open();
+window.setInterval(refreshWeekly,WEEKLY_REFRESH_MS);
+document.addEventListener('visibilitychange',refreshWeekly);
 window.addEventListener('hashchange',()=>{const v=linkedView();if(v)navigate(v);else if(visible)close();});
 document.addEventListener('click',e=>{const b=e.target.closest?.('.positions .pos');if(b&&b!==button&&visible)close();},true);
 section.addEventListener('pointerover',e=>{
@@ -1012,7 +1045,7 @@ section.addEventListener('change',e=>{
   state.intelCompareKeys=[...new Set(chosen)];render();return;
  }
 });
-section.addEventListener('change',e=>{if(e.target.id==='stWeeklyChartWeek'){state.weeklyChartWeek=Number(e.target.value);render();return;}if(e.target.matches('[data-st-compare-search]')){const idx=Number(e.target.dataset.stCompareSearch),candidate=dataset.players.find(p=>p.position===state.pos&&p.name.toLowerCase()===e.target.value.trim().toLowerCase());if(candidate){state.compare[idx]=candidate.key;render();}return;}if(e.target.id==='stTeamMetric'){state.teamMetric=e.target.value;render();return;}if(e.target.id==='stTeamWindow'){state.teamWindow=e.target.value;render();return;}if(e.target.id==='stWeeklyMetric'){state.weeklyMetric=e.target.value;render();return;}if(e.target.id==='stWeeklyPos'){state.weeklyPos=e.target.value;render();return;}if(e.target.id==='stUsagePos'){state.usagePos=e.target.value;rerenderUsage();return;}if(e.target.id==='stUsageMetric'){state.usageMetric=e.target.value;rerenderUsage();return;}if(e.target.id==='stScheduleDisplay'){state.scheduleDisplay=e.target.value;state.scheduleQuery='';state.scheduleFocusKey='';render();return;}if(e.target.matches('[data-st-hit-filter]')){state.hitFilters=state.hitFilters||[0,0,0,0];state.hitFilters[Number(e.target.dataset.stHitFilter)]=Number(e.target.value);render();return;}const id=e.target.id,v=e.target.value;if(id==='stDashboard'){navigate(v);return;}if(id==='stSchedulePlayer'){state.scheduleFocusKey=v;state.scheduleScrollPending=true;render();return;}if(id==='stInjuryPos'){state.injuryPos=v;state.injuredKey='';render();return;}if(id==='stInjuryStatus'){state.injuryStatus=v;state.injuredKey='';render();return;}if(id==='stSeason'){if(state.view==='schedule'||state.view==='intelligence')return;state.year=+v;state.week=0;state.outWeeks=null;load();return;}if(id==='stPlayer'){state.player=v;state.outWeeks=null;}else if(id==='stTeam'){state.team=v;state.player='';state.outWeeks=null;}else if(id==='stWeek'){state.week=+v;state.outWeeks=null;if(state.view==='schedule'){state.scheduleSortWeek=null;state.scheduleSortDirection=null;}}else if(id==='stRange')state.range=+v;else if(id==='stRankSource')state.rankSource=v;else if(id==='stPlayoffs'){state.playoffs=v==='playoffs';state.scheduleSortWeek=null;state.scheduleSortDirection=null;}else if(id==='stInjuredPlayer'){state.player=v;state.outWeeks=null;}else if(id.startsWith('stCompare')){state.compare=[0,1,2,3].map(i=>document.getElementById('stCompare'+i)?.value).filter(Boolean);state.compare=[...new Set(state.compare)];}else if(e.target.matches('[data-st-out]'))state.outWeeks=[...section.querySelectorAll('[data-st-out]:checked')].map(e=>+e.dataset.stOut);else return;render();});
+section.addEventListener('change',e=>{if(e.target.id==='stWeeklyChartWeek'){state.weeklyChartWeek=Number(e.target.value);render();return;}if(e.target.matches('[data-st-compare-search]')){const idx=Number(e.target.dataset.stCompareSearch),candidate=dataset.players.find(p=>p.position===state.pos&&p.name.toLowerCase()===e.target.value.trim().toLowerCase());if(candidate){state.compare[idx]=candidate.key;render();}return;}if(e.target.id==='stTeamMetric'){state.teamMetric=e.target.value;render();return;}if(e.target.id==='stTeamWindow'){state.teamWindow=e.target.value;render();return;}if(e.target.id==='stWeeklyMetric'){state.weeklyMetric=e.target.value;render();return;}if(e.target.id==='stWeeklyPos'){state.weeklyPos=e.target.value;render();return;}if(e.target.id==='stUsagePos'){state.usagePos=e.target.value;rerenderUsage();return;}if(e.target.id==='stUsageMetric'){state.usageMetric=e.target.value;rerenderUsage();return;}if(e.target.id==='stScheduleDisplay'){state.scheduleDisplay=e.target.value;state.scheduleQuery='';state.scheduleFocusKey='';render();return;}if(e.target.matches('[data-st-hit-filter]')){state.hitFilters=state.hitFilters||[0,0,0,0];state.hitFilters[Number(e.target.dataset.stHitFilter)]=Number(e.target.value);render();return;}const id=e.target.id,v=e.target.value;if(id==='stDashboard'){navigate(v);return;}if(id==='stSchedulePlayer'){state.scheduleFocusKey=v;state.scheduleScrollPending=true;render();return;}if(id==='stInjuryPos'){state.injuryPos=v;state.injuredKey='';render();return;}if(id==='stInjuryStatus'){state.injuryStatus=v;state.injuredKey='';render();return;}if(id==='stSeason'){if(state.view==='schedule'||state.view==='intelligence')return;state.year=+v;state.week=0;state.outWeeks=null;weeklyWeekOverride=null;load();return;}if(id==='stPlayer'){state.player=v;state.outWeeks=null;}else if(id==='stTeam'){state.team=v;state.player='';state.outWeeks=null;}else if(id==='stWeek'){if(isCurrentWeekly())weeklyWeekOverride=+v===weeklyCurrentWeek()?null:+v;state.week=+v;state.outWeeks=null;if(state.view==='schedule'){state.scheduleSortWeek=null;state.scheduleSortDirection=null;}}else if(id==='stRange')state.range=+v;else if(id==='stRankSource')state.rankSource=v;else if(id==='stPlayoffs'){state.playoffs=v==='playoffs';state.scheduleSortWeek=null;state.scheduleSortDirection=null;}else if(id==='stInjuredPlayer'){state.player=v;state.outWeeks=null;}else if(id.startsWith('stCompare')){state.compare=[0,1,2,3].map(i=>document.getElementById('stCompare'+i)?.value).filter(Boolean);state.compare=[...new Set(state.compare)];}else if(e.target.matches('[data-st-out]'))state.outWeeks=[...section.querySelectorAll('[data-st-out]:checked')].map(e=>+e.dataset.stOut);else return;render();});
 section.addEventListener('input',e=>{if(e.target.id==='stGlobalSearch'){state.studioSearch=e.target.value;const clear=section.querySelector('[data-st-clear-search]');if(clear)clear.hidden=!state.studioSearch;showAnalyticsPlayerMatches(state.studioSearch);if(state.view!=='weekly')applyStudioSearch();return;}
  const picker=e.target.closest('[data-st-compare-search]');if(picker){showCompareSuggestions(picker);return;}
  if(e.target.id!=='stScheduleSearch')return;

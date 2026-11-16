@@ -4,7 +4,7 @@
 const S=globalThis.ShuaStudio,{num,key,canonicalTeam:T}=S,cache=new Map();
 const YEAR=2026,REPO='dinguspingus84acl/shuaper-tubby-goyball';
 const ids={1:'ATL',2:'BUF',3:'CHI',4:'CIN',5:'CLE',6:'DAL',7:'DEN',8:'DET',9:'GB',10:'TEN',11:'IND',12:'KC',13:'LV',14:'LAR',15:'MIA',16:'MIN',17:'NE',18:'NO',19:'NYG',20:'NYJ',21:'PHI',22:'ARI',23:'PIT',24:'LAC',25:'SF',26:'SEA',27:'TB',28:'WAS',29:'CAR',30:'JAX',33:'BAL',34:'HOU'};
-const fields={passAtt:0,passYds:3,passTD:4,interceptions:20,rushAtt:23,rushYds:24,rushTD:25,recYds:42,recTD:43,receptions:53,targets:58,fumblesLost:72};
+const fields={passAtt:0,completions:1,passYds:3,passTD:4,interceptions:20,rushAtt:23,rushYds:24,rushTD:25,recYds:42,recTD:43,receptions:53,targets:58,fumblesLost:72};
 async function json(url,options={}){const c=new AbortController(),timeout=setTimeout(()=>c.abort(),18000);try{const r=await fetch(url,{...options,signal:c.signal});if(!r.ok)throw new Error('HTTP '+r.status+' from '+new URL(url,location.href).hostname);return await r.json();}finally{clearTimeout(timeout);}}
 async function memo(k,fn){if(cache.has(k))return cache.get(k);const p=fn();cache.set(k,p);try{return await p;}catch(e){cache.delete(k);throw e;}}
 function readSaved(k){try{return JSON.parse(localStorage.getItem('shua-studio:'+k)||'null');}catch(e){return null;}}
@@ -20,6 +20,39 @@ async function schedule(year){return memo('schedule:'+year,async()=>{
 function normalise(p,sched){const team=T(p.team||ids[p.proTeamId]),gms=(p.games||[]).filter(g=>g.hasStats!==false&&num(g.totalPoints??g.points)!==null&&g.week>0&&g.week<=18).map(g=>{const opponent=T(g.opponent),inferred=sched[opponent]?.[g.week]?.opponent;return {...g,week:+g.week,points:num(g.totalPoints??g.points),team:T(g.team||((S.teams[inferred])?inferred:team)),opponent};}).sort((a,b)=>a.week-b.week);return {...p,key:key(p.name),id:String(p.id||''),name:p.name,team,position:String(p.position||'').toUpperCase(),headshot:p.headshot||p.headshots?.[0]||(/^\d+$/.test(String(p.id||''))?'https://a.espncdn.com/i/headshots/nfl/players/full/'+p.id+'.png':''),games:gms};}
 function parseEspn(entries,year,sched){return entries.map(e=>{const p=e.playerPoolEntry?.player||e.player||e;if(!S.positions.includes(({1:'QB',2:'RB',3:'WR',4:'TE'})[p.defaultPositionId]))return null;const best=new Map();for(const stat of p.stats||[]){const w=+stat.scoringPeriodId;if(+stat.seasonId!==year||+stat.statSourceId!==0||w<1||w>18||(+stat.seasonTypeId&&+stat.seasonTypeId!==2))continue;if(num(stat.appliedTotal)===null||!stat.stats||!Object.keys(stat.stats).length)continue;const old=best.get(w);if(!old||Object.keys(stat.stats).length>Object.keys(old.stats).length)best.set(w,stat);}
  const team=ids[p.proTeamId],gs=[...best].map(([week,x])=>{const g={week,hasStats:true,totalPoints:+x.appliedTotal,opponent:sched[team]?.[week]?.opponent||'—',team};for(const [k,id] of Object.entries(fields))g[k]=Object.prototype.hasOwnProperty.call(x.stats,id)?num(x.stats[id]):0;return g;});return normalise({id:p.id,name:p.fullName,position:({1:'QB',2:'RB',3:'WR',4:'TE'})[p.defaultPositionId],team,games:gs,injuryStatus:p.injuryStatus||'',injured:!!p.injured},sched);}).filter(Boolean);}
+async function espnPlayers(year,sched){
+ const filter=JSON.stringify({players:{filterSlotIds:{value:[0,2,4,6]},filterStatsForSourceIds:{value:[0]},filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+year]}}});
+ let error;
+ for(const host of ['https://lm-api-reads.fantasy.espn.com','https://fantasy.espn.com']){
+  try{
+   const d=await json(host+'/apis/v3/games/ffl/seasons/'+year+'/segments/0/leaguedefaults/3?scoringPeriodId=0&view=kona_player_info',{headers:{'Accept':'application/json','X-Fantasy-Filter':filter,'X-Fantasy-Source':'kona'},cache:'no-store'});
+   const players=parseEspn(Array.isArray(d)?d:d.players||[],year,sched).filter(p=>p.games.length);
+   if(players.length)return players;
+  }catch(e){error=e;}
+ }
+ throw error||new Error('The '+year+' feed has not returned weekly statistics.');
+}
+async function loadWeekly(dataset,previous){
+ const [scoreboard,live]=await Promise.allSettled([
+  json('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard',{cache:'no-store'}),
+  espnPlayers(dataset.year,dataset.schedule)
+ ]);
+ const board=scoreboard.value,week=Number(board?.week?.number);
+ const currentWeek=board?.season?.year===dataset.year&&board.season.type===2&&Number.isInteger(week)&&week>=1&&week<=18?week:null;
+ const players=previous?.players||dataset.players;
+ if(live.status!=='fulfilled')return {currentWeek,players};
+ const byKey=new Map(players.map(p=>[p.key,p]));
+ for(const player of live.value){
+  const saved=byKey.get(player.key);
+  const games=new Map((saved?.games||[]).map(g=>[g.week,g]));
+  for(const game of player.games){
+   const old=games.get(game.week);
+   games.set(game.week,{...old,...game,team:old?.team||game.team,opponent:old?.opponent||game.opponent});
+  }
+  byKey.set(player.key,{...saved,...player,games:[...games.values()].sort((a,b)=>a.week-b.week)});
+ }
+ return {currentWeek,players:[...byKey.values()]};
+}
 async function load(year){return memo('season:'+year,async()=>{
  let manifest={};try{manifest=await json('analytics/manifest.json',{cache:'no-store'});}catch(e){}
  const stored=manifest.datasets?.[year]?await json(manifest.datasets[year],{cache:'no-store'}).catch(()=>null):null;
@@ -27,11 +60,7 @@ async function load(year){return memo('season:'+year,async()=>{
  if(stored?.players?.length){players=stored.players.map(p=>normalise(p,sched));source=stored.source;warnings=stored.warnings||[];}
  else
  if(year<YEAR){const local=await json('legacy-stats/'+year+'.json',{cache:'force-cache'});players=(Array.isArray(local)?local:local.rows||[]).map(p=>normalise(p,sched));source='nflverse · site historical archive';}
- else{
- const filter=JSON.stringify({players:{filterSlotIds:{value:[0,2,4,6]},filterStatsForSourceIds:{value:[0]},filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+year]}}});let error;
- for(const host of ['https://lm-api-reads.fantasy.espn.com','https://fantasy.espn.com']){try{const d=await json(host+'/apis/v3/games/ffl/seasons/'+year+'/segments/0/leaguedefaults/3?scoringPeriodId=0&view=kona_player_info',{headers:{'Accept':'application/json','X-Fantasy-Filter':filter,'X-Fantasy-Source':'kona'},cache:'no-store'});players=parseEspn(Array.isArray(d)?d:d.players||[],year,sched);if(players.some(p=>p.games.length))break;}catch(e){error=e;}}
- if(!players.some(p=>p.games.length)){throw error||new Error('The '+year+' feed has not returned completed weekly statistics. Choose an archived season to inspect the dashboards.');}
- }
+ else players=await espnPlayers(year,sched);
  players=players.filter(p=>S.positions.includes(p.position)&&p.name);
  let enrichment=null;try{const path=manifest.seasons?.[year];if(path)enrichment=await json(path);}catch(e){warnings.push('Supplemental usage feed could not be loaded.');}
  if(enrichment){const rows=enrichment.players||{};for(const p of players){const extra=rows[p.id]||rows[p.key];if(!extra)continue;for(const g of p.games){Object.assign(g,extra.weeks?.[g.week]||{});}p.availability=extra.availability||{};}source+=' · '+(enrichment.source||'supplemental usage');}
@@ -123,5 +152,5 @@ async function rankHistory(path='big-board.json'){
  });
 }
 async function preferredYear(){try{const m=await json('analytics/manifest.json',{cache:'no-store'});const ys=Object.keys(m.datasets||{}).map(Number).filter(y=>y<=YEAR);return ys.length?Math.max(...ys):YEAR;}catch(e){return YEAR;}}
-S.Data={load,schedule,scheduleRoster,espnMatchups,espnDefense,rankHistory,currentRanks,json,normalise,parseEspn,preferredYear,clear(){cache.clear();},YEAR};
+S.Data={load,loadWeekly,schedule,scheduleRoster,espnMatchups,espnDefense,rankHistory,currentRanks,json,normalise,parseEspn,preferredYear,clear(){cache.clear();},YEAR};
 })();

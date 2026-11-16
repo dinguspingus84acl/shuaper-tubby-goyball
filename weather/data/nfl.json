@@ -1,376 +1,9 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-15T22:59:32Z",
+  "generatedAt": "2026-11-16T06:50:35Z",
   "weatherSource": "https://mysportsweather.com/nfl",
   "scheduleSource": "MySportsWeather",
   "games": [
-    {
-      "id": "msw-2026-11-15-lar-ari",
-      "week": 10,
-      "kickoffUtc": "2026-11-15T21:05:00Z",
-      "away": {
-        "abbr": "LAR",
-        "name": "Los Angeles Rams",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/lar.png"
-      },
-      "home": {
-        "abbr": "ARI",
-        "name": "Arizona Cardinals",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ari.png"
-      },
-      "venue": "State Farm Stadium",
-      "city": "Glendale, AZ",
-      "indoor": true,
-      "forecast": {
-        "tempF": 75,
-        "precipPct": 0,
-        "precipType": "Rain",
-        "windMph": 5,
-        "gustMph": 7,
-        "windDirection": "NE",
-        "hourly": [
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 75,
-            "windMph": 5,
-            "gustMph": 7,
-            "windDirection": "NE"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 75,
-            "windMph": 2,
-            "gustMph": 6,
-            "windDirection": "NE"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 76,
-            "windMph": 2,
-            "gustMph": 5,
-            "windDirection": "NNW"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "3 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 74,
-            "windMph": 4,
-            "gustMph": 9,
-            "windDirection": "E"
-          },
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 73,
-            "windMph": 4,
-            "gustMph": 8,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 74,
-            "windMph": 3,
-            "gustMph": 7,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 74,
-            "windMph": 3,
-            "gustMph": 6,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 75,
-            "windMph": 2,
-            "gustMph": 4,
-            "windDirection": "NNE"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-lar-ari"
-      }
-    },
-    {
-      "id": "msw-2026-11-15-sea-lv",
-      "week": 10,
-      "kickoffUtc": "2026-11-15T21:05:00Z",
-      "away": {
-        "abbr": "SEA",
-        "name": "Seattle Seahawks",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png"
-      },
-      "home": {
-        "abbr": "LV",
-        "name": "Las Vegas Raiders",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/lv.png"
-      },
-      "venue": "Allegiant Stadium",
-      "city": "Paradise, NV",
-      "indoor": true,
-      "forecast": null
-    },
-    {
-      "id": "msw-2026-11-15-sf-dal",
-      "week": 10,
-      "kickoffUtc": "2026-11-15T21:25:00Z",
-      "away": {
-        "abbr": "SF",
-        "name": "San Francisco 49ers",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/sf.png"
-      },
-      "home": {
-        "abbr": "DAL",
-        "name": "Dallas Cowboys",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/dal.png"
-      },
-      "venue": "AT&T Stadium",
-      "city": "Arlington, TX",
-      "indoor": true,
-      "forecast": {
-        "tempF": 49,
-        "precipPct": 20,
-        "precipType": "Rain",
-        "windMph": 10,
-        "gustMph": 22,
-        "windDirection": "ENE",
-        "hourly": [
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "sky": "partly",
-            "precipPct": 20,
-            "tempF": 49,
-            "windMph": 10,
-            "gustMph": 22,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "sky": "partly",
-            "precipPct": 20,
-            "tempF": 49,
-            "windMph": 10,
-            "gustMph": 22,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "sky": "partly",
-            "precipPct": 20,
-            "tempF": 49,
-            "windMph": 10,
-            "gustMph": 20,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "sky": "partly",
-            "precipPct": 23,
-            "tempF": 49,
-            "windMph": 10,
-            "gustMph": 17,
-            "windDirection": "ENE"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "3 PM",
-            "inGame": false,
-            "precipPct": 13,
-            "tempF": 51,
-            "windMph": 11,
-            "gustMph": 22,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "4 PM",
-            "inGame": true,
-            "precipPct": 9,
-            "tempF": 51,
-            "windMph": 11,
-            "gustMph": 22,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "5 PM",
-            "inGame": true,
-            "precipPct": 11,
-            "tempF": 51,
-            "windMph": 11,
-            "gustMph": 21,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "6 PM",
-            "inGame": true,
-            "precipPct": 10,
-            "tempF": 51,
-            "windMph": 11,
-            "gustMph": 20,
-            "windDirection": "ENE"
-          },
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "precipPct": 16,
-            "tempF": 50,
-            "windMph": 10,
-            "gustMph": 18,
-            "windDirection": "ENE"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-sf-dal"
-      }
-    },
-    {
-      "id": "msw-2026-11-16-pit-cin",
-      "week": 10,
-      "kickoffUtc": "2026-11-16T01:20:00Z",
-      "away": {
-        "abbr": "PIT",
-        "name": "Pittsburgh Steelers",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/pit.png"
-      },
-      "home": {
-        "abbr": "CIN",
-        "name": "Cincinnati Bengals",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/cin.png"
-      },
-      "venue": "Paycor Stadium",
-      "city": "Cincinnati, OH",
-      "indoor": false,
-      "forecast": {
-        "tempF": 43,
-        "precipPct": 0,
-        "precipType": "Rain",
-        "windMph": 0,
-        "gustMph": 2,
-        "windDirection": "—",
-        "hourly": [
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 45,
-            "windMph": 1,
-            "gustMph": 3,
-            "windDirection": "N"
-          },
-          {
-            "time": "8 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 43,
-            "windMph": 0,
-            "gustMph": 2,
-            "windDirection": "—"
-          },
-          {
-            "time": "9 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 42,
-            "windMph": 0,
-            "gustMph": 1,
-            "windDirection": "—"
-          },
-          {
-            "time": "10 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 41,
-            "windMph": 0,
-            "gustMph": 1,
-            "windDirection": "—"
-          },
-          {
-            "time": "11 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 40,
-            "windMph": 0,
-            "gustMph": 1,
-            "windDirection": "—"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 44,
-            "windMph": 1,
-            "gustMph": 3,
-            "windDirection": "NNE"
-          },
-          {
-            "time": "8 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 43,
-            "windMph": 0,
-            "gustMph": 2,
-            "windDirection": "NNE"
-          },
-          {
-            "time": "9 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 42,
-            "windMph": 0,
-            "gustMph": 2,
-            "windDirection": "NNE"
-          },
-          {
-            "time": "10 PM",
-            "inGame": true,
-            "precipPct": 0,
-            "tempF": 41,
-            "windMph": 0,
-            "gustMph": 2,
-            "windDirection": "NE"
-          },
-          {
-            "time": "11 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 40,
-            "windMph": 0,
-            "gustMph": 1,
-            "windDirection": "NE"
-          }
-        ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-pit-cin"
-      }
-    },
     {
       "id": "msw-2026-11-17-lac-bal",
       "week": 10,
@@ -453,7 +86,7 @@
             "inGame": false,
             "precipPct": 0,
             "tempF": 48,
-            "windMph": 3,
+            "windMph": 2,
             "gustMph": 7,
             "windDirection": "NNW"
           },
@@ -462,7 +95,7 @@
             "inGame": true,
             "precipPct": 0,
             "tempF": 46,
-            "windMph": 3,
+            "windMph": 2,
             "gustMph": 7,
             "windDirection": "NNW"
           },
@@ -471,7 +104,7 @@
             "inGame": true,
             "precipPct": 0,
             "tempF": 44,
-            "windMph": 3,
+            "windMph": 2,
             "gustMph": 7,
             "windDirection": "NNW"
           },
@@ -480,8 +113,8 @@
             "inGame": true,
             "precipPct": 0,
             "tempF": 43,
-            "windMph": 3,
-            "gustMph": 8,
+            "windMph": 2,
+            "gustMph": 7,
             "windDirection": "NW"
           },
           {
@@ -489,9 +122,9 @@
             "inGame": false,
             "precipPct": 0,
             "tempF": 42,
-            "windMph": 3,
-            "gustMph": 8,
-            "windDirection": "NW"
+            "windMph": 2,
+            "gustMph": 7,
+            "windDirection": "WNW"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-lac-bal"

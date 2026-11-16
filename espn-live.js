@@ -17,21 +17,6 @@ const PLAYER_NAME_ALIASES={kennethwalkeriii:'kennethwalker'};
 const nameKey=s=>PLAYER_NAME_ALIASES[norm(s)]||norm(s);
 
 const STAT_CONFIG={
-  ALL:[
-    {key:'points',label:'PPR Pts'},
-    {key:'average',label:'PPG'},
-    {key:'passYds',label:'Pass Yds'},
-    {key:'passTD',label:'Pass TD'},
-    {key:'completions',label:'Comp'},
-    {key:'passAtt',label:'Pass Att'},
-    {key:'rushAtt',label:'Rush Att'},
-    {key:'rushYds',label:'Rush Yds'},
-    {key:'rushTD',label:'Rush TD'},
-    {key:'targets',label:'Targets'},
-    {key:'receptions',label:'Rec'},
-    {key:'recYds',label:'Rec Yds'},
-    {key:'recTD',label:'Rec TD'}
-  ],
   QB:[
     {key:'points',label:'PPR Pts'},
     {key:'average',label:'PPG'},
@@ -68,6 +53,21 @@ const STAT_CONFIG={
     {key:'receptions',label:'Rec'},
     {key:'recYds',label:'Rec Yds'},
     {key:'recTD',label:'Rec TD'}
+  ],
+  FLEX:[
+    {key:'points',label:'PPR Pts'},
+    {key:'average',label:'PPG'},
+    {key:'passYds',label:'Pass Yds'},
+    {key:'passTD',label:'Pass TD'},
+    {key:'completions',label:'Comp'},
+    {key:'passAtt',label:'Pass Att'},
+    {key:'rushAtt',label:'Rush Att'},
+    {key:'rushYds',label:'Rush Yds'},
+    {key:'rushTD',label:'Rush TD'},
+    {key:'targets',label:'Targets'},
+    {key:'receptions',label:'Rec'},
+    {key:'recYds',label:'Rec Yds'},
+    {key:'recTD',label:'Rec TD'}
   ]
 };
 
@@ -75,7 +75,7 @@ let rows=[];
 let statsRows=[];
 let statsSeason=SEASON;
 let statsLastUpdated=null;
-let activeFilter='ALL';
+let activeFilter='FLEX';
 let activeTeam='ALL';
 let activeStat='points';
 let statView='TOTAL';
@@ -86,7 +86,7 @@ try{
   const saved=JSON.parse(localStorage.getItem(STATS_UI_STATE_KEY)||'null');
   if(saved){
     const yr=Number(saved.statsSeason);if(Number.isFinite(yr)&&yr>=1999&&yr<=SEASON)statsSeason=yr;
-    if(['ALL','QB','RB','WR','TE'].includes(saved.activeFilter))activeFilter=saved.activeFilter;
+    if(Object.hasOwn(STAT_CONFIG,saved.activeFilter))activeFilter=saved.activeFilter;
     if(typeof saved.activeTeam==='string'&&saved.activeTeam)activeTeam=saved.activeTeam;
     if(typeof saved.activeStat==='string'&&saved.activeStat)activeStat=saved.activeStat;
     if(['TOTAL','PERGAME'].includes(saved.statView))statView=saved.statView;
@@ -97,7 +97,11 @@ function saveStatsUiState(){
   try{localStorage.setItem(STATS_UI_STATE_KEY,JSON.stringify({statsSeason,activeFilter,activeTeam,activeStat,statView,sortDirection}))}catch(e){}
 }
 function syncStatsControls(){
-  document.querySelectorAll('[data-espn-filter]').forEach(x=>x.classList.toggle('active',x.dataset.espnFilter===activeFilter));
+  document.querySelectorAll('[data-espn-filter]').forEach(button=>{
+    const selected=button.dataset.espnFilter===activeFilter;
+    button.classList.toggle('active',selected);
+    button.setAttribute('aria-pressed',String(selected));
+  });
   document.querySelectorAll('[data-espn-view]').forEach(x=>x.classList.toggle('active',x.dataset.espnView===statView));
   const y=document.getElementById('espnStatsYear');if(y)y.value=String(statsSeason);
   const t=document.getElementById('espnTeamFilter');if(t)t.value=activeTeam;
@@ -452,11 +456,7 @@ section.innerHTML=`
     <div class="espn-sticky-controls">
       <div class="espn-live-toolbar">
         <div class="espn-live-filters">
-          <button type="button" class="espn-filter active" data-espn-filter="ALL">All</button>
-          <button type="button" class="espn-filter" data-espn-filter="QB">QB</button>
-          <button type="button" class="espn-filter" data-espn-filter="RB">RB</button>
-          <button type="button" class="espn-filter" data-espn-filter="WR">WR</button>
-          <button type="button" class="espn-filter" data-espn-filter="TE">TE</button>
+          ${Object.keys(STAT_CONFIG).map(position=>`<button type="button" class="espn-filter" data-espn-filter="${position}">${position}</button>`).join('')}
         </div>
         <div class="espn-team-filter-wrap">
           <span class="espn-team-filter-title">Teams</span>
@@ -911,10 +911,10 @@ function historicalTeamLogoUrl(team){
 }
 
 function configForFilter(){
-  return STAT_CONFIG[activeFilter]||STAT_CONFIG.ALL;
+  return STAT_CONFIG[activeFilter]||STAT_CONFIG.FLEX;
 }
 function statLabel(key){
-  return (configForFilter().find(x=>x.key===key)||STAT_CONFIG.ALL.find(x=>x.key===key)||{label:key}).label;
+  return (configForFilter().find(x=>x.key===key)||STAT_CONFIG.FLEX.find(x=>x.key===key)||{label:key}).label;
 }
 function rawPlayerStatValue(p,key){
   const v=p?.[key];
@@ -961,7 +961,7 @@ function formatStat(p,key){
   return Number.isInteger(v)?String(v):v.toFixed(1);
 }
 function rankRows(list,filter){
-  let filtered=filter==='ALL'?list:list.filter(p=>p.position===filter);
+  let filtered=list.filter(p=>filter==='FLEX'?p.position!=='QB':p.position===filter);
   if(activeTeam!=='ALL')filtered=filtered.filter(p=>String(p.team||'').toUpperCase()===activeTeam);
   const dir=sortDirection==='ASC'?1:-1;
   return [...filtered].sort((a,b)=>{
@@ -1619,7 +1619,7 @@ function openEspnPlayerProfile(player){
     document.getElementById('pm').textContent=player.team+' · '+player.position;
     document.getElementById('profileTop').innerHTML='<div class="person"></div>'+teamLogo(player.team);
     document.getElementById('injuryStatus').innerHTML='';
-    const cfg=STAT_CONFIG[player.position]||STAT_CONFIG.ALL;
+    const cfg=STAT_CONFIG[player.position]||STAT_CONFIG.FLEX;
     document.getElementById('stats').innerHTML=cfg.slice(0,4).map(x=>'<div class="stat"><span>'+x.label+'</span><b>'+formatStat(player,x.key)+'</b></div>').join('');
     document.getElementById('playerNotes').textContent='No notes provided.';
     modal.classList.add('open');
@@ -1883,10 +1883,10 @@ button.onclick=e=>{e.preventDefault();showEspn()};
 document.querySelectorAll('[data-espn-filter]').forEach(b=>{
   b.onclick=()=>{
     activeFilter=b.dataset.espnFilter;
-    const cfg=STAT_CONFIG[activeFilter]||STAT_CONFIG.ALL;
+    const cfg=configForFilter();
     if(!cfg.some(x=>x.key===activeStat))activeStat='points';
     sortDirection='DESC';
-    document.querySelectorAll('[data-espn-filter]').forEach(x=>x.classList.toggle('active',x===b));
+    syncStatsControls();
     saveStatsUiState();
     renderStatFilters();
     render();
@@ -2094,7 +2094,7 @@ window.ShuaEspnLive={
       if(!p){target.innerHTML='<div class="espn-game-log-empty">No ESPN data found for this player.</div>';return}
       const posRows=rows.filter(x=>x.position===p.position).sort((a,b)=>b.points-a.points||((b.average??-Infinity)-(a.average??-Infinity)));
       const rank=posRows.findIndex(x=>String(x.id)===String(p.id))+1;
-      const cfg=STAT_CONFIG[p.position]||STAT_CONFIG.ALL;
+      const cfg=STAT_CONFIG[p.position]||STAT_CONFIG.FLEX;
       target.innerHTML='<div class="unified-rank-grid">'+
         '<div class="unified-rank-card"><span>ESPN '+p.position+' Rank</span><b>#'+(rank||'—')+'</b></div>'+
         '<div class="unified-rank-card"><span>PPR Points</span><b>'+p.points.toFixed(1)+'</b></div>'+

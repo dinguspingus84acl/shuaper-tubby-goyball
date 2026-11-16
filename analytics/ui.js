@@ -820,25 +820,25 @@ function weekly(){
  const current=live?weeklyCurrentWeek():null;
  const week=live?(weeklyWeekOverride??current):state.week;
  const players=live&&weeklyReport?weeklyReport.players:dataset.players;
- const position=state.weeklyPos||'ALL';
  const configs={
-  ALL:[['points','PPR Points'],['average','Points Per Game']],
   QB:[['points','PPR Points'],['average','Points Per Game'],['passYds','Passing Yards'],['passTD','Passing Touchdowns'],['completions','Completions'],['passAtt','Pass Attempts'],['rushYds','Rushing Yards'],['rushTD','Rushing Touchdowns']],
   RB:[['points','PPR Points'],['average','Points Per Game'],['rushAtt','Rush Attempts'],['rushYds','Rushing Yards'],['rushTD','Rushing Touchdowns'],['targets','Targets'],['receptions','Receptions'],['recYds','Receiving Yards'],['recTD','Receiving Touchdowns']],
   WR:[['points','PPR Points'],['average','Points Per Game'],['targets','Targets'],['receptions','Receptions'],['recYds','Receiving Yards'],['recTD','Receiving Touchdowns']],
-  TE:[['points','PPR Points'],['average','Points Per Game'],['targets','Targets'],['receptions','Receptions'],['recYds','Receiving Yards'],['recTD','Receiving Touchdowns']]
+  TE:[['points','PPR Points'],['average','Points Per Game'],['targets','Targets'],['receptions','Receptions'],['recYds','Receiving Yards'],['recTD','Receiving Touchdowns']],
+  FLEX:[['points','PPR Points'],['average','Points Per Game']]
  };
- const available=configs[position]||configs.ALL;
+ const position=Object.hasOwn(configs,state.weeklyPos)?state.weeklyPos:'FLEX';
+ const available=configs[position];
  const selected=available.some(([k])=>k===state.weeklyMetric)?state.weeklyMetric:'points';
  const title=available.find(([k])=>k===selected)?.[1]||'PPR Points';
- const candidates=players.filter(p=>position==='ALL'||p.position===position).map(p=>{
+ const candidates=players.filter(p=>position==='FLEX'?p.position!=='QB':p.position===position).map(p=>{
   const g=G(p).find(x=>x.week===week);
   if(!g)return null;
   const appearances=G(p,week);
   const value=selected==='points'?N(g.points):selected==='average'?avg(appearances.map(x=>x.points)):N(g[selected]);
   return value===null?null:{...p,g,rankValue:value};
  }).filter(Boolean).sort((a,b)=>b.rankValue-a.rankValue||a.name.localeCompare(b.name));
- const positionFilter='<div class="st-weekly-positions" role="group" aria-label="Weekly positions">'+['ALL','QB','RB','WR','TE'].map(p=>'<button type="button" data-st-weekly-pos="'+p+'" aria-pressed="'+(position===p)+'">'+p+'</button>').join('')+'</div>';
+ const positionFilter='<div class="st-weekly-positions" role="group" aria-label="Weekly positions">'+Object.keys(configs).map(p=>'<button type="button" data-st-weekly-pos="'+p+'" aria-pressed="'+(position===p)+'">'+p+'</button>').join('')+'</div>';
  const metricFilter='<label class="st-weekly-metric-filter">Rank by <select id="stWeeklyMetric">'+available.map(([k,label])=>'<option value="'+k+'"'+(selected===k?' selected':'')+'>'+label+'</option>').join('')+'</select></label>';
  const weeks=live?Array.from({length:current},(_,i)=>i+1):dataset.weeks;
  const filters='<div class="st-controls">'+select('stSeason','Season',[2026,2025,2024].map(y=>[y,y]),state.year)+

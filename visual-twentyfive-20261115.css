@@ -20,7 +20,10 @@ body.shua-clean #board .pick[data-shua-round] .name{
   color:#f5fcff!important;text-shadow:0 1px 5px #051525d9;
 }
 body.shua-clean #board .pick[data-shua-round] .slot{
-  top:auto;bottom:7px;
+  top:auto;right:auto;bottom:7px;left:7px;
+}
+body.shua-clean #board .pick[data-shua-round] .arrow{
+  position:absolute;top:auto;right:8px;bottom:8px;left:auto;
 }
 body.shua-clean #tableCard #rows tr:has(.photo-cell){
   border-bottom:1px solid #87b1c026!important;

@@ -1,0 +1,27 @@
+/* Fit the source image inside the avatar so the round mask has room above the head. */
+body.shua-clean :is(
+  #rows .photo-cell img.photo,
+  #espnLiveSection .espn-player img.espn-headshot,
+  #shuaAnalyticsSection[data-active-view] img[data-st-initials]:not(.st-hero-art *, .st-feature-top *),
+  #shuaAnalyticsSection img:is(.st-global-player-face,.st-global-leading-image),
+  #shuaExpandedSearch .shua-search-avatar img.shua-search-face,
+  #shuaMyTeams .myteams-player-open > img:not(.myteams-nfl-logo),
+  #modal .player-sticky-face img.featured-photo:not(.featured-defense-logo),
+  img:is(.photo,.player-photo,.compare-face,.player-compare-face,.trade-headshot,.shua-tcc-face,.stock-face,.kp-portrait)
+) {
+  object-fit: contain !important;
+  object-position: center !important;
+  padding: 1px;
+}
+
+/* Keep the portrait inside the visible stage in both player-card layouts. */
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box img.featured-photo:not(.featured-defense-logo),
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard img.featured-photo:not(.featured-defense-logo) {
+  bottom: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  padding-top: 3px;
+}

@@ -12,6 +12,9 @@ body.shua-clean #board .pick .shua-pick-watermark{
   opacity:.23!important;
   filter:drop-shadow(0 2px 3px #020e1a8c);
 }
+body.shua-clean #board .pick .shua-pick-watermark[src*="/500-dark/"]{
+  opacity:.44!important;
+}
 body.shua-clean #board .pick[data-shua-round] .name{
   color:#f5fcff!important;text-shadow:0 1px 5px #051525d9;
 }
@@ -39,6 +42,10 @@ body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-b
 }
 body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box .featured-bg-logo{
   opacity:.16!important;filter:drop-shadow(0 1px 5px #020f1f52);
+}
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box .featured-bg-logo[src*="/500-dark/"]{
+  width:100%!important;height:116%!important;
+  opacity:.50!important;filter:drop-shadow(0 1px 4px #020f1f70)!important;
 }
 body.shua-clean #modal .featured-player-card.broadcast-card .featured-bio{
   border-top:1px solid #ffffff1c!important;padding-top:5px!important;

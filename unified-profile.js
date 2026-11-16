@@ -748,6 +748,11 @@ function featuredLogoUrl(team){
   }catch(e){}
   return '';
 }
+function featuredWatermarkHtml(logo){
+  const source=logo.replace(/\/500\/(nyj|nyg|lar)\.png$/,'/500-dark/$1.png');
+  const fallback=source===logo?'':' onerror="this.onerror=null;this.src=\''+logo+'\'"';
+  return '<img class="featured-bg-logo" src="'+source+'" alt=""'+fallback+'>';
+}
 function featuredFaceHtml(player){
   if(player?.position==='D/ST'){
     const url=featuredLogoUrl(player?.team);
@@ -977,7 +982,7 @@ function applyFeaturedProfile(name,seed=null){
   hero.innerHTML=
     '<div class="featured-left">'+
       '<div class="featured-portrait-box">'+
-        (logo&&!defense?'<img class="featured-bg-logo" src="'+logo+'" alt="">':'')+
+        (logo&&!defense?featuredWatermarkHtml(logo):'')+
         featuredFaceHtml(player)+
       '</div>'+
     '</div>'+
@@ -1476,7 +1481,7 @@ function ensurePlayerSwipePreview(targetId){
   if(teamName.length>=9)copy.classList.add('featured-team-long');
   if(p.position==='D/ST')copy.classList.add('featured-defense-profile');
   const face=copy.querySelector('.featured-portrait-box');
-  if(face)face.innerHTML=(logo&&p.position!=='D/ST'?'<img class="featured-bg-logo" src="'+logo+'" alt="">':'')+featuredFaceHtml(p);
+  if(face)face.innerHTML=(logo&&p.position!=='D/ST'?featuredWatermarkHtml(logo):'')+featuredFaceHtml(p);
   const strip=copy.querySelector('.featured-team-strip');
   if(strip)strip.innerHTML=(logo?'<img class="featured-mini-logo" src="'+logo+'" alt="">':'')+
     (logo?'<span class="featured-divider" aria-hidden="true">&#8203;</span>':'')+

@@ -52,8 +52,13 @@
         image.decoding='async';
         image.alt='';
         image.setAttribute('aria-hidden','true');
-        image.src='https://a.espncdn.com/i/teamlogos/nfl/500/'+code+'.png';
-        image.onerror=()=>image.remove();
+        const standard='https://a.espncdn.com/i/teamlogos/nfl/500/'+code+'.png';
+        const darkBackground=['nyj','nyg','lar'].includes(code);
+        image.src=darkBackground?standard.replace('/500/','/500-dark/'):standard;
+        image.onerror=()=>{
+          if(image.src!==standard){image.src=standard;return;}
+          image.remove();
+        };
         tile.append(image);
       }
     });

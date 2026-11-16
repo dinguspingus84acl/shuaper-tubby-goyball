@@ -1,11 +1,29 @@
-/* Give the player's hair room above the portrait in both open card layouts. */
-body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box img.featured-photo:not(.featured-defense-logo),
-body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard img.featured-photo:not(.featured-defense-logo) {
-  bottom: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 100% !important;
+/* Anchor the enlarged portrait at the top so the card crops from the shoulders. */
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box img.featured-photo:not(.featured-defense-logo) {
+  top: 3px !important;
+  bottom: auto !important;
+  width: 120% !important;
+  max-width: none !important;
+  height: 120% !important;
   object-fit: contain !important;
+  object-position: center top !important;
+}
+
+body.shua-clean #modal .featured-player-card.broadcast-card .featured-portrait-box img.featured-bg-logo[src] {
+  width: 134% !important;
+  height: 134% !important;
+}
+
+/* The compact card uses a round frame and keeps the portrait bottom-aligned. */
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard img.featured-photo:not(.featured-defense-logo) {
+  top: auto !important;
+  bottom: 0 !important;
+  width: 116% !important;
+  max-width: none !important;
+  height: 100% !important;
   object-position: center bottom !important;
-  padding-top: 3px;
+}
+body.shua-clean #modal .featured-player-profile:has(#unifiedOverviewPanel[hidden]) #featuredPlayerCard img.featured-bg-logo {
+  width: 116% !important;
+  height: 116% !important;
 }

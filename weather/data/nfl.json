@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-16T06:50:35Z",
+  "generatedAt": "2026-11-16T18:41:35Z",
   "weatherSource": "https://mysportsweather.com/nfl",
   "scheduleSource": "MySportsWeather",
   "games": [
@@ -22,11 +22,11 @@
       "city": "Baltimore, MD",
       "indoor": false,
       "forecast": {
-        "tempF": 45,
+        "tempF": 46,
         "precipPct": 0,
         "precipType": "Rain",
-        "windMph": 5,
-        "gustMph": 8,
+        "windMph": 2,
+        "gustMph": 7,
         "windDirection": "NW",
         "hourly": [
           {
@@ -34,9 +34,9 @@
             "inGame": false,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 47,
-            "windMph": 5,
-            "gustMph": 8,
+            "tempF": 48,
+            "windMph": 2,
+            "gustMph": 7,
             "windDirection": "N"
           },
           {
@@ -44,73 +44,25 @@
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 45,
-            "windMph": 5,
-            "gustMph": 8,
-            "windDirection": "NW"
-          },
-          {
-            "time": "9 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 44,
-            "windMph": 5,
-            "gustMph": 8,
-            "windDirection": "NW"
-          },
-          {
-            "time": "10 PM",
-            "inGame": true,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 42,
-            "windMph": 5,
-            "gustMph": 9,
-            "windDirection": "NW"
-          },
-          {
-            "time": "11 PM",
-            "inGame": false,
-            "sky": "sun",
-            "precipPct": 0,
-            "tempF": 40,
-            "windMph": 5,
-            "gustMph": 9,
-            "windDirection": "NW"
-          }
-        ],
-        "nbmHourly": [
-          {
-            "time": "7 PM",
-            "inGame": false,
-            "precipPct": 0,
-            "tempF": 48,
-            "windMph": 2,
-            "gustMph": 7,
-            "windDirection": "NNW"
-          },
-          {
-            "time": "8 PM",
-            "inGame": true,
-            "precipPct": 0,
             "tempF": 46,
             "windMph": 2,
             "gustMph": 7,
-            "windDirection": "NNW"
+            "windDirection": "NW"
           },
           {
             "time": "9 PM",
             "inGame": true,
+            "sky": "sun",
             "precipPct": 0,
             "tempF": 44,
             "windMph": 2,
             "gustMph": 7,
-            "windDirection": "NNW"
+            "windDirection": "NW"
           },
           {
             "time": "10 PM",
             "inGame": true,
+            "sky": "sun",
             "precipPct": 0,
             "tempF": 43,
             "windMph": 2,
@@ -120,11 +72,59 @@
           {
             "time": "11 PM",
             "inGame": false,
+            "sky": "sun",
             "precipPct": 0,
             "tempF": 42,
             "windMph": 2,
             "gustMph": 7,
-            "windDirection": "WNW"
+            "windDirection": "NW"
+          }
+        ],
+        "nbmHourly": [
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "precipPct": 0,
+            "tempF": 46,
+            "windMph": 3,
+            "gustMph": 7,
+            "windDirection": "NNW"
+          },
+          {
+            "time": "8 PM",
+            "inGame": true,
+            "precipPct": 0,
+            "tempF": 44,
+            "windMph": 2,
+            "gustMph": 7,
+            "windDirection": "NNW"
+          },
+          {
+            "time": "9 PM",
+            "inGame": true,
+            "precipPct": 0,
+            "tempF": 43,
+            "windMph": 2,
+            "gustMph": 7,
+            "windDirection": "NW"
+          },
+          {
+            "time": "10 PM",
+            "inGame": true,
+            "precipPct": 0,
+            "tempF": 42,
+            "windMph": 3,
+            "gustMph": 8,
+            "windDirection": "NW"
+          },
+          {
+            "time": "11 PM",
+            "inGame": false,
+            "precipPct": 0,
+            "tempF": 41,
+            "windMph": 3,
+            "gustMph": 8,
+            "windDirection": "NW"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-lac-bal"

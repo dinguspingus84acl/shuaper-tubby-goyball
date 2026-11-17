@@ -8,9 +8,9 @@ body.shua-live-scores-open #shuaVisualContext { display:none!important; }
 #lsPeriod,#lsStatus { font-size:12px;color:#a8c0d3; }
 #lsRefresh { border:1px solid #50728a;border-radius:8px;background:#18394f;color:#ecf7ff;padding:8px 12px;font-weight:750; }
 #lsRefresh:disabled { opacity:.55;cursor:wait; }
-#lsPositions { display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:460px; }
-#lsPositions button { min-width:0;min-height:36px;padding:4px 0;border:1px solid #50728a;border-radius:8px;background:#102a40;color:#d9eaf6;font-size:13px;font-weight:750;white-space:nowrap;cursor:pointer; }
-#lsPositions button[aria-pressed="true"] { background:#b9ecda;border-color:#b9ecda;color:#0b2b37; }
+.ls-positions { display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;width:min(100%,460px); }
+.ls-positions button { min-width:0;min-height:36px;padding:4px 0;border:1px solid #50728a;border-radius:8px;background:#102a40;color:#d9eaf6;font-size:13px;font-weight:750;white-space:nowrap;cursor:pointer; }
+.ls-positions button[aria-pressed="true"] { background:#b9ecda;border-color:#b9ecda;color:#0b2b37; }
 #lsGames { display:grid;gap:10px; }
 #lsGames details { background:#102a40;border:1px solid #385971;border-radius:11px;overflow:hidden; }
 #lsGames summary { padding:9px 12px;cursor:pointer;background:#14334b; }
@@ -20,17 +20,35 @@ body.shua-live-scores-open #shuaVisualContext { display:none!important; }
 .ls-score-team { display:flex;align-items:center;gap:7px;min-width:0; }
 .ls-score-team img { width:29px;height:29px;object-fit:contain; }
 .ls-score-team b { margin-left:auto;font-size:18px;font-variant-numeric:tabular-nums; }
-.ls-box { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:10px 12px; }
-.ls-team h3 { display:flex;justify-content:space-between;gap:7px;margin:0;padding:4px 0;color:#bbd5e7;font-size:13px; }
-.ls-team ul { list-style:none;padding:0;margin:0; }
-.ls-team li { display:grid;grid-template-columns:32px minmax(0,1fr) max-content;align-items:center;gap:8px;padding:7px 0;border-top:1px solid #34536b;font-size:13px; }
-.ls-face { display:grid;place-items:center;width:32px;height:32px;object-fit:contain;border:1px solid #50728a;border-radius:50%;background:#1c3b52; }
+.ls-box { display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:10px 12px; }
+.ls-team { min-width:0; }
+.ls-team h3 { margin:0;padding:4px 0 7px;color:#d7e9f5;font-size:14px; }
+#shuaLiveScores .ls-log { display:table;width:100%;table-layout:fixed;border-collapse:collapse; }
+#shuaLiveScores .ls-log thead { display:table-header-group; }
+#shuaLiveScores .ls-log tbody { display:table-row-group;padding:0; }
+#shuaLiveScores .ls-log tr { display:table-row;border:0; }
+#shuaLiveScores .ls-log :is(th,td) { display:table-cell;position:static;padding:7px 3px;border:0;border-bottom:1px solid #34536b;text-align:center;vertical-align:middle;white-space:normal; }
+#shuaLiveScores .ls-log tr > :first-child { width:32%;padding-left:6px;text-align:left; }
+#shuaLiveScores .ls-log thead th { background:#183a51;color:#bcd6e9;font-size:11px;line-height:1.15; }
+#shuaLiveScores .ls-log td { color:#eaf4fc;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums; }
+#shuaLiveScores .ls-log .ls-pts { color:#83e7ba; }
+#shuaLiveScores .ls-log .ls-pts-negative { color:#ef8798; }
+.ls-player { display:flex;align-items:center;gap:7px;min-width:0; }
+.ls-player strong { display:block;overflow-wrap:anywhere;font-size:13px;line-height:1.15; }
+.ls-face { display:grid;place-items:center;flex:none;width:32px;height:32px;object-fit:contain;border:1px solid #50728a;border-radius:50%;background:#1c3b52; }
 .ls-face img { width:23px;height:23px;object-fit:contain; }
-.ls-team li .ls-initials { font-weight:750;color:#d9eaf6; }
-.ls-team li span,.ls-team small,.ls-pending,.ls-team p { color:#abc3d6;font-size:11px; }
-.ls-team small { display:block;padding-top:3px; }
-.ls-team li b { color:#83e7ba;font-variant-numeric:tabular-nums; }
+.ls-initials { font-size:11px;font-weight:750;color:#d9eaf6; }
+.ls-player small,.ls-pending,.ls-team p { color:#abc3d6;font-size:11px; }
+.ls-player small { display:block;margin-top:2px; }
 @media(max-width:560px){
- .ls-box { grid-template-columns:1fr; }
+ .ls-box { padding-inline:7px; }
  .ls-score-team strong { font-size:12px; }
+ #shuaLiveScores .ls-log :is(th,td) { padding-inline:1px; }
+ #shuaLiveScores .ls-log tr > :first-child { width:34%;padding-left:3px; }
+ #shuaLiveScores .ls-log thead th { font-size:clamp(8px,2.45vw,11px); }
+ #shuaLiveScores .ls-log td { font-size:clamp(11px,3.4vw,15px); }
+ .ls-player { gap:4px; }
+ .ls-player strong { font-size:11px; }
+ .ls-face { width:26px;height:26px; }
+ .ls-face img { width:18px;height:18px; }
 }

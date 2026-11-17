@@ -23,18 +23,21 @@
   const games=section.querySelector('#lsGames');
   const refreshButton=section.querySelector('#lsRefresh');
   const positions={1:'QB',2:'RB',3:'WR',4:'TE',5:'K',16:'D/ST'};
-  const positionOptions=['All',...Object.values(positions)];
-  const gamePositions=new Map();
+  const positionOptions=['All','QB','RB','WR','TE','K/D'];
+  const gameViews=new Map();
+  const statViews={
+    QB:['Passing','Rushing'],
+    RB:['Rushing','Receiving'],
+    WR:['Receiving','Rushing'],
+    TE:['Receiving','Rushing']
+  };
   // ESPN stat IDs match the player card's game log.
-  const receiving=[['REC',53],['TGT',58],['YDS',42],['TD',43]];
   const statColumns={
     All:[['PASS YDS',3],['RUSH YDS',24],['REC YDS',42],['OFF TD',[4,25,43]]],
-    QB:[['CMP',1],['PASS ATT',0],['PASS YDS',3],['PASS TD',4],['INT/FUM',[20,72]],['RUSH ATT',23],['RUSH YDS',24]],
-    RB:[['RUSH ATT',23],['RUSH YDS',24],['RUSH TD',25],['REC',53],['TGT',58],['REC YDS',42],['REC TD',43]],
-    WR:receiving,
-    TE:receiving,
-    K:[],
-    'D/ST':[]
+    Passing:[['CMP',1],['PASS ATT',0],['PASS YDS',3],['PASS TD',4],['INT/FUM',[20,72]]],
+    Rushing:[['RUSH ATT',23],['RUSH YDS',24],['RUSH TD',25]],
+    Receiving:[['REC',53],['TGT',58],['REC YDS',42],['REC TD',43]],
+    'K/D':[]
   };
   const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const clock=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
@@ -94,26 +97,30 @@
       ' data-face-urls="'+escape(urls.map(encodeURIComponent).join('|'))+'" data-face-initials="'+initials+'"'+
       ' data-face-fallback-class="ls-face ls-initials" onerror="window.ShuaAdvanceFace(this)">';
   }
-  function positionFilters(contenders,selectedPosition){
+  function matchupFilters(contenders,position,statView){
     const matchup=contenders.map(item=>teamLabel(item.team)).join(' vs. ');
-    return '<div class="ls-positions" role="group" aria-label="'+escape(matchup+' positions')+'">'+
-      positionOptions.map(pos=>'<button type="button" data-ls-position="'+pos+'" aria-pressed="'+String(pos===selectedPosition)+'">'+pos+'</button>').join('')+'</div>';
+    const stats=statViews[position];
+    const statButtons=stats?'<div class="ls-stat-views" role="group" aria-label="'+escape(matchup+' '+position+' stats')+'">'+
+      stats.map(view=>'<button type="button" data-ls-stat="'+view+'" aria-pressed="'+String(view===statView)+'">'+view+'</button>').join('')+'</div>':'';
+    return '<div class="ls-filters"><div class="ls-positions" role="group" aria-label="'+escape(matchup+' positions')+'">'+
+      positionOptions.map(pos=>'<button type="button" data-ls-position="'+pos+'" aria-pressed="'+String(pos===position)+'">'+pos+'</button>').join('')+'</div>'+statButtons+'</div>';
   }
 
-  function playerStats(team,selectedPosition){
+  function playerStats(team,position,statView){
     const players=fantasy?.teams.get(String(team.id));
-    const columns=statColumns[selectedPosition];
-    const rows=(players||[]).filter(p=>selectedPosition==='All'||p.position===selectedPosition)
+    const columns=statColumns[statView||position];
+    const rows=(players||[]).filter(p=>position==='All'||p.position===position||
+      (position==='K/D'&&(p.position==='K'||p.position==='D/ST')))
       .map(p=>{
         const stats=columns.map(([,ids])=>{
           const value=Array.isArray(ids)?ids.reduce((total,id)=>total+(Number(p.stats[id])||0),0):Number(p.stats[ids])||0;
-          return '<td>'+(selectedPosition==='All'&&!value?'—':value)+'</td>';
+          return '<td>'+(position==='All'&&!value?'—':value)+'</td>';
         }).join('');
         return '<tr><th scope="row"><div class="ls-player">'+playerFace(p,team)+
           '<button type="button" class="ls-player-name" data-ls-player="'+escape(p.id)+'">'+escape(p.name)+'</button>'+
           '</div></th><td class="ls-pts'+(p.points<0?' ls-pts-negative':'')+'">'+p.points.toFixed(1)+'</td>'+stats+'</tr>';
       }).join('');
-    const empty=!players?'Waiting for ESPN fantasy stats.':selectedPosition==='All'?'No players with fantasy points.':'No '+selectedPosition+' with fantasy points.';
+    const empty=!players?'Waiting for ESPN fantasy stats.':position==='All'?'No players with fantasy points.':'No '+position+' with fantasy points.';
     const label=escape(teamLabel(team));
     return '<section class="ls-team" data-ls-team-id="'+escape(team.id)+'" data-ls-team="'+escape(team.abbreviation)+'"><h3>'+label+'</h3>'+
       (rows?'<table class="ls-log" aria-label="'+label+' fantasy stats"><thead><tr><th scope="col">Player</th><th scope="col">PPR</th>'+
@@ -123,9 +130,10 @@
   function renderGames(){
     const expanded=new Set([...games.querySelectorAll('details[open]')].map(node=>node.dataset.game));
     const firstRender=!games.querySelector('details');
-    const focused=document.activeElement?.closest('#lsGames summary, #lsGames [data-ls-position], #lsGames [data-ls-player]');
+    const focused=document.activeElement?.closest('#lsGames summary, #lsGames [data-ls-position], #lsGames [data-ls-stat], #lsGames [data-ls-player]');
     const focusGame=focused?.closest('details')?.dataset.game;
     const focusPosition=focused?.dataset.lsPosition;
+    const focusStat=focused?.dataset.lsStat;
     const focusPlayer=focused?.dataset.lsPlayer;
     const rank={in:0,pre:1,post:2};
     const events=[...scoreboard.events].filter(e=>e.competitions?.[0]?.competitors?.length===2).sort((a,b)=>{
@@ -140,9 +148,9 @@
       const label=state==='pre'&&type.name==='STATUS_SCHEDULED'&&Number.isFinite(+kickoff)?clock.format(kickoff):type.shortDetail||type.detail||type.description;
       const scores=contenders.map(item=>'<span class="ls-score-team">'+teamLogo(item.team)+'<strong>'+escape(teamLabel(item.team))+'</strong>'+
         (state!=='pre'&&item.score!=null?'<b>'+escape(item.score)+'</b>':'')+'</span>').join('');
-      const selectedPosition=gamePositions.get(String(event.id))||'All';
+      const {position,statView}=gameViews.get(String(event.id))||{position:'All'};
       const box=state==='pre'?'<p class="ls-pending">Fantasy stats appear after kickoff.</p>':
-        positionFilters(contenders,selectedPosition)+contenders.map(item=>playerStats(item.team,selectedPosition)).join('');
+        matchupFilters(contenders,position,statView)+contenders.map(item=>playerStats(item.team,position,statView)).join('');
       return '<details data-game="'+escape(event.id)+'"'+(expanded.has(String(event.id))||(firstRender&&event===initial)?' open':'')+
         '><summary><span class="ls-game-status'+(state==='in'?' ls-in-progress':'')+'">'+escape(label)+'</span><span class="ls-matchup">'+scores+'</span></summary><div class="ls-box">'+box+'</div></details>';
     }).join('');
@@ -153,6 +161,7 @@
     if(focusGame){
       const game=[...games.querySelectorAll('details')].find(node=>node.dataset.game===focusGame);
       const selector=focusPosition?'[data-ls-position="'+focusPosition+'"]':
+        focusStat?'[data-ls-stat="'+focusStat+'"]':
         focusPlayer?'[data-ls-player="'+CSS.escape(focusPlayer)+'"]':'summary';
       game?.querySelector(selector)?.focus({preventScroll:true});
     }
@@ -226,9 +235,12 @@
       });
       return;
     }
-    const filter=event.target.closest('[data-ls-position]');
+    const filter=event.target.closest('[data-ls-position], [data-ls-stat]');
     if(!filter||filter.getAttribute('aria-pressed')==='true')return;
-    gamePositions.set(filter.closest('details').dataset.game,filter.dataset.lsPosition);
+    const game=filter.closest('details').dataset.game;
+    const {lsPosition,lsStat}=filter.dataset;
+    const position=lsPosition||gameViews.get(game).position;
+    gameViews.set(game,{position,statView:lsStat||statViews[position]?.[0]});
     renderGames();
   });
   document.addEventListener('visibilitychange',()=>void refresh(true));

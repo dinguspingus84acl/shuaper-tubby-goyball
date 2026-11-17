@@ -1,11 +1,16 @@
 body.shua-live-scores-open main { display:block!important; }
-body.shua-live-scores-open main>*:not(#shuaLiveScores) { display:none!important; }
+body.shua-live-scores-open main:has(> #shuaLiveScores) > :not(#shuaLiveScores),
+body.shua-clean.shua-live-scores-open main > .head.shua-board-controls-inline:has(#teamControls),
+body.shua-live-scores-open #shuaVisualContext { display:none!important; }
 #shuaLiveScores { max-width:900px;margin:0 auto;color:#eaf4fc; }
 .ls-header { display:flex;align-items:center;justify-content:space-between;padding:4px 0 12px;border:0; }
 .ls-header h2 { margin:0 0 4px;font-size:clamp(22px,4vw,32px); }
 #lsPeriod,#lsStatus { font-size:12px;color:#a8c0d3; }
 #lsRefresh { border:1px solid #50728a;border-radius:8px;background:#18394f;color:#ecf7ff;padding:8px 12px;font-weight:750; }
 #lsRefresh:disabled { opacity:.55;cursor:wait; }
+#lsPositions { display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:460px; }
+#lsPositions button { min-width:0;min-height:36px;padding:4px 0;border:1px solid #50728a;border-radius:8px;background:#102a40;color:#d9eaf6;font-size:13px;font-weight:750;white-space:nowrap;cursor:pointer; }
+#lsPositions button[aria-pressed="true"] { background:#b9ecda;border-color:#b9ecda;color:#0b2b37; }
 #lsGames { display:grid;gap:10px; }
 #lsGames details { background:#102a40;border:1px solid #385971;border-radius:11px;overflow:hidden; }
 #lsGames summary { padding:9px 12px;cursor:pointer;background:#14334b; }
@@ -18,7 +23,10 @@ body.shua-live-scores-open main>*:not(#shuaLiveScores) { display:none!important;
 .ls-box { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:10px 12px; }
 .ls-team h3 { display:flex;justify-content:space-between;gap:7px;margin:0;padding:4px 0;color:#bbd5e7;font-size:13px; }
 .ls-team ul { list-style:none;padding:0;margin:0; }
-.ls-team li { display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid #34536b;font-size:13px; }
+.ls-team li { display:grid;grid-template-columns:32px minmax(0,1fr) max-content;align-items:center;gap:8px;padding:7px 0;border-top:1px solid #34536b;font-size:13px; }
+.ls-face { display:grid;place-items:center;width:32px;height:32px;object-fit:contain;border:1px solid #50728a;border-radius:50%;background:#1c3b52; }
+.ls-face img { width:23px;height:23px;object-fit:contain; }
+.ls-team li .ls-initials { font-weight:750;color:#d9eaf6; }
 .ls-team li span,.ls-team small,.ls-pending,.ls-team p { color:#abc3d6;font-size:11px; }
 .ls-team small { display:block;padding-top:3px; }
 .ls-team li b { color:#83e7ba;font-variant-numeric:tabular-nums; }

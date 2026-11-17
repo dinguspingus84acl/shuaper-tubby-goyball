@@ -1,69 +1,807 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-17T02:59:28Z",
+  "generatedAt": "2026-11-17T22:29:47Z",
   "weatherSource": "https://mysportsweather.com/nfl",
   "scheduleSource": "MySportsWeather",
   "games": [
     {
-      "id": "msw-2026-11-17-lac-bal",
-      "week": 10,
-      "kickoffUtc": "2026-11-17T01:16:00Z",
+      "id": "msw-2026-11-20-ind-hou",
+      "week": 11,
+      "kickoffUtc": "2026-11-20T01:15:00Z",
       "away": {
-        "abbr": "LAC",
-        "name": "Los Angeles Chargers",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/lac.png"
+        "abbr": "IND",
+        "name": "Indianapolis Colts",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ind.png"
       },
       "home": {
-        "abbr": "BAL",
-        "name": "Baltimore Ravens",
-        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png"
+        "abbr": "HOU",
+        "name": "Houston Texans",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/hou.png"
       },
-      "venue": "M&T Bank Stadium",
-      "city": "Baltimore, MD",
-      "indoor": false,
+      "venue": "NRG Stadium",
+      "city": "Houston, TX",
+      "indoor": true,
       "forecast": {
-        "tempF": 44,
+        "tempF": 67,
         "precipPct": 0,
         "precipType": "Rain",
-        "windMph": 2,
-        "gustMph": 7,
-        "windDirection": "NW",
+        "windMph": 5,
+        "gustMph": 5,
+        "windDirection": "NE",
         "hourly": [
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 68,
+            "windMph": 5,
+            "gustMph": 6,
+            "windDirection": "NE"
+          },
+          {
+            "time": "8 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 67,
+            "windMph": 5,
+            "gustMph": 5,
+            "windDirection": "NE"
+          },
           {
             "time": "9 PM",
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 43,
-            "windMph": 2,
-            "gustMph": 7,
-            "windDirection": "NW"
+            "tempF": 65,
+            "windMph": 5,
+            "gustMph": 6,
+            "windDirection": "NE"
           },
           {
             "time": "10 PM",
             "inGame": true,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 42,
-            "windMph": 2,
-            "gustMph": 8,
-            "windDirection": "NW"
+            "tempF": 63,
+            "windMph": 5,
+            "gustMph": 6,
+            "windDirection": "NE"
           },
           {
             "time": "11 PM",
             "inGame": false,
             "sky": "sun",
             "precipPct": 0,
-            "tempF": 41,
-            "windMph": 2,
-            "gustMph": 8,
-            "windDirection": "NW"
+            "tempF": 63,
+            "windMph": 5,
+            "gustMph": 6,
+            "windDirection": "NE"
           }
         ],
-        "nbmHourly": [
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-ind-hou"
+      }
+    },
+    {
+      "id": "msw-2026-11-22-ari-kc",
+      "week": 11,
+      "kickoffUtc": "2026-11-22T18:00:00Z",
+      "away": {
+        "abbr": "ARI",
+        "name": "Arizona Cardinals",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ari.png"
+      },
+      "home": {
+        "abbr": "KC",
+        "name": "Kansas City Chiefs",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/kc.png"
+      },
+      "venue": "GEHA Field at Arrowhead Stadium",
+      "city": "Kansas City, MO",
+      "indoor": false,
+      "forecast": {
+        "tempF": 48,
+        "precipPct": 2,
+        "precipType": "Rain",
+        "windMph": 7,
+        "gustMph": 9,
+        "windDirection": "NNW",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 4,
+            "tempF": 46,
+            "windMph": 7,
+            "gustMph": 9,
+            "windDirection": "NNW"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 48,
+            "windMph": 7,
+            "gustMph": 9,
+            "windDirection": "NNW"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 49,
+            "windMph": 7,
+            "gustMph": 9,
+            "windDirection": "NNW"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 50,
+            "windMph": 7,
+            "gustMph": 9,
+            "windDirection": "NNW"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 2,
+            "tempF": 49,
+            "windMph": 7,
+            "gustMph": 9,
+            "windDirection": "NNW"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-ari-kc"
+      }
+    },
+    {
+      "id": "msw-2026-11-22-bal-car",
+      "week": 11,
+      "kickoffUtc": "2026-11-22T18:00:00Z",
+      "away": {
+        "abbr": "BAL",
+        "name": "Baltimore Ravens",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png"
+      },
+      "home": {
+        "abbr": "CAR",
+        "name": "Carolina Panthers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/car.png"
+      },
+      "venue": "Bank of America Stadium",
+      "city": "Charlotte, NC",
+      "indoor": false,
+      "forecast": {
+        "tempF": 67,
+        "precipPct": 10,
+        "precipType": "Rain",
+        "windMph": 7,
+        "gustMph": 10,
+        "windDirection": "N",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 19,
+            "tempF": 66,
+            "windMph": 7,
+            "gustMph": 9,
+            "windDirection": "N"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 10,
+            "tempF": 67,
+            "windMph": 7,
+            "gustMph": 10,
+            "windDirection": "N"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 10,
+            "tempF": 69,
+            "windMph": 7,
+            "gustMph": 10,
+            "windDirection": "N"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 10,
+            "tempF": 69,
+            "windMph": 7,
+            "gustMph": 9,
+            "windDirection": "N"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 10,
+            "tempF": 68,
+            "windMph": 6,
+            "gustMph": 8,
+            "windDirection": "N"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-bal-car"
+      }
+    },
+    {
+      "id": "msw-2026-11-22-mia-buf",
+      "week": 11,
+      "kickoffUtc": "2026-11-22T18:00:00Z",
+      "away": {
+        "abbr": "MIA",
+        "name": "Miami Dolphins",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/mia.png"
+      },
+      "home": {
+        "abbr": "BUF",
+        "name": "Buffalo Bills",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/buf.png"
+      },
+      "venue": "Highmark Stadium",
+      "city": "Orchard Park, NY",
+      "indoor": false,
+      "forecast": {
+        "tempF": 60,
+        "precipPct": 42,
+        "precipType": "Rain",
+        "windMph": 9,
+        "gustMph": 13,
+        "windDirection": "S",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "partly",
+            "precipPct": 28,
+            "tempF": 59,
+            "windMph": 9,
+            "gustMph": 13,
+            "windDirection": "S"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "rain",
+            "precipPct": 42,
+            "tempF": 60,
+            "windMph": 9,
+            "gustMph": 13,
+            "windDirection": "S"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "rain",
+            "precipPct": 42,
+            "tempF": 60,
+            "windMph": 9,
+            "gustMph": 12,
+            "windDirection": "S"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "rain",
+            "precipPct": 42,
+            "tempF": 60,
+            "windMph": 8,
+            "gustMph": 12,
+            "windDirection": "SW"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "rain",
+            "precipPct": 42,
+            "tempF": 59,
+            "windMph": 8,
+            "gustMph": 10,
+            "windDirection": "SW"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-mia-buf"
+      }
+    },
+    {
+      "id": "msw-2026-11-22-no-chi",
+      "week": 11,
+      "kickoffUtc": "2026-11-22T18:00:00Z",
+      "away": {
+        "abbr": "NO",
+        "name": "New Orleans Saints",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/no.png"
+      },
+      "home": {
+        "abbr": "CHI",
+        "name": "Chicago Bears",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/chi.png"
+      },
+      "venue": "Soldier Field",
+      "city": "Chicago, IL",
+      "indoor": false,
+      "forecast": {
+        "tempF": 49,
+        "precipPct": 12,
+        "precipType": "Rain",
+        "windMph": 10,
+        "gustMph": 15,
+        "windDirection": "WNW",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "partly",
+            "precipPct": 32,
+            "tempF": 49,
+            "windMph": 10,
+            "gustMph": 15,
+            "windDirection": "WNW"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 12,
+            "tempF": 49,
+            "windMph": 10,
+            "gustMph": 15,
+            "windDirection": "WNW"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 12,
+            "tempF": 50,
+            "windMph": 10,
+            "gustMph": 15,
+            "windDirection": "WNW"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 12,
+            "tempF": 50,
+            "windMph": 10,
+            "gustMph": 15,
+            "windDirection": "WNW"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 12,
+            "tempF": 50,
+            "windMph": 10,
+            "gustMph": 14,
+            "windDirection": "WNW"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-no-chi"
+      }
+    },
+    {
+      "id": "msw-2026-11-22-pit-phi",
+      "week": 11,
+      "kickoffUtc": "2026-11-22T18:00:00Z",
+      "away": {
+        "abbr": "PIT",
+        "name": "Pittsburgh Steelers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/pit.png"
+      },
+      "home": {
+        "abbr": "PHI",
+        "name": "Philadelphia Eagles",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/phi.png"
+      },
+      "venue": "Lincoln Financial Field",
+      "city": "Philadelphia, PA",
+      "indoor": false,
+      "forecast": {
+        "tempF": 61,
+        "precipPct": 37,
+        "precipType": "Rain",
+        "windMph": 5,
+        "gustMph": 6,
+        "windDirection": "NE",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "partly",
+            "precipPct": 28,
+            "tempF": 60,
+            "windMph": 5,
+            "gustMph": 6,
+            "windDirection": "NE"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "partly",
+            "precipPct": 37,
+            "tempF": 61,
+            "windMph": 5,
+            "gustMph": 6,
+            "windDirection": "NE"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "partly",
+            "precipPct": 37,
+            "tempF": 62,
+            "windMph": 5,
+            "gustMph": 6,
+            "windDirection": "NE"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "partly",
+            "precipPct": 37,
+            "tempF": 62,
+            "windMph": 5,
+            "gustMph": 5,
+            "windDirection": "NE"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "partly",
+            "precipPct": 37,
+            "tempF": 62,
+            "windMph": 5,
+            "gustMph": 5,
+            "windDirection": "NE"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-pit-phi"
+      }
+    },
+    {
+      "id": "msw-2026-11-22-tb-det",
+      "week": 11,
+      "kickoffUtc": "2026-11-22T18:00:00Z",
+      "away": {
+        "abbr": "TB",
+        "name": "Tampa Bay Buccaneers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/tb.png"
+      },
+      "home": {
+        "abbr": "DET",
+        "name": "Detroit Lions",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/det.png"
+      },
+      "venue": "Ford Field",
+      "city": "Detroit, MI",
+      "indoor": true,
+      "forecast": null
+    },
+    {
+      "id": "msw-2026-11-22-ten-dal",
+      "week": 11,
+      "kickoffUtc": "2026-11-22T18:00:00Z",
+      "away": {
+        "abbr": "TEN",
+        "name": "Tennessee Titans",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ten.png"
+      },
+      "home": {
+        "abbr": "DAL",
+        "name": "Dallas Cowboys",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/dal.png"
+      },
+      "venue": "AT&T Stadium",
+      "city": "Arlington, TX",
+      "indoor": true,
+      "forecast": {
+        "tempF": 60,
+        "precipPct": 4,
+        "precipType": "Rain",
+        "windMph": 10,
+        "gustMph": 12,
+        "windDirection": "N",
+        "hourly": [
+          {
+            "time": "12 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 7,
+            "tempF": 58,
+            "windMph": 10,
+            "gustMph": 12,
+            "windDirection": "N"
+          },
+          {
+            "time": "1 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 4,
+            "tempF": 60,
+            "windMph": 10,
+            "gustMph": 12,
+            "windDirection": "N"
+          },
+          {
+            "time": "2 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 4,
+            "tempF": 61,
+            "windMph": 10,
+            "gustMph": 12,
+            "windDirection": "N"
+          },
+          {
+            "time": "3 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 4,
+            "tempF": 62,
+            "windMph": 10,
+            "gustMph": 12,
+            "windDirection": "N"
+          },
+          {
+            "time": "4 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 4,
+            "tempF": 62,
+            "windMph": 10,
+            "gustMph": 12,
+            "windDirection": "N"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-ten-dal"
+      }
+    },
+    {
+      "id": "msw-2026-11-22-nyj-lac",
+      "week": 11,
+      "kickoffUtc": "2026-11-22T21:05:00Z",
+      "away": {
+        "abbr": "NYJ",
+        "name": "New York Jets",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/nyj.png"
+      },
+      "home": {
+        "abbr": "LAC",
+        "name": "Los Angeles Chargers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/lac.png"
+      },
+      "venue": "SoFi Stadium",
+      "city": "Inglewood, CA",
+      "indoor": false,
+      "forecast": {
+        "tempF": 64,
+        "precipPct": 14,
+        "precipType": "Rain",
+        "windMph": 1,
+        "gustMph": 2,
+        "windDirection": "SSW",
+        "hourly": [
+          {
+            "time": "3 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 14,
+            "tempF": 64,
+            "windMph": 5,
+            "gustMph": 5,
+            "windDirection": "E"
+          },
+          {
+            "time": "4 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 14,
+            "tempF": 64,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "SSW"
+          },
+          {
+            "time": "5 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 14,
+            "tempF": 64,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "SSW"
+          },
+          {
+            "time": "6 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 14,
+            "tempF": 63,
+            "windMph": 1,
+            "gustMph": 2,
+            "windDirection": "SSW"
+          },
           {
             "time": "7 PM",
             "inGame": false,
+            "sky": "partly",
+            "precipPct": 23,
+            "tempF": 62,
+            "windMph": 5,
+            "gustMph": 8,
+            "windDirection": "WSW"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-nyj-lac"
+      }
+    },
+    {
+      "id": "msw-2026-11-22-jax-nyg",
+      "week": 11,
+      "kickoffUtc": "2026-11-22T21:25:00Z",
+      "away": {
+        "abbr": "JAX",
+        "name": "Jacksonville Jaguars",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/jax.png"
+      },
+      "home": {
+        "abbr": "NYG",
+        "name": "New York Giants",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/nyg.png"
+      },
+      "venue": "MetLife Stadium",
+      "city": "East Rutherford, NJ",
+      "indoor": false,
+      "forecast": {
+        "tempF": 59,
+        "precipPct": 37,
+        "precipType": "Rain",
+        "windMph": 5,
+        "gustMph": 7,
+        "windDirection": "NE",
+        "hourly": [
+          {
+            "time": "3 PM",
+            "inGame": false,
+            "sky": "partly",
+            "precipPct": 37,
+            "tempF": 59,
+            "windMph": 5,
+            "gustMph": 8,
+            "windDirection": "NE"
+          },
+          {
+            "time": "4 PM",
+            "inGame": true,
+            "sky": "partly",
+            "precipPct": 37,
+            "tempF": 59,
+            "windMph": 5,
+            "gustMph": 7,
+            "windDirection": "NE"
+          },
+          {
+            "time": "5 PM",
+            "inGame": true,
+            "sky": "partly",
+            "precipPct": 37,
+            "tempF": 58,
+            "windMph": 5,
+            "gustMph": 6,
+            "windDirection": "NE"
+          },
+          {
+            "time": "6 PM",
+            "inGame": true,
+            "sky": "partly",
+            "precipPct": 37,
+            "tempF": 58,
+            "windMph": 3,
+            "gustMph": 6,
+            "windDirection": "NE"
+          },
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "rain",
+            "precipPct": 40,
+            "tempF": 57,
+            "windMph": 3,
+            "gustMph": 5,
+            "windDirection": "NE"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-jax-nyg"
+      }
+    },
+    {
+      "id": "msw-2026-11-22-lv-den",
+      "week": 11,
+      "kickoffUtc": "2026-11-22T21:25:00Z",
+      "away": {
+        "abbr": "LV",
+        "name": "Las Vegas Raiders",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/lv.png"
+      },
+      "home": {
+        "abbr": "DEN",
+        "name": "Denver Broncos",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/den.png"
+      },
+      "venue": "Empower Field at Mile High",
+      "city": "Denver, CO",
+      "indoor": false,
+      "forecast": {
+        "tempF": 48,
+        "precipPct": 0,
+        "precipType": "Rain",
+        "windMph": 5,
+        "gustMph": 8,
+        "windDirection": "NE",
+        "hourly": [
+          {
+            "time": "3 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 47,
+            "windMph": 3,
+            "gustMph": 7,
+            "windDirection": "NE"
+          },
+          {
+            "time": "4 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 48,
+            "windMph": 5,
+            "gustMph": 8,
+            "windDirection": "NE"
+          },
+          {
+            "time": "5 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 0,
+            "tempF": 48,
+            "windMph": 5,
+            "gustMph": 8,
+            "windDirection": "NNE"
+          },
+          {
+            "time": "6 PM",
+            "inGame": true,
+            "sky": "sun",
             "precipPct": 0,
             "tempF": 46,
             "windMph": 3,
@@ -71,43 +809,173 @@
             "windDirection": "N"
           },
           {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 1,
+            "tempF": 44,
+            "windMph": 3,
+            "gustMph": 6,
+            "windDirection": "N"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-lv-den"
+      }
+    },
+    {
+      "id": "msw-2026-11-23-min-sf",
+      "week": 11,
+      "kickoffUtc": "2026-11-23T01:20:00Z",
+      "away": {
+        "abbr": "MIN",
+        "name": "Minnesota Vikings",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/min.png"
+      },
+      "home": {
+        "abbr": "SF",
+        "name": "San Francisco 49ers",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/sf.png"
+      },
+      "venue": "Estadio Banorte",
+      "city": "Mexico City, MX",
+      "indoor": false,
+      "forecast": {
+        "tempF": 64,
+        "precipPct": 42,
+        "precipType": "Rain",
+        "windMph": 1,
+        "gustMph": null,
+        "windDirection": "NNW",
+        "hourly": [
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "partly",
+            "precipPct": 36,
+            "tempF": 65,
+            "windMph": 1,
+            "windDirection": "NNW"
+          },
+          {
             "time": "8 PM",
             "inGame": true,
-            "precipPct": 0,
-            "tempF": 44,
-            "windMph": 2,
-            "gustMph": 7,
+            "sky": "partly",
+            "precipPct": 36,
+            "tempF": 64,
+            "windMph": 1,
             "windDirection": "NNW"
           },
           {
             "time": "9 PM",
             "inGame": true,
-            "precipPct": 0,
-            "tempF": 43,
-            "windMph": 2,
-            "gustMph": 7,
-            "windDirection": "NNW"
+            "sky": "partly",
+            "precipPct": 36,
+            "tempF": 62,
+            "windMph": 1,
+            "windDirection": "NW"
           },
           {
             "time": "10 PM",
             "inGame": true,
-            "precipPct": 0,
-            "tempF": 42,
-            "windMph": 3,
-            "gustMph": 8,
-            "windDirection": "NNW"
+            "sky": "rain",
+            "precipPct": 42,
+            "tempF": 61,
+            "windMph": 1,
+            "windDirection": "NW"
           },
           {
             "time": "11 PM",
             "inGame": false,
-            "precipPct": 0,
-            "tempF": 41,
-            "windMph": 3,
-            "gustMph": 8,
+            "sky": "rain",
+            "precipPct": 41,
+            "tempF": 60,
+            "windMph": 1,
+            "windDirection": "SW"
+          }
+        ],
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-min-sf"
+      }
+    },
+    {
+      "id": "msw-2026-11-24-cin-was",
+      "week": 11,
+      "kickoffUtc": "2026-11-24T01:15:00Z",
+      "away": {
+        "abbr": "CIN",
+        "name": "Cincinnati Bengals",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/cin.png"
+      },
+      "home": {
+        "abbr": "WAS",
+        "name": "Washington Commanders",
+        "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/wsh.png"
+      },
+      "venue": "Northwest Stadium",
+      "city": "Landover, MD",
+      "indoor": false,
+      "forecast": {
+        "tempF": 50,
+        "precipPct": 3,
+        "precipType": "Rain",
+        "windMph": 9,
+        "gustMph": 13,
+        "windDirection": "NW",
+        "hourly": [
+          {
+            "time": "7 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 3,
+            "tempF": 52,
+            "windMph": 9,
+            "gustMph": 14,
+            "windDirection": "NW"
+          },
+          {
+            "time": "8 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 3,
+            "tempF": 50,
+            "windMph": 9,
+            "gustMph": 13,
+            "windDirection": "NW"
+          },
+          {
+            "time": "9 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 3,
+            "tempF": 49,
+            "windMph": 8,
+            "gustMph": 13,
+            "windDirection": "NW"
+          },
+          {
+            "time": "10 PM",
+            "inGame": true,
+            "sky": "sun",
+            "precipPct": 3,
+            "tempF": 48,
+            "windMph": 8,
+            "gustMph": 12,
+            "windDirection": "NW"
+          },
+          {
+            "time": "11 PM",
+            "inGame": false,
+            "sky": "sun",
+            "precipPct": 3,
+            "tempF": 47,
+            "windMph": 8,
+            "gustMph": 10,
             "windDirection": "NW"
           }
         ],
-        "sourceUrl": "https://mysportsweather.com/nfl#match-lac-bal"
+        "nbmHourly": [],
+        "sourceUrl": "https://mysportsweather.com/nfl#match-cin-was"
       }
     }
   ]

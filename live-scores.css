@@ -1,0 +1,28 @@
+body.shua-live-scores-open main { display:block!important; }
+body.shua-live-scores-open main>*:not(#shuaLiveScores) { display:none!important; }
+#shuaLiveScores { max-width:900px;margin:0 auto;color:#eaf4fc; }
+.ls-header { display:flex;align-items:center;justify-content:space-between;padding:4px 0 12px;border:0; }
+.ls-header h2 { margin:0 0 4px;font-size:clamp(22px,4vw,32px); }
+#lsPeriod,#lsStatus { font-size:12px;color:#a8c0d3; }
+#lsRefresh { border:1px solid #50728a;border-radius:8px;background:#18394f;color:#ecf7ff;padding:8px 12px;font-weight:750; }
+#lsRefresh:disabled { opacity:.55;cursor:wait; }
+#lsGames { display:grid;gap:10px; }
+#lsGames details { background:#102a40;border:1px solid #385971;border-radius:11px;overflow:hidden; }
+#lsGames summary { padding:9px 12px;cursor:pointer;background:#14334b; }
+.ls-game-status { margin-left:4px;font-size:12px;color:#c1d9ea; }
+.ls-in-progress { color:#72e9b3;font-weight:850; }
+.ls-matchup { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px; }
+.ls-score-team { display:flex;align-items:center;gap:7px;min-width:0; }
+.ls-score-team img { width:29px;height:29px;object-fit:contain; }
+.ls-score-team b { margin-left:auto;font-size:18px;font-variant-numeric:tabular-nums; }
+.ls-box { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:10px 12px; }
+.ls-team h3 { display:flex;justify-content:space-between;gap:7px;margin:0;padding:4px 0;color:#bbd5e7;font-size:13px; }
+.ls-team ul { list-style:none;padding:0;margin:0; }
+.ls-team li { display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid #34536b;font-size:13px; }
+.ls-team li span,.ls-team small,.ls-pending,.ls-team p { color:#abc3d6;font-size:11px; }
+.ls-team small { display:block;padding-top:3px; }
+.ls-team li b { color:#83e7ba;font-variant-numeric:tabular-nums; }
+@media(max-width:560px){
+ .ls-box { grid-template-columns:1fr; }
+ .ls-score-team strong { font-size:12px; }
+}

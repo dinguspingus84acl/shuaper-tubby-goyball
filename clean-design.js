@@ -24,7 +24,7 @@
   ];
   const groups=[
     {id:'rankings',label:'Rankings',items:['HOME','ALL','QB','RB','WR','TE','MYGUYS','DND']},
-    {id:'analytics',label:'Analytics',items:[...analyticsViews,'ESPN']},
+    {id:'analytics',label:'Analytics',items:[...analyticsViews,'LIVESCORES','ESPN']},
     {id:'teams',label:'My Teams',items:['MYTEAMS','STOCK']},
     {id:'tools',label:'Tools',items:['SEARCH','MOCK','DEPTH','TRADE','COMMAND','WEATHER']}
   ];

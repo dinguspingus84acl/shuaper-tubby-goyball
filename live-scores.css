@@ -29,17 +29,17 @@ body.shua-live-scores-open #shuaVisualContext { display:none!important; }
 #shuaLiveScores .ls-log tr { display:table-row;border:0; }
 #shuaLiveScores .ls-log :is(th,td) { display:table-cell;position:static;padding:7px 3px;border:0;border-bottom:1px solid #34536b;text-align:center;vertical-align:middle;white-space:normal; }
 #shuaLiveScores .ls-log tr > :first-child { width:32%;padding-left:6px;text-align:left; }
-#shuaLiveScores .ls-log thead th { background:#183a51;color:#bcd6e9;font-size:11px;line-height:1.15; }
+#shuaLiveScores .ls-log thead th { background:#183a51;color:#bcd6e9;font-size:11px;line-height:1.15;overflow-wrap:anywhere; }
 #shuaLiveScores .ls-log td { color:#eaf4fc;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums; }
 #shuaLiveScores .ls-log .ls-pts { color:#83e7ba; }
 #shuaLiveScores .ls-log .ls-pts-negative { color:#ef8798; }
 .ls-player { display:flex;align-items:center;gap:7px;min-width:0; }
-.ls-player strong { display:block;overflow-wrap:anywhere;font-size:13px;line-height:1.15; }
+.ls-player-name { min-width:0;padding:0;border:0;background:none;color:#eaf4fc;font:inherit;font-size:13px;font-weight:800;line-height:1.15;text-align:left;overflow-wrap:anywhere;cursor:pointer; }
+.ls-player-name:hover,.ls-player-name:focus-visible { color:#b9ecda;text-decoration:underline; }
 .ls-face { display:grid;place-items:center;flex:none;width:32px;height:32px;object-fit:contain;border:1px solid #50728a;border-radius:50%;background:#1c3b52; }
 .ls-face img { width:23px;height:23px;object-fit:contain; }
 .ls-initials { font-size:11px;font-weight:750;color:#d9eaf6; }
-.ls-player small,.ls-pending,.ls-team p { color:#abc3d6;font-size:11px; }
-.ls-player small { display:block;margin-top:2px; }
+.ls-pending,.ls-team p { color:#abc3d6;font-size:11px; }
 @media(max-width:560px){
  .ls-box { padding-inline:7px; }
  .ls-score-team strong { font-size:12px; }
@@ -48,7 +48,7 @@ body.shua-live-scores-open #shuaVisualContext { display:none!important; }
  #shuaLiveScores .ls-log thead th { font-size:clamp(8px,2.45vw,11px); }
  #shuaLiveScores .ls-log td { font-size:clamp(11px,3.4vw,15px); }
  .ls-player { gap:4px; }
- .ls-player strong { font-size:11px; }
+ .ls-player-name { font-size:11px; }
  .ls-face { width:26px;height:26px; }
  .ls-face img { width:18px;height:18px; }
 }

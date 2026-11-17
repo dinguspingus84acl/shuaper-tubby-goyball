@@ -1294,7 +1294,7 @@ function renderOverviewRanks(name){
   const hist=historicalSeed();
   if(hist){renderHistoricalOverview(hist);return}
   const p=playerByName(name)||basePositionPlayer(name);
-  const pos=p?.position||'—';
+  const pos=p?.position||activeSeed?.position||'—';
   const pre=preseasonRank(name);
   const ros=rosRank(name,pos);
   const stats=document.getElementById('stats');
@@ -1683,7 +1683,8 @@ async function openByName(name,seed=null){
     activeSeed=null;
     baseProfile(p.id);
     const modal=document.getElementById('modal');
-    if(modal&&document.body.classList.contains('stats-mode'))modal.dataset.statsName=name;
+    if(document.body.classList.contains('stats-mode'))modal.dataset.statsName=name;
+    else delete modal.dataset.statsName;
     fixKnownHeadshot(name);
     prepareUnified(p.name);
     return;
@@ -1698,13 +1699,16 @@ async function openByName(name,seed=null){
     if(!ep)return;
 
     const modal=document.getElementById('modal');
-    if(modal&&document.body.classList.contains('stats-mode'))modal.dataset.statsName=ep.name;
+    if(document.body.classList.contains('stats-mode'))modal.dataset.statsName=ep.name;
+    else delete modal.dataset.statsName;
+    delete modal.dataset.id;
     document.getElementById('pn').textContent=ep.name;
     document.getElementById('pn').className='';
     const yr=seedYear(ep);
     document.getElementById('pm').textContent=(yr?yr+' · ':'')+(ep.team||'—')+' · '+(ep.position||'—');
     document.getElementById('profileTop').innerHTML=seedFace(ep)+seedTeamLogo(ep);
     document.getElementById('injuryStatus').innerHTML='';
+    document.getElementById('stats').replaceChildren();
     document.getElementById('playerNotes').textContent='No notes provided.';
     modal.classList.add('open');
     document.body.style.overflow='hidden';

@@ -29,8 +29,8 @@
   const receiving=[['REC',53],['TGT',58],['YDS',42],['TD',43]];
   const statColumns={
     All:[['PASS YDS',3],['RUSH YDS',24],['REC YDS',42],['OFF TD',[4,25,43]]],
-    QB:[['CMP',1],['ATT',0],['YDS',3],['TD',4],['INT/FUM',[20,72]],['RUSH YDS',24]],
-    RB:[['ATT',23],['YDS',24],['TD',25],['REC',53],['REC YDS',42],['REC TD',43]],
+    QB:[['CMP',1],['PASS ATT',0],['PASS YDS',3],['PASS TD',4],['INT/FUM',[20,72]],['RUSH ATT',23],['RUSH YDS',24]],
+    RB:[['RUSH ATT',23],['RUSH YDS',24],['RUSH TD',25],['REC',53],['TGT',58],['REC YDS',42],['REC TD',43]],
     WR:receiving,
     TE:receiving,
     K:[],
@@ -109,12 +109,13 @@
           const value=Array.isArray(ids)?ids.reduce((total,id)=>total+(Number(p.stats[id])||0),0):Number(p.stats[ids])||0;
           return '<td>'+(selectedPosition==='All'&&!value?'—':value)+'</td>';
         }).join('');
-        return '<tr><th scope="row"><div class="ls-player">'+playerFace(p,team)+'<div><strong>'+escape(p.name)+'</strong>'+
-          '<small>'+p.position+'</small></div></div></th><td class="ls-pts'+(p.points<0?' ls-pts-negative':'')+'">'+p.points.toFixed(1)+'</td>'+stats+'</tr>';
+        return '<tr><th scope="row"><div class="ls-player">'+playerFace(p,team)+
+          '<button type="button" class="ls-player-name" data-ls-player="'+escape(p.id)+'">'+escape(p.name)+'</button>'+
+          '</div></th><td class="ls-pts'+(p.points<0?' ls-pts-negative':'')+'">'+p.points.toFixed(1)+'</td>'+stats+'</tr>';
       }).join('');
     const empty=!players?'Waiting for ESPN fantasy stats.':selectedPosition==='All'?'No players with fantasy points.':'No '+selectedPosition+' with fantasy points.';
     const label=escape(teamLabel(team));
-    return '<section class="ls-team"><h3>'+label+'</h3>'+
+    return '<section class="ls-team" data-ls-team-id="'+escape(team.id)+'" data-ls-team="'+escape(team.abbreviation)+'"><h3>'+label+'</h3>'+
       (rows?'<table class="ls-log" aria-label="'+label+' fantasy stats"><thead><tr><th scope="col">Player</th><th scope="col">PPR</th>'+
         columns.map(([heading])=>'<th scope="col">'+heading+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table>':'<p>'+empty+'</p>')+'</section>';
   }
@@ -122,9 +123,10 @@
   function renderGames(){
     const expanded=new Set([...games.querySelectorAll('details[open]')].map(node=>node.dataset.game));
     const firstRender=!games.querySelector('details');
-    const focused=document.activeElement?.closest('#lsGames summary, #lsGames [data-ls-position]');
+    const focused=document.activeElement?.closest('#lsGames summary, #lsGames [data-ls-position], #lsGames [data-ls-player]');
     const focusGame=focused?.closest('details')?.dataset.game;
     const focusPosition=focused?.dataset.lsPosition;
+    const focusPlayer=focused?.dataset.lsPlayer;
     const rank={in:0,pre:1,post:2};
     const events=[...scoreboard.events].filter(e=>e.competitions?.[0]?.competitors?.length===2).sort((a,b)=>{
       const aState=a.status.type.state,bState=b.status.type.state;
@@ -150,7 +152,9 @@
     games.innerHTML=html;
     if(focusGame){
       const game=[...games.querySelectorAll('details')].find(node=>node.dataset.game===focusGame);
-      game?.querySelector(focusPosition?'[data-ls-position="'+focusPosition+'"]':'summary')?.focus({preventScroll:true});
+      const selector=focusPosition?'[data-ls-position="'+focusPosition+'"]':
+        focusPlayer?'[data-ls-player="'+CSS.escape(focusPlayer)+'"]':'summary';
+      game?.querySelector(selector)?.focus({preventScroll:true});
     }
   }
 
@@ -213,6 +217,15 @@
 
   refreshButton.addEventListener('click',()=>void refresh(true));
   games.addEventListener('click',event=>{
+    const nameButton=event.target.closest('[data-ls-player]');
+    if(nameButton){
+      const team=nameButton.closest('.ls-team').dataset;
+      const player=fantasy?.teams.get(team.lsTeamId)?.find(row=>String(row.id)===nameButton.dataset.lsPlayer);
+      if(player)void window.openUnifiedPlayerProfileByName?.(player.name,{
+        id:player.id,name:player.name,position:player.position,team:team.lsTeam
+      });
+      return;
+    }
     const filter=event.target.closest('[data-ls-position]');
     if(!filter||filter.getAttribute('aria-pressed')==='true')return;
     gamePositions.set(filter.closest('details').dataset.game,filter.dataset.lsPosition);

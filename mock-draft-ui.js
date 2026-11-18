@@ -122,6 +122,34 @@ body.shua-clean #mockSection .mock-team-grid .roster-name-line b{font-size:13px!
 body.shua-clean #mockSection .mock-team-grid .empty-slot{grid-template-columns:1fr!important;min-height:30px!important}
 body.shua-clean #mockSection .mock-team-grid .empty-slot .lineup-slot{width:auto!important;justify-self:start}
   `;
+  style.textContent += `
+body.shua-clean #mockSection .mock-filters .pool-filter{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  text-align:center!important;font-size:11px!important;line-height:1!important;letter-spacing:0!important;
+}
+body.shua-clean #mockSection #draftBoard .drafted:not(.empty-slot){
+  position:relative!important;isolation:isolate;overflow:hidden!important;
+  border:1px solid #547a8a!important;border-top:2px solid #34546b!important;
+  border-radius:9px!important;
+  background:linear-gradient(135deg,#10283b,#0b1d30 88%)!important;
+  box-shadow:inset 0 1px #d7efff12,0 2px 8px #0004!important;
+}
+body.shua-clean #mockSection #draftBoard .drafted.shua-round-even{
+  background:linear-gradient(135deg,#142f45,#0c2032 88%)!important;
+  border-top-color:#557c88!important;
+}
+body.shua-clean #mockSection #draftBoard .drafted .shua-pick-watermark{
+  position:absolute;z-index:0;right:3px;bottom:4px;width:76px;height:76px;
+  max-width:61%;object-fit:contain;opacity:.23;pointer-events:none;
+  filter:drop-shadow(0 2px 3px #020e1a8c);
+}
+body.shua-clean #mockSection #draftBoard .drafted .shua-pick-watermark[src*="/500-dark/"]{opacity:.44}
+body.shua-clean #mockSection #draftBoard .drafted :is(.name,.slot,.team){z-index:1!important}
+body.shua-clean #mockSection #draftBoard .drafted .name{
+  position:relative!important;color:#f5fcff!important;font-weight:950!important;
+  letter-spacing:-.03em!important;text-shadow:0 1px 5px #051525d9;
+}
+  `;
   document.head.appendChild(style);
 
   const teamSelect=document.getElementById('mockTeams');

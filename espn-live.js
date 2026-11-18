@@ -1302,6 +1302,7 @@ function gameLogDifficulty(year,position){
   return promise;
 }
 function colorGameLogMatchups(panel,year,position){
+  if(panel?.closest('#unifiedHistoryPanel'))return;
   const items=panel?.querySelectorAll?.('.espn-game-log-opponent[data-gl-opponent]');
   if(!items?.length)return;
   const token=Number(year)+'|'+String(position||'').toUpperCase();

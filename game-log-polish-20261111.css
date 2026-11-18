@@ -1,15 +1,15 @@
 /* Game-log readability and natural phone scrolling. The profile sheet is the
    only vertical scroller; the table itself never traps the final weeks. */
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table-wrap,
-body.shua-clean.phone-mode #modal #unifiedGameLogPanel .espn-game-log-table-wrap {
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table-wrap,
+body.shua-clean.phone-mode #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table-wrap {
   height:auto!important;
   max-height:none!important;
   overflow:visible!important;
   touch-action:pan-y!important;
 }
 
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table thead th,
-body.shua-clean.phone-mode #modal #unifiedGameLogPanel .espn-game-log-table thead th {
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table thead th,
+body.shua-clean.phone-mode #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table thead th {
   text-align:center!important;
   vertical-align:middle!important;
   font-size:clamp(10px,2.65vw,12px)!important;
@@ -18,8 +18,8 @@ body.shua-clean.phone-mode #modal #unifiedGameLogPanel .espn-game-log-table thea
   letter-spacing:0!important;
 }
 
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table tbody td,
-body.shua-clean.phone-mode #modal #unifiedGameLogPanel .espn-game-log-table tbody td {
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table tbody td,
+body.shua-clean.phone-mode #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table tbody td {
   font-size:clamp(16px,4.3vw,18px)!important;
   line-height:1.2!important;
   font-weight:950!important;
@@ -29,7 +29,7 @@ body.shua-clean.phone-mode #modal #unifiedGameLogPanel .espn-game-log-table tbod
 }
 
 /* Leave team badges aligned with their labels; center only the column header. */
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table tbody td:nth-child(2) {
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table tbody td:nth-child(2) {
   text-align:left!important;
 }
 
@@ -44,22 +44,22 @@ body.shua-clean #modal #unifiedGameLogPanel {
 }
 
 @media(max-width:370px){
-  body.shua-clean.phone-mode #modal #unifiedGameLogPanel .espn-game-log-table tbody td {
+  body.shua-clean.phone-mode #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table tbody td {
     font-size:clamp(15px,4.35vw,16px)!important;
   }
 }
 
 /* Give QB passing totals and completions separate, predictable columns. */
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) :is(th,td) {
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table:has(.gl-col-completions) :is(th,td) {
   padding-left:3px!important;
   padding-right:3px!important;
 }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) :is(th,td):first-child { width:8%!important; }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) :is(th,td):nth-child(2) { width:18%!important; }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-pts { width:16%!important;font-size:16px!important; }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-completions { width:12%!important; }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-passAtt { width:12%!important; }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-passYds { width:14%!important; }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-passTD { width:8%!important; }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-turnovers { width:12%!important; }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) td.gl-pts::before { content:none; }
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table:has(.gl-col-completions) :is(th,td):first-child { width:8%!important; }
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table:has(.gl-col-completions) :is(th,td):nth-child(2) { width:18%!important; }
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table:has(.gl-col-completions) .gl-col-pts { width:16%!important;font-size:16px!important; }
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table:has(.gl-col-completions) .gl-col-completions { width:12%!important; }
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table:has(.gl-col-completions) .gl-col-passAtt { width:12%!important; }
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table:has(.gl-col-completions) .gl-col-passYds { width:14%!important; }
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table:has(.gl-col-completions) .gl-col-passTD { width:8%!important; }
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table:has(.gl-col-completions) .gl-col-turnovers { width:12%!important; }
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table:has(.gl-col-completions) td.gl-pts::before { content:none; }

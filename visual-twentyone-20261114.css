@@ -110,25 +110,25 @@ body.shua-clean #modal .featured-player-card.broadcast-card .featured-bio-value{
 
 /* 7 — Calm Game Log header, legible aligned columns and subtle dividers.
    Preserve full-width, no-scroll table and current Rushing/Receiving/Snap tabs. */
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table thead th{
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table thead th{
   background:#193749!important;color:#bbd7e6!important;
   border-top:1px solid #416278!important;
   border-bottom:2px solid #52768a!important;
   font-weight:900!important;letter-spacing:.01em!important;
 }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table tbody tr+tr>td{
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table tbody tr+tr>td{
   border-top:1px solid #99bfd41f!important;
 }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table :is(th,td){
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table :is(th,td){
   font-variant-numeric:tabular-nums;
 }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table :is(th,td):first-child{
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table :is(th,td):first-child{
   width:10%!important;
 }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table :is(th,td):nth-child(2){
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table :is(th,td):nth-child(2){
   width:22%!important;
 }
-body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table .gl-pts{
+body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table .gl-pts{
   font-size:1.09em!important;letter-spacing:-.02em;
 }
 
@@ -222,7 +222,7 @@ body.shua-clean #shuaMyTeams .myteams-score-vs{
   }
   body.shua-clean #shuaMyTeams .myteams-score-label{font-size:10px!important}
   body.shua-clean #shuaMyTeams .myteams-score-current strong{font-size:22px!important}
-  body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table .gl-pts{
+  body.shua-clean #modal :is(#unifiedGameLogPanel,#unifiedHistoryPanel) .espn-game-log-table .gl-pts{
     font-size:1.02em!important;
   }
 }

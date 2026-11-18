@@ -849,7 +849,7 @@ function historicalGameLogHtml(player,career,year){
   const tabs='<div class="espn-game-log-tabs" role="group" aria-label="Game log category">'+modes.map(x=>'<button type="button" class="espn-game-log-tab'+(x.key===mode?' active':'')+'" aria-pressed="'+(x.key===mode)+'" data-hist-gl-mode="'+x.key+'">'+x.label+'</button>').join('')+'</div>';
   const title='<div class="espn-game-log-title"><strong>'+seasonRow.name+' Game Log</strong><span>'+year+' · PPR</span></div>';
   const games=Array.isArray(seasonRow.games)?seasonRow.games:[];
-  const histGp=Number(seasonRow.gamesPlayed)||games.filter(g=>g?.hasStats).length;
+  const histGp=Number(seasonRow.gamesPlayed)||games.filter(g=>g?.hasStats&&!g.zeroWeek).length;
   const histPts=Number.isFinite(Number(seasonRow.points))?Number(seasonRow.points):games.reduce((sum,g)=>sum+(g?.hasStats?Number(g.totalPoints||0):0),0);
   const histPpg=Number.isFinite(Number(seasonRow.average))?Number(seasonRow.average):(Number.isFinite(Number(seasonRow.ppg))?Number(seasonRow.ppg):(histGp?histPts/histGp:null));
   const summary=gameLogSummaryHtml(year,histPts,histPpg,histGp,seasonRow.position,seasonRow.rank);
@@ -885,6 +885,7 @@ function bindHistoricalGameLog(panel,player,career,year){
       panel.innerHTML='<div class="espn-game-log-empty">Loading '+nextYear+' game log…</div>';
       const hydrated=await hydrateHistoricalCareerYear(career,player.name,nextYear);
       const nextPlayer=hydrated.find(x=>Number(x.year)===nextYear)||player;
+      nextPlayer.games=await completePointWeeks(nextPlayer.games||[],nextYear,nextPlayer);
       await attachGameLogSnapRates(nextPlayer,nextYear,nextPlayer?.games||[]);
        panel.innerHTML=historicalGameLogHtml(nextPlayer,hydrated,nextYear);
       bindHistoricalGameLog(panel,nextPlayer,hydrated,nextYear);
@@ -897,6 +898,7 @@ async function renderHistoricalGameLog(name,target,preferredYear){
   const year=Number(preferredYear)||Number(career[0].year);
   career=await hydrateHistoricalCareerYear(career,name,year);
   const player=career.find(x=>Number(x.year)===year)||career[0];
+  player.games=await completePointWeeks(player.games||[],year,player);
   await attachGameLogSnapRates(player,year,player?.games||[]);
    target.innerHTML=historicalGameLogHtml(player,career,year);
   bindHistoricalGameLog(target,player,career,year);
@@ -1041,6 +1043,28 @@ function deepStats(entry){
 }
 function gameLogCacheKey(player,year){return String(player.id)+':'+year}
 
+async function completePointWeeks(games,year,player){
+ if(!games.some(g=>g.hasStats!==false&&g.totalPoints!=null))return games;
+ const teams=await fetchProSchedule(year);
+ const lookup=new Map(games.map(g=>[Number(g.week),g]));
+ const totalWeeks=Number(year)>=2021?18:17;
+ return Array.from({length:totalWeeks},(_,i)=>{
+  const week=i+1,record=lookup.get(week);
+  if(record?.hasStats&&record.totalPoints!=null)return record;
+  const team=canonicalGameLogTeam(record?.team||player.team);
+  const scheduled=teams.find(t=>canonicalGameLogTeam(TEAM_BY_ID[t.id])===team||Number(t.id)===Number(player.proTeamId));
+  const entries=scheduled?.proGamesByScoringPeriod?.[week];
+  const game=Array.isArray(entries)?entries[0]:entries;
+  const opponent=opponentLabel(scheduled?.id,week,year);
+  if(game?.statsOfficial)return {
+   week,opponent,hasStats:true,totalPoints:0,zeroWeek:true,
+   passAtt:0,completions:0,passYds:0,passTD:0,interceptions:0,
+   rushAtt:0,rushYds:0,rushTD:0,recYds:0,recTD:0,receptions:0,targets:0,fumblesLost:0
+  };
+  return {...record,week,opponent,hasStats:false,totalPoints:null};
+ });
+}
+
 let currentSeasonSnapPromise=null;
 function getCurrentSeasonSnapDataset(){
  if(!currentSeasonSnapPromise)currentSeasonSnapPromise=
@@ -1149,7 +1173,7 @@ async function fetchGameLog(player,year=SEASON){
     try{
       const historical=await loadHistoricalPlayerYear(player.name,year);
       if(historical&&Array.isArray(historical.games)&&historical.games.length){
-        const localRows=historical.games.map(g=>({...g,hasStats:true}));
+        const localRows=await completePointWeeks(historical.games.map(g=>({...g,hasStats:true})),year,historical);
         const localKey=gameLogCacheKey(player,year);
         await attachGameLogSnapRates(player,year,localRows);
          gameLogCache.set(localKey,{ts:Date.now(),rows:localRows,source:'local'});
@@ -1232,6 +1256,7 @@ async function fetchGameLog(player,year=SEASON){
   }else{
     log=[...byWeek.entries()].sort((a,b)=>a[0]-b[0]).map(([week,s])=>makeRow(week,s));
   }
+  log=await completePointWeeks(log,year,{...player,proTeamId:historicalTeamId});
   await attachGameLogSnapRates(player,year,log);
    gameLogCache.set(cacheKey,{ts:Date.now(),rows:log});
   return log;
@@ -1507,7 +1532,7 @@ function gameLogHtml(player,opts={}){
   if(!cached)return title+controls+'<div class="espn-game-log-empty">Loading '+year+' game log…</div>';
   if(cached.error)return title+controls+'<div class="espn-game-log-empty espn-error">Could not load '+year+' game log.</div>';
   if(!cached.rows.length)return title+controls+'<div class="espn-game-log-empty">No game stats found for '+year+'.</div>';
-  const played=cached.rows.filter(g=>g?.hasStats);
+  const played=cached.rows.filter(g=>g?.hasStats&&!g.zeroWeek);
   const totalPts=played.reduce((sum,g)=>sum+Number(g.totalPoints||0),0);
   const gp=played.length;
   const finishInfo=gameLogFinishCache.get(gameLogFinishKey(player,year))||{};
@@ -2177,6 +2202,7 @@ window.ShuaEspnLive={
         if(hist.some(x=>Number(x.year)===Number(year))){
           hist=await hydrateHistoricalCareerYear(hist,name,Number(year));
           const row=hist.find(x=>Number(x.year)===Number(year));
+          row.games=await completePointWeeks(row.games||[],Number(year),row);
           await attachGameLogSnapRates(row,Number(year),row?.games||[]);
            target.innerHTML=historicalGameLogHtml(row,hist,Number(year));
           bindHistoricalGameLog(target,row,hist,Number(year));

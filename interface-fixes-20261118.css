@@ -35,3 +35,10 @@ body.shua-clean main>.head.shua-board-controls-inline #shuaBoardSettingsPanel:ha
 body.shua-clean main>.head.shua-board-controls-inline #shuaBoardSettingsPanel #teamControls,body.shua-clean main>.head.shua-board-controls-inline #shuaBoardSettingsPanel #overallToggle{margin:0!important;display:flex!important;flex-wrap:wrap}
 body.shua-clean main>.head #shuaBoardSettingsPanel .shua-board-setting-group{display:grid;gap:5px}
 @media(max-width:700px){body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden])){grid-template-columns:minmax(0,1fr)!important}body.shua-clean main>.head.shua-board-controls-inline:has(#teamControls:not([hidden])) #shuaBoardSettingsPanel{grid-column:1!important;justify-content:flex-start!important}}
+
+/* Keep bottom menus above the page, independent of the sticky header. */
+@media(max-width:700px){body.shua-clean>#shuaCleanNav{z-index:10000!important;overflow:visible!important}}
+body.shua-clean.phone-mode>#shuaCleanNav{z-index:10000!important;overflow:visible!important}
+/* Backdrop filters create a containing block for fixed descendants. These
+   popups use viewport coordinates, so the nav must not create that block. */
+body.shua-clean #shuaCleanNav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}

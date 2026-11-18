@@ -39,6 +39,15 @@
         '<div class="shua-clean-popup" id="shua-menu-'+group.id+'" hidden></div></div>'
     ).join('')+'</div>';
   tools.prepend(cleanNav);
+  // A bottom menu must not inherit the sticky header's stacking context.
+  const bottomLayout=window.matchMedia('(max-width:700px)');
+  function placeNavigation(){
+    if(bottomLayout.matches)document.body.append(cleanNav);
+    else tools.prepend(cleanNav);
+    window.ShuaViewportMenus?.layout();
+  }
+  placeNavigation();
+  bottomLayout.addEventListener('change',placeNavigation);
 
   function closeMenus(except=null){
     cleanNav.querySelectorAll('.shua-clean-group').forEach(group=>{
@@ -119,15 +128,16 @@
   }
   function startPress(target,id,kind){
     const trigger=target.closest('.shua-clean-trigger');
-    const option=target.closest('.shua-clean-popup button');
-    if(!trigger&&!option)return false;
+    // Options use native clicks/taps and native scrolling. Only a trigger
+    // starts the optional press-and-slide gesture.
+    if(!trigger)return false;
     const group=target.closest('.shua-clean-group');
     if(!group)return false;
     const alreadyOpen=group.classList.contains('is-open');
     if(trigger&&!alreadyOpen)openMenu(group);
     group.classList.add('is-dragging');
     press={pointerId:id,kind,trigger,group,alreadyOpen,option:null};
-    if(option)previewOption(option);
+
     return true;
   }
   function movePress(position){

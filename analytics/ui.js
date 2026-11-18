@@ -279,7 +279,7 @@ function fetchRankedUsage(){
  if(rankedUsage||rankedUsagePending||rankedUsageError)return;
  rankedUsagePending=true;
  Promise.all([
-  S.Data.json('analytics/data/ranked-usage-2026.json?v=20261026-fantasy-intelligence9',{cache:'no-store'}),
+  S.Data.json('analytics/data/ranked-usage-2026.json?v=20261118-player-fixes-v2',{cache:'no-store'}),
   S.Data.json('analytics/data/expected-weekly-2026.json?v=20261026-fantasy-intelligence9',{cache:'no-store'})
  ]).then(([data,weekly])=>{
   if(data.schema!==1||data.season!==2026||!data.players)throw new Error('Invalid ranked-player usage snapshot');
@@ -288,7 +288,10 @@ function fetchRankedUsage(){
   rankedUsage=data;
  }).catch(err=>{rankedUsageError=err.message||String(err);}).finally(()=>{
   rankedUsagePending=false;
-  if(visible&&['usage','intelligence','startsit'].includes(state.view)&&dataset?.year===2026)render();
+  if(visible&&dataset?.year===2026){
+   if(['usage','intelligence'].includes(state.view))render();
+   else if(state.view==='startsit'){const advanced=section.querySelector('#stAdvancedComparison');if(advanced)advanced.innerHTML=advancedComparison();}
+  }
  });
 }
 function usage(){
@@ -304,7 +307,11 @@ function usage(){
  if(isCurrent){
   const actual=new Map(dataset.players.map(p=>[p.key,p]));
   const rankedPositions=new Map(Object.entries(dataset.rankData?.position||{}).flatMap(([pos,rows])=>(rows||[]).map(r=>[key(r.name),pos])));
-  entries=Object.entries(rankedUsage.players).map(([id,row])=>({p:actual.get(id)||{key:id,name:row.name,team:row.team||'',position:row.position||rankedPositions.get(id)||'',headshot:''},...row}));
+  entries=Object.entries(rankedUsage.players).map(([id,row])=>{
+   const canonical=key(row.name||id),player=actual.get(canonical)||actual.get(id);
+   const p={...(player||{}),key:canonical,name:row.name||player?.name,team:player?.team||row.team||'',position:player?.position||row.position||rankedPositions.get(canonical)||'',headshot:player?.headshot||''};
+   return {p,...S.completeUsageFromGames(dataset,p,row,dataset.latestWeek)};
+  });
  }else{
   const players=dataset.players.filter(p=>['QB','RB','WR','TE'].includes(p.position));
   const targets=new Map();
@@ -767,11 +774,8 @@ function currentWeekCompare(){
   '<p>'+(x.def?opponentHtml(x.p,x.def,week):'<span class="st-tag">Matchup rating unavailable</span>')+'</p>'+
   comparisonRows(x)
  )).join('')+'</div>';
- if(chosen.length===1)return search+cards+advancedComparison();
- const weeks=[...new Set(chosen.flatMap(p=>G(p,through).slice(-5).map(g=>g.week)))].sort((a,b)=>a-b);
- const graph=C.line({title:'Recent scoring comparison',labels:weeks.map(w=>'W'+w),
-  series:chosen.map(p=>({name:p.name,values:weeks.map(w=>G(p,through).find(g=>g.week===w)?.points??null)})),area:false});
- return search+cards+panel('Recent scoring comparison','',graph)+advancedComparison();
+ const advanced='<div id="stAdvancedComparison">'+advancedComparison()+'</div>';
+ return search+advanced+cards;
 }
 function advancedComparison(){
  if(rankedUsageError)return note('Advanced comparison data could not load. '+E(rankedUsageError),true)+'<button type="button" class="st-button" data-st-usage-retry>Retry advanced comparison</button>';

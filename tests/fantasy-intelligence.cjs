@@ -95,6 +95,8 @@ for(const pane of ['breakouts','trades','similar','expected','rankings','forecas
 for(const marker of ['breakouts','trades','similar','expected','rankings','forecast'])assert.ok(view.includes("['"+marker+"'"),'Missing feature view '+marker);
 const comparison=render({...presentation,state:{compare:rows.slice(0,2).map(r=>r.p.key)},comparisonOnly:true});
 assert.ok(comparison.includes('Advanced player comparison'),'Advanced comparison missing');
+for(const label of ['Upcoming modeled PPR','10+ point likelihood','20+ point likelihood','Expected PPR / game','Actual PPR / game','FPOE / matched game','Targets / game','Carries / game','Snap share','Route participation','Target share','Yards per route','Recent opportunity change','Actual weekly PPR scoring'])assert.ok(comparison.includes(label),'Moved comparison lost '+label);
+assert.ok(comparison.includes('test-chart'),'Moved comparison lost the full-season chart');
 assert.ok(!comparison.includes('st-intel-nav')&&!comparison.includes('stIntelCompare'),'Moved comparison must use Compare selections');
 assert.ok(ui.includes('advancedComparison()')&&ui.includes('comparisonOnly:true'),'Comparison not integrated in Compare');
 for(const marker of ['data-st-intel-view','data-st-intel-position','data-st-intel-trade','data-st-intel-rankmode','data-st-intel-weight','stIntelCompare'])assert.ok(ui.includes(marker),'Missing view control wiring '+marker);

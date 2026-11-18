@@ -27,3 +27,12 @@ for(const [width,height,rect] of [[1360,900,{left:1000,top:10,bottom:52}],[360,3
  assert.ok(top>=0&&top+h<=height,'Menu height overflows viewport');
 }
 console.log('PASS: suffixed player stats and snaps resolve; menu bounds fit desktop and zoomed viewports.');
+
+const S=require('../analytics/core.js');
+const season=require('../analytics/data/season-2026.json');
+const cook=season.players.find(p=>S.key(p.name)==='jamescook');
+const fallback=S.completeUsageFromGames(season,cook,{games:0,targetsPerGame:null,carriesPerGame:null,snapShare:null,routeParticipation:null},10);
+assert.ok(fallback.games>0&&fallback.targetsPerGame>0&&fallback.carriesPerGame>0&&fallback.snapShare>0,'Observed Cook workload must survive a missing ranked row');
+assert.equal(fallback.routeParticipation,null,'Route charting must never be inferred from snaps');
+assert.equal(S.completeUsageFromGames({players:[]},{games:[]},{targetsPerGame:null},10).targetsPerGame,null);
+console.log('PASS: missing Usage rows recover verified games and workloads without inventing route metrics.');

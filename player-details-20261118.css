@@ -1,0 +1,23 @@
+/* The header uses the same star artwork as the homepage. */
+body.shua-clean #shuaCleanNav .shua-clean-brand{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;min-width:44px;width:44px;height:44px;padding:0!important;margin:0;border:0;background:transparent;box-shadow:none;cursor:pointer;text-shadow:none}
+body.shua-clean #shuaCleanNav .shua-clean-brand::before{content:none!important;display:none!important}
+body.shua-clean #shuaCleanNav .shua-brand-star{display:block;width:44px;height:44px;object-fit:contain}
+body.shua-clean #shuaCleanNav .shua-clean-brand:focus-visible{outline:2px solid #6dbfea;outline-offset:3px;border-radius:8px}
+@media(max-width:700px){body.shua-clean #shuaCleanNav .shua-clean-brand{display:none!important}}
+body.shua-clean.phone-mode #shuaCleanNav .shua-clean-brand{display:none!important}
+/* Hovered notes remain legible outside scroll containers. */
+body.shua-clean #tableCard .shua-note-toggle.shua-note-info{display:inline-grid!important;place-items:center;width:24px!important;height:24px!important;min-width:24px;padding:0!important;margin:0 0 0 6px;border:1px solid #4c948b;border-radius:50%;background:#143b49;color:#bcefe0;font:800 14px/1 system-ui,sans-serif!important;cursor:help;z-index:5!important;pointer-events:auto!important}
+body.shua-clean #tableCard .shua-note-toggle.shua-note-info::before{content:none!important}
+#shuaPlayerNoteTooltip{position:fixed;z-index:1000001;box-sizing:border-box;width:min(440px,calc(100vw - 20px));max-height:calc(100dvh - 20px);overflow:auto;overscroll-behavior:contain;padding:14px 16px;background:#0b2639;color:#e6f2fa;border:1px solid #5aab98;border-radius:11px;box-shadow:0 12px 32px #0009;font-size:14px;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+#shuaPlayerNoteTooltip[hidden]{display:none!important}
+#shuaPlayerNoteTooltip>strong{display:block;color:#91ecd1;margin-bottom:7px;font-size:14px}
+#shuaPlayerNoteTooltip>p{margin:0;white-space:pre-wrap}
+/* The complete Intelligence comparison belongs to Compare, with every metric visible. */
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-view{min-width:0;margin-top:12px}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-table{max-height:none!important;overflow:auto!important;border:1px solid #315266;border-radius:9px}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-table table{width:100%;border-collapse:collapse;font-size:14px}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-table :is(th,td){padding:11px 12px!important;border-bottom:1px solid #ffffff15;text-align:right;white-space:nowrap}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-table tr>:first-child{text-align:left;white-space:normal;min-width:170px;color:#b5cddd}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-table thead th{background:#143449;color:#e7f6ff}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-table tr:nth-child(even){background:#18354a55}
+body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-note,body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-source{color:#a4bdce;font-size:12px;line-height:1.45}

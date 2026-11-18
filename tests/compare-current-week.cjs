@@ -97,15 +97,15 @@ test('Compare opens blank with no optional labels or introductory clutter',()=>{
  assert.match(ui,/if\(view==='startsit'\)\{state\.year=2026;if\(state\.view!=='startsit'\)state\.compare=\[\];\}/);
  assert.doesNotMatch(compare,/optional|Search for at least two players|Comparing Week/);
  assert.match(compare,/if\(!chosen\.length\)return search;/);
- assert.match(ui,/,'startsit'\]\.includes\(state\.view\)/);
+ assert.match(ui,/state\.view==='startsit'/);
 });
 
 test('Selecting one player immediately displays stats; additional players add a graph',()=>{
  const compare=ui.slice(ui.indexOf('function currentWeekCompare(){'),ui.indexOf('function showCompareSuggestions('));
  assert.match(compare,/if\(!chosen\.length\)return search;/);
  assert.match(compare,/const cards=/);
- assert.match(compare,/if\(chosen\.length===1\)return search\+cards\+advancedComparison\(\);/);
- assert.match(compare,/return search\+cards\+panel\('Recent scoring comparison'/);
+ assert.match(compare,/return search\+advanced\+cards;/);
+ assert.ok(read('analytics/intelligence-view.js').includes("panel('Actual weekly PPR scoring'"));
  assert.match(compare,/st-compare-selected/);
  assert.match(compare,/st-compare-selected-logo/);
  assert.match(compare,/S\.teams\[S\.canonicalTeam\(p\.team\)\]/);
@@ -117,6 +117,6 @@ test('Selecting one player immediately displays stats; additional players add a 
 });
 
 test('new Compare assets use fresh cache versions',()=>{
- assert.ok(html.includes('analytics-dashboard.js?v=20261118-interface-fixes-v1'));
- assert.match(read('analytics-dashboard.js'),/20261118-interface-fixes-v1/);
+ assert.ok(html.includes('analytics-dashboard.js?v=20261118-player-fixes-v2'));
+ assert.match(read('analytics-dashboard.js'),/20261118-player-fixes-v2/);
 });

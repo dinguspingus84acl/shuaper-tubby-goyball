@@ -88,7 +88,7 @@ function render({dataset:ds,usage,state,person,panel,face,logo,comparisonOnly=fa
   const comparisonTable=chosen.length?tbl(headers,comparison.map(([name,fn,d,unit])=>'<tr><th scope="row">'+E(name)+'</th>'+chosen.map(r=>'<td>'+F(fn(r),d,unit)+'</td>').join('')+'</tr>')):blank('Choose at least one player.');
   const weeks=[...new Set(chosen.flatMap(r=>r.gs.map(g=>g.week)))].sort((a,b)=>a-b);
   content=(comparisonOnly?'':selectHtml)+panel('Advanced player comparison','Up to four players at any position, with matching stat definitions.',comparisonTable)+
-   (!comparisonOnly&&chosen.length>1?panel('Actual weekly PPR scoring','Recorded ESPN results only; missing appearances are not zeros.',C.line({title:'Comparison · observed PPR',labels:weeks.map(w=>'W'+w),series:chosen.map(r=>({name:r.p.name,values:weeks.map(w=>r.gs.find(g=>g.week===w)?.points??null)})),area:false})):'')+
+   (chosen.length>1?panel('Actual weekly PPR scoring','Recorded ESPN results only; missing appearances are not zeros.',C.line({title:'Comparison · observed PPR',labels:weeks.map(w=>'W'+w),series:chosen.map(r=>({name:r.p.name,values:weeks.map(w=>r.gs.find(g=>g.week===w)?.points??null)})),area:false})):'')+
    note('Comparable PPR scores are shown side by side, but target, route and rushing usage are role-specific. Projected scores and likelihoods share the disclosed model in Forecast & odds.');
  }
  return (comparisonOnly?'':title+nav)+'<div class="st-intel-view">'+content+source+'</div>';

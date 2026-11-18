@@ -28,9 +28,13 @@
   let archive={},archiveAliases={};
   function urls(name){
     const exact=normalize(name),base=key(name);
+    const currentSleeper={michaelpittman:'6819',marvinharrison:'11628'}[base];
+    if(currentSleeper)return [verifiedUrl(name),'https://sleepercdn.com/content/nfl/players/thumb/'+currentSleeper+'.jpg'];
     return [...new Set([verifiedUrl(name),...(archive[exact]||archive[base]||archiveAliases[base]||[])].filter(Boolean))];
   }
   function faceName(element){
+    const analytics=element.closest('.st-person');
+    if(analytics)return analytics.querySelector('strong')?.textContent?.trim()||'';
     const rank=element.closest('.photo-cell');
     if(rank)return rank.querySelector('b')?.textContent?.trim()||'';
     const pool=element.closest('.pool-player');
@@ -77,6 +81,15 @@
     requestAnimationFrame(()=>{
       queued=false;
       document.querySelectorAll('.photo.fallback, .espn-headshot-fallback, .featured-photo.fallback').forEach(fixFallback);
+      document.querySelectorAll('.photo, .featured-photo, .player-photo, .espn-headshot, .st-face').forEach(el=>{
+        const name=faceName(el),base=key(name);
+        if(!['michaelpittman','marvinharrison'].includes(base)||el.tagName!=='IMG'||el.dataset.currentPortrait==='1')return;
+        // A list's older fallback may have already inserted a different player's image.
+        el.dataset.currentPortrait='1';
+        el.dataset.faceUrls=urls(name).map(encodeURIComponent).join('|');el.dataset.faceIndex='0';
+        el.src=verifiedUrl(name);el.hidden=false;el.style.removeProperty('display');
+        el.onerror=()=>window.ShuaAdvanceFace?.(el);
+      });
     });
   }
   window.ShuaPlayerFaces=Object.freeze({key,urls,url:name=>urls(name)[0]||'',verifiedUrl});

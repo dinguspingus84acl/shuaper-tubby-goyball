@@ -64,6 +64,28 @@ function splits(ds,starter,team,through=18,manualOut){
  const withWeeks=allWeeks.filter(w=>!out.includes(w)&&starterWeeks.has(w));
  const rows=ds.players.filter(p=>p.key!==starter.key).map(p=>{const gs=games(p,through).filter(g=>g.team===team);const a=gs.filter(g=>withWeeks.includes(g.week)),b=gs.filter(g=>out.includes(g.week));const av=mean(a.map(g=>(g.targets??0)+(g.rushAtt??0))),bv=mean(b.map(g=>(g.targets??0)+(g.rushAtt??0)));return {player:p,with:av,without:bv,delta:av!==null&&bv!==null?bv-av:null,withPpg:mean(a.map(g=>g.points)),withoutPpg:mean(b.map(g=>g.points)),nWith:a.length,nWithout:b.length,withoutGames:b};}).filter(x=>x.nWith||x.nWithout).sort((a,b)=>(b.delta??-Infinity)-(a.delta??-Infinity));return {out,withWeeks,rows};
 }
-Object.assign(S,{key,num,mean,sum,quantile,dev,rolling,pct,fmt,esc,canonicalTeam,teams,positions,games,consistency,positionalRank,defense,aggregate,teamShares,positionOpportunityShares,splits});
+function completeUsageFromGames(ds,p,row,through=18){
+ const out={...row},gs=games(p,through);if(!gs.length)return out;
+ const a=aggregate(p,through),set=(field,value)=>{if(num(out[field])===null&&num(value)!==null)out[field]=Math.round(value*100)/100;};
+ set('games',a.n);if(!out.games)out.games=a.n;
+ set('targetsPerGame',a.targets===null?null:a.targets/a.n);set('carriesPerGame',a.rushAtt===null?null:a.rushAtt/a.n);
+ set('targets',a.targets);set('snapShare',a.snapRate);set('redZoneOpportunities',a.redZone);
+ const fields=['targetShare','carryShare',...(['RB','WR','TE'].includes(p.position)?['opportunityShare']:[])];
+ if(fields.every(field=>num(out[field])!==null))return out;
+ const totals=new Map();
+ for(const peer of ds.players)for(const g of games(peer,through)){
+  const id=canonicalTeam(g.team||peer.team)+'|'+g.week;if(!totals.has(id))totals.set(id,{targets:[],carries:[],opportunities:[]});
+  const t=totals.get(id);t.targets.push(g.targets);t.carries.push(g.rushAtt);
+  if(peer.position===p.position&&num(g.targets)!==null&&num(g.rushAtt)!==null)t.opportunities.push(g.targets+g.rushAtt);
+ }
+ const denominators=(field,numerator)=>{
+  const matched=gs.filter(g=>num(numerator(g))!==null&&num(sum(totals.get(canonicalTeam(g.team||p.team)+'|'+g.week)?.[field]||[]))!==null);
+  return pct(sum(matched.map(numerator)),sum(matched.map(g=>sum(totals.get(canonicalTeam(g.team||p.team)+'|'+g.week)[field]))));
+ };
+ set('targetShare',denominators('targets',g=>g.targets));set('carryShare',denominators('carries',g=>g.rushAtt));
+ if(['RB','WR','TE'].includes(p.position))set('opportunityShare',denominators('opportunities',g=>num(g.targets)!==null&&num(g.rushAtt)!==null?g.targets+g.rushAtt:null));
+ return out;
+}
+Object.assign(S,{key,num,mean,sum,quantile,dev,rolling,pct,fmt,esc,canonicalTeam,teams,positions,games,consistency,positionalRank,defense,aggregate,teamShares,positionOpportunityShares,splits,completeUsageFromGames});
 if(typeof module!=='undefined')module.exports=S;
 })(globalThis);

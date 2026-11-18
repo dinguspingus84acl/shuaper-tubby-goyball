@@ -31,7 +31,7 @@
   const cleanNav=document.createElement('nav');
   cleanNav.id='shuaCleanNav';
   cleanNav.setAttribute('aria-label','Fantasy site navigation');
-  cleanNav.innerHTML='<span class="shua-clean-brand">GOYBALL<span class="shua-brand-dot">.</span></span>'+
+  cleanNav.innerHTML='<button type="button" class="shua-clean-brand" data-shua-target="HOME" aria-label="Fantasy home"><img class="shua-brand-star" src="fantasy-star.svg?v=20261118-player-fixes-v2" alt=""></button>'+
     '<div class="shua-clean-groups">'+groups.map(group=>
       '<div class="shua-clean-group" data-shua-group="'+group.id+'">'+
         '<button type="button" class="shua-clean-trigger" aria-expanded="false" aria-controls="shua-menu-'+group.id+'">'+

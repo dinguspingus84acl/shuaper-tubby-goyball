@@ -365,7 +365,8 @@ function upgradeFallbackFaces(){
       name=el.closest('.espn-player')?.querySelector('.espn-name-btn')?.textContent?.trim()||'';
     }
     if(!name)return;
-    const candidates=headshotUrls(historicalHeadshots?.[norm(name)]);
+    const current=window.ShuaPlayerFaces?.urls(name)||[];
+    const candidates=current.length?current:headshotUrls(historicalHeadshots?.[norm(name)]);
     if(!candidates.length)return;
     const img=document.createElement('img');
     img.className=el.classList.contains('espn-headshot-fallback')?'espn-headshot':[...el.classList].filter(x=>x!=='fallback').join(' ');

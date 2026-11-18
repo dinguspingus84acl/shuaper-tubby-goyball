@@ -3,11 +3,11 @@
 'use strict';
 const modal=document.getElementById('modal');
 if(!modal)return;
-const aliases={kennethwalkeriii:'kennethwalker',michaelpittmanjr:'michaelpittman',brianthomasjr:'brianthomas',marvinharrisonjr:'marvinharrison',chigokonkwo:'chigoziemokonkwo',lutherburdeniii:'lutherburden',haroldfanninjr:'haroldfannin',joshpalmer:'joshuapalmer'};
+const aliases={lutherburdeniii:'lutherburden',kevincolemanjr:'kevincoleman',stetsonbennettiv:'stetsonbennett',gardnerminshewii:'gardnerminshew',frankgorejr:'frankgore',kennethwalkeriii:'kennethwalker',gregdesrosiersjr:'gregdesrosiers',haroldfanninjr:'haroldfannin',jimmyhornjr:'jimmyhorn',johnmetchieiii:'johnmetchie',erickalljr:'erickall',kylepittssr:'kylepitts',brianrobinsonjr:'brianrobinson',michaelpenixjr:'michaelpenix',pierrestrongjr:'pierrestrong',chrisrodriguezjr:'chrisrodriguez',davidsillsv:'davidsills',kevinaustinjr:'kevinaustin',odellbeckhamjr:'odellbeckham',tedhurstiii:'tedhurst',tyronetracyjr:'tyronetracy',roberthenryjr:'roberthenry',travisetiennejr:'travisetienne',marvinmimsjr:'marvinmims',thomasfidoneii:'thomasfidone',lequintallenjr:'lequintallen',jamescookiii:'jamescook',carloswashingtonjr:'carloswashington',brianthomasjr:'brianthomas',montoriefosterjr:'montoriefoster',theoweasejr:'theowease',mikewashingtonjr:'mikewashington',marvinharrisonjr:'marvinharrison',olliegordonii:'olliegordon',omarcooperjr:'omarcooper',anthonytyusiii:'anthonytyus',chrisgodwinjr:'chrisgodwin',velusjonesjr:'velusjones',michaelpittmanjr:'michaelpittman',harrisonwallaceiii:'harrisonwallace',eftonchismiii:'eftonchism',aaronjonessr:'aaronjones',deebosamuelsr:'deebosamuel',anthonyrichardsonsr:'anthonyrichardson',kennethwalkeriii:'kennethwalker',michaelpittmanjr:'michaelpittman',brianthomasjr:'brianthomas',marvinharrisonjr:'marvinharrison',chigokonkwo:'chigoziemokonkwo',lutherburdeniii:'lutherburden',haroldfanninjr:'haroldfannin',joshpalmer:'joshuapalmer'};
 const key=name=>{const s=String(name||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');return aliases[s]||s;};
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let snapshotPromise=null,scheduled=false,currentName='';
-const data=()=>snapshotPromise||(snapshotPromise=fetch('analytics/data/ranked-usage-2026.json?v=20261026-1',{cache:'force-cache'})
+const data=()=>snapshotPromise||(snapshotPromise=fetch('analytics/data/ranked-usage-2026.json?v=20261118-interface-fixes-v1',{cache:'force-cache'})
  .then(r=>{if(!r.ok)throw new Error('Usage data unavailable');return r.json();})
  .then(d=>{if(d.schema!==1||d.season!==2026||!d.players)throw new Error('Unsupported usage data');return d;})
  .catch(e=>{snapshotPromise=null;throw e;}));

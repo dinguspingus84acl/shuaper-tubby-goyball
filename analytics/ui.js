@@ -55,11 +55,11 @@ function feature(p,i,value,label,extra=''){return `<article class="st-feature"><
 function spark(a){const v=a.filter(x=>N(x)!==null);if(v.length<2)return '';const lo=Math.min(...v),hi=Math.max(...v),pts=v.map((x,i)=>`${4+i*86/(v.length-1)},${26-(x-lo)/(hi-lo||1)*22}`);return `<svg class="st-spark" viewBox="0 0 94 32" aria-hidden="true"><path d="M${pts.join('L')}" stroke="#24efa0" stroke-width="1.8" fill="none"/>${pts.map(p=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="2" fill="#24efa0"/>`).join('')}</svg>`;}
 function chartName(p){const a=String(p.name||'').trim().split(/\s+/);if(a.length===1)return a[0];const suffix=/^(?:jr\.?|sr\.?|ii|iii|iv|v)$/i.test(a.at(-1));const surname=a.slice(suffix?-2:-1).join(' ');return a[0][0]+'. '+surname;}
 function rankedRows(rows,value,subtitle,limit=10,through=state.week||18){return rows.slice(0,limit).map((p,i)=>`<div class="st-rank-row"><span class="st-rank-num">${i+1}</span>${person(p)}<div class="st-score ${String(value(p)).startsWith('-')?'negative':''}">${E(value(p))}<small>${E(subtitle)}</small></div>${spark(G(p,through).slice(-5).map(g=>g.points))}</div>`).join('')||C.empty();}
-function selectedPlayers(){return dataset.players.filter(p=>p.position===state.pos).sort((a,b)=>(A(b).points||0)-(A(a).points||0));}
+function selectedPlayers(){return dataset.players.filter(p=>state.pos==='FLEX'?p.position!=='QB':p.position===state.pos).sort((a,b)=>(A(b).points||0)-(A(a).points||0));}
 function selected(){let list=selectedPlayers(),p=list.find(p=>p.key===state.player)||list[0];if(p)state.player=p.key;return p;}
 function select(id,label,options,value){return `<label class="${id==='stPlayer'||id==='stInjuredPlayer'?'st-player-control':''}"><span class="st-label">${E(label)}</span><select id="${id}">${options.map(([v,n])=>`<option value="${E(v)}" ${String(v)===String(value)?'selected':''}>${E(n)}</option>`).join('')}</select></label>`;}
 function controls({player=false,team=false,week=false,range=false,ranking=false,playoffs=false,season=true}={}){let h=season?select('stSeason','Season',[2026,2025,2024].map(y=>[y,y]),state.year):'';if(week)h+=select('stWeek','Week',Array.from({length:18},(_,i)=>[i+1,'Week '+(i+1)]),state.week||dataset.latestWeek);if(player){const p=selected();h+=select('stPlayer','Player',selectedPlayers().map(p=>[p.key,p.name]),p?.key);}if(team)h+=select('stTeam','Team',Object.entries(S.teams).sort((a,b)=>a[1].localeCompare(b[1])),state.team);if(range)h+=select('stRange','Sample',[['0','Season to date'],['4','Last 4 weeks'],['6','Last 6 weeks']],state.range);if(ranking)h+=select('stRankSource','Your rankings',[['big-board.json','Overall · Big Board'],['ros-rankings.json','Position · Rest of season']],state.rankSource);if(playoffs)h+=select('stPlayoffs','Schedule window',[['remaining','Selected week onward'],['playoffs','Fantasy playoffs · W15–17']],state.playoffs?'playoffs':'remaining');return `<div class="st-controls">${h}</div>`;}
-function positions(){return `<div class="st-position" aria-label="Position">${S.positions.map(p=>`<button type="button" data-st-pos="${p}" aria-pressed="${state.pos===p}">${p}</button>`).join('')}</div>`;}
+function positions(){return `<div class="st-position" aria-label="Position">${[...S.positions,'FLEX'].map(p=>`<button type="button" data-st-pos="${p}" aria-pressed="${state.pos===p}">${p}</button>`).join('')}</div>`;}
 function upcoming(p,week=state.week){return dataset.schedule[p.team]?.[week];}
 function defenseForPosition(pos,through,last=0){
  if(dataset.year!==2026)return S.defense(dataset,pos,through,last);
@@ -288,7 +288,7 @@ function fetchRankedUsage(){
   rankedUsage=data;
  }).catch(err=>{rankedUsageError=err.message||String(err);}).finally(()=>{
   rankedUsagePending=false;
-  if(visible&&['usage','intelligence'].includes(state.view)&&dataset?.year===2026)render();
+  if(visible&&['usage','intelligence','startsit'].includes(state.view)&&dataset?.year===2026)render();
  });
 }
 function usage(){
@@ -324,7 +324,7 @@ function usage(){
  const chosen=metrics.find(m=>m[0]===state.usageMetric)||metrics[0];
  const sortDirection=state.usageSortDirection==='asc'?'asc':'desc';
  const rankedOrder=new Map((dataset.rankData?.overall||[]).map((name,i)=>[key(name),i]));
- const rows=entries.filter(x=>(!state.usagePos||state.usagePos==='ALL'||x.p.position===state.usagePos))
+ const rows=entries.filter(x=>(!state.usagePos||state.usagePos==='ALL'||(state.usagePos==='FLEX'?x.p.position!=='QB':x.p.position===state.usagePos)))
   .sort((a,b)=>{
    const av=N(a[chosen[0]]),bv=N(b[chosen[0]]);
    if(av===null&&bv!==null)return 1;
@@ -333,7 +333,7 @@ function usage(){
    return (rankedOrder.get(a.p.key)??9999)-(rankedOrder.get(b.p.key)??9999)||a.p.name.localeCompare(b.p.name);
   });
  const groupButtons='<div class="st-usage-groups" role="group" aria-label="Usage stat category">'+[['volume','Volume'],['opportunity','Opportunity'],['efficiency','Efficiency'],['advanced','Advanced'],['signals','Signals']].map(([id,label])=>'<button type="button" data-st-usage-group="'+id+'" aria-pressed="'+(group===id)+'">'+label+'</button>').join('')+'</div>';
- const nav='<div class="st-usage-controls"><label>Position <select id="stUsagePos">'+['ALL','QB','RB','WR','TE'].map(p=>'<option value="'+p+'"'+((state.usagePos||'ALL')===p?' selected':'')+'>'+p+'</option>').join('')+'</select></label>'+groupButtons+'<label class="st-usage-rank-filter">Rank by <select id="stUsageMetric">'+metrics.map(m=>'<option value="'+m[0]+'"'+(chosen[0]===m[0]?' selected':'')+'>'+m[1]+'</option>').join('')+'</select></label></div>';
+ const nav='<div class="st-usage-controls"><label>Position <select id="stUsagePos">'+['ALL','FLEX','QB','RB','WR','TE'].map(p=>'<option value="'+p+'"'+((state.usagePos||'ALL')===p?' selected':'')+'>'+p+'</option>').join('')+'</select></label>'+groupButtons+'<label class="st-usage-rank-filter">Rank by <select id="stUsageMetric">'+metrics.map(m=>'<option value="'+m[0]+'"'+(chosen[0]===m[0]?' selected':'')+'>'+m[1]+'</option>').join('')+'</select></label></div>';
  const subtitle=isCurrent?rankedUsage.rankedPlayers+' ranked players · ESPN through W'+rankedUsage.throughWeek+(rankedUsage.routeThroughWeek?' · charted routes through W'+rankedUsage.routeThroughWeek:''):'Historical '+dataset.year+' recorded games';
  const cells=rows.map(x=>'<tr data-st-usage-key="'+E(x.p.key)+'"><td>'+person(x.p)+'</td>'+metrics.map(([field,label,,decimals,suffix])=>{
   const value=N(x[field]);
@@ -461,13 +461,13 @@ function teams(){
  const teTargets=members.filter(p=>p.position==='TE'&&N(p.targets)>0).sort((a,b)=>b.targets-a.targets);
  const red=members.filter(p=>N(p.redZone)>0).sort((a,b)=>b.redZone-a.redZone);
  const snapPos=state.teamSnapPos||'ALL';
- const snaps=members.filter(p=>N(p.snapRate)!==null&&(snapPos==='ALL'||p.position===snapPos)).sort((a,b)=>b.snapRate-a.snapRate).slice(0,12);
+ const snaps=members.filter(p=>N(p.snapRate)!==null&&(snapPos==='ALL'||(snapPos==='FLEX'?p.position!=='QB':p.position===snapPos))).sort((a,b)=>b.snapRate-a.snapRate).slice(0,12);
  const opportunityPos=state.teamOpportunityPos||'ALL';
- const opportunityRows=members.filter(p=>opportunityPos==='ALL'||p.position===opportunityPos).sort((a,b)=>(N(b.targets)||0)-(N(a.targets)||0)).slice(0,12);
+ const opportunityRows=members.filter(p=>opportunityPos==='ALL'||(opportunityPos==='FLEX'?p.position!=='QB':p.position===opportunityPos)).sort((a,b)=>(N(b.targets)||0)-(N(a.targets)||0)).slice(0,12);
  const positionDenom=(p,key,pos)=>members.filter(x=>x.team===p.team&&x.position===pos).reduce((n,x)=>n+(N(x[key])||0),0);
  const shareRows=(players,key,pos)=>'<div class="st-team-share-ranked">'+players.slice(0,12).map((p,i)=>'<div class="st-team-share-item"><span class="st-rank-num">'+(1+players.filter(x=>x.team===p.team&&N(x[key])>N(p[key])).length)+'</span>'+person(p)+'<b>'+F(S.pct(p[key],positionDenom(p,key,pos)),1,'%')+'</b></div>').join('')+'</div>';
  const redRows='<div class="st-team-share-ranked">'+red.slice(0,12).map((p,i)=>'<div class="st-team-share-item"><span class="st-rank-num">'+(i+1)+'</span>'+person(p)+'<b>'+F(p.redZone,0)+'</b></div>').join('')+'</div>';
- const snapRows='<div class="st-team-opportunity-pos">'+['ALL','QB','RB','WR','TE'].map(pos=>'<button type="button" data-st-team-snap-pos="'+pos+'" aria-pressed="'+(snapPos===pos)+'">'+pos+'</button>').join('')+'</div><div class="st-team-snap-graph">'+snaps.map((p,i)=>'<div class="st-team-snap-row"><span class="st-team-snap-rank">'+(i+1)+'</span><div class="st-team-snap-player">'+face(p,'st-team-snap-face')+'<span>'+E(p.name)+'</span>'+logo(p.team,'st-team-snap-logo')+'<small>'+E(p.position)+'</small>'+'</span></div><div class="st-team-snap-track"><div style="width:'+Math.max(0,Math.min(100,p.snapRate))+'%"></div></div><b>'+F(p.snapRate,1,'%')+'</b></div>').join('')+'</div>';
+ const snapRows='<div class="st-team-opportunity-pos">'+['ALL','FLEX','QB','RB','WR','TE'].map(pos=>'<button type="button" data-st-team-snap-pos="'+pos+'" aria-pressed="'+(snapPos===pos)+'">'+pos+'</button>').join('')+'</div><div class="st-team-snap-graph">'+snaps.map((p,i)=>'<div class="st-team-snap-row"><span class="st-team-snap-rank">'+(i+1)+'</span><div class="st-team-snap-player">'+face(p,'st-team-snap-face')+'<span>'+E(p.name)+'</span>'+logo(p.team,'st-team-snap-logo')+'<small>'+E(p.position)+'</small>'+'</span></div><div class="st-team-snap-track"><div style="width:'+Math.max(0,Math.min(100,p.snapRate))+'%"></div></div><b>'+F(p.snapRate,1,'%')+'</b></div>').join('')+'</div>';
  const options=Array.from({length:18},(_,i)=>[String(i+1),'Week '+(i+1)]);
  const teamOptions=[['ALL','Entire NFL'],...Object.entries(S.teams).sort((a,b)=>a[1].localeCompare(b[1]))];
  const toolbar='<div class="st-team-logo-picker">'+(allNFL?'':logo(state.team,'st-team-filter-logo'))+'<div class="st-team-custom-picker"><button type="button" data-st-team-menu-toggle aria-expanded="false" aria-label="Choose NFL team">'+(allNFL?'🏈':logo(state.team,'st-team-menu-logo'))+'<span>'+(allNFL?'Entire NFL':E(allNFL?'Entire NFL':S.teams[state.team]))+'</span><span>⌄</span></button><div class="st-team-menu" id="stTeamMenu" hidden>'+teamOptions.map(([code,name])=>'<button type="button" data-st-select-team="'+E(code)+'">'+(code==='ALL'?'🏈':logo(code,'st-team-menu-logo'))+'<span>'+E(name)+'</span></button>').join('')+'</div></div></div>'+'<button type="button" class="st-team-std" data-st-team-std aria-pressed="'+(selected==='STD')+'">Season to Date</button>'+select('stTeamWindow','Week',options,selected==='STD'?String(through):selected);
@@ -479,7 +479,7 @@ function teams(){
    +panel('TE target share','Among recorded TE targets',shareRows(teTargets,'targets','TE'))
    +panel('Red-zone opportunities','Recorded carries plus targets inside the 20; not receptions alone',redRows)
    +panel('Offensive snap rate','Weighted by recorded snaps and team snaps for this period',snapRows)+'</div>')
- +panel('Opportunity leaders','', '<div class="st-team-opportunity-pos">'+['ALL','RB','WR','TE'].map(pos=>'<button type="button" data-st-team-opportunity-pos="'+pos+'" aria-pressed="'+(opportunityPos===pos)+'">'+pos+'</button>').join('')+'</div><div class="st-table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Carries</th><th>Carry share</th><th>Targets</th><th>Target share</th><th>RZ opportunities</th><th>Snap rate</th></tr></thead><tbody>'+opportunityRows.map((p,i)=>'<tr><td class="st-team-opportunity-rank">'+(i+1)+'</td><td>'+person(p)+'</td><td>'+F(p.rushAtt,0)+'</td><td>'+F(p.carryShare,1,'%')+'</td><td>'+F(p.targets,0)+'</td><td>'+F(p.targetShare,1,'%')+'</td><td>'+F(p.redZone,0)+'</td><td>'+F(p.snapRate,1,'%')+'</td></tr>').join('')+'</tbody></table></div>')
+ +panel('Opportunity leaders','', '<div class="st-team-opportunity-pos">'+['ALL','FLEX','RB','WR','TE'].map(pos=>'<button type="button" data-st-team-opportunity-pos="'+pos+'" aria-pressed="'+(opportunityPos===pos)+'">'+pos+'</button>').join('')+'</div><div class="st-table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Carries</th><th>Carry share</th><th>Targets</th><th>Target share</th><th>RZ opportunities</th><th>Snap rate</th></tr></thead><tbody>'+opportunityRows.map((p,i)=>'<tr><td class="st-team-opportunity-rank">'+(i+1)+'</td><td>'+person(p)+'</td><td>'+F(p.rushAtt,0)+'</td><td>'+F(p.carryShare,1,'%')+'</td><td>'+F(p.targets,0)+'</td><td>'+F(p.targetShare,1,'%')+'</td><td>'+F(p.redZone,0)+'</td><td>'+F(p.snapRate,1,'%')+'</td></tr>').join('')+'</tbody></table></div>')
  +weeklyTargetShare(allNFL?(S.teams[state.targetShareChartTeam]?state.targetShareChartTeam:'ARI'):state.team)
  +positionOpportunityShare(allNFL?(S.teams[state.targetShareChartTeam]?state.targetShareChartTeam:'ARI'):state.team)
  +'<div id="stReceiverEfficiencyMount" class="st-receiver-efficiency-slot"></div>';
@@ -562,7 +562,8 @@ function schedule(){
  if(dataset.scheduleRosterError)return toolbar+note('Unable to load schedule rosters: '+E(dataset.scheduleRosterError),true);
  const roster=dataset.scheduleRoster;
  const pos=['QB','RB','WR','TE','DST'].includes(state.schedulePos)?state.schedulePos:'QB';
- const players=teamMode?Object.keys(S.teams).map((team,index)=>({key:'team-'+team,name:S.teams[team],team,position:pos,rosOrder:index})):roster[pos]||[];
+ const searchActive=!!String(state.scheduleQuery||'').trim();
+ const players=teamMode?Object.keys(S.teams).map((team,index)=>({key:'team-'+team,name:S.teams[team],team,position:pos,rosOrder:index})):searchActive?Object.values(roster).flat():roster[pos]||[];
  const through=Math.min(state.week-1,dataset.latestWeek);
  if(!dataset.espnRatings)return schedulePositions(roster)+toolbar+note('ESPN full-PPR matchup rankings are temporarily unavailable. '+E(dataset.espnRatingsError||'Retry later.')+' No local rankings are substituted.',true);
  const ratings={};
@@ -670,14 +671,14 @@ function injury(){
  const current=dataset.year===2026,all=injuryCases();
  if(!all.length)return controls()+panel('Offensive injury report','Reported designations for QBs, RBs, WRs and TEs.',C.empty('No injured offensive players in the current snapshot.'));
  const pos=state.injuryPos||'ALL',status=state.injuryStatus||'ALL';
- const filtered=all.filter(p=>(pos==='ALL'||p.position===pos)&&(status==='ALL'||injuryLabel(p)===status));
+ const filtered=all.filter(p=>(pos==='ALL'||(pos==='FLEX'?p.position!=='QB':p.position===pos))&&(status==='ALL'||injuryLabel(p)===status));
  const starter=filtered.find(p=>p.key===state.injuredKey)||filtered[0];
  if(starter)state.injuredKey=starter.key;
  const snapshot=dataset.snapshotAt?new Date(dataset.snapshotAt):null,valid=snapshot&&!isNaN(snapshot.getTime());
  const stamp=valid?snapshot.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'Unknown';
  const stale=!valid||Date.now()-snapshot.getTime()>48*3600000;
  let output='';
- output+='<div class="st-injury-filters">'+select('stSeason','Season',[[2026,'2026']],2026)+select('stInjuryPos','Position',[['ALL','All positions'],['QB','QB'],['RB','RB'],['WR','WR'],['TE','TE']],pos)+select('stInjuryStatus','Status',[['ALL','All injury statuses'],['Out','Out'],['Questionable','Questionable'],['Doubtful','Doubtful'],['Injured reserve','Injured reserve'],['PUP','PUP']],status)+'</div>';
+ output+='<div class="st-injury-filters">'+select('stSeason','Season',[[2026,'2026']],2026)+select('stInjuryPos','Position',[['ALL','All positions'],['FLEX','FLEX'],['QB','QB'],['RB','RB'],['WR','WR'],['TE','TE']],pos)+select('stInjuryStatus','Status',[['ALL','All injury statuses'],['Out','Out'],['Questionable','Questionable'],['Doubtful','Doubtful'],['Injured reserve','Injured reserve'],['PUP','PUP']],status)+'</div>';
  const listing=filtered.map(p=>'<div class="st-injury-item'+(p.key===starter?.key?' selected':'')+'" data-name="'+E(p.name.toLowerCase())+'"><button type="button" class="st-injury-profile-open" data-st-open="'+E(p.key)+'" aria-label="Open player card: '+E(p.name)+'">'+face(p,'st-injury-face')+'<span class="st-injury-name"><b>'+logo(p.team,'st-injury-team-logo')+E(p.name)+'</b><small>'+E(p.team)+' · '+E(p.position)+'</small></span></button><button type="button" class="st-injury-select" data-st-injury="'+E(p.key)+'" aria-pressed="'+(p.key===starter?.key)+'" aria-label="Analyze injury impact: '+E(p.name)+'"><span class="st-injury-tag '+E(injuryLabel(p).toLowerCase().replace(/\s+/g,'-'))+'">'+E(injuryShortLabel(p))+'</span></button></div>').join('');
  output+='<div class="st-injury-layout"><aside class="st-injury-browser"><div class="st-injury-browser-top"><b>Injury report</b><span id="stInjuryCount">'+filtered.length+' players</span></div><label><span class="st-label">Find injured player</span><input id="stInjurySearch" type="search" placeholder="Search players" autocomplete="off" value="'+E(state.injurySearch||'')+'"></label><div class="st-injury-list" id="stInjuryList">'+listing+'</div><p class="st-injury-time">ESPN player designations, snapshot: '+E(stamp)+(stale?' · Over 48 hours old':'')+'. Check final game-day availability.</p></aside><div class="st-injury-detail">';
  if(!starter)return output+C.empty('No players match these filters.')+'</div></div>';
@@ -766,11 +767,16 @@ function currentWeekCompare(){
   '<p>'+(x.def?opponentHtml(x.p,x.def,week):'<span class="st-tag">Matchup rating unavailable</span>')+'</p>'+
   comparisonRows(x)
  )).join('')+'</div>';
- if(chosen.length===1)return search+cards;
+ if(chosen.length===1)return search+cards+advancedComparison();
  const weeks=[...new Set(chosen.flatMap(p=>G(p,through).slice(-5).map(g=>g.week)))].sort((a,b)=>a-b);
  const graph=C.line({title:'Recent scoring comparison',labels:weeks.map(w=>'W'+w),
   series:chosen.map(p=>({name:p.name,values:weeks.map(w=>G(p,through).find(g=>g.week===w)?.points??null)})),area:false});
- return search+cards+panel('Recent scoring comparison','',graph);
+ return search+cards+panel('Recent scoring comparison','',graph)+advancedComparison();
+}
+function advancedComparison(){
+ if(rankedUsageError)return note('Advanced comparison data could not load. '+E(rankedUsageError),true)+'<button type="button" class="st-button" data-st-usage-retry>Retry advanced comparison</button>';
+ if(!rankedUsage){fetchRankedUsage();return '<div class="st-loading">Loading advanced comparison…</div>';}
+ return S.IntelligenceView.render({dataset,usage:rankedUsage,state,person,panel,face,logo,comparisonOnly:true});
 }
 function showCompareSuggestions(input){
  const index=Number(input.dataset.stCompareSearch);
@@ -1050,6 +1056,10 @@ section.addEventListener('input',e=>{if(e.target.id==='stGlobalSearch'){state.st
  const picker=e.target.closest('[data-st-compare-search]');if(picker){showCompareSuggestions(picker);return;}
  if(e.target.id!=='stScheduleSearch')return;
  const search=e.target.value.trim().toLowerCase();state.scheduleQuery=search;
+ const cursor=e.target.selectionStart;
+ render();
+ const field=section.querySelector('#stScheduleSearch');
+ if(field){field.focus({preventScroll:true});if(cursor!==null)field.setSelectionRange(cursor,cursor);}
  let count=0;
  section.querySelectorAll('#stScheduleRows tr').forEach(row=>{
   row.hidden=!!search&&!row.dataset.stScheduleName.includes(search);

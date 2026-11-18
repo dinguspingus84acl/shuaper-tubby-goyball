@@ -23,7 +23,7 @@
     {view:'weekly',label:'Weekly Report'}
   ];
   const groups=[
-    {id:'rankings',label:'Rankings',items:['HOME','ALL','QB','RB','WR','TE','MYGUYS','DND']},
+    {id:'rankings',label:'Rankings',items:['HOME','ALL','QB','RB','WR','TE','FLEX','MYGUYS','DND']},
     {id:'analytics',label:'Analytics',items:[...analyticsViews,'LIVESCORES','ESPN']},
     {id:'teams',label:'My Teams',items:['MYTEAMS','STOCK']},
     {id:'tools',label:'Tools',items:['SEARCH','MOCK','DEPTH','TRADE','COMMAND','WEATHER']}
@@ -56,6 +56,7 @@
     group.classList.add('is-open');
     group.querySelector('.shua-clean-trigger')?.setAttribute('aria-expanded','true');
     const popup=group.querySelector('.shua-clean-popup');if(popup)popup.hidden=false;
+    window.ShuaViewportMenus?.layout();
   }
 
   function populate(){

@@ -181,7 +181,7 @@ function idFor(p){return `${p.position.toLowerCase()}-${p.positionRank}-${norm(p
 function buildRows(kind){
   const key=kind==='MYGUYS'?'draft':'do-not-draft';
   let arr=rankPlayers.filter(p=>isTagged(p,key));
-  if(currentPos!=='ALL')arr=arr.filter(p=>p.position===currentPos);
+  if(currentPos!=='ALL')arr=arr.filter(p=>currentPos==='FLEX'?p.position!=='QB':p.position===currentPos);
   arr.sort((a,b)=>POSITIONS.indexOf(a.position)-POSITIONS.indexOf(b.position)||a.positionRank-b.positionRank);
   return arr;
 }
@@ -191,7 +191,7 @@ function ensureControls(){
   if(c)return c;
   c=document.createElement('div');
   c.id='taggedControls';c.className='tagged-controls';
-  c.innerHTML=`<button data-tagpos="ALL" class="active">All</button><button data-tagpos="QB">QB</button><button data-tagpos="RB">RB</button><button data-tagpos="WR">WR</button><button data-tagpos="TE">TE</button><span id="taggedCount" class="tagged-count"></span>`;
+  c.innerHTML=`<button data-tagpos="ALL" class="active">All</button><button data-tagpos="FLEX">FLEX</button><button data-tagpos="QB">QB</button><button data-tagpos="RB">RB</button><button data-tagpos="WR">WR</button><button data-tagpos="TE">TE</button><span id="taggedCount" class="tagged-count"></span>`;
   const anchor=document.getElementById('overallToggle');
   (anchor?.parentNode||document.querySelector('main'))?.insertBefore(c,anchor?anchor.nextSibling:null);
   c.querySelectorAll('[data-tagpos]').forEach(b=>b.onclick=()=>{

@@ -104,7 +104,7 @@ test('Selecting one player immediately displays stats; additional players add a 
  const compare=ui.slice(ui.indexOf('function currentWeekCompare(){'),ui.indexOf('function showCompareSuggestions('));
  assert.match(compare,/if\(!chosen\.length\)return search;/);
  assert.match(compare,/const cards=/);
- assert.match(compare,/if\(chosen\.length===1\)return search\+cards;/);
+ assert.match(compare,/if\(chosen\.length===1\)return search\+cards\+advancedComparison\(\);/);
  assert.match(compare,/return search\+cards\+panel\('Recent scoring comparison'/);
  assert.match(compare,/st-compare-selected/);
  assert.match(compare,/st-compare-selected-logo/);
@@ -117,6 +117,6 @@ test('Selecting one player immediately displays stats; additional players add a 
 });
 
 test('new Compare assets use fresh cache versions',()=>{
- assert.ok(html.includes('analytics-dashboard.js?v=20261114-compare-tap-layer-v4'));
- assert.match(read('analytics-dashboard.js'),/20261114-compare-tap-layer-v4/);
+ assert.ok(html.includes('analytics-dashboard.js?v=20261118-interface-fixes-v1'));
+ assert.match(read('analytics-dashboard.js'),/20261118-interface-fixes-v1/);
 });

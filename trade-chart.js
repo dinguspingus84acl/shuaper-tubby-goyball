@@ -15,13 +15,13 @@ const chooser=document.createElement('div');chooser.className='trade-chart-views
 chooser.innerHTML='<button class="trade-chart-view-btn" type="button" data-tcc-view="calculator" aria-pressed="true">Trade Calculator</button><button class="trade-chart-view-btn" type="button" data-tcc-view="chart" aria-pressed="false">Trade Chart</button>';
 shell.insertBefore(chooser,shell.firstChild);
 const panel=document.createElement('div');panel.id='tradeChartPanel';panel.hidden=true;
-panel.innerHTML='<div class="tcc-shell"><div class="tcc-tools"><div class="tcc-tools-search"><label for="tradeChartSearch">Find player</label><input id="tradeChartSearch" type="search" autocomplete="off" placeholder="Search this trade chart…"></div><div class="tcc-position-picker" role="group" aria-label="Chart positions">'+['ALL','RB','WR','TE','QB'].map(p=>'<button type="button" data-tcc-pos="'+p+'" aria-pressed="'+(p==='ALL')+'">'+(p==='ALL'?'All':p)+'</button>').join('')+'</div></div><p class="tcc-caption" id="tradeChartSourceInfo">Values use your Big Board and existing Trade Calculator scale. Loading rankings…</p><div id="tradeChartContent" class="tcc-status" role="status">Loading your rankings…</div></div>';
+panel.innerHTML='<div class="tcc-shell"><div class="tcc-tools"><div class="tcc-tools-search"><label for="tradeChartSearch">Find player</label><input id="tradeChartSearch" type="search" autocomplete="off" placeholder="Search this trade chart…"></div><div class="tcc-position-picker" role="group" aria-label="Chart positions">'+['ALL','FLEX','RB','WR','TE','QB'].map(p=>'<button type="button" data-tcc-pos="'+p+'" aria-pressed="'+(p==='ALL')+'">'+(p==='ALL'?'All':p)+'</button>').join('')+'</div></div><p class="tcc-caption" id="tradeChartSourceInfo">Values use your Big Board and existing Trade Calculator scale. Loading rankings…</p><div id="tradeChartContent" class="tcc-status" role="status">Loading your rankings…</div></div>';
 shell.append(panel);
 const nameLabels={RB:'RUNNING BACKS',WR:'WIDE RECEIVERS',TE:'TIGHT ENDS',QB:'QUARTERBACKS'};
 function source(){try{return window.ShuaTradeChartSource?.()||null;}catch(e){return null;}}
 function groupRows(players){
  const seen=new Set();
- const pool=players.filter(p=>positions.some(x=>x[0]===p.position)&&(pos==='ALL'||p.position===pos)&&number(p.value)!==null)
+ const pool=players.filter(p=>positions.some(x=>x[0]===p.position)&&(pos==='ALL'||(pos==='FLEX'?p.position!=='QB':p.position===pos))&&number(p.value)!==null)
  .filter(p=>{const id=key(p.name)+'|'+p.position;if(seen.has(id))return false;seen.add(id);return true;})
  .sort((a,b)=>b.value-a.value||a.rank-b.rank||a.positionRank-b.positionRank||a.name.localeCompare(b.name));
  const bands=[];
@@ -62,7 +62,7 @@ function render(){
  const previous=holder.querySelector('#tradeChartScroll');const oldX=previous?.scrollLeft||0;
  const src=source(),data=src?.players||[],mode=src?.mode||'PRESEASON';
  if(!data.length){holder.className='tcc-status';holder.textContent='Loading your published Big Board and positional rankings…';return;}
- const selected=positions.filter(x=>pos==='ALL'||x[0]===pos);
+ const selected=positions.filter(x=>pos==='ALL'||(pos==='FLEX'?x[0]!=='QB':x[0]===pos));
  const bands=groupRows(data);
  const count=bands.reduce((n,b)=>n+b.players.length,0);
  const info=document.getElementById('tradeChartSourceInfo');
@@ -70,7 +70,7 @@ function render(){
  ' · Same trade-value numbers as the calculator · 2026 PPR/G and FPOE are observed, not forecasts.';
  let html='<div class="tcc-paper"><div class="tcc-title-row"><h3 class="tcc-title"><em>SHUA TRADE CHART</em> &amp; RANKINGS</h3><div class="tcc-legend"><span><b class="tag-draft">Green</b> Your draft tag</span><span><b class="tag-avoid">Red</b> Your do-not-draft tag</span></div></div>';
  html+='<p class="tcc-subtitle">'+(mode==='ROS'?'REST OF SEASON':'PRESEASON')+' | 2026 PPR | Built from your rankings, not Kyle Menton’s. Chart columns: player, value, xFP Δ, FPG, FPOE/G.</p>';
- html+='<div class="tcc-scroll" id="tradeChartScroll" tabindex="0" role="region" aria-label="Trade values for running backs, wide receivers, tight ends and quarterbacks; swipe sideways on phones"><div class="tcc-table '+(pos==='ALL'?'':'tcc-one')+'">';
+ html+='<div class="tcc-scroll" id="tradeChartScroll" tabindex="0" role="region" aria-label="Trade values for running backs, wide receivers, tight ends and quarterbacks; swipe sideways on phones"><div class="tcc-table '+(pos==='ALL'||pos==='FLEX'?'':'tcc-one')+'">';
  html+='<div class="tcc-headers"><div class="tcc-haxis">VALUE</div>'+selected.map(([p])=>'<div class="tcc-hposition '+p.toLowerCase()+'">'+nameLabels[p]+'<span>PLAYER · VALUE · xFP Δ · FPG · FPOE</span></div>').join('')+'</div>';
  for(const band of bands){
   const label=band.high===band.low?format(band.high,1):format(band.high,1)+' – '+format(band.low,1);

@@ -111,21 +111,21 @@ function render(){
   status.textContent='Loading historical player directory…';results.innerHTML='<p class="shua-search-empty">Loading archived seasons…</p>';return;
  }
  const q=key(input.value),pool=mode==='current'?current():historical;
- const found=pool.filter(p=>!q||key(p.name).includes(q)).sort((a,b)=>{
+ const found=pool.filter(p=>q&&key(p.name).includes(q)).sort((a,b)=>{
   const x=key(a.name),y=key(b.name),ax=q?(x===q?0:x.startsWith(q)?1:2):0,ay=q?(y===q?0:y.startsWith(q)?1:2):0;
   return ax-ay||(mode==='current'?((a.rank||9999)-(b.rank||9999)):(b.lastYear||0)-(a.lastYear||0))||a.name.localeCompare(b.name);
  }).slice(0,35);
  syncInputAvatar(found[0]);
  shown=found;
- status.textContent=(mode==='historical'?'Archived NFL players (1999–2025)':'Current ranked players')+' · '+found.length+' results shown';
+ status.textContent=q?found.length+' results shown':'Search for a player by name';
  const prefixCount=q?found.filter(p=>key(p.name).startsWith(q)).length:0;
  results.innerHTML=found.length?found.map((p,i)=>
   (q&&i===0&&prefixCount?'<div class="shua-search-group-header">Closest matches</div>':'')+
   (q&&i===prefixCount&&prefixCount<found.length?'<div class="shua-search-group-header">Other matches</div>':'')+
   '<button type="button" class="shua-search-result" data-search-player="'+i+'">'+faceHtml(p)+'<span class="shua-search-result-copy"><strong>'+highlightedName(p.name,q)+'</strong><small class="shua-search-result-meta">'+
-  (p.team?teamLogo(p.team):'')+esc(p.position||'')+(p.team?' · '+esc(p.team):'')+(p.rank?' · Rank #'+p.rank:'')+(p.lastYear?' · Last season '+p.lastYear:'')+
+  (p.team?teamLogo(p.team):'')+esc(p.position||'')+(p.team?' · '+esc(p.team):'')+(p.lastYear?' · Last season '+p.lastYear:'')+
   '</small></span><span class="shua-search-chevron" aria-hidden="true">›</span></button>').join(''):
-  '<p class="shua-search-empty">No players found in this list.</p>';
+  '<p class="shua-search-empty">'+(q?'No players found in this list.':'Enter a player name to search.')+'</p>';
 }
 async function changeMode(next){
  mode=next==='historical'?'historical':'current';

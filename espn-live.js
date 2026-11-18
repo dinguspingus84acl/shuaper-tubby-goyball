@@ -487,7 +487,7 @@ section.innerHTML=`
     </div>
     <div class="espn-live-card">
     <div class="espn-live-head">
-        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div>PPR Pts</div><div class="espn-stat-bar-head">Compared to leader</div><div id="espnSelectedStatHead" class="espn-selected-stat-head">Stat</div>
+        <div>Rank</div><div>Player</div><div>Pos</div><div>Team</div><div>PPR Pts</div><div id="espnSelectedStatHead" class="espn-selected-stat-head">Stat</div>
       </div>
       <div id="espnLiveRows"><div class="espn-status">Open Stats to load rankings.</div></div>
     </div>
@@ -1767,7 +1767,6 @@ function render(){
       <div class="espn-pos">${p.position}</div>
       <div class="espn-team">${teamLogo(p.team)}<span>${p.team}</span></div>
       <div class="espn-points">${formatStat(p,'points')}</div>
-      <div class="espn-metric-track" aria-hidden="true"><span style="width:${percent}%"></span></div>
       <div class="espn-selected-stat">${formatStat(p,activeStat)}</div>
     </div>`;
   }).join('');

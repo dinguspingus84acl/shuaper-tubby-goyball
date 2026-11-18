@@ -2,14 +2,14 @@
 (function(root){
 'use strict';
 const S=root.ShuaStudio,I=S.Intelligence,C=S.Chart,{esc:E,fmt:F,num:N,games:G}=S;
-const views=[['breakouts','Breakouts'],['trades','Buy / sell'],['similar','Similarity'],['expected','Expected vs actual'],['rankings','Custom ranks & tiers'],['forecast','Forecast & odds'],['compare','Compare']];
+const views=[['breakouts','Breakouts'],['trades','Buy / sell'],['similar','Similarity'],['expected','Expected vs actual'],['rankings','Custom ranks & tiers'],['forecast','Forecast & odds']];
 const signed=(n,d=1,unit='')=>N(n)===null?'—':(n>0?'+':'')+F(n,d,unit);
-function render({dataset:ds,usage,state,person,panel,face,logo}){
+function render({dataset:ds,usage,state,person,panel,face,logo,comparisonOnly=false}){
  const rows=I.build(ds,usage),lookup=new Map(rows.map(r=>[r.p.key,r]));
- const pane=views.some(([id])=>id===state.intelView)?state.intelView:'breakouts';
- const current=state.intelPosition||'ALL',filtered=rows.filter(r=>current==='ALL'||r.p.position===current);
+ const pane=comparisonOnly?'compare':views.some(([id])=>id===state.intelView)?state.intelView:'breakouts';
+ const current=state.intelPosition||'ALL',filtered=rows.filter(r=>current==='ALL'||(current==='FLEX'?r.p.position!=='QB':r.p.position===current));
  const selector=(id,value,options,label)=>'<label class="st-intel-select"><span>'+E(label)+'</span><select id="'+id+'">'+options.map(([v,name])=>'<option value="'+E(v)+'"'+(value===v?' selected':'')+'>'+E(name)+'</option>').join('')+'</select></label>';
- const positionNav=()=>'<div class="st-intel-positions" role="group" aria-label="Filter positions">'+['ALL','QB','RB','WR','TE'].map(p=>'<button type="button" data-st-intel-position="'+p+'" aria-pressed="'+(current===p)+'">'+p+'</button>').join('')+'</div>';
+ const positionNav=()=>'<div class="st-intel-positions" role="group" aria-label="Filter positions">'+['ALL','FLEX','QB','RB','WR','TE'].map(p=>'<button type="button" data-st-intel-position="'+p+'" aria-pressed="'+(current===p)+'">'+p+'</button>').join('')+'</div>';
  const title='<div class="st-intel-header"><strong>Fantasy Intelligence</strong><span>2026 · ESPN PPR through W'+ds.latestWeek+' · '+usage.rankedPlayers+' ranked players</span></div>';
  const nav='<nav class="st-intel-nav" aria-label="Fantasy Intelligence features">'+views.map(([id,label])=>'<button type="button" data-st-intel-view="'+id+'" aria-pressed="'+(pane===id)+'">'+E(label)+'</button>').join('')+'</nav>';
  const tbl=(columns,items)=>'<div class="st-table-wrap st-intel-table"><table><thead><tr>'+columns.map(x=>'<th scope="col">'+E(x)+'</th>').join('')+'</tr></thead><tbody>'+items.join('')+'</tbody></table></div>';
@@ -75,8 +75,8 @@ function render({dataset:ds,usage,state,person,panel,face,logo}){
    note('Hit likelihoods are <strong>uncalibrated model estimates</strong> using a normal distribution around the projection with player scoring variability shrunk toward position peers; they are not guarantees, betting probabilities, or official ESPN forecasts.');
  }else if(pane==='compare'){
   const all=rows.slice().sort((a,b)=>a.p.name.localeCompare(b.p.name));
-  let chosen=(state.intelCompareKeys||[]).map(k=>lookup.get(k)).filter(Boolean);
-  if(!Array.isArray(state.intelCompareKeys))chosen=rows.filter(r=>r.n>=3).slice(0,2);
+  let chosen=(comparisonOnly?state.compare:state.intelCompareKeys||[]).map(k=>lookup.get(k)).filter(Boolean);
+  if(!comparisonOnly&&!Array.isArray(state.intelCompareKeys))chosen=rows.filter(r=>r.n>=3).slice(0,2);
   chosen=[...new Map(chosen.map(r=>[r.p.key,r])).values()].slice(0,4);
   const selectHtml='<div class="st-intel-compare-pickers">'+Array.from({length:4},(_,i)=>selector('stIntelCompare'+i,chosen[i]?.p.key||'',[['','None'],...all.map(r=>[r.p.key,r.p.name+' · '+r.p.position+' · '+r.p.team])],'Player '+(i+1))).join('')+'</div>';
   const comparison=[['Upcoming modeled PPR',r=>r.projection,1,''],['10+ point likelihood',r=>r.probabilities[10],0,'%'],['20+ point likelihood',r=>r.probabilities[20],0,'%'],
@@ -87,11 +87,11 @@ function render({dataset:ds,usage,state,person,panel,face,logo}){
   const headers=['Metric',...chosen.map(r=>r.p.name)];
   const comparisonTable=chosen.length?tbl(headers,comparison.map(([name,fn,d,unit])=>'<tr><th scope="row">'+E(name)+'</th>'+chosen.map(r=>'<td>'+F(fn(r),d,unit)+'</td>').join('')+'</tr>')):blank('Choose at least one player.');
   const weeks=[...new Set(chosen.flatMap(r=>r.gs.map(g=>g.week)))].sort((a,b)=>a-b);
-  content=selectHtml+panel('Advanced player comparison','Up to four players at any position, with matching stat definitions.',comparisonTable)+
-   (chosen.length>1?panel('Actual weekly PPR scoring','Recorded ESPN results only; missing appearances are not zeros.',C.line({title:'Comparison · observed PPR',labels:weeks.map(w=>'W'+w),series:chosen.map(r=>({name:r.p.name,values:weeks.map(w=>r.gs.find(g=>g.week===w)?.points??null)})),area:false})):'')+
+  content=(comparisonOnly?'':selectHtml)+panel('Advanced player comparison','Up to four players at any position, with matching stat definitions.',comparisonTable)+
+   (!comparisonOnly&&chosen.length>1?panel('Actual weekly PPR scoring','Recorded ESPN results only; missing appearances are not zeros.',C.line({title:'Comparison · observed PPR',labels:weeks.map(w=>'W'+w),series:chosen.map(r=>({name:r.p.name,values:weeks.map(w=>r.gs.find(g=>g.week===w)?.points??null)})),area:false})):'')+
    note('Comparable PPR scores are shown side by side, but target, route and rushing usage are role-specific. Projected scores and likelihoods share the disclosed model in Forecast & odds.');
  }
- return title+nav+'<div class="st-intel-view">'+content+source+'</div>';
+ return (comparisonOnly?'':title+nav)+'<div class="st-intel-view">'+content+source+'</div>';
 }
 S.IntelligenceView={render,views};
 })(globalThis);

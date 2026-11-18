@@ -16,14 +16,14 @@
   section.id='shuaLiveScores';
   section.hidden=true;
   section.setAttribute('aria-labelledby','liveScoresTitle');
-  section.innerHTML='<header class="ls-header"><div><h2 id="liveScoresTitle">Live Scores</h2><div id="lsPeriod">NFL · ESPN PPR</div></div><button type="button" id="lsRefresh">Refresh</button></header><p id="lsStatus" role="status"></p><div id="lsGames"></div>';
+  section.innerHTML='<header class="ls-header"><div><h2 id="liveScoresTitle">Live Scores</h2><div id="lsPeriod">NFL · ESPN PPR</div></div><label class="ls-week-picker">Week<select id="lsWeek" aria-label="Live Scores week"><option value="">Current week</option></select></label><button type="button" id="lsRefresh">Refresh</button></header><p id="lsStatus" role="status"></p><div id="lsGames"></div>';
   main.append(section);
   const period=section.querySelector('#lsPeriod');
   const status=section.querySelector('#lsStatus');
   const games=section.querySelector('#lsGames');
   const refreshButton=section.querySelector('#lsRefresh');
   const positions={1:'QB',2:'RB',3:'WR',4:'TE',5:'K',16:'D/ST'};
-  const positionOptions=['All','QB','RB','WR','TE','K/D'];
+  const positionOptions=['All','FLEX','QB','RB','WR','TE','K/D'];
   const gameViews=new Map();
   const statViews={
     QB:['Passing','Rushing'],
@@ -33,6 +33,7 @@
   };
   // ESPN stat IDs match the player card's game log.
   const statColumns={
+    FLEX:[['RUSH YDS',24],['REC YDS',42],['REC',53],['OFF TD',[4,25,43]]],
     All:[['PASS YDS',3],['RUSH YDS',24],['REC YDS',42],['OFF TD',[4,25,43]]],
     Passing:[['CMP',1],['PASS ATT',0],['PASS YDS',3],['PASS TD',4],['INT/FUM',[20,72]]],
     Rushing:[['RUSH ATT',23],['RUSH YDS',24],['RUSH TD',25]],
@@ -41,6 +42,8 @@
   };
   const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const clock=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+  const weekSelect=section.querySelector('#lsWeek');
+  let selectedPeriod='',selectionVersion=0,refreshPending=false;
   let scoreboard=null, fantasy=null, busy=false, visible=false, timer=null, lastStatsAttempt=0;
 
   async function json(url,headers){
@@ -109,7 +112,7 @@
   function playerStats(team,position,statView){
     const players=fantasy?.teams.get(String(team.id));
     const columns=statColumns[statView||position];
-    const rows=(players||[]).filter(p=>position==='All'||p.position===position||
+    const rows=(players||[]).filter(p=>position==='All'||(position==='FLEX'&&p.position!=='QB')||p.position===position||
       (position==='K/D'&&(p.position==='K'||p.position==='D/ST')))
       .map(p=>{
         const stats=columns.map(([,ids])=>{
@@ -168,14 +171,22 @@
   }
 
   async function refresh(force=false){
-    if(busy||!visible||document.hidden)return;
+    if(!visible||document.hidden)return;
+    if(busy){refreshPending=refreshPending||force;return;}
+    const version=selectionVersion;
     busy=true;
     refreshButton.disabled=true;
     if(!scoreboard)status.textContent='Loading NFL games…';
     try{
-      const next=await json('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?limit=100');
+      const params=selectedPeriod?'&dates='+selectedPeriod.split(':')[0]+'&seasontype=2&week='+selectedPeriod.split(':')[1]:'';
+      const next=await json('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?limit=100'+params);
+      if(version!==selectionVersion)return;
       if(!Array.isArray(next.events))throw Error('ESPN scoreboard unavailable');
       const year=Number(next.season?.year),week=Number(next.week?.number),type=Number(next.season?.type);
+      if(!selectedPeriod){
+        const lastWeek=type===2?Math.min(18,week):type===3?18:0;
+        weekSelect.innerHTML='<option value="">Current week'+(type===2?' · Week '+week:'')+'</option>'+Array.from({length:lastWeek},(_,i)=>lastWeek-i).map(w=>'<option value="'+year+':'+w+'">'+year+' · Week '+w+'</option>').join('');
+      }
       const periodKey=year+'-'+type+'-'+week;
       if(fantasy?.key!==periodKey)fantasy=null;
       scoreboard=next;
@@ -191,16 +202,19 @@
         lastStatsAttempt=Date.now();
         try{
           const teams=await getFantasy(year,week,type);
+          if(version!==selectionVersion)return;
           if(teams.size)fantasy={key:periodKey,teams};
           else status.textContent+=' · Waiting for ESPN fantasy stats';
-        }catch(_){status.textContent+=' · Fantasy stats delayed';}
+        }catch(_){if(version===selectionVersion)status.textContent+=' · Fantasy stats delayed';}
         renderGames();
       }
     }catch(_){
+      if(version!==selectionVersion)return;
       status.textContent=scoreboard?'ESPN scores delayed. Showing the last update.':'Unable to load ESPN scores. Try Refresh.';
     }finally{
       busy=false;
       refreshButton.disabled=false;
+      if(refreshPending){refreshPending=false;void refresh(true);}
     }
   }
 
@@ -224,6 +238,11 @@
     clearInterval(timer);
   }
 
+  weekSelect.addEventListener('change',()=>{
+    selectedPeriod=weekSelect.value;selectionVersion++;scoreboard=null;fantasy=null;lastStatsAttempt=0;gameViews.clear();
+    games.removeAttribute('data-rendered');games.replaceChildren();status.textContent='Loading selected week…';
+    void refresh(true);
+  });
   refreshButton.addEventListener('click',()=>void refresh(true));
   games.addEventListener('click',event=>{
     const nameButton=event.target.closest('[data-ls-player]');

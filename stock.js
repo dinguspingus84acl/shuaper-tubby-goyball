@@ -83,10 +83,10 @@ function combined(pos){const list=new Map();for(const p of players[pos])list.set
 function render(){
  section.dataset.stockFilter=filter;
  section.dataset.stockMode=mode;
- const groups=order.filter(pos=>filter==='ALL'||filter===pos);
+ const groups=order.filter(pos=>filter==='ALL'||(filter==='FLEX'?pos!=='QB':filter===pos));
  section.innerHTML='<div class="stock-top"><div><h2>Stock</h2><p class="stock-sub">'+(mode==='draft'?'2026 draft picks · Week 1 baseline':mode==='current'?'Drafted vs current ownership · Flaim snapshot':'Draft round vs actual 2026 full-PPR production')+'</p></div><span class="stock-count">'+denominator+' Teams</span></div>'+
- '<div class="stock-modes">'+[['draft','Draft Stock'],['current','Current Stock'],['performance','Performance']].map(([m,label])=>'<button type="button" data-stock-mode="'+m+'" aria-pressed="'+(mode===m)+'">'+label+'</button>').join('')+'</div>'+
- '<div class="stock-filters">'+['ALL',...order].map(pos=>'<button type="button" data-stock-position="'+pos+'" aria-pressed="'+(filter===pos)+'">'+pos+'</button>').join('')+'</div>'+
+ '<div class="stock-modes">'+[['draft','Draft Stock'],['current','Current Stock']].map(([m,label])=>'<button type="button" data-stock-mode="'+m+'" aria-pressed="'+(mode===m)+'">'+label+'</button>').join('')+'</div>'+
+ '<div class="stock-filters">'+['ALL','FLEX',...order].map(pos=>'<button type="button" data-stock-position="'+pos+'" aria-pressed="'+(filter===pos)+'">'+pos+'</button>').join('')+'</div>'+
  (metricError?'<p class="stock-sub">'+esc(metricError)+'</p>':'')+
  '<div class="stock-groups">'+groups.map(pos=>{
   const list=mode==='draft'?players[pos]:combined(pos).filter(p=>mode==='performance'?(p.leagues?.length||0)>0:(p.current?.length||0)>0||(p.leagues?.length||0)>0);

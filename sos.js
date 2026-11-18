@@ -43,6 +43,7 @@
     const parts=(document.getElementById('pm')?.textContent||'').split('·').map(t=>t.trim());
     const position=parts[parts.length-1]||'';
     if(!name)return;
+    window.shuaScheduleProfileReturn={name,position,team:parts[parts.length-2]||'',id:modal.dataset.id||'',year:modal.dataset.unifiedYear||2026};
     document.getElementById('close')?.click();
     try{
       if(window.ShuaStudioLoader?.load)await window.ShuaStudioLoader.load();

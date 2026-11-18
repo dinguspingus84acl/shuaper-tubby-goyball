@@ -31,7 +31,9 @@
     toggle.id='shuaBoardOptions';
     toggle.type='button';
     toggle.setAttribute('aria-controls','teamControls overallToggle');
-    toggle.setAttribute('aria-expanded','false');
+    toggle.setAttribute('aria-expanded','true');
+    body.classList.add('shua-board-options-open');
+    toggle.hidden=true;
     toggle.innerHTML='<span>Board Settings</span><small id="shuaBoardSummary"></small><span aria-hidden="true">⌄</span>';
     teamControls.insertAdjacentElement('beforebegin',toggle);
     function updateBoardSummary(){
@@ -82,13 +84,8 @@
       header.dataset.shuaInfo='1';
       const desc=header.querySelector(':scope > div > p');
       if(!desc||!desc.textContent.trim())return;
-      const disclosure=document.createElement('details');
-      disclosure.className='shua-chart-info';
-      const summary=document.createElement('summary');
-      summary.textContent='i';
-      summary.setAttribute('aria-label','About this chart');
-      disclosure.append(summary,desc);
-      header.append(disclosure);
+      // Short chart descriptions are already readable inline; no disclosure needed.
+      desc.classList.add('shua-inline-description');
     });
   }
   function attachAnalytics(){

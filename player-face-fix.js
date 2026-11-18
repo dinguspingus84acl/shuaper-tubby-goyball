@@ -3,6 +3,8 @@
 (()=>{
   'use strict';
   const verifiedIds=Object.freeze({
+    michaelpittman:'4035687',
+    marvinharrison:'4432708',
     lutherburden:'4685278',
     chrisgodwin:'3116165',
     kcconcepcion:'4870653',

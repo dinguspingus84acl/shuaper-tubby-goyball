@@ -27,19 +27,6 @@
   options.setAttribute('aria-controls',panel.id);
   options.setAttribute('aria-label','Toggle Big Board settings');
 
-  const close=()=>{
-    document.body.classList.remove('shua-board-options-open');
-    options.setAttribute('aria-expanded','false');
-  };
-  panel.addEventListener('click',event=>{
-    if(event.target.closest('[data-teams],[data-view]'))requestAnimationFrame(close);
-  });
-  document.addEventListener('click',event=>{
-    if(document.body.classList.contains('shua-board-options-open')&&!head.contains(event.target))close();
-  });
-  document.addEventListener('keydown',event=>{
-    if(event.key==='Escape'&&document.body.classList.contains('shua-board-options-open')){
-      close();options.focus();
-    }
-  });
+  options.remove();
+  document.body.classList.add('shua-board-options-open');
 })();

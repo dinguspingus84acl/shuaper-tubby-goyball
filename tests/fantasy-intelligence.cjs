@@ -83,16 +83,20 @@ const render=context.ShuaStudio.IntelligenceView.render;
 const presentation={dataset:ds,usage,person:p=>'<button>'+context.ShuaStudio.esc(p.name)+'</button>',
  panel:(title,subtitle,body)=>'<section><h3>'+title+'</h3>'+body+'</section>',
  face:()=>'',logo:()=>''};
-for(const pane of ['breakouts','trades','similar','expected','rankings','forecast','compare']){
+for(const pane of ['breakouts','trades','similar','expected','rankings','forecast']){
  const output=render({...presentation,state:{intelView:pane}});
  assert.ok(output.includes('Fantasy Intelligence')&&output.includes('st-intel-nav'),'View failed to render '+pane);
  assert.ok(!output.includes('could not render'),'View error '+pane);
  if(pane==='expected')assert.ok(output.includes('Expected vs actual'),'Missing weekly xFP graph');
  if(pane==='forecast')assert.ok(output.includes('10+ chance')&&output.includes('25+ chance'),'Missing score probabilities');
  if(pane==='rankings')assert.ok(output.includes('data-st-intel-weight'),'Ranking weights not configurable');
- if(pane==='compare')assert.ok(output.includes('stIntelCompare3'),'Four-way comparison unavailable');
+
 }
-for(const marker of ['breakouts','trades','similar','expected','rankings','forecast','compare'])assert.ok(view.includes("['"+marker+"'"),'Missing feature view '+marker);
+for(const marker of ['breakouts','trades','similar','expected','rankings','forecast'])assert.ok(view.includes("['"+marker+"'"),'Missing feature view '+marker);
+const comparison=render({...presentation,state:{compare:rows.slice(0,2).map(r=>r.p.key)},comparisonOnly:true});
+assert.ok(comparison.includes('Advanced player comparison'),'Advanced comparison missing');
+assert.ok(!comparison.includes('st-intel-nav')&&!comparison.includes('stIntelCompare'),'Moved comparison must use Compare selections');
+assert.ok(ui.includes('advancedComparison()')&&ui.includes('comparisonOnly:true'),'Comparison not integrated in Compare');
 for(const marker of ['data-st-intel-view','data-st-intel-position','data-st-intel-trade','data-st-intel-rankmode','data-st-intel-weight','stIntelCompare'])assert.ok(ui.includes(marker),'Missing view control wiring '+marker);
 for(const file of ['analytics/intelligence.js','analytics/intelligence-view.js'])assert.ok(loader.includes(file),'Lazy loader missing '+file);
 assert.ok(ui.includes('Expected vs actual PPR'),'Player Performance lacks expected-vs-actual chart');

@@ -108,11 +108,11 @@ body.shua-clean #mockSection .pool-player>span[data-id]>b{flex:0 1 auto!importan
 body.shua-clean #mockSection .pool-meta{flex:0 0 auto!important;display:flex!important;align-items:center!important;gap:5px!important;margin-top:0!important;font-size:11px!important;line-height:1.2!important}
 body.shua-clean #mockSection .mock-player-team{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 body.shua-clean #mockSection .mock-player-team img{width:17px;height:17px;object-fit:contain}
-body.shua-clean #mockSection #draftBoard{grid-template-columns:repeat(var(--mock-team-count),140px)!important}
-body.shua-clean #mockSection #draftBoard .drafted{display:grid!important;grid-template-rows:minmax(0,1fr) 12px 12px!important;gap:3px!important;height:76px!important;min-height:76px!important;padding:6px!important;align-content:start!important}
+body.shua-clean #mockSection #draftBoard{grid-template-columns:repeat(var(--mock-team-count),132px)!important}
+body.shua-clean #mockSection #draftBoard .drafted{display:grid!important;grid-template-rows:minmax(0,1fr) 12px 20px!important;gap:2px!important;height:82px!important;min-height:82px!important;padding:6px!important;align-content:start!important}
 body.shua-clean #mockSection #draftBoard .drafted .name{grid-row:1;position:static!important;transform:none!important;margin:0!important;padding:0!important;min-width:0!important;max-width:100%!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;white-space:normal!important;overflow-wrap:anywhere!important;overflow:hidden!important;font-size:12px!important;line-height:1.2!important;-webkit-line-clamp:2!important}
 body.shua-clean #mockSection #draftBoard .drafted .team{grid-row:2;position:static!important;transform:none!important;margin:0!important;font-size:10px!important}
-body.shua-clean #mockSection #draftBoard .drafted .slot{grid-row:3;position:static!important;transform:none!important;justify-self:start!important;width:max-content!important;max-width:100%;margin:0!important;font-size:10px!important;line-height:1.2!important}
+body.shua-clean #mockSection #draftBoard .drafted .slot{grid-row:3;position:static!important;transform:none!important;justify-self:start!important;width:max-content!important;max-width:100%;height:20px!important;min-height:20px!important;min-width:40px!important;padding:3px 6px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;border-radius:999px!important;box-sizing:border-box!important;margin:0!important;font-size:10px!important;line-height:12px!important}
 body.shua-clean #mockSection .mock-team-grid .roster-card{display:grid!important;grid-template-columns:36px 28px minmax(0,1fr) 38px!important;align-items:center!important;gap:5px!important;padding:4px 7px!important;min-height:46px!important;height:auto!important}
 body.shua-clean #mockSection .mock-team-grid .roster-card>.photo{position:static!important;transform:none!important;width:36px!important;height:36px!important;flex-basis:36px!important}
 body.shua-clean #mockSection .mock-team-grid .lineup-slot,
@@ -139,7 +139,7 @@ body.shua-clean #mockSection #draftBoard .drafted.shua-round-even{
   border-top-color:#557c88!important;
 }
 body.shua-clean #mockSection #draftBoard .drafted .shua-pick-watermark{
-  position:absolute;z-index:0;right:3px;bottom:4px;width:76px;height:76px;
+  position:absolute;z-index:0;right:6px;bottom:6px;width:32px;height:32px;
   max-width:61%;object-fit:contain;opacity:.23;pointer-events:none;
   filter:drop-shadow(0 2px 3px #020e1a8c);
 }

@@ -14,7 +14,7 @@ const rolling=(a,n)=>a.map((v,i)=>i<n-1?null:vals(a.slice(i-n+1,i+1)).length===n
 const pct=(n,d)=>num(n)!==null&&num(d)!==null&&d>0?n/d*100:null;
 const fmt=(v,d=1,suffix='')=>num(v)===null?'—':Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})+suffix;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const canonicalTeam=v=>{let s=String(v||'').trim().replace(/^(@|vs\.?\s*)/i,'').toUpperCase();return ({GNB:'GB',KAN:'KC',LVR:'LV',OAK:'LV',NWE:'NE',NOR:'NO',SFO:'SF',TAM:'TB',JAC:'JAX',WSH:'WAS',LA:'LAR',STL:'LAR',SD:'LAC'})[s]||s;};
+const canonicalTeam=v=>{let s=String(v||'').trim().replace(/^(@|vs\.?\s*)/i,'').trim().toUpperCase();return ({GNB:'GB',KAN:'KC',LVR:'LV',OAK:'LV',NWE:'NE',NOR:'NO',SFO:'SF',TAM:'TB',JAC:'JAX',WSH:'WAS',LA:'LAR',STL:'LAR',SD:'LAC'})[s]||s;};
 const teams={ARI:'Arizona Cardinals',ATL:'Atlanta Falcons',BAL:'Baltimore Ravens',BUF:'Buffalo Bills',CAR:'Carolina Panthers',CHI:'Chicago Bears',CIN:'Cincinnati Bengals',CLE:'Cleveland Browns',DAL:'Dallas Cowboys',DEN:'Denver Broncos',DET:'Detroit Lions',GB:'Green Bay Packers',HOU:'Houston Texans',IND:'Indianapolis Colts',JAX:'Jacksonville Jaguars',KC:'Kansas City Chiefs',LAC:'Los Angeles Chargers',LAR:'Los Angeles Rams',LV:'Las Vegas Raiders',MIA:'Miami Dolphins',MIN:'Minnesota Vikings',NE:'New England Patriots',NO:'New Orleans Saints',NYG:'New York Giants',NYJ:'New York Jets',PHI:'Philadelphia Eagles',PIT:'Pittsburgh Steelers',SEA:'Seattle Seahawks',SF:'San Francisco 49ers',TB:'Tampa Bay Buccaneers',TEN:'Tennessee Titans',WAS:'Washington Commanders'};
 const positions=['QB','RB','WR','TE'];
 const played=g=>g&&g.hasStats!==false&&num(g.points??g.totalPoints)!==null;

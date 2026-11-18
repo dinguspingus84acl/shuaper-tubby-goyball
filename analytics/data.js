@@ -57,7 +57,14 @@ async function load(year){return memo('season:'+year,async()=>{
  let manifest={};try{manifest=await json('analytics/manifest.json',{cache:'no-store'});}catch(e){}
  const stored=manifest.datasets?.[year]?await json(manifest.datasets[year],{cache:'no-store'}).catch(()=>null):null;
  const freshSchedule=year===YEAR?await schedule(year).catch(()=>null):null;
- const sched=Object.keys(freshSchedule||{}).length?freshSchedule:stored?.schedule||await schedule(year).catch(()=>({}));let players=[],source='ESPN actual statistics',warnings=[];
+ const sched=JSON.parse(JSON.stringify(stored?.schedule||{}));
+ for(const [team,weeks] of Object.entries(freshSchedule||await schedule(year).catch(()=>({})))){
+  sched[team]||={};
+  for(const [week,game] of Object.entries(weeks)){
+   if(game.known||!sched[team][week]?.known)sched[team][week]=game;
+  }
+ }
+ let players=[],source='ESPN actual statistics',warnings=[];
  if(stored?.players?.length){players=stored.players.map(p=>normalise(p,sched));source=stored.source;warnings=stored.warnings||[];}
  else
  if(year<YEAR){const local=await json('legacy-stats/'+year+'.json',{cache:'force-cache'});players=(Array.isArray(local)?local:local.rows||[]).map(p=>normalise(p,sched));source='nflverse · site historical archive';}

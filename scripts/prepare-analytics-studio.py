@@ -44,8 +44,9 @@ for year in [2024,2025,2026]:
    for week in range(1,19):
     g=t.get('proGamesByScoringPeriod',{}).get(str(week),[]);g=g[0] if isinstance(g,list) and g else g
     h=g.get('homeProTeamId',g.get('homeTeamId')) if g else None;a=g.get('awayProTeamId',g.get('awayTeamId')) if g else None
-    opp=TEAMS.get(a if h==t['id'] else h) if g else 'BYE'
-    sched[code][str(week)]={'week':week,'opponent':opp or '—','home':h==t['id'],'bye':not bool(g),'known':bool(opp)}
+    opp=TEAMS.get(a if h==t['id'] else h) if g else None
+    bye=not g and t.get('byeWeek')==week
+    sched[code][str(week)]={'week':week,'opponent':opp or ('BYE' if bye else '—'),'home':h==t['id'],'bye':bye,'known':bool(opp) or bye}
   sources.append('ESPN pro-team schedules')
  except Exception as e:issues.append('Schedule: '+str(e))
  try:

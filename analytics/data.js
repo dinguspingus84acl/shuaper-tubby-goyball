@@ -14,7 +14,7 @@ async function schedule(year){return memo('schedule:'+year,async()=>{
  const result={};
  if(list.length&&list.some(t=>t.weeks)){for(const t of list){const team=T(t.team);if(!S.teams[team])continue;result[team]={};for(const [w,o] of Object.entries(t.weeks)){result[team][w]={week:+w,opponent:T(o),home:/^vs/.test(o),bye:o==='BYE',known:!!S.teams[T(o)]||o==='BYE'};}}return result;}
  let raw;for(const host of ['https://lm-api-reads.fantasy.espn.com','https://fantasy.espn.com']){try{raw=await json(host+'/apis/v3/games/ffl/seasons/'+year+'?view=proTeamSchedules_wl');if((raw?.settings?.proTeams||raw?.proTeams)?.length)break;}catch(e){}}
- const ts=raw?.settings?.proTeams||raw?.proTeams||[];for(const t of ts){const team=ids[t.id];if(!team)continue;result[team]={};for(let w=1;w<=18;w++){let g=t.proGamesByScoringPeriod?.[w];g=Array.isArray(g)?g[0]:g;const home=g&&(g.homeProTeamId??g.homeTeamId),away=g&&(g.awayProTeamId??g.awayTeamId);const opp=g?(+home===+t.id?ids[away]:+away===+t.id?ids[home]:ids[g.opponentProTeamId]):null;result[team][w]={week:w,opponent:opp||(!g?'BYE':'—'),home:+home===+t.id,bye:!g,known:!!opp||!g};}}
+ const ts=raw?.settings?.proTeams||raw?.proTeams||[];for(const t of ts){const team=ids[t.id];if(!team)continue;result[team]={};for(let w=1;w<=18;w++){let g=t.proGamesByScoringPeriod?.[w];g=Array.isArray(g)?g[0]:g;const home=g&&(g.homeProTeamId??g.homeTeamId),away=g&&(g.awayProTeamId??g.awayTeamId);const opp=g?(+home===+t.id?ids[away]:+away===+t.id?ids[home]:ids[g.opponentProTeamId]):null;const bye=!g&&Number(t.byeWeek)===w;result[team][w]={week:w,opponent:opp||(bye?'BYE':'—'),home:+home===+t.id,bye,known:!!opp||bye};}}
  return result;
  });}
 function normalise(p,sched){const team=T(p.team||ids[p.proTeamId]),gms=(p.games||[]).filter(g=>g.hasStats!==false&&num(g.totalPoints??g.points)!==null&&g.week>0&&g.week<=18).map(g=>{const opponent=T(g.opponent),inferred=sched[opponent]?.[g.week]?.opponent;return {...g,week:+g.week,points:num(g.totalPoints??g.points),team:T(g.team||((S.teams[inferred])?inferred:team)),opponent};}).sort((a,b)=>a.week-b.week);return {...p,key:key(p.name),id:String(p.id||''),name:p.name,team,position:String(p.position||'').toUpperCase(),headshot:p.headshot||p.headshots?.[0]||(/^\d+$/.test(String(p.id||''))?'https://a.espncdn.com/i/headshots/nfl/players/full/'+p.id+'.png':''),games:gms};}
@@ -56,7 +56,8 @@ async function loadWeekly(dataset,previous){
 async function load(year){return memo('season:'+year,async()=>{
  let manifest={};try{manifest=await json('analytics/manifest.json',{cache:'no-store'});}catch(e){}
  const stored=manifest.datasets?.[year]?await json(manifest.datasets[year],{cache:'no-store'}).catch(()=>null):null;
- const sched=stored?.schedule||await schedule(year).catch(()=>({}));let players=[],source='ESPN actual statistics',warnings=[];
+ const freshSchedule=year===YEAR?await schedule(year).catch(()=>null):null;
+ const sched=Object.keys(freshSchedule||{}).length?freshSchedule:stored?.schedule||await schedule(year).catch(()=>({}));let players=[],source='ESPN actual statistics',warnings=[];
  if(stored?.players?.length){players=stored.players.map(p=>normalise(p,sched));source=stored.source;warnings=stored.warnings||[];}
  else
  if(year<YEAR){const local=await json('legacy-stats/'+year+'.json',{cache:'force-cache'});players=(Array.isArray(local)?local:local.rows||[]).map(p=>normalise(p,sched));source='nflverse · site historical archive';}

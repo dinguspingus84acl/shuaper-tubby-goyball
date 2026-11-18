@@ -1025,7 +1025,7 @@ function opponentLabel(proTeamId,week,year=SEASON){
   const team=schedule.find(t=>Number(t.id)===Number(proTeamId));
   const games=team?.proGamesByScoringPeriod?.[String(week)]||team?.proGamesByScoringPeriod?.[week]||[];
   const g=Array.isArray(games)?games[0]:games;
-  if(!g)return 'BYE';
+  if(!g)return team&&Number(team.byeWeek)===Number(week)?'BYE':'—';
   const home=Number(g.homeProTeamId??g.homeTeamId??g.home?.proTeamId??g.home?.teamId??0);
   const away=Number(g.awayProTeamId??g.awayTeamId??g.away?.proTeamId??g.away?.teamId??0);
   let opp=0,prefix='';

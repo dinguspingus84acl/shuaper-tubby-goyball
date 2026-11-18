@@ -1323,8 +1323,9 @@ function gameLogPointsClass(g,mode,position){
   const pts=categoryPoints(g,mode,position);
   if(pts===null||!Number.isFinite(Number(pts)))return '';
   const n=Number(pts);
-  if(n<10)return ' gl-pts-low';
-  const greenThreshold=['RB','WR','TE'].includes(String(position||'').toUpperCase())?20:25;
+  const pos=String(position||'').toUpperCase();
+  if(n<(pos==='QB'?15:10))return ' gl-pts-low';
+  const greenThreshold=pos==='QB'?20:['RB','WR','TE'].includes(pos)?15:25;
   return n>greenThreshold?' gl-pts-high':' gl-pts-mid';
 }
 function gameLogFinishKey(player,year){

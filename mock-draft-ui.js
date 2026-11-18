@@ -100,16 +100,17 @@
   `;
   style.textContent += `
 body.shua-clean #mockSection .mock-filters{justify-content:center!important;align-items:center!important;gap:7px!important;padding:6px 0!important;margin:0!important}
-body.shua-clean #mockSection .mock-filters .pool-filter{width:40px!important;height:40px!important;min-height:40px!important;flex:0 0 40px!important;border-radius:50%!important}
+body.shua-clean #mockSection .mock-filters .pool-filter{width:40px!important;height:40px!important;min-height:40px!important;flex:0 0 40px!important;border-radius:50%!important;display:grid!important;place-items:center!important;text-align:center!important;line-height:1!important}
 body.shua-clean #mockSection .pool-player{grid-template-columns:36px minmax(0,1fr) 54px!important;grid-template-areas:'photo player action'!important;gap:10px!important;min-height:58px!important;padding:8px 10px!important}
 body.shua-clean #mockSection .pool-player>.photo{width:36px!important;height:36px!important}
-body.shua-clean #mockSection .pool-player>span[data-id]{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center;gap:8px}
-body.shua-clean #mockSection .pool-player>span[data-id]>b{white-space:normal!important;font-size:14px!important;line-height:1.2!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-body.shua-clean #mockSection .pool-meta{display:flex!important;align-items:center!important;gap:5px!important;margin-top:0!important;font-size:11px!important;line-height:1.2!important}
+body.shua-clean #mockSection .pool-player>span[data-id]{display:flex!important;align-items:center;justify-content:flex-start;gap:6px}
+body.shua-clean #mockSection .pool-player>span[data-id]>b{flex:0 1 auto!important;min-width:0!important;white-space:normal!important;font-size:14px!important;line-height:1.2!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+body.shua-clean #mockSection .pool-meta{flex:0 0 auto!important;display:flex!important;align-items:center!important;gap:5px!important;margin-top:0!important;font-size:11px!important;line-height:1.2!important}
 body.shua-clean #mockSection .mock-player-team{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 body.shua-clean #mockSection .mock-player-team img{width:17px;height:17px;object-fit:contain}
-body.shua-clean #mockSection #draftBoard .drafted{display:grid!important;grid-template-rows:minmax(48px,1fr) auto auto!important;gap:4px!important;height:auto!important;min-height:96px!important;padding:7px!important;align-content:start!important}
-body.shua-clean #mockSection #draftBoard .drafted .name{grid-row:1;position:static!important;transform:none!important;margin:0!important;padding:0!important;min-width:0!important;max-width:100%!important;display:block!important;white-space:normal!important;overflow-wrap:anywhere!important;overflow:visible!important;font-size:12px!important;line-height:1.2!important;-webkit-line-clamp:unset!important}
+body.shua-clean #mockSection #draftBoard{grid-template-columns:repeat(var(--mock-team-count),140px)!important}
+body.shua-clean #mockSection #draftBoard .drafted{display:grid!important;grid-template-rows:minmax(0,1fr) 12px 12px!important;gap:3px!important;height:76px!important;min-height:76px!important;padding:6px!important;align-content:start!important}
+body.shua-clean #mockSection #draftBoard .drafted .name{grid-row:1;position:static!important;transform:none!important;margin:0!important;padding:0!important;min-width:0!important;max-width:100%!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;white-space:normal!important;overflow-wrap:anywhere!important;overflow:hidden!important;font-size:12px!important;line-height:1.2!important;-webkit-line-clamp:2!important}
 body.shua-clean #mockSection #draftBoard .drafted .team{grid-row:2;position:static!important;transform:none!important;margin:0!important;font-size:10px!important}
 body.shua-clean #mockSection #draftBoard .drafted .slot{grid-row:3;position:static!important;transform:none!important;justify-self:start!important;width:max-content!important;max-width:100%;margin:0!important;font-size:10px!important;line-height:1.2!important}
 body.shua-clean #mockSection .mock-team-grid .roster-card{display:grid!important;grid-template-columns:36px 28px minmax(0,1fr) 38px!important;align-items:center!important;gap:5px!important;padding:4px 7px!important;min-height:46px!important;height:auto!important}

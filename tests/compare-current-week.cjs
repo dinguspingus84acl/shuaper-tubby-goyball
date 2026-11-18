@@ -117,6 +117,6 @@ test('Selecting one player immediately displays stats; additional players add a 
 });
 
 test('new Compare assets use fresh cache versions',()=>{
- assert.ok(html.includes('analytics-dashboard.js?v=20261118-player-fixes-v2'));
- assert.match(read('analytics-dashboard.js'),/20261118-player-fixes-v2/);
+ assert.ok(html.includes('analytics-dashboard.js?v=20261118-usage-complete-v3'));
+ assert.match(read('analytics-dashboard.js'),/20261118-usage-complete-v3/);
 });

@@ -1,5 +1,5 @@
 /* The header uses the same star artwork as the homepage. */
-body.shua-clean #shuaCleanNav .shua-clean-brand{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;min-width:44px;width:44px;height:44px;padding:0!important;margin:0;border:0;background:transparent;box-shadow:none;cursor:pointer;text-shadow:none}
+body.shua-clean #shuaCleanNav .shua-clean-brand{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:44px;width:auto;height:44px;gap:9px;padding:0!important;margin:0;border:0;background:transparent;box-shadow:none;cursor:pointer;text-shadow:none}
 body.shua-clean #shuaCleanNav .shua-clean-brand::before{content:none!important;display:none!important}
 body.shua-clean #shuaCleanNav .shua-brand-star{display:block;width:44px;height:44px;object-fit:contain}
 body.shua-clean #shuaCleanNav .shua-clean-brand:focus-visible{outline:2px solid #6dbfea;outline-offset:3px;border-radius:8px}
@@ -21,3 +21,5 @@ body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-tab
 body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-table thead th{background:#143449;color:#e7f6ff}
 body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-table tr:nth-child(even){background:#18354a55}
 body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-note,body.shua-clean #shuaAnalyticsSection[data-active-view="startsit"] .st-intel-source{color:#a4bdce;font-size:12px;line-height:1.45}
+
+body.shua-clean #shuaCleanNav .shua-brand-name{font-size:17px;font-weight:950;letter-spacing:.06em;color:#f3fbff;line-height:1;white-space:nowrap}

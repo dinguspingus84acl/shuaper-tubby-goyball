@@ -99,6 +99,12 @@ for year in [2024,2025,2026]:
    status=r.get('report_status','');p['availability'][str(w)]={'status':status,'detail':r.get('report_primary_injury',''),'source':'nflverse weekly injury report','date':r.get('date_modified','')};count+=1
   sources.append(f'nflverse injury reports ({count} matched reports)')
  except Exception as e:issues.append('Injury feed: '+str(e))
+ # Current weekly IDs include rookies and full names absent from legacy seasons.
+ try:
+  identities=csv_rows(f'https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_{year}.csv.gz')
+  for r in identities:
+   if r.get('player_id') and r.get('player_display_name'):gsis[r['player_id']]=key(r['player_display_name'])
+ except Exception as e:issues.append('Player identity feed: '+str(e))
  try:
   pbp=csv_rows(f'https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_{year}.csv.gz');included=set();counts=defaultdict(lambda:{'redZone':0,'inside10':0});seen_ids={}
   for r in pbp:

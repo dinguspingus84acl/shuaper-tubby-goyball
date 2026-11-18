@@ -279,7 +279,7 @@ function fetchRankedUsage(){
  if(rankedUsage||rankedUsagePending||rankedUsageError)return;
  rankedUsagePending=true;
  Promise.all([
-  S.Data.json('analytics/data/ranked-usage-2026.json?v=20261118-player-fixes-v2',{cache:'no-store'}),
+  S.Data.json('analytics/data/ranked-usage-2026.json?v=20261118-usage-complete-v3',{cache:'no-store'}),
   S.Data.json('analytics/data/expected-weekly-2026.json?v=20261026-fantasy-intelligence9',{cache:'no-store'})
  ]).then(([data,weekly])=>{
   if(data.schema!==1||data.season!==2026||!data.players)throw new Error('Invalid ranked-player usage snapshot');

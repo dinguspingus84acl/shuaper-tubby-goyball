@@ -7,7 +7,7 @@ const aliases={lutherburdeniii:'lutherburden',kevincolemanjr:'kevincoleman',stet
 const key=name=>{const s=String(name||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');return aliases[s]||s;};
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let snapshotPromise=null,scheduled=false,currentName='';
-const data=()=>snapshotPromise||(snapshotPromise=fetch('analytics/data/ranked-usage-2026.json?v=20261118-interface-fixes-v1',{cache:'force-cache'})
+const data=()=>snapshotPromise||(snapshotPromise=fetch('analytics/data/ranked-usage-2026.json?v=20261118-usage-complete-v3',{cache:'force-cache'})
  .then(r=>{if(!r.ok)throw new Error('Usage data unavailable');return r.json();})
  .then(d=>{if(d.schema!==1||d.season!==2026||!d.players)throw new Error('Unsupported usage data');return d;})
  .catch(e=>{snapshotPromise=null;throw e;}));

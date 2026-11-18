@@ -15,6 +15,16 @@ for(const name of ['jamescook','travisetienne','chrisgodwin','aaronjones','deebo
 }
 assert.equal(generated.rankedPlayers,Object.keys(generated.players).length);
 assert.equal(snapshot.rankedPlayers,generated.rankedPlayers);
+// These suffix variants previously lost receiving and advanced imports.
+for(const name of ['jamescook','olliegordon','aaronjones']){
+ for(const field of ['redZoneOpportunities','highValueTouches','routesRun','routeParticipation',
+  'targetsPerRouteRun','yardsPerRouteRun','airYardsShare','aDOT','expectedFantasyPointsPerGame',
+  'fantasyPointsOverExpected','redZoneTargetShare','insideFiveCarryShare','insideTenTargets',
+  'deepTargetRate','receivingFirstDownsPerRoute','yardsAfterContactPerCarry',
+  'expectedFantasyPointsTrend','endZoneTargets','targetShareTrend',
+  'fantasyPointsPerOpportunity','explosivePlayRate','rushingSuccessRate'])
+  assert.ok(Number.isFinite(snapshot.players[name][field]),name+' missing sourced '+field);
+}
 // Menus must stay inside both a desktop viewport and a small zoomed viewport.
 for(const [width,height,rect] of [[1360,900,{left:1000,top:10,bottom:52}],[360,300,{left:260,top:250,bottom:292}],[240,200,{left:180,top:10,bottom:40}]]){
  const properties={},menu={style:{getPropertyValue:k=>properties[k],setProperty:(k,v)=>properties[k]=v},parentElement:{querySelector:()=>({getBoundingClientRect:()=>rect})},querySelectorAll:()=>Array(10)};

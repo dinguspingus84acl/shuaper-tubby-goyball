@@ -48,3 +48,18 @@ body.shua-clean #modal #unifiedGameLogPanel {
     font-size:clamp(15px,4.35vw,16px)!important;
   }
 }
+
+/* Give QB passing totals and completions separate, predictable columns. */
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) :is(th,td) {
+  padding-left:3px!important;
+  padding-right:3px!important;
+}
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) :is(th,td):first-child { width:8%!important; }
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) :is(th,td):nth-child(2) { width:18%!important; }
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-pts { width:16%!important;font-size:16px!important; }
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-completions { width:12%!important; }
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-passAtt { width:12%!important; }
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-passYds { width:14%!important; }
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-passTD { width:8%!important; }
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) .gl-col-turnovers { width:12%!important; }
+body.shua-clean #modal #unifiedGameLogPanel .espn-game-log-table:has(.gl-col-completions) td.gl-pts::before { content:none; }

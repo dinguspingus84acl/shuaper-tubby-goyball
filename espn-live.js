@@ -1253,7 +1253,7 @@ function gameLogColumns(mode,position){
  if(mode==='pass')return cols.concat([
   {label:'CMP',key:'completions'},{label:'ATT',key:'passAtt'},
   {label:'YDS',key:'passYds'},{label:'TD',key:'passTD'},
-  {label:'INT/FUM',key:'turnovers'}
+  {label:'I/F',key:'turnovers'}
  ]);
  if(mode==='rush')return cols.concat([
   {label:'ATT',key:'rushAtt'},{label:'YDS',key:'rushYds'},

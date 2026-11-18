@@ -1056,7 +1056,7 @@ async function attachGameLogSnapRates(player,year,games){
   const id=String(player?.id||''),normalized=nameKey(player?.name||'');
   const season=ds?.players?.find(p=>id&&String(p.id)===id)||
     ds?.players?.find(p=>nameKey(p.name)===normalized);
-  matches=(season?.games||[]).filter(g=>g.hasStats!==false);
+  matches=season?.games||[];
  }else if(Number(year)>=2013&&window.ShuaPlayerHistory?.getWeeklySnapRates){
   matches=await window.ShuaPlayerHistory.getWeeklySnapRates(player?.name,year,player?.position).catch(()=>[]);
  }
@@ -1419,6 +1419,29 @@ function snapRateHtml(name,year,years,games,{embedded=false}={}){
  return heading+summary+(known.length?'':'<div class="espn-game-log-empty">Snap percentages are unavailable for this season.</div>')+table+info;
 }
 let snapRenderCounter=0;
+async function completeSnapWeeks(player,year,games){
+ const dataset=Number(year)===SEASON?await getCurrentSeasonSnapDataset():null;
+ const season=dataset?.players?.find(p=>nameKey(p.name)===nameKey(player.name));
+ const team=season?.team||player.team;
+ const teams=await fetchProSchedule(year);
+ const scheduleTeam=teams.find(t=>TEAM_BY_ID[t.id]===team);
+ const byWeek=new Map(games.map(g=>[Number(g.week),g]));
+ const totalWeeks=Number(year)>=2021?18:17;
+ return Array.from({length:totalWeeks},(_,i)=>{
+  const week=i+1,record=byWeek.get(week);
+  const matchup=dataset?.schedule?.[team]?.[week];
+  const opponent=record?.opponent&&record.opponent!=='—'?record.opponent:
+   matchup?.opponent||opponentLabel(scheduleTeam?.id,week,year);
+  if(record?.hasStats!==false&&record)return {...record,opponent};
+  // A missing player row is zero only when the source records team snaps
+  // for that same completed game. Future and unavailable data stay blank.
+  const teamGame=dataset?.players?.flatMap(p=>p.games||[]).find(g=>
+   g.team===team&&Number(g.week)===week&&Number(g.teamSnaps)>0);
+  const bye=matchup?.bye||opponent==='BYE';
+  const zero=!!teamGame&&!bye;
+  return {...record,week,opponent,snapCount:zero?0:null,snapRate:zero?0:null};
+ });
+}
 async function renderSnapRatesData(name,target,explicitYear=null,{embedded=false}={}){
  if(!target)return;
  const token=String(++snapRenderCounter);
@@ -1452,6 +1475,7 @@ async function renderSnapRatesData(name,target,explicitYear=null,{embedded=false
     games=await fetchGameLog(player,year).catch(()=>[]);
    }
   }
+  games=await completeSnapWeeks(player,year,games);
   if(target.dataset.snapRenderToken!==token)return;
   target.innerHTML=snapRateHtml(name,year,years,games,{embedded});
   colorGameLogMatchups(target,year,player.position);

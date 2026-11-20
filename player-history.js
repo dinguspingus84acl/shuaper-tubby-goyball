@@ -18,7 +18,7 @@ const seasonBoardCache=new Map();
 const playerWeekCache=new Map();
 const weekBoardCache=new Map();
 const snapSeasonCache=new Map();
-const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+const norm=s=>{const key=String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');return key==='lutherburdeniii'?'lutherburden':key;};
 
 const style=document.createElement('style');
 style.id='playerHistoryStyles';

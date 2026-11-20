@@ -4,7 +4,7 @@
 if(typeof profile!=='function'||!document.getElementById('modal'))return;
 
 const baseProfile=profile;
-const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+const norm=s=>{const key=String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');return key==='lutherburdeniii'?'lutherburden':key;};
 const ROS_ALIASES={chigoziemokonkwo:'chigokonkwo',chigokonkwo:'chigoziemokonkwo'};
 const COMPACT_PROFILE_V2=true; // ROLLBACK: change to false to restore the original player-card view.
 const PROFILE_BIO_OVERRIDES={

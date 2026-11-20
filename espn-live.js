@@ -1068,8 +1068,8 @@ async function completePointWeeks(games,year,player){
 let currentSeasonSnapPromise=null;
 function getCurrentSeasonSnapDataset(){
  if(!currentSeasonSnapPromise)currentSeasonSnapPromise=
-  fetch('analytics/data/season-2026.json',{cache:'force-cache'})
-   .then(r=>{if(!r.ok)throw Error('No weekly snap source');return r.json()}).catch(()=>null);
+  fetch('analytics/data/season-2026.json?v=20261120-snap-refresh-v2',{cache:'no-store'})
+   .then(r=>{if(!r.ok)throw Error('No weekly snap source');return r.json()}).catch(()=>{currentSeasonSnapPromise=null;return null;});
  return currentSeasonSnapPromise;
 }
 async function attachGameLogSnapRates(player,year,games){

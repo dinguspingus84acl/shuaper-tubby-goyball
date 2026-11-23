@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "generatedAt": "2026-11-23T07:54:20Z",
+  "generatedAt": "2026-11-23T20:22:47Z",
   "weatherSource": "https://mysportsweather.com/nfl",
   "scheduleSource": "MySportsWeather",
   "games": [
@@ -22,61 +22,61 @@
       "city": "Landover, MD",
       "indoor": false,
       "forecast": {
-        "tempF": 56,
-        "precipPct": 15,
+        "tempF": 57,
+        "precipPct": 10,
         "precipType": "Rain",
         "windMph": 9,
-        "gustMph": 17,
+        "gustMph": 18,
         "windDirection": "NW",
         "hourly": [
           {
             "time": "7 PM",
             "inGame": false,
-            "sky": "partly",
-            "precipPct": 22,
-            "tempF": 58,
+            "sky": "sun",
+            "precipPct": 19,
+            "tempF": 60,
             "windMph": 9,
-            "gustMph": 17,
+            "gustMph": 21,
             "windDirection": "NW"
           },
           {
             "time": "8 PM",
             "inGame": true,
             "sky": "sun",
-            "precipPct": 15,
-            "tempF": 56,
+            "precipPct": 6,
+            "tempF": 57,
             "windMph": 9,
-            "gustMph": 17,
+            "gustMph": 18,
             "windDirection": "NW"
           },
           {
             "time": "9 PM",
             "inGame": true,
             "sky": "sun",
-            "precipPct": 5,
-            "tempF": 54,
+            "precipPct": 8,
+            "tempF": 55,
             "windMph": 9,
-            "gustMph": 16,
+            "gustMph": 20,
             "windDirection": "NW"
           },
           {
             "time": "10 PM",
             "inGame": true,
             "sky": "sun",
-            "precipPct": 2,
-            "tempF": 52,
+            "precipPct": 10,
+            "tempF": 53,
             "windMph": 9,
-            "gustMph": 16,
+            "gustMph": 18,
             "windDirection": "NW"
           },
           {
             "time": "11 PM",
             "inGame": false,
             "sky": "sun",
-            "precipPct": 2,
+            "precipPct": 7,
             "tempF": 50,
             "windMph": 9,
-            "gustMph": 16,
+            "gustMph": 17,
             "windDirection": "NW"
           }
         ],
@@ -84,47 +84,47 @@
           {
             "time": "7 PM",
             "inGame": false,
-            "precipPct": 3,
+            "precipPct": 7,
             "tempF": 58,
-            "windMph": 9,
-            "gustMph": 17,
-            "windDirection": "NW"
+            "windMph": 10,
+            "gustMph": 20,
+            "windDirection": "NNW"
           },
           {
             "time": "8 PM",
             "inGame": true,
-            "precipPct": 3,
-            "tempF": 55,
-            "windMph": 9,
-            "gustMph": 17,
-            "windDirection": "NW"
+            "precipPct": 6,
+            "tempF": 56,
+            "windMph": 10,
+            "gustMph": 19,
+            "windDirection": "NNW"
           },
           {
             "time": "9 PM",
             "inGame": true,
-            "precipPct": 2,
-            "tempF": 53,
+            "precipPct": 7,
+            "tempF": 54,
             "windMph": 9,
-            "gustMph": 17,
-            "windDirection": "NW"
+            "gustMph": 18,
+            "windDirection": "NNW"
           },
           {
             "time": "10 PM",
             "inGame": true,
-            "precipPct": 2,
+            "precipPct": 3,
             "tempF": 52,
             "windMph": 9,
             "gustMph": 17,
-            "windDirection": "NW"
+            "windDirection": "NNW"
           },
           {
             "time": "11 PM",
             "inGame": false,
-            "precipPct": 1,
+            "precipPct": 2,
             "tempF": 50,
-            "windMph": 9,
+            "windMph": 10,
             "gustMph": 17,
-            "windDirection": "NW"
+            "windDirection": "NNW"
           }
         ],
         "sourceUrl": "https://mysportsweather.com/nfl#match-cin-was"

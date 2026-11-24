@@ -442,8 +442,8 @@ function ensureUi(){
 function syncForPlayer(){
   if(!ensureUi())return;
   loadData().then(()=>{
-    if(customMode==='dynasty')renderDynasty();
-    else if(customMode==='profile')renderProfileTab();
+    if(customMode==='dynasty'){setCustomTab('dynasty');renderDynasty();}
+    else if(customMode==='profile'){setCustomTab('profile');renderProfileTab();}
   }).catch(()=>{});
 }
 const modal=document.getElementById('modal');

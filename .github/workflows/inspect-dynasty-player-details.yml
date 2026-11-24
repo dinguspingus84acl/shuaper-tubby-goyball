@@ -1,0 +1,35 @@
+name: Inspect Dynasty player details API
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/inspect-dynasty-player-details.yml'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect headers and sample
+        run: |
+          set -e
+          URL='https://dynasty-daddy.com/api/v1/player/details/joshallenqb'
+          echo '--- HEADERS ---'
+          curl -sS -D - -o /tmp/details.json "$URL" | head -40
+          echo '--- SIZE ---'
+          wc -c /tmp/details.json
+          echo '--- KEYS / SAMPLE ---'
+          python - <<'PY'
+          import json
+          j=json.load(open('/tmp/details.json'))
+          print(type(j).__name__)
+          if isinstance(j,dict):
+              print('keys',list(j.keys()))
+              for k,v in j.items():
+                  if isinstance(v,list):
+                      print(k,'list',len(v),'sample',v[:2])
+                  elif isinstance(v,dict):
+                      print(k,'dict keys',list(v.keys())[:40])
+                  else:
+                      print(k,type(v).__name__,str(v)[:500])
+          PY

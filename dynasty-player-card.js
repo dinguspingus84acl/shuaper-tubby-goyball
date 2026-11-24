@@ -388,7 +388,6 @@ if(modal){
     requestAnimationFrame(ensureUi);
   }).observe(modal,{attributes:true,attributeFilter:['data-unified-name','class'],subtree:false});
 }
-new MutationObserver(()=>requestAnimationFrame(syncForPlayer)).observe(document.body,{childList:true,subtree:true});
 ensureUi();
 syncForPlayer();
 window.ShuaDynastyPlayerCard={show:showDynasty,refresh(){data=null;cachePromise=null;return loadData().then(()=>{if(dynastyActive)renderPanel();});}};

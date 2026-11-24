@@ -6,7 +6,7 @@ if(!toggle||toggle.querySelector('[data-posview="DYNASTY"]'))return;
 
 const DATA_FILE='dynasty-rankings.json';
 const allowed=new Set(['QB','RB','WR','TE']);
-let mode='1QB',dataset=null,pending=null;
+let mode='1QB',rookiesOnly=false,dataset=null,pending=null;
 
 const norm=v=>typeof N==='function'?N(v):String(v||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const relaxed=v=>norm(v).replace(/(jr|sr|ii|iii|iv)$/,'');
@@ -23,7 +23,7 @@ const formatBar=document.createElement('div');
 formatBar.id='dynastyFormatToggle';
 formatBar.className='dynasty-format-toggle';
 formatBar.hidden=true;
-formatBar.innerHTML='<span>Dynasty</span><button type="button" data-dynasty-format="1QB" class="active">1QB</button><button type="button" data-dynasty-format="SF">Superflex</button><span class="dynasty-updated" id="dynastyUpdated"></span>';
+formatBar.innerHTML='<span>Dynasty</span><button type="button" data-dynasty-format="1QB" class="active">1QB</button><button type="button" data-dynasty-format="SF">Superflex</button><button type="button" data-dynasty-rookies="1">Rookies</button><span class="dynasty-updated" id="dynastyUpdated"></span>';
 toggle.insertAdjacentElement('afterend',formatBar);
 
 const style=document.createElement('style');
@@ -37,8 +37,8 @@ function setHeaders(isDynasty){
  th[1].textContent='Player';
  th[2].textContent='Position';
  th[3].textContent='Team';
- th[4].textContent=isDynasty?'Dynasty Value':'ESPN ADP';
- th[5].textContent=isDynasty?'Overall':'Notes';
+ th[4].textContent=isDynasty?'Value':'ESPN ADP';
+ th[5].textContent=isDynasty?'Rank':'Notes';
 }
 
 function localMaps(){
@@ -126,9 +126,11 @@ function renderDynasty(){
 
  const list=dataset.players
    .filter(r=>String(r.position||'').toUpperCase()===position)
+   .filter(r=>!rookiesOnly||r.rookie===true)
    .map(r=>({r,...fields(r)}))
    .filter(x=>x.rank!==null&&x.rank>0)
    .sort((a,b)=>a.rank-b.rank||((b.value??-1)-(a.value??-1))||String(a.r.name||'').localeCompare(String(b.r.name||'')));
+ const displayRank=new Map(list.map((x,i)=>[x.r,i+1]));
 
  rows.innerHTML=list.map(x=>{
    const p=x.r;
@@ -138,13 +140,14 @@ function renderDynasty(){
    const pos=String(p.position||local?.position||position).toUpperCase();
    const photo=typeof pic==='function'?pic(name,'',team,pos):'<span class="photo fallback">'+esc(name.slice(0,2).toUpperCase())+'</span>';
    const id=local?.id?' data-id="'+esc(local.id)+'"':'';
-   return '<tr class="dynasty-rank-row"'+id+'>'+
-     '<td class="rank">#'+x.rank+'</td>'+
-     '<td><div class="photo-cell">'+photo+'<div class="rank-player-copy"><b>'+esc(name)+'</b><span class="phone-rank-meta">'+(typeof teamMini==='function'?teamMini(team):'')+'<span>'+esc(team)+' · '+esc(pos)+' · '+esc(x.label)+' #'+x.rank+'</span></span></div></div></td>'+
+   const shownRank=rookiesOnly?displayRank.get(p):x.rank;
+   return '<tr class="dynasty-rank-row"'+id+'>
+     '<td class="rank">#'+shownRank+'</td>'+
+     '<td><div class="photo-cell">'+photo+'<div class="rank-player-copy"><b>'+esc(name)+'</b><span class="phone-rank-meta">'+(typeof teamMini==='function'?teamMini(team):'')+'<span>'+esc(pos)+'</span></span></div></div></td>'+
      '<td><span class="badge">'+esc(pos)+'</span></td>'+
      '<td>'+esc(team)+'</td>'+
      '<td><span class="dynasty-value">'+(x.value===null?'—':Math.round(x.value).toLocaleString())+'</span><span class="dynasty-source-note">'+esc(x.label)+'</span></td>'+
-     '<td>#'+(x.overall??'—')+'<span class="dynasty-source-note">Overall dynasty</span></td>'+
+     '<td>#'+(x.overall??'—')+'</td>'+
    '</tr>';
  }).join('')||'<tr class="dynasty-error"><td colspan="6">No dynasty rankings found for this position.</td></tr>';
 
@@ -169,16 +172,25 @@ dynastyBtn.addEventListener('click',()=>{
 });
 
 formatBar.addEventListener('click',e=>{
- const b=e.target.closest('[data-dynasty-format]');
- if(!b)return;
- mode=b.dataset.dynastyFormat==='SF'?'SF':'1QB';
- formatBar.querySelectorAll('[data-dynasty-format]').forEach(x=>x.classList.toggle('active',x===b));
- renderDynasty();
+ const formatButton=e.target.closest('[data-dynasty-format]');
+ if(formatButton){
+   mode=formatButton.dataset.dynastyFormat==='SF'?'SF':'1QB';
+   formatBar.querySelectorAll('[data-dynasty-format]').forEach(x=>x.classList.toggle('active',x===formatButton));
+   renderDynasty();
+   return;
+ }
+ const rookieButton=e.target.closest('[data-dynasty-rookies]');
+ if(rookieButton){
+   rookiesOnly=!rookiesOnly;
+   rookieButton.classList.toggle('active',rookiesOnly);
+   renderDynasty();
+ }
 });
 
 window.ShuaDynastyRankings={
  file:DATA_FILE,
  get format(){return mode;},
+ get rookiesOnly(){return rookiesOnly;},
  refresh(){dataset=null;return loadData().then(renderDynasty);}
 };
 })();

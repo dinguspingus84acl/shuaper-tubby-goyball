@@ -118,9 +118,9 @@ function changePct(current,old){
   if(!current||!old)return null;
   return (current-old)/old*100;
 }
-function historyFor(p){
+function historyFor(p,days=rangeDays){
   const rows=data?.history?.players?.[p.name_id]||[];
-  const cutoff=Date.now()-rangeDays*86400000;
+  const cutoff=Date.now()-days*86400000;
   return rows.map(r=>({
     date:r.date,
     time:new Date(r.date).getTime(),
@@ -202,7 +202,17 @@ function combineMap(profile){
   return out;
 }
 function renderValue(panel,p){
-  const f=valueFields(p),hist=historyFor(p),chg=changePct(f.value,f.lastMonth);
+  const f=valueFields(p),hist=historyFor(p),hist90=historyFor(p,90);
+  const values90=hist90.map(x=>x.value).filter(v=>v!==null);
+  const ranks90=hist90.map(x=>x.rank).filter(v=>v!==null&&v>0);
+  const target30=Date.now()-30*86400000;
+  const ref30=hist90.length?hist90.reduce((best,x)=>Math.abs(x.time-target30)<Math.abs(best.time-target30)?x:best,hist90[0]):null;
+  const lastMonth=f.lastMonth??ref30?.value??null;
+  const high90=f.high90??(values90.length?Math.max(...values90):null);
+  const low90=f.low90??(values90.length?Math.min(...values90):null);
+  const best90=f.best90??(ranks90.length?Math.min(...ranks90):null);
+  const worst90=f.worst90??(ranks90.length?Math.max(...ranks90):null);
+  const chg=changePct(f.value,lastMonth);
   panel.innerHTML=
     '<div class="dpc-summary">'+
       metric('Dynasty Value',int(f.value))+
@@ -212,10 +222,10 @@ function renderValue(panel,p){
     '</div>'+
     '<div class="dpc-card"><div class="dpc-title"><strong>Value History</strong><div class="dpc-range"><button data-dpc-range="30" class="'+(rangeDays===30?'active':'')+'">30D</button><button data-dpc-range="90" class="'+(rangeDays===90?'active':'')+'">90D</button></div></div><div class="dpc-chart-wrap">'+svgLine(hist)+'</div></div>'+
     '<div class="dpc-card"><div class="dpc-title"><strong>Market Range</strong></div><div class="dpc-metrics">'+
-      metric('90D High',int(f.high90))+
-      metric('90D Low',int(f.low90))+
-      metric('90D Best Rank',rank(f.best90))+
-      metric('90D Worst Rank',rank(f.worst90))+
+      metric('90D High',int(high90))+
+      metric('90D Low',int(low90))+
+      metric('90D Best Rank',rank(best90))+
+      metric('90D Worst Rank',rank(worst90))+
       metric('All-Time High',int(f.allHigh))+
       metric('All-Time Low',int(f.allLow))+
       metric('All-Time Best Rank',rank(f.allBest))+

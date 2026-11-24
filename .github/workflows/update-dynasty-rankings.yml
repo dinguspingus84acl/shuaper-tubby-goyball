@@ -35,6 +35,17 @@ jobs:
             'https://api.sleeper.app/v1/players/nfl' \
             -o /tmp/sleeper-players.json
 
+      - name: Inspect pick rows
+        run: |
+          python - <<'PY'
+          import json
+          raw=json.load(open('/tmp/dynasty-daddy.json'))
+          rows=[r for r in raw if str((r or {}).get('position') or '').upper() not in {'QB','RB','WR','TE'}]
+          print('NON_PLAYER_COUNT',len(rows))
+          for r in rows[:120]:
+              print(json.dumps(r, sort_keys=True))
+          PY
+
       - name: Validate and build Goyball dynasty dataset
         run: |
           python - <<'PY'

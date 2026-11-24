@@ -35,7 +35,7 @@ const formatBar=document.createElement('div');
 formatBar.id='dynastyFormatToggle';
 formatBar.className='dynasty-format-toggle';
 formatBar.hidden=true;
-formatBar.innerHTML='<button type="button" data-dynasty-format="1QB" class="active">1QB</button><button type="button" data-dynasty-format="SF">Superflex</button><button type="button" data-dynasty-rookies="1">Rookies</button><button type="button" data-dynasty-include-picks="1">Picks</button>';
+formatBar.innerHTML='<button type="button" data-dynasty-superflex="1">Superflex</button><button type="button" data-dynasty-rookies="1">Rookies</button><button type="button" data-dynasty-include-picks="1">Picks</button>';
 toggle.insertAdjacentElement('afterend',formatBar);
 
 const style=document.createElement('style');
@@ -49,7 +49,8 @@ style.textContent=`
 .dynasty-pick-avatar{background:#183d63!important;border-color:#ffffff45!important;font-size:.72rem!important}
 .dynasty-pick-name{color:#fff}
 @media(max-width:650px){
- .phone-mode .dynasty-format-toggle{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;margin:8px 0!important;padding-bottom:2px!important;scrollbar-width:none}
+ .phone-mode .dynasty-format-toggle[hidden]{display:none!important}
+ .phone-mode .dynasty-format-toggle:not([hidden]){display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;margin:8px 0!important;padding-bottom:2px!important;scrollbar-width:none}
  .phone-mode .dynasty-format-toggle::-webkit-scrollbar{display:none}
  .phone-mode .dynasty-format-toggle>*{flex:0 0 auto}
  .phone-mode #tableCard tbody tr.dynasty-rank-row{grid-template-columns:40px minmax(0,1fr)!important}
@@ -251,10 +252,10 @@ picksNav.addEventListener('click',e=>{
 });
 
 formatBar.addEventListener('click',e=>{
- const formatButton=e.target.closest('[data-dynasty-format]');
- if(formatButton){
-   mode=formatButton.dataset.dynastyFormat==='SF'?'SF':'1QB';
-   formatBar.querySelectorAll('[data-dynasty-format]').forEach(x=>x.classList.toggle('active',x===formatButton));
+ const superflexButton=e.target.closest('[data-dynasty-superflex]');
+ if(superflexButton){
+   mode=mode==='SF'?'1QB':'SF';
+   superflexButton.classList.toggle('active',mode==='SF');
    renderDynasty();
    window.dispatchEvent(new CustomEvent('shua:dynasty-format-change',{detail:{format:mode}}));
    return;

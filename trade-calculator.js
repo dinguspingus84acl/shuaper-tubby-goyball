@@ -111,7 +111,7 @@ function sideHtml(side,label){
   return '<div class="trade-side">'+
     '<div class="trade-side-head"><h3>'+label+'</h3><span id="tradeTotal-'+side+'" class="trade-total">0.0</span></div>'+
     '<div class="trade-search-wrap">'+
-      '<input id="tradeSearch-'+side+'" class="trade-search" type="search" autocomplete="off" placeholder="Add a player…">'+
+      '<input id="tradeSearch-'+side+'" class="trade-search" type="search" autocomplete="off" placeholder="Add a player or pick…">'+
       '<div id="tradeResults-'+side+'" class="trade-results"></div>'+
     '</div>'+
     '<div id="tradeList-'+side+'" class="trade-list"></div>'+
@@ -205,14 +205,16 @@ function packageWeight(p,index){
   return q*.25;
 }
 function packageBaseFor(players){
-  // The best asset counts fully. Extra assets are discounted by roster cost,
-  // but elite secondary pieces retain much more value than mid/depth pieces.
+  // Dynasty mode uses the published dynasty market values directly.
+  if(tradeMode==='DYNASTY')return players.reduce((total,p)=>total+p.value,0);
+  // The redraft/preseason modes keep Goyball's existing package discounting.
   return [...players]
     .sort((a,b)=>b.value-a.value)
     .reduce((total,p,i)=>total+p.value*packageWeight(p,i),0);
 }
 function packageBase(side){return packageBaseFor(state[side]);}
 function consolidationInfo(topCount=state.left.length,bottomCount=state.right.length){
+  if(tradeMode==='DYNASTY')return {premiumSide:null,premium:0,label:''};
   let premiumSide=null,premium=0,label='';
   if(topCount===1&&bottomCount===2){premiumSide='left';premium=.06;label='2-for-1 stud premium'}
   else if(bottomCount===1&&topCount===2){premiumSide='right';premium=.06;label='2-for-1 stud premium'}
@@ -332,12 +334,12 @@ function updateVerdict(){
   renderBalanceSuggestion();
   const lp=total?a/total*100:50;
   ml.style.width=lp+'%';mr.style.width=(100-lp)+'%';
-  document.getElementById('tradeCompareLeft').textContent=a.toFixed(1);
-  document.getElementById('tradeCompareRight').textContent=b.toFixed(1);
+  document.getElementById('tradeCompareLeft').textContent=formatTradeValue(a);
+  document.getElementById('tradeCompareRight').textContent=formatTradeValue(b);
   const center=document.getElementById('tradeCenterDelta');
   const comparison=document.getElementById('tradeComparisonMeter');
   comparison.setAttribute('aria-label','Top side '+a.toFixed(1)+' versus bottom side '+b.toFixed(1));
-  center.textContent=state.left.length&&state.right.length?(Math.abs(a-b)<=.05?'Even':'Difference '+Math.abs(a-b).toFixed(1)):'Add players';
+  center.textContent=state.left.length&&state.right.length?(Math.abs(a-b)<=.05?'Even':'Difference '+formatTradeValue(Math.abs(a-b))):'Add assets';
   if(!state.left.length||!state.right.length){
     verdict.textContent='Add players to both sides';
     edge.textContent='';

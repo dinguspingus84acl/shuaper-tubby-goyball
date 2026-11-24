@@ -3,7 +3,7 @@
 
 /* The older phone layout hides main>.head, which also hid the real ROS /
    Pre Season controls after they were moved beside the ranking title. */
-body.shua-clean.phone-mode:has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"])) main>.head {
+body.shua-clean.phone-mode:has(.positions .pos.active:is([data-pos="QB"],[data-pos="RB"],[data-pos="WR"],[data-pos="TE"],[data-pos="FLEX"])) main>.head {
   display:flex!important;
   align-items:center!important;
   justify-content:space-between!important;

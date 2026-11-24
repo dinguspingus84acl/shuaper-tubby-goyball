@@ -6,6 +6,7 @@ if(!toggle||toggle.querySelector('[data-posview="DYNASTY"]'))return;
 
 const DATA_FILE='dynasty-rankings.json';
 const allowed=new Set(['QB','RB','WR','TE']);
+const dynastyScopes=new Set(['ALL','FLEX','QB','RB','WR','TE']);
 let mode='1QB',rookiesOnly=false,dataset=null,pending=null;
 
 const norm=v=>typeof N==='function'?N(v):String(v||'').toLowerCase().replace(/[^a-z0-9]/g,'');
@@ -98,7 +99,7 @@ function fields(r){
 }
 
 function renderDynasty(){
- if(typeof positionView==='undefined'||positionView!=='DYNASTY'||typeof position==='undefined'||!allowed.has(position))return;
+ if(typeof positionView==='undefined'||positionView!=='DYNASTY'||typeof position==='undefined'||!dynastyScopes.has(position))return;
  formatBar.hidden=false;
  setHeaders(true);
 
@@ -109,7 +110,7 @@ function renderDynasty(){
  const sub=document.getElementById('sub');
  if(boardEl)boardEl.hidden=true;
  if(card)card.hidden=false;
- if(title)title.textContent=position+' Dynasty Rankings';
+ if(title)title.textContent=(position==='ALL'?'Overall':position)+' Dynasty Rankings';
  if(sub)sub.textContent='Goyball dynasty rankings · sourced from Dynasty Daddy';
  if(!rows)return;
 
@@ -124,12 +125,22 @@ function renderDynasty(){
  const updated=document.getElementById('dynastyUpdated');
  if(updated)updated.textContent=formatUpdated(dataset.updated_at);
 
+ const combined=position==='ALL'||position==='FLEX';
  const list=dataset.players
-   .filter(r=>String(r.position||'').toUpperCase()===position)
+   .filter(r=>{
+     const p=String(r.position||'').toUpperCase();
+     if(position==='ALL')return allowed.has(p);
+     if(position==='FLEX')return allowed.has(p)&&p!=='QB';
+     return p===position;
+   })
    .filter(r=>!rookiesOnly||r.rookie===true)
-   .map(r=>({r,...fields(r)}))
-   .filter(x=>x.rank!==null&&x.rank>0)
-   .sort((a,b)=>a.rank-b.rank||((b.value??-1)-(a.value??-1))||String(a.r.name||'').localeCompare(String(b.r.name||'')));
+   .map(r=>{
+     const base=fields(r);
+     const sortRank=combined?base.overall:base.rank;
+     return {r,...base,sortRank};
+   })
+   .filter(x=>x.sortRank!==null&&x.sortRank>0)
+   .sort((a,b)=>a.sortRank-b.sortRank||((b.value??-1)-(a.value??-1))||String(a.r.name||'').localeCompare(String(b.r.name||'')));
  const displayRank=new Map(list.map((x,i)=>[x.r,i+1]));
 
  rows.innerHTML=list.map(x=>{
@@ -140,7 +151,7 @@ function renderDynasty(){
    const pos=String(p.position||local?.position||position).toUpperCase();
    const photo=typeof pic==='function'?pic(name,'',team,pos):'<span class="photo fallback">'+esc(name.slice(0,2).toUpperCase())+'</span>';
    const id=local?.id?' data-id="'+esc(local.id)+'"':'';
-   const shownRank=rookiesOnly?displayRank.get(p):x.rank;
+   const shownRank=(position==='ALL'&&!rookiesOnly)?x.overall:((position==='FLEX'||rookiesOnly)?displayRank.get(p):x.rank);
    return '<tr class="dynasty-rank-row"'+id+'>'+
      '<td class="rank">#'+shownRank+'</td>'+
      '<td><div class="photo-cell">'+photo+'<div class="rank-player-copy"><b>'+esc(name)+'</b><span class="phone-rank-meta">'+(typeof teamMini==='function'?teamMini(team):'')+'<span>'+esc(team)+' · '+esc(pos)+'</span></span></div></div></td>'+
@@ -158,7 +169,9 @@ if(typeof render==='function'){
  const baseRender=render;
  render=function(){
    baseRender();
-   const active=typeof positionView!=='undefined'&&positionView==='DYNASTY'&&typeof position!=='undefined'&&allowed.has(position);
+   const eligible=typeof position!=='undefined'&&dynastyScopes.has(position);
+   const active=typeof positionView!=='undefined'&&positionView==='DYNASTY'&&eligible;
+   if(toggle&&eligible)toggle.hidden=false;
    formatBar.hidden=!active;
    setHeaders(active);
    if(active)renderDynasty();

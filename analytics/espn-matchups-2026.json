@@ -1,74 +1,74 @@
 {
-  "fetchedAt": "2026-11-23T23:51:24.869702+00:00",
+  "fetchedAt": "2026-11-24T09:51:20.032139+00:00",
   "leagueId": 456278,
   "positions": {
     "DST": {
       "ARI": {
-        "allowed": 6.7,
-        "rank": 20
+        "allowed": 6.81818,
+        "rank": 22
       },
       "ATL": {
         "allowed": 7.8,
-        "rank": 26
+        "rank": 24
       },
       "BAL": {
-        "allowed": 6.4,
+        "allowed": 6.18182,
         "rank": 17
       },
       "BUF": {
-        "allowed": 2.0,
-        "rank": 6
+        "allowed": 2.2,
+        "rank": 7
       },
       "CAR": {
-        "allowed": 6.44444,
-        "rank": 18
+        "allowed": 6.7,
+        "rank": 20
       },
       "CHI": {
-        "allowed": 4.55556,
-        "rank": 11
+        "allowed": 4.7,
+        "rank": 12
       },
       "CIN": {
-        "allowed": 1.77778,
-        "rank": 5
+        "allowed": 1.9,
+        "rank": 6
       },
       "CLE": {
         "allowed": 8.2,
         "rank": 28
       },
       "DAL": {
-        "allowed": 2.0,
-        "rank": 6
+        "allowed": 0.90909,
+        "rank": 4
       },
       "DEN": {
-        "allowed": 4.44444,
+        "allowed": 4.1,
         "rank": 10
       },
       "DET": {
-        "allowed": 0.88889,
-        "rank": 3
+        "allowed": 0.7,
+        "rank": 2
       },
       "GB": {
         "allowed": 5.6,
         "rank": 14
       },
       "HOU": {
-        "allowed": 2.33333,
+        "allowed": 2.3,
         "rank": 8
       },
       "IND": {
-        "allowed": 9.9,
+        "allowed": 10.36364,
         "rank": 31
       },
       "JAX": {
-        "allowed": 0.88889,
-        "rank": 3
+        "allowed": 1.4,
+        "rank": 5
       },
       "KC": {
-        "allowed": 0.55556,
+        "allowed": 0.2,
         "rank": 1
       },
       "LAC": {
-        "allowed": 10.66667,
+        "allowed": 10.4,
         "rank": 32
       },
       "LAR": {
@@ -76,39 +76,39 @@
         "rank": 9
       },
       "LV": {
-        "allowed": 4.9,
-        "rank": 12
+        "allowed": 5.54545,
+        "rank": 13
       },
       "MIA": {
-        "allowed": 9.11111,
+        "allowed": 9.2,
         "rank": 30
       },
       "MIN": {
-        "allowed": 7.77778,
-        "rank": 25
+        "allowed": 8.4,
+        "rank": 29
       },
       "NE": {
         "allowed": 6.5,
         "rank": 19
       },
       "NO": {
-        "allowed": 7.33333,
-        "rank": 24
+        "allowed": 8.1,
+        "rank": 26
       },
       "NYG": {
-        "allowed": 6.11111,
-        "rank": 16
+        "allowed": 6.0,
+        "rank": 15
       },
       "NYJ": {
-        "allowed": 6.9,
-        "rank": 22
+        "allowed": 6.36364,
+        "rank": 18
       },
       "PHI": {
-        "allowed": 8.0,
-        "rank": 27
+        "allowed": 7.9,
+        "rank": 25
       },
       "PIT": {
-        "allowed": 5.77778,
+        "allowed": 6.0,
         "rank": 15
       },
       "SEA": {
@@ -116,495 +116,495 @@
         "rank": 23
       },
       "SF": {
-        "allowed": 0.77778,
+        "allowed": 0.7,
         "rank": 2
       },
       "TB": {
-        "allowed": 8.33333,
-        "rank": 29
+        "allowed": 8.1,
+        "rank": 26
       },
       "TEN": {
-        "allowed": 6.77778,
-        "rank": 21
+        "allowed": 6.7,
+        "rank": 20
       },
       "WAS": {
-        "allowed": 5.11111,
-        "rank": 13
+        "allowed": 4.6,
+        "rank": 11
       }
     },
     "QB": {
       "ARI": {
-        "allowed": 20.81,
-        "rank": 31
+        "allowed": 21.16909,
+        "rank": 32
       },
       "ATL": {
         "allowed": 18.956,
-        "rank": 26
+        "rank": 27
       },
       "BAL": {
-        "allowed": 17.424,
+        "allowed": 17.29091,
         "rank": 18
       },
       "BUF": {
-        "allowed": 15.60889,
-        "rank": 10
+        "allowed": 14.346,
+        "rank": 9
       },
       "CAR": {
-        "allowed": 15.94889,
-        "rank": 12
+        "allowed": 15.728,
+        "rank": 11
       },
       "CHI": {
-        "allowed": 17.82222,
-        "rank": 21
+        "allowed": 17.468,
+        "rank": 19
       },
       "CIN": {
-        "allowed": 17.19556,
+        "allowed": 17.182,
         "rank": 17
       },
       "CLE": {
         "allowed": 14.772,
-        "rank": 9
+        "rank": 10
       },
       "DAL": {
-        "allowed": 20.318,
-        "rank": 30
+        "allowed": 20.49091,
+        "rank": 29
       },
       "DEN": {
-        "allowed": 16.87333,
-        "rank": 15
+        "allowed": 17.474,
+        "rank": 20
       },
       "DET": {
-        "allowed": 20.84889,
-        "rank": 32
+        "allowed": 20.672,
+        "rank": 30
       },
       "GB": {
         "allowed": 13.566,
-        "rank": 6
-      },
-      "HOU": {
-        "allowed": 18.16889,
-        "rank": 23
-      },
-      "IND": {
-        "allowed": 17.646,
-        "rank": 19
-      },
-      "JAX": {
-        "allowed": 13.22222,
         "rank": 5
       },
+      "HOU": {
+        "allowed": 16.778,
+        "rank": 16
+      },
+      "IND": {
+        "allowed": 17.90182,
+        "rank": 22
+      },
+      "JAX": {
+        "allowed": 13.972,
+        "rank": 7
+      },
       "KC": {
-        "allowed": 12.35556,
-        "rank": 4
+        "allowed": 12.19,
+        "rank": 3
       },
       "LAC": {
-        "allowed": 15.71111,
-        "rank": 11
+        "allowed": 16.084,
+        "rank": 12
       },
       "LAR": {
         "allowed": 14.268,
-        "rank": 7
+        "rank": 8
       },
       "LV": {
-        "allowed": 19.922,
-        "rank": 29
+        "allowed": 19.15636,
+        "rank": 28
       },
       "MIA": {
-        "allowed": 16.72889,
-        "rank": 13
+        "allowed": 16.262,
+        "rank": 14
       },
       "MIN": {
-        "allowed": 8.68,
+        "allowed": 10.042,
         "rank": 1
       },
       "NE": {
         "allowed": 17.724,
-        "rank": 20
+        "rank": 21
       },
       "NO": {
-        "allowed": 16.78889,
-        "rank": 14
+        "allowed": 16.544,
+        "rank": 15
       },
       "NYG": {
-        "allowed": 18.99111,
-        "rank": 27
-      },
-      "NYJ": {
-        "allowed": 18.04,
-        "rank": 22
-      },
-      "PHI": {
-        "allowed": 18.54444,
+        "allowed": 18.366,
         "rank": 24
       },
+      "NYJ": {
+        "allowed": 18.44,
+        "rank": 25
+      },
+      "PHI": {
+        "allowed": 18.288,
+        "rank": 23
+      },
       "PIT": {
-        "allowed": 14.41111,
-        "rank": 8
+        "allowed": 13.604,
+        "rank": 6
       },
       "SEA": {
         "allowed": 10.788,
         "rank": 2
       },
       "SF": {
-        "allowed": 17.10444,
-        "rank": 16
+        "allowed": 16.25,
+        "rank": 13
       },
       "TB": {
-        "allowed": 11.74444,
-        "rank": 3
+        "allowed": 12.606,
+        "rank": 4
       },
       "TEN": {
-        "allowed": 19.30667,
-        "rank": 28
+        "allowed": 20.966,
+        "rank": 31
       },
       "WAS": {
-        "allowed": 18.75333,
-        "rank": 25
+        "allowed": 18.868,
+        "rank": 26
       }
     },
     "RB": {
       "ARI": {
-        "allowed": 22.21,
-        "rank": 19
+        "allowed": 22.53636,
+        "rank": 20
       },
       "ATL": {
         "allowed": 26.69,
         "rank": 29
       },
       "BAL": {
-        "allowed": 20.02,
-        "rank": 9
+        "allowed": 20.98182,
+        "rank": 15
       },
       "BUF": {
-        "allowed": 24.8,
-        "rank": 24
+        "allowed": 23.46,
+        "rank": 21
       },
       "CAR": {
-        "allowed": 27.25556,
-        "rank": 30
+        "allowed": 28.2,
+        "rank": 32
       },
       "CHI": {
-        "allowed": 20.2,
-        "rank": 12
+        "allowed": 20.03,
+        "rank": 10
       },
       "CIN": {
-        "allowed": 20.61111,
-        "rank": 14
+        "allowed": 20.76,
+        "rank": 13
       },
       "CLE": {
         "allowed": 20.43,
-        "rank": 13
+        "rank": 12
       },
       "DAL": {
-        "allowed": 29.31,
-        "rank": 32
+        "allowed": 27.83636,
+        "rank": 31
       },
       "DEN": {
-        "allowed": 24.08889,
-        "rank": 22
+        "allowed": 24.89,
+        "rank": 26
       },
       "DET": {
-        "allowed": 17.47778,
-        "rank": 2
+        "allowed": 18.62,
+        "rank": 6
       },
       "GB": {
         "allowed": 24.88,
         "rank": 25
       },
       "HOU": {
-        "allowed": 22.13333,
-        "rank": 18
+        "allowed": 21.03,
+        "rank": 16
       },
       "IND": {
-        "allowed": 24.97,
-        "rank": 26
+        "allowed": 24.54545,
+        "rank": 24
       },
       "JAX": {
-        "allowed": 18.92,
-        "rank": 6
+        "allowed": 17.808,
+        "rank": 3
       },
       "KC": {
-        "allowed": 19.88889,
+        "allowed": 18.68,
         "rank": 7
       },
       "LAC": {
-        "allowed": 23.15556,
-        "rank": 21
+        "allowed": 23.68,
+        "rank": 22
       },
       "LAR": {
         "allowed": 17.51,
-        "rank": 3
+        "rank": 2
       },
       "LV": {
-        "allowed": 25.44,
-        "rank": 27
-      },
-      "MIA": {
-        "allowed": 25.44444,
+        "allowed": 26.35455,
         "rank": 28
       },
+      "MIA": {
+        "allowed": 26.08,
+        "rank": 27
+      },
       "MIN": {
-        "allowed": 18.22222,
-        "rank": 4
+        "allowed": 18.47,
+        "rank": 5
       },
       "NE": {
         "allowed": 22.08,
-        "rank": 17
+        "rank": 18
       },
       "NO": {
-        "allowed": 28.91111,
-        "rank": 31
+        "allowed": 27.72,
+        "rank": 30
       },
       "NYG": {
-        "allowed": 18.78889,
-        "rank": 5
+        "allowed": 18.34,
+        "rank": 4
       },
       "NYJ": {
-        "allowed": 24.58,
+        "allowed": 24.1,
         "rank": 23
       },
       "PHI": {
-        "allowed": 19.96667,
+        "allowed": 19.2,
         "rank": 8
       },
       "PIT": {
-        "allowed": 22.76667,
-        "rank": 20
+        "allowed": 21.73,
+        "rank": 17
       },
       "SEA": {
         "allowed": 20.1,
         "rank": 11
       },
       "SF": {
-        "allowed": 20.03333,
-        "rank": 10
+        "allowed": 19.83,
+        "rank": 9
       },
       "TB": {
-        "allowed": 15.66667,
+        "allowed": 17.04,
         "rank": 1
       },
       "TEN": {
-        "allowed": 21.52222,
-        "rank": 16
+        "allowed": 22.25,
+        "rank": 19
       },
       "WAS": {
-        "allowed": 20.74444,
-        "rank": 15
+        "allowed": 20.9,
+        "rank": 14
       }
     },
     "TE": {
       "ARI": {
-        "allowed": 16.67,
+        "allowed": 17.92727,
         "rank": 29
       },
       "ATL": {
         "allowed": 12.5,
-        "rank": 11
+        "rank": 16
       },
       "BAL": {
-        "allowed": 12.93,
-        "rank": 17
+        "allowed": 14.06364,
+        "rank": 21
       },
       "BUF": {
-        "allowed": 12.55556,
-        "rank": 13
+        "allowed": 11.62,
+        "rank": 11
       },
       "CAR": {
-        "allowed": 12.52222,
-        "rank": 12
+        "allowed": 12.11,
+        "rank": 13
       },
       "CHI": {
-        "allowed": 11.4,
-        "rank": 10
+        "allowed": 10.81,
+        "rank": 9
       },
       "CIN": {
-        "allowed": 15.62222,
+        "allowed": 15.12,
         "rank": 24
       },
       "CLE": {
         "allowed": 14.12,
-        "rank": 21
+        "rank": 22
       },
       "DAL": {
-        "allowed": 13.16,
-        "rank": 20
+        "allowed": 12.40909,
+        "rank": 15
       },
       "DEN": {
-        "allowed": 19.21111,
+        "allowed": 18.32,
         "rank": 30
       },
       "DET": {
-        "allowed": 22.91111,
+        "allowed": 20.8,
         "rank": 32
       },
       "GB": {
         "allowed": 10.12,
-        "rank": 2
+        "rank": 3
       },
       "HOU": {
-        "allowed": 10.73333,
-        "rank": 5
+        "allowed": 9.98,
+        "rank": 2
       },
       "IND": {
-        "allowed": 13.08,
+        "allowed": 13.37273,
         "rank": 19
       },
       "JAX": {
-        "allowed": 10.77778,
-        "rank": 6
+        "allowed": 10.64,
+        "rank": 5
       },
       "KC": {
-        "allowed": 16.04444,
+        "allowed": 16.27,
         "rank": 27
       },
       "LAC": {
-        "allowed": 11.2,
-        "rank": 9
+        "allowed": 11.13,
+        "rank": 10
       },
       "LAR": {
         "allowed": 10.81,
         "rank": 8
       },
       "LV": {
-        "allowed": 16.03,
-        "rank": 25
-      },
-      "MIA": {
-        "allowed": 16.15556,
+        "allowed": 16.55455,
         "rank": 28
       },
+      "MIA": {
+        "allowed": 15.45,
+        "rank": 25
+      },
       "MIN": {
-        "allowed": 8.52222,
+        "allowed": 9.68,
         "rank": 1
       },
       "NE": {
         "allowed": 10.27,
-        "rank": 3
+        "rank": 4
       },
       "NO": {
-        "allowed": 16.03333,
+        "allowed": 15.91,
         "rank": 26
       },
       "NYG": {
-        "allowed": 12.98889,
-        "rank": 18
+        "allowed": 12.15,
+        "rank": 14
       },
       "NYJ": {
-        "allowed": 14.13,
-        "rank": 22
+        "allowed": 13.38182,
+        "rank": 20
       },
       "PHI": {
-        "allowed": 10.3,
-        "rank": 4
+        "allowed": 10.69,
+        "rank": 6
       },
       "PIT": {
-        "allowed": 12.83333,
-        "rank": 15
+        "allowed": 12.03,
+        "rank": 12
       },
       "SEA": {
         "allowed": 10.8,
         "rank": 7
       },
       "SF": {
-        "allowed": 12.84444,
-        "rank": 16
+        "allowed": 12.86,
+        "rank": 17
       },
       "TB": {
-        "allowed": 14.65556,
+        "allowed": 15.01,
         "rank": 23
       },
       "TEN": {
-        "allowed": 12.61111,
-        "rank": 14
+        "allowed": 12.96,
+        "rank": 18
       },
       "WAS": {
-        "allowed": 20.18889,
+        "allowed": 20.36,
         "rank": 31
       }
     },
     "WR": {
       "ARI": {
-        "allowed": 32.05,
-        "rank": 18
+        "allowed": 32.69091,
+        "rank": 21
       },
       "ATL": {
         "allowed": 35.43,
-        "rank": 25
+        "rank": 26
       },
       "BAL": {
-        "allowed": 32.0,
+        "allowed": 32.02727,
         "rank": 17
       },
       "BUF": {
-        "allowed": 33.94444,
-        "rank": 23
+        "allowed": 32.21,
+        "rank": 18
       },
       "CAR": {
-        "allowed": 30.84444,
-        "rank": 14
+        "allowed": 31.71,
+        "rank": 15
       },
       "CHI": {
-        "allowed": 29.44444,
+        "allowed": 30.08,
         "rank": 9
       },
       "CIN": {
-        "allowed": 29.71111,
+        "allowed": 30.21,
         "rank": 10
       },
       "CLE": {
         "allowed": 31.11,
-        "rank": 15
+        "rank": 14
       },
       "DAL": {
-        "allowed": 35.73,
-        "rank": 27
+        "allowed": 37.21818,
+        "rank": 29
       },
       "DEN": {
-        "allowed": 27.57778,
+        "allowed": 28.06,
         "rank": 6
       },
       "DET": {
-        "allowed": 33.06444,
-        "rank": 21
+        "allowed": 33.198,
+        "rank": 22
       },
       "GB": {
         "allowed": 35.85,
         "rank": 28
       },
       "HOU": {
-        "allowed": 37.94444,
-        "rank": 30
+        "allowed": 35.69,
+        "rank": 27
       },
       "IND": {
-        "allowed": 30.186,
-        "rank": 12
+        "allowed": 30.69636,
+        "rank": 13
       },
       "JAX": {
-        "allowed": 32.54889,
-        "rank": 19
+        "allowed": 31.894,
+        "rank": 16
       },
       "KC": {
-        "allowed": 24.6,
+        "allowed": 24.18,
         "rank": 2
       },
       "LAC": {
-        "allowed": 35.61111,
-        "rank": 26
+        "allowed": 35.03,
+        "rank": 25
       },
       "LAR": {
         "allowed": 25.89,
-        "rank": 4
-      },
-      "LV": {
-        "allowed": 34.59,
-        "rank": 24
-      },
-      "MIA": {
-        "allowed": 24.98889,
         "rank": 3
       },
+      "LV": {
+        "allowed": 33.35455,
+        "rank": 23
+      },
+      "MIA": {
+        "allowed": 26.7,
+        "rank": 4
+      },
       "MIN": {
-        "allowed": 26.15556,
+        "allowed": 27.57,
         "rank": 5
       },
       "NE": {
@@ -612,43 +612,43 @@
         "rank": 31
       },
       "NO": {
-        "allowed": 28.61111,
+        "allowed": 28.23,
         "rank": 8
       },
       "NYG": {
-        "allowed": 30.7,
-        "rank": 13
+        "allowed": 32.55,
+        "rank": 19
       },
       "NYJ": {
-        "allowed": 28.15,
+        "allowed": 28.09091,
         "rank": 7
       },
       "PHI": {
-        "allowed": 37.68889,
-        "rank": 29
+        "allowed": 37.58,
+        "rank": 30
       },
       "PIT": {
-        "allowed": 31.67778,
-        "rank": 16
+        "allowed": 30.54,
+        "rank": 12
       },
       "SEA": {
         "allowed": 21.35,
         "rank": 1
       },
       "SF": {
-        "allowed": 33.62222,
-        "rank": 22
+        "allowed": 33.79,
+        "rank": 24
       },
       "TB": {
-        "allowed": 30.02222,
+        "allowed": 30.42,
         "rank": 11
       },
       "TEN": {
-        "allowed": 42.82222,
+        "allowed": 45.16,
         "rank": 32
       },
       "WAS": {
-        "allowed": 32.99556,
+        "allowed": 32.596,
         "rank": 20
       }
     }
@@ -657,8 +657,8 @@
   "referenceUrl": "https://fantasy.espn.com/football/pointsagainst?leagueId=456278",
   "schema": 1,
   "scoring": "full PPR; 4-point passing TD",
-  "scoringPeriodId": 11,
+  "scoringPeriodId": 12,
   "season": 2026,
   "source": "ESPN Fantasy Football mPositionalRatings",
-  "sourceUrl": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leagues/456278?view=mPositionalRatings&scoringPeriodId=11"
+  "sourceUrl": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leagues/456278?view=mPositionalRatings&scoringPeriodId=12"
 }

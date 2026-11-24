@@ -141,7 +141,7 @@ function renderDynasty(){
    const photo=typeof pic==='function'?pic(name,'',team,pos):'<span class="photo fallback">'+esc(name.slice(0,2).toUpperCase())+'</span>';
    const id=local?.id?' data-id="'+esc(local.id)+'"':'';
    const shownRank=rookiesOnly?displayRank.get(p):x.rank;
-   return '<tr class="dynasty-rank-row"'+id+'>
+   return '<tr class="dynasty-rank-row"'+id+'>'+
      '<td class="rank">#'+shownRank+'</td>'+
      '<td><div class="photo-cell">'+photo+'<div class="rank-player-copy"><b>'+esc(name)+'</b><span class="phone-rank-meta">'+(typeof teamMini==='function'?teamMini(team):'')+'<span>'+esc(pos)+'</span></span></div></div></td>'+
      '<td><span class="badge">'+esc(pos)+'</span></td>'+

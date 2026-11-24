@@ -1,0 +1,94 @@
+name: Update Dynasty Daddy rankings
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */3 * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update-dynasty-rankings.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-dynasty-daddy-rankings
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Dynasty Daddy rankings
+        run: |
+          curl --fail --silent --show-error --location \
+            --retry 3 --retry-delay 5 \
+            -H 'Accept: application/json' \
+            'https://api.dynasty-daddy.com/api/v1/values/dynasty' \
+            -o /tmp/dynasty-daddy.json
+
+      - name: Validate and build Goyball dynasty dataset
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          src = Path('/tmp/dynasty-daddy.json')
+          raw = json.loads(src.read_text())
+          if not isinstance(raw, list) or len(raw) < 100:
+              raise SystemExit(f'Unexpected Dynasty Daddy payload: {type(raw).__name__}, rows={len(raw) if isinstance(raw, list) else "n/a"}')
+
+          allowed = {'QB', 'RB', 'WR', 'TE'}
+          players = []
+          for row in raw:
+              if not isinstance(row, dict):
+                  continue
+              pos = str(row.get('position') or '').upper()
+              if pos not in allowed:
+                  continue
+              if row.get('position_rank') is None and row.get('sf_position_rank') is None:
+                  continue
+              players.append({
+                  'name_id': row.get('name_id'),
+                  'sleeper_id': row.get('sleeper_id'),
+                  'espn_id': row.get('espn_id'),
+                  'yahoo_id': row.get('yahoo_id'),
+                  'position': pos,
+                  'team': row.get('team'),
+                  'trade_value': row.get('trade_value'),
+                  'sf_trade_value': row.get('sf_trade_value'),
+                  'position_rank': row.get('position_rank'),
+                  'sf_position_rank': row.get('sf_position_rank'),
+                  'overall_rank': row.get('overall_rank'),
+                  'sf_overall_rank': row.get('sf_overall_rank'),
+              })
+
+          if len(players) < 100:
+              raise SystemExit(f'Too few usable dynasty players: {len(players)}')
+
+          out = {
+              'source': 'Dynasty Daddy',
+              'source_url': 'https://dynasty-daddy.com/fantasy-rankings',
+              'api_url': 'https://api.dynasty-daddy.com/api/v1/values/dynasty',
+              'updated_at': datetime.now(timezone.utc).isoformat(),
+              'players': players,
+          }
+          Path('dynasty-rankings.json').write_text(json.dumps(out, indent=2) + '\n')
+          print(f'Wrote {len(players)} dynasty players')
+          PY
+
+      - name: Commit updated rankings
+        run: |
+          if git diff --quiet -- dynasty-rankings.json; then
+            echo 'No dynasty ranking changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dynasty-rankings.json
+          git commit -m 'Update Dynasty Daddy rankings'
+          git push

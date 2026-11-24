@@ -124,6 +124,72 @@ jobs:
                   'drafters_adp': extra.get('drafters_adp') if extra.get('drafters_adp') is not None else row.get('drafters_adp'),
               })
 
+          # Append current-market players that are not in the ranking-only feed.
+          # Ranking fields stay null so these rows never alter Goyball's Dynasty ranking lists.
+          seen_ids={str(p.get('name_id') or '') for p in players}
+          for extra in today_raw if isinstance(today_raw, list) else []:
+              if not isinstance(extra, dict):
+                  continue
+              nid=str(extra.get('name_id') or '')
+              pos=str(extra.get('position') or '').upper()
+              if not nid or nid in seen_ids or pos in {'PI','PICK',''}:
+                  continue
+              sid=str(extra.get('sleeper_id') or '')
+              sleeper=sleeper_by_id.get(sid) or {}
+              name=extra.get('full_name') or sleeper.get('full_name')
+              if not name:
+                  name=((extra.get('first_name') or sleeper.get('first_name') or '')+' '+(extra.get('last_name') or sleeper.get('last_name') or '')).strip() or nid
+              players.append({
+                  'name': name,
+                  'rookie': (extra.get('experience') if extra.get('experience') is not None else sleeper.get('years_exp')) == 0,
+                  'name_id': nid,
+                  'sleeper_id': extra.get('sleeper_id'),
+                  'espn_id': extra.get('espn_id'),
+                  'yahoo_id': extra.get('yahoo_id'),
+                  'position': pos,
+                  'team': extra.get('team'),
+                  'age': extra.get('age') if extra.get('age') is not None else sleeper.get('age'),
+                  'experience': extra.get('experience') if extra.get('experience') is not None else sleeper.get('years_exp'),
+                  'injury_status': extra.get('injury_status'),
+                  'trade_value': None,
+                  'sf_trade_value': None,
+                  'position_rank': None,
+                  'sf_position_rank': None,
+                  'overall_rank': None,
+                  'sf_overall_rank': None,
+                  'market_trade_value': extra.get('trade_value'),
+                  'market_sf_trade_value': extra.get('sf_trade_value'),
+                  'market_position_rank': extra.get('position_rank'),
+                  'market_sf_position_rank': extra.get('sf_position_rank'),
+                  'last_month_value': extra.get('last_month_value'),
+                  'last_month_value_sf': extra.get('last_month_value_sf'),
+                  'last_month_rank': extra.get('last_month_rank'),
+                  'last_month_rank_sf': extra.get('last_month_rank_sf'),
+                  'three_month_high': extra.get('three_month_high'),
+                  'three_month_high_sf': extra.get('three_month_high_sf'),
+                  'three_month_low': extra.get('three_month_low'),
+                  'three_month_low_sf': extra.get('three_month_low_sf'),
+                  'three_month_best_rank': extra.get('three_month_best_rank'),
+                  'three_month_best_rank_sf': extra.get('three_month_best_rank_sf'),
+                  'three_month_worst_rank': extra.get('three_month_worst_rank'),
+                  'three_month_worst_rank_sf': extra.get('three_month_worst_rank_sf'),
+                  'all_time_high': extra.get('all_time_high'),
+                  'all_time_high_sf': extra.get('all_time_high_sf'),
+                  'all_time_low': extra.get('all_time_low'),
+                  'all_time_low_sf': extra.get('all_time_low_sf'),
+                  'all_time_best_rank': extra.get('all_time_best_rank'),
+                  'all_time_best_rank_sf': extra.get('all_time_best_rank_sf'),
+                  'all_time_worst_rank': extra.get('all_time_worst_rank'),
+                  'all_time_worst_rank_sf': extra.get('all_time_worst_rank_sf'),
+                  'avg_adp': extra.get('avg_adp'),
+                  'fantasypro_adp': extra.get('fantasypro_adp'),
+                  'bb10_adp': extra.get('bb10_adp'),
+                  'rtsports_adp': extra.get('rtsports_adp'),
+                  'underdog_adp': extra.get('underdog_adp'),
+                  'drafters_adp': extra.get('drafters_adp'),
+              })
+              seen_ids.add(nid)
+
           if len(players) < 100:
               raise SystemExit(f'Too few usable dynasty players: {len(players)}')
 

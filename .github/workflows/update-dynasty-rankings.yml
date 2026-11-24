@@ -30,6 +30,10 @@ jobs:
             -H 'Accept: application/json' \
             'https://api.dynasty-daddy.com/api/v1/values/dynasty' \
             -o /tmp/dynasty-daddy.json
+          curl --fail --silent --show-error --location \
+            --retry 3 --retry-delay 5 \
+            'https://api.sleeper.app/v1/players/nfl' \
+            -o /tmp/sleeper-players.json
 
       - name: Validate and build Goyball dynasty dataset
         run: |
@@ -40,6 +44,8 @@ jobs:
 
           src = Path('/tmp/dynasty-daddy.json')
           raw = json.loads(src.read_text())
+          sleeper_raw = json.loads(Path('/tmp/sleeper-players.json').read_text())
+          sleeper_by_id = sleeper_raw if isinstance(sleeper_raw, dict) else {}
           if not isinstance(raw, list) or len(raw) < 100:
               raise SystemExit(f'Unexpected Dynasty Daddy payload: {type(raw).__name__}, rows={len(raw) if isinstance(raw, list) else "n/a"}')
 
@@ -53,7 +59,15 @@ jobs:
                   continue
               if row.get('position_rank') is None and row.get('sf_position_rank') is None:
                   continue
+              sid = str(row.get('sleeper_id') or '')
+              sleeper = sleeper_by_id.get(sid) or {}
+              name = sleeper.get('full_name')
+              if not name:
+                  first = sleeper.get('first_name') or ''
+                  last = sleeper.get('last_name') or ''
+                  name = (first + ' ' + last).strip() or None
               players.append({
+                  'name': name,
                   'name_id': row.get('name_id'),
                   'sleeper_id': row.get('sleeper_id'),
                   'espn_id': row.get('espn_id'),

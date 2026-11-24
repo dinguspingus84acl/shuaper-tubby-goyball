@@ -1,0 +1,46 @@
+name: Verify Dynasty player card
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dynasty-player-card.js'
+      - 'dynasty-rankings.json'
+      - 'dynasty-history.json'
+      - 'dynasty-player-details.json'
+      - '.github/workflows/verify-dynasty-player-card.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Dynasty player-card data and JS
+        run: |
+          node --check dynasty-player-card.js
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          ranks=json.loads(Path('dynasty-rankings.json').read_text())
+          hist=json.loads(Path('dynasty-history.json').read_text())
+          details=json.loads(Path('dynasty-player-details.json').read_text())
+          assert len(ranks.get('players',[])) >= 300
+          assert len(hist.get('players',{})) >= 300
+          assert len(details.get('players',{})) >= 300
+          jh=hist['players'].get('joshallenqb') or []
+          jd=details['players'].get('joshallenqb') or {}
+          assert len(jh) >= 10, f'Josh Allen history too short: {len(jh)}'
+          assert isinstance(jd.get('tradeVolume'),list) and len(jd['tradeVolume']) >= 4
+          assert isinstance(jd.get('profile'),dict) and jd['profile'].get('profile_json')
+          print('players',len(ranks['players']))
+          print('history players',len(hist['players']))
+          print('Josh history points',len(jh))
+          print('Josh first',jh[0])
+          print('Josh last',jh[-1])
+          print('Josh trade-volume points',len(jd['tradeVolume']))
+          print('Josh contract',jd['profile']['profile_json'].get('contract'))
+          PY

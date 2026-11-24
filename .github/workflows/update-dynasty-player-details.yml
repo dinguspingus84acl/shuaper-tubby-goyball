@@ -26,15 +26,26 @@ jobs:
       - name: Fetch player profile and trade-volume details
         run: |
           python - <<'PY'
-          import json, time, urllib.request
+          import json, time, urllib.request, os
           from concurrent.futures import ThreadPoolExecutor, as_completed
           from datetime import datetime, timezone
           from pathlib import Path
 
           rankings=json.loads(Path('dynasty-rankings.json').read_text())
           players=rankings.get('players') or []
-          out={}
-          history_out={}
+          try:
+              existing_details=json.loads(Path('dynasty-player-details.json').read_text()).get('players',{})
+          except Exception:
+              existing_details={}
+          try:
+              existing_history=json.loads(Path('dynasty-history.json').read_text()).get('players',{})
+          except Exception:
+              existing_history={}
+          out=dict(existing_details)
+          history_out=dict(existing_history)
+          refresh_all=os.environ.get('GITHUB_EVENT_NAME') in {'schedule','workflow_dispatch'}
+          targets=players if refresh_all else [p for p in players if not p.get('name_id') or p.get('name_id') not in out or p.get('name_id') not in history_out or not history_out.get(p.get('name_id'))]
+          print('refresh_all',refresh_all,'targets',len(targets),'of',len(players))
           headers={'User-Agent':'Goyball dynasty cache/1.0','Accept':'application/json'}
 
           def get_json(url, attempts=3):
@@ -87,7 +98,7 @@ jobs:
               return nid, detail, clean
 
           with ThreadPoolExecutor(max_workers=4) as pool:
-              futures=[pool.submit(fetch_player,p) for p in players if p.get('name_id')]
+              futures=[pool.submit(fetch_player,p) for p in targets if p.get('name_id')]
               for idx,future in enumerate(as_completed(futures),1):
                   result=future.result()
                   if result:

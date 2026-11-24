@@ -68,6 +68,7 @@ jobs:
                   name = (first + ' ' + last).strip() or None
               players.append({
                   'name': name,
+                  'rookie': sleeper.get('years_exp') == 0,
                   'name_id': row.get('name_id'),
                   'sleeper_id': row.get('sleeper_id'),
                   'espn_id': row.get('espn_id'),

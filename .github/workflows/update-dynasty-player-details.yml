@@ -32,6 +32,7 @@ jobs:
           rankings=json.loads(Path('dynasty-rankings.json').read_text())
           players=rankings.get('players') or []
           out={}
+          history_out={}
           headers={'User-Agent':'Goyball dynasty cache/1.0','Accept':'application/json'}
 
           def get_json(url, attempts=3):
@@ -53,16 +54,35 @@ jobs:
               try:
                   data=get_json('https://dynasty-daddy.com/api/v1/player/details/'+nid)
               except Exception as e:
-                  print('skip',nid,type(e).__name__,e)
-                  continue
-              profile=(data.get('profile') or [])
+                  print('details skip',nid,type(e).__name__,e)
+                  data={}
+              try:
+                  hist=get_json('https://dynasty-daddy.com/api/v1/player/'+nid+'?isAllTime=false')
+              except Exception as e:
+                  print('history skip',nid,type(e).__name__,e)
+                  hist=[]
+              profile=(data.get('profile') or []) if isinstance(data,dict) else []
               profile=profile[0] if profile and isinstance(profile[0],dict) else {}
-              trade=data.get('tradeData') if isinstance(data.get('tradeData'),dict) else {}
+              trade=data.get('tradeData') if isinstance(data,dict) and isinstance(data.get('tradeData'),dict) else {}
               out[nid]={
                   'profile': profile,
                   'tradeVolume': trade.get('tradeVolume') if isinstance(trade,dict) else None,
-                  'rostership': data.get('rostership') if isinstance(data.get('rostership'),dict) else {},
+                  'rostership': data.get('rostership') if isinstance(data,dict) and isinstance(data.get('rostership'),dict) else {},
               }
+              if isinstance(hist,list):
+                  clean=[]
+                  for row in hist:
+                      if not isinstance(row,dict):
+                          continue
+                      clean.append({
+                          'date':row.get('date'),
+                          'trade_value':row.get('trade_value'),
+                          'sf_trade_value':row.get('sf_trade_value'),
+                          'position_rank':row.get('position_rank'),
+                          'sf_position_rank':row.get('sf_position_rank'),
+                      })
+                  clean.sort(key=lambda x:str(x.get('date') or ''))
+                  history_out[nid]=clean
               if idx%25==0:
                   print('fetched',idx,'of',len(players))
               time.sleep(.05)
@@ -73,17 +93,24 @@ jobs:
               'players':out,
           }
           Path('dynasty-player-details.json').write_text(json.dumps(payload,separators=(',',':'))+'\n')
-          print('Wrote details for',len(out),'players')
+          history_payload={
+              'source':'Dynasty Daddy',
+              'updated_at':datetime.now(timezone.utc).isoformat(),
+              'players':history_out,
+          }
+          Path('dynasty-history.json').write_text(json.dumps(history_payload,separators=(',',':'))+'\n')
+          print('Wrote details for',len(out),'players and history for',len(history_out),'players')
           PY
 
       - name: Commit updated player details
         run: |
-          if [ -z "$(git status --porcelain -- dynasty-player-details.json)" ]; then
+          if [ -z "$(git status --porcelain -- dynasty-player-details.json dynasty-history.json)" ]; then
             echo 'No Dynasty player detail changes.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add dynasty-player-details.json
+          git add dynasty-player-details.json dynasty-history.json
           git commit -m 'Update Dynasty player details'
+          git pull --rebase origin main
           git push

@@ -32,6 +32,11 @@ jobs:
             -o /tmp/dynasty-daddy.json
           curl --fail --silent --show-error --location \
             --retry 3 --retry-delay 5 \
+            -H 'Accept: application/json' \
+            'https://dynasty-daddy.com/api/v1/player/all/today' \
+            -o /tmp/dynasty-today.json
+          curl --fail --silent --show-error --location \
+            --retry 3 --retry-delay 5 \
             'https://api.sleeper.app/v1/players/nfl' \
             -o /tmp/sleeper-players.json
 
@@ -46,6 +51,8 @@ jobs:
           raw = json.loads(src.read_text())
           sleeper_raw = json.loads(Path('/tmp/sleeper-players.json').read_text())
           sleeper_by_id = sleeper_raw if isinstance(sleeper_raw, dict) else {}
+          today_raw = json.loads(Path('/tmp/dynasty-today.json').read_text())
+          today_by_id = {str(x.get('name_id')): x for x in today_raw if isinstance(x, dict) and x.get('name_id')} if isinstance(today_raw, list) else {}
           if not isinstance(raw, list) or len(raw) < 100:
               raise SystemExit(f'Unexpected Dynasty Daddy payload: {type(raw).__name__}, rows={len(raw) if isinstance(raw, list) else "n/a"}')
 
@@ -61,6 +68,7 @@ jobs:
                   continue
               sid = str(row.get('sleeper_id') or '')
               sleeper = sleeper_by_id.get(sid) or {}
+              extra = today_by_id.get(str(row.get('name_id') or '')) or {}
               name = sleeper.get('full_name')
               if not name:
                   first = sleeper.get('first_name') or ''
@@ -75,41 +83,41 @@ jobs:
                   'yahoo_id': row.get('yahoo_id'),
                   'position': pos,
                   'team': row.get('team'),
-                  'age': row.get('age') if row.get('age') is not None else sleeper.get('age'),
-                  'experience': row.get('experience') if row.get('experience') is not None else sleeper.get('years_exp'),
-                  'injury_status': row.get('injury_status'),
+                  'age': extra.get('age') if extra.get('age') is not None else (row.get('age') if row.get('age') is not None else sleeper.get('age')),
+                  'experience': extra.get('experience') if extra.get('experience') is not None else (row.get('experience') if row.get('experience') is not None else sleeper.get('years_exp')),
+                  'injury_status': extra.get('injury_status') if extra.get('injury_status') is not None else row.get('injury_status'),
                   'trade_value': row.get('trade_value'),
                   'sf_trade_value': row.get('sf_trade_value'),
                   'position_rank': row.get('position_rank'),
                   'sf_position_rank': row.get('sf_position_rank'),
                   'overall_rank': row.get('overall_rank'),
                   'sf_overall_rank': row.get('sf_overall_rank'),
-                  'last_month_value': row.get('last_month_value'),
-                  'last_month_value_sf': row.get('last_month_value_sf'),
-                  'last_month_rank': row.get('last_month_rank'),
-                  'last_month_rank_sf': row.get('last_month_rank_sf'),
-                  'three_month_high': row.get('three_month_high'),
-                  'three_month_high_sf': row.get('three_month_high_sf'),
-                  'three_month_low': row.get('three_month_low'),
-                  'three_month_low_sf': row.get('three_month_low_sf'),
-                  'three_month_best_rank': row.get('three_month_best_rank'),
-                  'three_month_best_rank_sf': row.get('three_month_best_rank_sf'),
-                  'three_month_worst_rank': row.get('three_month_worst_rank'),
-                  'three_month_worst_rank_sf': row.get('three_month_worst_rank_sf'),
-                  'all_time_high': row.get('all_time_high'),
-                  'all_time_high_sf': row.get('all_time_high_sf'),
-                  'all_time_low': row.get('all_time_low'),
-                  'all_time_low_sf': row.get('all_time_low_sf'),
-                  'all_time_best_rank': row.get('all_time_best_rank'),
-                  'all_time_best_rank_sf': row.get('all_time_best_rank_sf'),
-                  'all_time_worst_rank': row.get('all_time_worst_rank'),
-                  'all_time_worst_rank_sf': row.get('all_time_worst_rank_sf'),
-                  'avg_adp': row.get('avg_adp'),
-                  'fantasypro_adp': row.get('fantasypro_adp'),
-                  'bb10_adp': row.get('bb10_adp'),
-                  'rtsports_adp': row.get('rtsports_adp'),
-                  'underdog_adp': row.get('underdog_adp'),
-                  'drafters_adp': row.get('drafters_adp'),
+                  'last_month_value': extra.get('last_month_value') if extra.get('last_month_value') is not None else row.get('last_month_value'),
+                  'last_month_value_sf': extra.get('last_month_value_sf') if extra.get('last_month_value_sf') is not None else row.get('last_month_value_sf'),
+                  'last_month_rank': extra.get('last_month_rank') if extra.get('last_month_rank') is not None else row.get('last_month_rank'),
+                  'last_month_rank_sf': extra.get('last_month_rank_sf') if extra.get('last_month_rank_sf') is not None else row.get('last_month_rank_sf'),
+                  'three_month_high': extra.get('three_month_high') if extra.get('three_month_high') is not None else row.get('three_month_high'),
+                  'three_month_high_sf': extra.get('three_month_high_sf') if extra.get('three_month_high_sf') is not None else row.get('three_month_high_sf'),
+                  'three_month_low': extra.get('three_month_low') if extra.get('three_month_low') is not None else row.get('three_month_low'),
+                  'three_month_low_sf': extra.get('three_month_low_sf') if extra.get('three_month_low_sf') is not None else row.get('three_month_low_sf'),
+                  'three_month_best_rank': extra.get('three_month_best_rank') if extra.get('three_month_best_rank') is not None else row.get('three_month_best_rank'),
+                  'three_month_best_rank_sf': extra.get('three_month_best_rank_sf') if extra.get('three_month_best_rank_sf') is not None else row.get('three_month_best_rank_sf'),
+                  'three_month_worst_rank': extra.get('three_month_worst_rank') if extra.get('three_month_worst_rank') is not None else row.get('three_month_worst_rank'),
+                  'three_month_worst_rank_sf': extra.get('three_month_worst_rank_sf') if extra.get('three_month_worst_rank_sf') is not None else row.get('three_month_worst_rank_sf'),
+                  'all_time_high': extra.get('all_time_high') if extra.get('all_time_high') is not None else row.get('all_time_high'),
+                  'all_time_high_sf': extra.get('all_time_high_sf') if extra.get('all_time_high_sf') is not None else row.get('all_time_high_sf'),
+                  'all_time_low': extra.get('all_time_low') if extra.get('all_time_low') is not None else row.get('all_time_low'),
+                  'all_time_low_sf': extra.get('all_time_low_sf') if extra.get('all_time_low_sf') is not None else row.get('all_time_low_sf'),
+                  'all_time_best_rank': extra.get('all_time_best_rank') if extra.get('all_time_best_rank') is not None else row.get('all_time_best_rank'),
+                  'all_time_best_rank_sf': extra.get('all_time_best_rank_sf') if extra.get('all_time_best_rank_sf') is not None else row.get('all_time_best_rank_sf'),
+                  'all_time_worst_rank': extra.get('all_time_worst_rank') if extra.get('all_time_worst_rank') is not None else row.get('all_time_worst_rank'),
+                  'all_time_worst_rank_sf': extra.get('all_time_worst_rank_sf') if extra.get('all_time_worst_rank_sf') is not None else row.get('all_time_worst_rank_sf'),
+                  'avg_adp': extra.get('avg_adp') if extra.get('avg_adp') is not None else row.get('avg_adp'),
+                  'fantasypro_adp': extra.get('fantasypro_adp') if extra.get('fantasypro_adp') is not None else row.get('fantasypro_adp'),
+                  'bb10_adp': extra.get('bb10_adp') if extra.get('bb10_adp') is not None else row.get('bb10_adp'),
+                  'rtsports_adp': extra.get('rtsports_adp') if extra.get('rtsports_adp') is not None else row.get('rtsports_adp'),
+                  'underdog_adp': extra.get('underdog_adp') if extra.get('underdog_adp') is not None else row.get('underdog_adp'),
+                  'drafters_adp': extra.get('drafters_adp') if extra.get('drafters_adp') is not None else row.get('drafters_adp'),
               })
 
           if len(players) < 100:

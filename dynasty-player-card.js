@@ -96,12 +96,22 @@ function currentPlayer(){
   if(!data)return null;
   return data.byName.get(norm(currentName()))||null;
 }
+function marketOverallRank(p){
+  if(!data||!p)return null;
+  const sf=format==='SF';
+  const list=(data.rankings.players||[]).filter(x=>allowed.has(x.position))
+    .map(x=>({p:x,v:num(sf?(x.market_sf_trade_value??x.sf_trade_value):(x.market_trade_value??x.trade_value))}))
+    .filter(x=>x.v!==null&&x.v>0)
+    .sort((a,b)=>b.v-a.v||String(a.p.name||'').localeCompare(String(b.p.name||'')));
+  const i=list.findIndex(x=>x.p.name_id===p.name_id);
+  return i>=0?i+1:null;
+}
 function valueFields(p){
   const sf=format==='SF';
   return {
-    value:num(sf?p.sf_trade_value:p.trade_value),
-    overall:num(sf?p.sf_overall_rank:p.overall_rank),
-    posRank:num(sf?p.sf_position_rank:p.position_rank),
+    value:num(sf?(p.market_sf_trade_value??p.sf_trade_value):(p.market_trade_value??p.trade_value)),
+    overall:marketOverallRank(p),
+    posRank:num(sf?(p.market_sf_position_rank??p.sf_position_rank):(p.market_position_rank??p.position_rank)),
     lastMonth:num(sf?p.last_month_value_sf:p.last_month_value),
     lastMonthRank:num(sf?p.last_month_rank_sf:p.last_month_rank),
     high90:num(sf?p.three_month_high_sf:p.three_month_high),
@@ -157,12 +167,13 @@ function metric(label,value){
 }
 function adjacentHtml(p){
   const sf=format==='SF';
-  const list=(data.rankings.players||[]).filter(x=>allowed.has(x.position)).filter(x=>num(sf?x.sf_trade_value:x.trade_value)>0)
-    .sort((a,b)=>(num(sf?b.sf_trade_value:b.trade_value)||0)-(num(sf?a.sf_trade_value:a.trade_value)||0));
+  const getVal=x=>num(sf?(x.market_sf_trade_value??x.sf_trade_value):(x.market_trade_value??x.trade_value));
+  const list=(data.rankings.players||[]).filter(x=>allowed.has(x.position)).filter(x=>getVal(x)>0)
+    .sort((a,b)=>(getVal(b)||0)-(getVal(a)||0)||String(a.name||'').localeCompare(String(b.name||'')));
   const idx=list.findIndex(x=>x.name_id===p.name_id);
   if(idx<0)return '<div class="dpc-empty">Adjacent players unavailable.</div>';
   return list.slice(Math.max(0,idx-2),Math.min(list.length,idx+3)).map((x,j)=>{
-    const v=num(sf?x.sf_trade_value:x.trade_value);
+    const v=getVal(x);
     const r=list.indexOf(x)+1;
     const cur=x.name_id===p.name_id;
     return '<button type="button" class="'+(cur?'current':'')+'" data-dpc-player="'+encodeURIComponent(x.name)+'"><span>#'+r+'</span><span><strong>'+esc(x.name)+'</strong><br><small>'+esc(x.team||'—')+' · '+esc(x.position||'—')+'</small></span><b>'+int(v)+'</b></button>';

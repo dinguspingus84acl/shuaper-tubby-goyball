@@ -28,14 +28,18 @@ jobs:
           ranks=json.loads(Path('dynasty-rankings.json').read_text())
           hist=json.loads(Path('dynasty-history.json').read_text())
           details=json.loads(Path('dynasty-player-details.json').read_text())
-          assert len(ranks.get('players',[])) >= 300
-          assert len(hist.get('players',{})) >= 300
-          assert len(details.get('players',{})) >= 300
+          assert len(ranks.get('players',[])) >= 600
+          assert len(hist.get('players',{})) >= 400
+          assert len(details.get('players',{})) >= 400
           jh=hist['players'].get('joshallenqb') or []
           jd=details['players'].get('joshallenqb') or {}
           assert len(jh) >= 10, f'Josh Allen history too short: {len(jh)}'
           assert isinstance(jd.get('tradeVolume'),list) and len(jd['tradeVolume']) >= 4
           assert isinstance(jd.get('profile'),dict) and jd['profile'].get('profile_json')
+          js=Path('dynasty-player-card.js').read_text()
+          for needle in ['>1M</button>','>3M</button>','>6M</button>','pointermove','data-dpc-point','data-profile-tab=\"profile\"']:
+              assert needle in js, needle
+          assert 'data-dpc-subview=\"market\"' not in js
           print('players',len(ranks['players']))
           print('history players',len(hist['players']))
           print('Josh history points',len(jh))

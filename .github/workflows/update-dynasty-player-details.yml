@@ -26,6 +26,7 @@ jobs:
         run: |
           python - <<'PY'
           import json, time, urllib.request
+          from concurrent.futures import ThreadPoolExecutor, as_completed
           from datetime import datetime, timezone
           from pathlib import Path
 
@@ -47,10 +48,10 @@ jobs:
                       time.sleep(.6*(i+1))
               raise last
 
-          for idx,p in enumerate(players,1):
+          def fetch_player(p):
               nid=p.get('name_id')
               if not nid:
-                  continue
+                  return None
               try:
                   data=get_json('https://dynasty-daddy.com/api/v1/player/details/'+nid)
               except Exception as e:
@@ -64,13 +65,13 @@ jobs:
               profile=(data.get('profile') or []) if isinstance(data,dict) else []
               profile=profile[0] if profile and isinstance(profile[0],dict) else {}
               trade=data.get('tradeData') if isinstance(data,dict) and isinstance(data.get('tradeData'),dict) else {}
-              out[nid]={
+              detail={
                   'profile': profile,
                   'tradeVolume': trade.get('tradeVolume') if isinstance(trade,dict) else None,
                   'rostership': data.get('rostership') if isinstance(data,dict) and isinstance(data.get('rostership'),dict) else {},
               }
+              clean=[]
               if isinstance(hist,list):
-                  clean=[]
                   for row in hist:
                       if not isinstance(row,dict):
                           continue
@@ -82,10 +83,18 @@ jobs:
                           'sf_position_rank':row.get('sf_position_rank'),
                       })
                   clean.sort(key=lambda x:str(x.get('date') or ''))
-                  history_out[nid]=clean
-              if idx%25==0:
-                  print('fetched',idx,'of',len(players))
-              time.sleep(.05)
+              return nid, detail, clean
+
+          with ThreadPoolExecutor(max_workers=4) as pool:
+              futures=[pool.submit(fetch_player,p) for p in players if p.get('name_id')]
+              for idx,future in enumerate(as_completed(futures),1):
+                  result=future.result()
+                  if result:
+                      nid,detail,clean=result
+                      out[nid]=detail
+                      history_out[nid]=clean
+                  if idx%25==0:
+                      print('fetched',idx,'of',len(futures))
 
           payload={
               'source':'Dynasty Daddy',

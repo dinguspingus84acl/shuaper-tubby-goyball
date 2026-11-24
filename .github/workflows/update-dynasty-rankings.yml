@@ -34,11 +34,6 @@ jobs:
             --retry 3 --retry-delay 5 \
             'https://api.sleeper.app/v1/players/nfl' \
             -o /tmp/sleeper-players.json
-          curl --fail --silent --show-error --location \
-            --retry 3 --retry-delay 5 \
-            -H 'Accept: application/json' \
-            'https://dynasty-daddy.com/api/v1/player/all/prev/90' \
-            -o /tmp/dynasty-history-90.json
 
       - name: Validate and build Goyball dynasty dataset
         run: |
@@ -128,44 +123,18 @@ jobs:
               'players': players,
           }
           Path('dynasty-rankings.json').write_text(json.dumps(out, indent=2) + '\n')
-
-          history_raw = json.loads(Path('/tmp/dynasty-history-90.json').read_text())
-          history_rows = history_raw if isinstance(history_raw, list) else []
-          grouped = {}
-          for row in history_rows:
-              if not isinstance(row, dict):
-                  continue
-              nid = row.get('name_id')
-              if not nid:
-                  continue
-              grouped.setdefault(nid, []).append({
-                  'date': row.get('date'),
-                  'trade_value': row.get('trade_value'),
-                  'sf_trade_value': row.get('sf_trade_value'),
-                  'position_rank': row.get('position_rank'),
-                  'sf_position_rank': row.get('sf_position_rank'),
-              })
-          for rows in grouped.values():
-              rows.sort(key=lambda x: str(x.get('date') or ''))
-          history_out = {
-              'source': 'Dynasty Daddy',
-              'days': 90,
-              'updated_at': datetime.now(timezone.utc).isoformat(),
-              'players': grouped,
-          }
-          Path('dynasty-history.json').write_text(json.dumps(history_out, separators=(',', ':')) + '\n')
-          print(f'Wrote {len(players)} dynasty players and history for {len(grouped)} players')
+          print(f'Wrote {len(players)} dynasty players')
           PY
 
       - name: Commit updated rankings
         run: |
-          if [ -z "$(git status --porcelain -- dynasty-rankings.json dynasty-history.json)" ]; then
+          if [ -z "$(git status --porcelain -- dynasty-rankings.json)" ]; then
             echo 'No dynasty ranking changes.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add dynasty-rankings.json dynasty-history.json
+          git add dynasty-rankings.json
           git commit -m 'Update Dynasty Daddy rankings'
           git pull --rebase origin main
           git push

@@ -35,17 +35,15 @@ const formatBar=document.createElement('div');
 formatBar.id='dynastyFormatToggle';
 formatBar.className='dynasty-format-toggle';
 formatBar.hidden=true;
-formatBar.innerHTML='<span>Dynasty</span><button type="button" data-dynasty-format="1QB" class="active">1QB</button><button type="button" data-dynasty-format="SF">Superflex</button><button type="button" data-dynasty-rookies="1">Rookies</button><button type="button" data-dynasty-include-picks="1">Include Picks</button><span class="dynasty-updated" id="dynastyUpdated"></span>';
+formatBar.innerHTML='<button type="button" data-dynasty-format="1QB" class="active">1QB</button><button type="button" data-dynasty-format="SF">Superflex</button><button type="button" data-dynasty-rookies="1">Rookies</button><button type="button" data-dynasty-include-picks="1">Picks</button>';
 toggle.insertAdjacentElement('afterend',formatBar);
 
 const style=document.createElement('style');
 style.textContent=`
 .dynasty-format-toggle{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 12px;color:var(--m)}
 .dynasty-format-toggle[hidden],.dynasty-picks-nav[hidden]{display:none!important}
-.dynasty-format-toggle>span:first-child{font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
 .dynasty-format-toggle button{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 11px;font-weight:900}
 .dynasty-format-toggle button.active{background:#183d63;color:#fff}
-.dynasty-updated{margin-left:auto;font-size:.68rem;color:var(--m)}
 .dynasty-loading td,.dynasty-error td{padding:20px!important;text-align:center;color:var(--m);white-space:normal!important}
 .dynasty-value{font-weight:950;color:#fff}
 .dynasty-pick-avatar{background:#183d63!important;border-color:#ffffff45!important;font-size:.72rem!important}
@@ -54,7 +52,6 @@ style.textContent=`
  .phone-mode .dynasty-format-toggle{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;margin:8px 0!important;padding-bottom:2px!important;scrollbar-width:none}
  .phone-mode .dynasty-format-toggle::-webkit-scrollbar{display:none}
  .phone-mode .dynasty-format-toggle>*{flex:0 0 auto}
- .phone-mode .dynasty-updated{margin-left:0}
  .phone-mode #tableCard tbody tr.dynasty-rank-row{grid-template-columns:40px minmax(0,1fr)!important}
  .phone-mode #tableCard tbody tr.dynasty-rank-row td:nth-child(3),
  .phone-mode #tableCard tbody tr.dynasty-rank-row td:nth-child(4),
@@ -120,13 +117,6 @@ async function loadData(){
  return pending;
 }
 
-function formatUpdated(value){
- if(!value)return'';
- const d=new Date(value);
- if(Number.isNaN(d.getTime()))return'';
- return 'Updated '+d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
-}
-
 function fields(r){
  return mode==='SF'
    ?{rank:number(r.sf_position_rank),value:number(r.sf_trade_value),overall:number(r.sf_overall_rank),label:'Superflex'}
@@ -184,8 +174,8 @@ function renderDynasty(){
  const sub=document.getElementById('sub');
  if(boardEl)boardEl.hidden=true;
  if(card)card.hidden=false;
- if(title)title.textContent=(position==='ALL'?'Overall':position==='PICKS'?'Draft Picks':position)+' Dynasty Rankings';
- if(sub)sub.textContent=position==='PICKS'?'Dynasty draft-pick market values':'Goyball dynasty rankings · sourced from Dynasty Daddy';
+ if(title)title.textContent=position==='ALL'?'Overall Rankings':position==='PICKS'?'Draft Picks':position+' Rankings';
+ if(sub)sub.textContent='';
  if(!rows)return;
 
  if(!dataset||!pickDataset){
@@ -195,9 +185,6 @@ function renderDynasty(){
    });
    return;
  }
-
- const updated=document.getElementById('dynastyUpdated');
- if(updated)updated.textContent=formatUpdated(dataset.updated_at);
 
  const list=makeAssets();
  rows.innerHTML=list.map((x,i)=>{
@@ -283,7 +270,7 @@ formatBar.addEventListener('click',e=>{
  if(pickButton){
    includePicks=!includePicks;
    pickButton.classList.toggle('active',includePicks);
-   pickButton.textContent=includePicks?'Picks Included':'Include Picks';
+   pickButton.textContent='Picks';
    renderDynasty();
  }
 });

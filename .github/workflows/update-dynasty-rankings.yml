@@ -34,6 +34,11 @@ jobs:
             --retry 3 --retry-delay 5 \
             'https://api.sleeper.app/v1/players/nfl' \
             -o /tmp/sleeper-players.json
+          curl --fail --silent --show-error --location \
+            --retry 3 --retry-delay 5 \
+            -H 'Accept: application/json' \
+            'https://dynasty-daddy.com/api/v1/player/all/prev/90' \
+            -o /tmp/dynasty-history-90.json
 
       - name: Validate and build Goyball dynasty dataset
         run: |
@@ -75,12 +80,41 @@ jobs:
                   'yahoo_id': row.get('yahoo_id'),
                   'position': pos,
                   'team': row.get('team'),
+                  'age': row.get('age') if row.get('age') is not None else sleeper.get('age'),
+                  'experience': row.get('experience') if row.get('experience') is not None else sleeper.get('years_exp'),
+                  'injury_status': row.get('injury_status'),
                   'trade_value': row.get('trade_value'),
                   'sf_trade_value': row.get('sf_trade_value'),
                   'position_rank': row.get('position_rank'),
                   'sf_position_rank': row.get('sf_position_rank'),
                   'overall_rank': row.get('overall_rank'),
                   'sf_overall_rank': row.get('sf_overall_rank'),
+                  'last_month_value': row.get('last_month_value'),
+                  'last_month_value_sf': row.get('last_month_value_sf'),
+                  'last_month_rank': row.get('last_month_rank'),
+                  'last_month_rank_sf': row.get('last_month_rank_sf'),
+                  'three_month_high': row.get('three_month_high'),
+                  'three_month_high_sf': row.get('three_month_high_sf'),
+                  'three_month_low': row.get('three_month_low'),
+                  'three_month_low_sf': row.get('three_month_low_sf'),
+                  'three_month_best_rank': row.get('three_month_best_rank'),
+                  'three_month_best_rank_sf': row.get('three_month_best_rank_sf'),
+                  'three_month_worst_rank': row.get('three_month_worst_rank'),
+                  'three_month_worst_rank_sf': row.get('three_month_worst_rank_sf'),
+                  'all_time_high': row.get('all_time_high'),
+                  'all_time_high_sf': row.get('all_time_high_sf'),
+                  'all_time_low': row.get('all_time_low'),
+                  'all_time_low_sf': row.get('all_time_low_sf'),
+                  'all_time_best_rank': row.get('all_time_best_rank'),
+                  'all_time_best_rank_sf': row.get('all_time_best_rank_sf'),
+                  'all_time_worst_rank': row.get('all_time_worst_rank'),
+                  'all_time_worst_rank_sf': row.get('all_time_worst_rank_sf'),
+                  'avg_adp': row.get('avg_adp'),
+                  'fantasypro_adp': row.get('fantasypro_adp'),
+                  'bb10_adp': row.get('bb10_adp'),
+                  'rtsports_adp': row.get('rtsports_adp'),
+                  'underdog_adp': row.get('underdog_adp'),
+                  'drafters_adp': row.get('drafters_adp'),
               })
 
           if len(players) < 100:
@@ -94,17 +128,43 @@ jobs:
               'players': players,
           }
           Path('dynasty-rankings.json').write_text(json.dumps(out, indent=2) + '\n')
-          print(f'Wrote {len(players)} dynasty players')
+
+          history_raw = json.loads(Path('/tmp/dynasty-history-90.json').read_text())
+          history_rows = history_raw if isinstance(history_raw, list) else []
+          grouped = {}
+          for row in history_rows:
+              if not isinstance(row, dict):
+                  continue
+              nid = row.get('name_id')
+              if not nid:
+                  continue
+              grouped.setdefault(nid, []).append({
+                  'date': row.get('date'),
+                  'trade_value': row.get('trade_value'),
+                  'sf_trade_value': row.get('sf_trade_value'),
+                  'position_rank': row.get('position_rank'),
+                  'sf_position_rank': row.get('sf_position_rank'),
+              })
+          for rows in grouped.values():
+              rows.sort(key=lambda x: str(x.get('date') or ''))
+          history_out = {
+              'source': 'Dynasty Daddy',
+              'days': 90,
+              'updated_at': datetime.now(timezone.utc).isoformat(),
+              'players': grouped,
+          }
+          Path('dynasty-history.json').write_text(json.dumps(history_out, separators=(',', ':')) + '\n')
+          print(f'Wrote {len(players)} dynasty players and history for {len(grouped)} players')
           PY
 
       - name: Commit updated rankings
         run: |
-          if [ -z "$(git status --porcelain -- dynasty-rankings.json)" ]; then
+          if [ -z "$(git status --porcelain -- dynasty-rankings.json dynasty-history.json)" ]; then
             echo 'No dynasty ranking changes.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add dynasty-rankings.json
+          git add dynasty-rankings.json dynasty-history.json
           git commit -m 'Update Dynasty Daddy rankings'
           git push

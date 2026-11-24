@@ -33,11 +33,13 @@
   function comparisonColumn(){
     if(!clean())return;
     revealMediumNotes();
+    const dynastyActive=typeof positionView!=='undefined'&&positionView==='DYNASTY';
     if(header){
-      header.textContent='vs ESPN';
-      header.title='Your preseason positional rank compared with ESPN preseason positional rank; ↑ means you ranked this player higher.';
+      header.textContent=dynastyActive?'Values':'vs ESPN';
+      header.title=dynastyActive?'Dynasty trade value':'Your preseason positional rank compared with ESPN preseason positional rank; ↑ means you ranked this player higher.';
     }
     rows?.querySelectorAll('tr').forEach(row=>{
+      if(dynastyActive||row.classList.contains('dynasty-rank-row'))return;
       const cell=row.children[4];
       if(!cell||cell.dataset.fifthEspnFormatted)return;
       const raw=cell.textContent.trim();

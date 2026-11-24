@@ -84,7 +84,7 @@ jobs:
 
       - name: Commit updated rankings
         run: |
-          if git diff --quiet -- dynasty-rankings.json; then
+          if [ -z "$(git status --porcelain -- dynasty-rankings.json)" ]; then
             echo 'No dynasty ranking changes.'
             exit 0
           fi

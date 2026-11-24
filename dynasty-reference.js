@@ -37,7 +37,7 @@ function setHeaders(isDynasty){
  th[1].textContent='Player';
  th[2].textContent='Position';
  th[3].textContent='Team';
- th[4].textContent=isDynasty?'Value':'ESPN ADP';
+ th[4].textContent=isDynasty?'Values':'ESPN ADP';
  th[5].textContent=isDynasty?'Rank':'Notes';
 }
 
@@ -143,10 +143,10 @@ function renderDynasty(){
    const shownRank=rookiesOnly?displayRank.get(p):x.rank;
    return '<tr class="dynasty-rank-row"'+id+'>'+
      '<td class="rank">#'+shownRank+'</td>'+
-     '<td><div class="photo-cell">'+photo+'<div class="rank-player-copy"><b>'+esc(name)+'</b><span class="phone-rank-meta">'+(typeof teamMini==='function'?teamMini(team):'')+'<span>'+esc(pos)+'</span></span></div></div></td>'+
+     '<td><div class="photo-cell">'+photo+'<div class="rank-player-copy"><b>'+esc(name)+'</b><span class="phone-rank-meta">'+(typeof teamMini==='function'?teamMini(team):'')+'<span>'+esc(team)+' · '+esc(pos)+'</span></span></div></div></td>'+
      '<td><span class="badge">'+esc(pos)+'</span></td>'+
      '<td>'+esc(team)+'</td>'+
-     '<td><span class="dynasty-value">'+(x.value===null?'—':Math.round(x.value).toLocaleString())+'</span><span class="dynasty-source-note">'+esc(x.label)+'</span></td>'+
+     '<td><span class="dynasty-value">'+(x.value===null?'—':Math.round(x.value).toLocaleString())+'</span></td>'+
      '<td>#'+(x.overall??'—')+'</td>'+
    '</tr>';
  }).join('')||'<tr class="dynasty-error"><td colspan="6">No dynasty rankings found for this position.</td></tr>';

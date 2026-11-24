@@ -127,7 +127,7 @@ function renderDynasty(){
  const list=dataset.players
    .filter(r=>String(r.position||'').toUpperCase()===position)
    .map(r=>({r,...fields(r)}))
-   .filter(x=>x.rank!==null)
+   .filter(x=>x.rank!==null&&x.rank>0)
    .sort((a,b)=>a.rank-b.rank||((b.value??-1)-(a.value??-1))||String(a.r.name||'').localeCompare(String(b.r.name||'')));
 
  rows.innerHTML=list.map(x=>{

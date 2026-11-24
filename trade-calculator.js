@@ -9,7 +9,7 @@ const TEAM_SLUGS={ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CI
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state={left:[],right:[]};
-let tradeMode='PRESEASON',tradePlayers=[],preseasonPlayers=[],rosPlayers=[];
+let tradeMode='PRESEASON',tradePlayers=[],preseasonPlayers=[],rosPlayers=[],dynastyPlayers=[],dynastyRaw=null,dynastyPickRaw=null,dynastyFormat='1QB';
 // Share the existing calculator's numbers with the chart; one source of truth.
 window.ShuaTradeChartSource=()=>({mode:tradeMode,players:tradePlayers});
 
@@ -19,7 +19,7 @@ style.textContent=`
 #tradeSection{margin-top:8px}
 .trade-shell{display:grid;gap:10px}
 .trade-note{color:var(--m);font-size:.72rem;margin:0 0 2px}
-.trade-mode-toggle{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 2px}.trade-mode-btn{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 12px;font-weight:900}.trade-mode-btn.active{background:#183d63!important;color:#fff!important}
+.trade-mode-toggle{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 2px}.trade-dynasty-format-toggle{display:flex;gap:7px;align-items:center;margin:0 0 2px}.trade-dynasty-format-toggle[hidden]{display:none!important}.trade-mode-btn,.trade-dynasty-format-btn{border:1px solid var(--l);background:transparent;color:var(--m);border-radius:8px;padding:8px 12px;font-weight:900}.trade-mode-btn.active,.trade-dynasty-format-btn.active{background:#183d63!important;color:#fff!important}
 .trade-sides{display:grid;grid-template-columns:1fr;gap:10px;align-items:start}
 .trade-side{border:1px solid var(--l);border-radius:12px;background:#091c30e8;overflow:visible;min-width:0}
 .trade-side-head{display:flex;justify-content:space-between;align-items:center;padding:10px 11px;border-bottom:1px solid var(--l)}
@@ -31,7 +31,7 @@ style.textContent=`
 .trade-result{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;border:0;border-top:1px solid #ffffff12;background:#081a2d;color:#fff;padding:8px 10px;text-align:left}
 .trade-result:first-child{border-top:0}
 .trade-result-player{display:flex;align-items:center;gap:7px;min-width:0}
-.trade-headshot{width:32px!important;height:32px!important;flex:0 0 32px!important;border-radius:50%!important;object-fit:cover!important;border:1px solid #ffffff25!important}
+.trade-headshot{width:32px!important;height:32px!important;flex:0 0 32px!important;border-radius:50%!important;object-fit:cover!important;border:1px solid #ffffff25!important}.trade-pick-icon{width:32px;height:32px;flex:0 0 32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#183d63;border:1px solid #ffffff25;font-size:.68rem;font-weight:950;color:#fff}.trade-player-name .trade-pick-icon{width:30px;height:30px;flex-basis:30px}.trade-why-player .trade-pick-icon{width:22px;height:22px;flex-basis:22px}
 .trade-player-name .trade-headshot{width:30px!important;height:30px!important;flex-basis:30px!important}
 .trade-why-player .trade-headshot{width:22px!important;height:22px!important;flex-basis:22px!important}
 .trade-result-name{font-weight:900;font-size:.76rem;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -84,7 +84,8 @@ section.id='tradeSection';
 section.hidden=true;
 section.innerHTML=
   '<div class="trade-shell">'+
-    '<div class="trade-mode-toggle"><button type="button" class="trade-mode-btn active" data-trade-mode="PRESEASON">Pre Season</button><button type="button" class="trade-mode-btn" data-trade-mode="ROS">ROS</button></div>'+
+    '<div class="trade-mode-toggle"><button type="button" class="trade-mode-btn active" data-trade-mode="PRESEASON">Pre Season</button><button type="button" class="trade-mode-btn" data-trade-mode="ROS">ROS</button><button type="button" class="trade-mode-btn" data-trade-mode="DYNASTY">Dynasty</button></div>'+
+    '<div id="tradeDynastyFormatToggle" class="trade-dynasty-format-toggle" hidden><button type="button" class="trade-dynasty-format-btn active" data-trade-dynasty-format="1QB">1QB</button><button type="button" class="trade-dynasty-format-btn" data-trade-dynasty-format="SF">Superflex</button></div>'+
     '<p id="tradeNote" class="trade-note">Pre Season values use your Big Board overall rankings.</p>'+
     '<div class="trade-sides">'+
       sideHtml('left','Top Side')+
@@ -122,30 +123,58 @@ function playerValue(rank){
   // #1 ~= 150, #10 ~= 105, #20 ~= 70, #30 ~= 47, #50 ~= 21.
   return Math.max(.1,150*Math.exp(-0.04*(rank-1)));
 }
-function activeModeLabel(){return tradeMode==='ROS'?'ROS':'Pre Season'}
+function activeModeLabel(){return tradeMode==='DYNASTY'?'Dynasty':tradeMode==='ROS'?'ROS':'Pre Season'}
 function syncSelectedToMode(){
   const byName=new Map(tradePlayers.map(p=>[norm(p.name),p]));
   ['left','right'].forEach(side=>{
     state[side]=state[side].map(p=>byName.get(norm(p.name))).filter(Boolean);
   });
 }
+function rebuildDynastyPlayers(){
+  if(!dynastyRaw||!dynastyPickRaw){dynastyPlayers=[];return dynastyPlayers;}
+  const sf=dynastyFormat==='SF';
+  const assets=(dynastyRaw.players||[]).map(r=>{
+    const value=Number(sf?r.sf_trade_value:r.trade_value);
+    const sourceRank=Number(sf?r.sf_overall_rank:r.overall_rank);
+    const positionRank=Number(sf?r.sf_position_rank:r.position_rank);
+    if(!Number.isFinite(value)||value<=0||!Number.isFinite(sourceRank)||sourceRank<=0)return null;
+    return {name:r.name||r.name_id,team:r.team||'—',position:r.position||'—',value,rank:sourceRank,sourceRank,positionRank,isPick:false};
+  }).filter(Boolean);
+  for(const p of dynastyPickRaw.picks||[]){
+    const value=Number(p.value);
+    if(!Number.isFinite(value)||value<=0)continue;
+    assets.push({name:p.name,team:'—',position:'PICK',value,rank:9999,sourceRank:null,positionRank:null,isPick:true,pickYear:p.year,pickRound:p.round,pickTier:p.tier});
+  }
+  assets.sort((a,b)=>b.value-a.value||(a.isPick?1:0)-(b.isPick?1:0)||(a.sourceRank??9999)-(b.sourceRank??9999)||a.name.localeCompare(b.name));
+  assets.forEach((p,i)=>p.rank=i+1);
+  dynastyPlayers=assets;
+  return assets;
+}
 function setTradeMode(mode){
-  tradeMode=mode==='ROS'?'ROS':'PRESEASON';
-  tradePlayers=tradeMode==='ROS'?rosPlayers:preseasonPlayers;
+  tradeMode=mode==='DYNASTY'?'DYNASTY':mode==='ROS'?'ROS':'PRESEASON';
+  if(tradeMode==='DYNASTY')rebuildDynastyPlayers();
+  tradePlayers=tradeMode==='DYNASTY'?dynastyPlayers:tradeMode==='ROS'?rosPlayers:preseasonPlayers;
   document.querySelectorAll('[data-trade-mode]').forEach(b=>b.classList.toggle('active',b.dataset.tradeMode===tradeMode));
+  const dynToggle=document.getElementById('tradeDynastyFormatToggle');
+  if(dynToggle)dynToggle.hidden=tradeMode!=='DYNASTY';
   const note=document.getElementById('tradeNote');
-  if(note)note.textContent=tradeMode==='ROS'
-    ?'ROS trade values.'
-    :'Pre Season trade values.';
+  if(note)note.textContent=tradeMode==='DYNASTY'
+    ?'Dynasty trade values use Goyball’s local Dynasty Daddy player and draft-pick market values.'
+    :tradeMode==='ROS'?'ROS trade values.':'Pre Season trade values.';
   syncSelectedToMode();
   renderSide('left');renderSide('right');
   ['left','right'].forEach(side=>showMatches(side));
   window.dispatchEvent(new Event('shua:trade-data-updated'));
 }
 function tradeHeadshot(p){
+  if(p?.isPick)return '<span class="trade-pick-icon">P</span>';
   try{
     return typeof pic==='function'?pic(p.name,'sm trade-headshot',p.team||'',p.position||''):'';
   }catch(e){return ''}
+}
+function formatTradeValue(v){
+  const n=Number(v)||0;
+  return tradeMode==='DYNASTY'?Math.round(n).toLocaleString():n.toFixed(1);
 }
 function teamLogo(team){
   const slug=TEAM_SLUGS[team];
@@ -246,32 +275,37 @@ function adjustmentText(side){
 function renderSide(side){
   const list=document.getElementById('tradeList-'+side);
   const total=adjustedSum(side);
-  document.getElementById('tradeTotal-'+side).textContent='Score '+total.toFixed(1);
+  document.getElementById('tradeTotal-'+side).textContent='Score '+formatTradeValue(total);
   if(!state[side].length){
-    list.innerHTML='<div class="trade-empty">No players added</div>';
+    list.innerHTML='<div class="trade-empty">No assets added</div>';
   }else{
-    list.innerHTML=state[side].map(p=>
-      '<div class="trade-player">'+
+    list.innerHTML=state[side].map(p=>{
+      const nameHtml=p.isPick?'<span class="trade-player-link">'+escapeHtml(p.name)+'</span>':'<button type="button" class="trade-player-link" data-trade-profile="'+encodeURIComponent(p.name)+'">'+escapeHtml(p.name)+'</button>';
+      const meta=tradeMode==='DYNASTY'
+        ?(p.isPick?'Draft Pick · Dynasty #'+p.rank:'Dynasty #'+p.rank+' overall · '+p.position+(p.team&&p.team!=='—'?' · '+p.team:''))
+        :(tradeMode==='ROS'?'ROS '+p.position+' #'+p.positionRank:'Pre Season #'+p.rank+' overall')+(p.team&&p.team!=='—'?' · '+p.team:'');
+      return '<div class="trade-player">'+
         '<div class="trade-player-main">'+
-          '<div class="trade-player-name">'+tradeHeadshot(p)+teamLogo(p.team)+'<button type="button" class="trade-player-link" data-trade-profile="'+encodeURIComponent(p.name)+'">'+p.name+'</button></div>'+
-          '<div class="trade-player-meta">'+(tradeMode==='ROS'?'ROS '+p.position+' #'+p.positionRank:'Pre Season #'+p.rank+' overall')+(p.team&&p.team!=='—'?' · '+p.team:'')+'</div>'+
+          '<div class="trade-player-name">'+tradeHeadshot(p)+(p.isPick?'':teamLogo(p.team))+nameHtml+'</div>'+
+          '<div class="trade-player-meta">'+meta+'</div>'+
         '</div>'+
-        '<div class="trade-value">'+p.value.toFixed(1)+'</div>'+
-        '<button type="button" class="trade-remove" data-remove="'+side+'" data-name="'+encodeURIComponent(p.name)+'" aria-label="Remove '+p.name+'">×</button>'+
-      '</div>'
-    ).join('');
+        '<div class="trade-value">'+formatTradeValue(p.value)+'</div>'+
+        '<button type="button" class="trade-remove" data-remove="'+side+'" data-name="'+encodeURIComponent(p.name)+'" aria-label="Remove '+escapeHtml(p.name)+'">×</button>'+
+      '</div>';
+    }).join('');
   }
   updateVerdict();
 }
 function tradeRankLabel(p){
+  if(tradeMode==='DYNASTY')return p.isPick?('Draft Pick · #'+p.rank+' market'):('#'+p.rank+' dynasty overall');
   return tradeMode==='ROS'?(p.position+' #'+p.positionRank+' ROS'):('#'+p.rank+' overall');
 }
 function whySideHtml(side,label){
   const total=adjustedSum(side);
   const items=[...state[side]].sort((a,b)=>b.value-a.value);
   return '<div class="trade-why-side"><h4>'+label+'</h4>'+
-    (items.length?items.map(p=>'<div class="trade-why-line"><div class="trade-why-player">'+tradeHeadshot(p)+teamLogo(p.team)+'<span>'+p.name+' · '+tradeRankLabel(p)+'</span></div><b>'+p.value.toFixed(1)+'</b></div>').join(''):'<div class="trade-empty">No players added</div>')+
-    '<div class="trade-why-total"><span>Score</span><b>'+total.toFixed(1)+'</b></div></div>';
+    (items.length?items.map(p=>'<div class="trade-why-line"><div class="trade-why-player">'+tradeHeadshot(p)+(p.isPick?'':teamLogo(p.team))+'<span>'+escapeHtml(p.name)+' · '+tradeRankLabel(p)+'</span></div><b>'+formatTradeValue(p.value)+'</b></div>').join(''):'<div class="trade-empty">No assets added</div>')+
+    '<div class="trade-why-total"><span>Score</span><b>'+formatTradeValue(total)+'</b></div></div>';
 }
 function updateWhy(){
   const box=document.getElementById('tradeWhy');if(!box)return;
@@ -347,12 +381,15 @@ function showMatches(side){
     results.style.display='block';
     return;
   }
-  results.innerHTML=matches.map(p=>
-    '<button type="button" class="trade-result" data-add="'+side+'" data-name="'+encodeURIComponent(p.name)+'">'+
-      '<span class="trade-result-player">'+tradeHeadshot(p)+teamLogo(p.team)+'<span class="trade-result-name">'+p.name+'</span></span>'+
-      '<span class="trade-result-meta">'+p.position+' · '+(tradeMode==='ROS'?'ROS #'+p.positionRank:'Overall #'+p.rank)+' · Value '+p.value.toFixed(1)+'</span>'+
-    '</button>'
-  ).join('');
+  results.innerHTML=matches.map(p=>{
+    const meta=tradeMode==='DYNASTY'
+      ?(p.isPick?'Draft Pick · Market #'+p.rank:'Dynasty #'+p.rank+' · '+p.position)+( ' · Value '+formatTradeValue(p.value))
+      :p.position+' · '+(tradeMode==='ROS'?'ROS #'+p.positionRank:'Overall #'+p.rank)+' · Value '+formatTradeValue(p.value);
+    return '<button type="button" class="trade-result" data-add="'+side+'" data-name="'+encodeURIComponent(p.name)+'">'+
+      '<span class="trade-result-player">'+tradeHeadshot(p)+(p.isPick?'':teamLogo(p.team))+'<span class="trade-result-name">'+escapeHtml(p.name)+'</span></span>'+
+      '<span class="trade-result-meta">'+meta+'</span>'+
+    '</button>';
+  }).join('');
   results.style.display='block';
 }
 function showTrade(){
@@ -387,6 +424,7 @@ button.onclick=e=>{e.preventDefault();showTrade()};
 
 document.addEventListener('click',e=>{
   const modeBtn=e.target.closest('[data-trade-mode]');if(modeBtn){setTradeMode(modeBtn.dataset.tradeMode);return;}
+  const dynFormatBtn=e.target.closest('[data-trade-dynasty-format]');if(dynFormatBtn){dynastyFormat=dynFormatBtn.dataset.tradeDynastyFormat==='SF'?'SF':'1QB';document.querySelectorAll('[data-trade-dynasty-format]').forEach(b=>b.classList.toggle('active',b===dynFormatBtn));rebuildDynastyPlayers();if(tradeMode==='DYNASTY')setTradeMode('DYNASTY');return;}
   const navBtn=e.target.closest('.positions .pos');
   if(navBtn&&navBtn.dataset.pos!=='TRADE')hideTrade();
   const prof=e.target.closest('[data-trade-profile]');
@@ -429,6 +467,7 @@ document.getElementById('tradeClear').onclick=()=>{
   state.left=[];state.right=[];
   renderSide('left');renderSide('right');
 };
+window.addEventListener('shua:dynasty-format-change',e=>{const next=e.detail?.format==='SF'?'SF':'1QB';dynastyFormat=next;document.querySelectorAll('[data-trade-dynasty-format]').forEach(b=>b.classList.toggle('active',b.dataset.tradeDynastyFormat===next));rebuildDynastyPlayers();if(tradeMode==='DYNASTY')setTradeMode('DYNASTY');});
 
 Promise.all([
   fetch('big-board.json',{cache:'no-store'}).then(r=>r.json()),
@@ -436,9 +475,12 @@ Promise.all([
   fetch('rb-rankings.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('wr-rankings.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('te-rankings.json',{cache:'no-store'}).then(r=>r.json()),
-  fetch('ros-rankings.json',{cache:'no-store'}).then(r=>r.json())
+  fetch('ros-rankings.json',{cache:'no-store'}).then(r=>r.json()),
+  fetch('dynasty-rankings.json',{cache:'no-store'}).then(r=>r.json()),
+  fetch('dynasty-picks.json',{cache:'no-store'}).then(r=>r.json())
 ]).then(data=>{
   const big=data[0],ros=data[5],meta=new Map(),positionLists={QB:[],RB:[],WR:[],TE:[]};
+  dynastyRaw=data[6];dynastyPickRaw=data[7];rebuildDynastyPlayers();
   ['QB','RB','WR','TE'].forEach((pos,i)=>{
     (data[i+1].players||[]).forEach(p=>{
       const k=norm(p.name);

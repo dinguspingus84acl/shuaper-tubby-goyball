@@ -2080,6 +2080,7 @@ window.ShuaEspnLive={
   },
   getHistoricalCareer,
   getCompleteCareer,
+  async getCareerSeasonBoard(year){return Number(year)===SEASON?ensureCurrentRows():fetchHistoricalSeason(Number(year));},
   getPlayerHeadshotUrl(player){return playerFaceCandidates(player)[0]||''},
   getPlayerHeadshotUrls(player){return playerFaceCandidates(player)},
   getTeamLogoUrl(team){return historicalTeamLogoUrl(team)},

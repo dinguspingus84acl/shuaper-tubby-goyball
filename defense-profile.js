@@ -43,16 +43,20 @@ async function season(id,team,year){
  })().catch(()=>null);
  seasonCache.set(key,promise);return promise;
 }
-async function ranks(year){
- if(rankingCache.has(year))return rankingCache.get(year);
+async function ranks(year,byPpg=false){
+ const cacheKey=year+':'+(byPpg?'ppg':'total');
+ if(rankingCache.has(cacheKey))return rankingCache.get(cacheKey);
  const promise=(async()=>{
   const filter={filterSlotIds:{value:[16]},filterStatsForSourceIds:{value:[0]},filterStatsForSplitTypeIds:{value:[0]},sortAppliedStatTotal:{sortAsc:false,sortPriority:1,value:'00'+year},filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+year]},limit:100,offset:0};
   const data=await json(fantasyUrl(year),headers(filter));
-  const rows=(data.players||[]).map(dataPlayer).filter(p=>Number(p?.defaultPositionId)===16).map(p=>({id:String(p.id),points:Number(seasonStat(p,year)?.appliedTotal)})).filter(p=>Number.isFinite(p.points)).sort((a,b)=>b.points-a.points);
+  const rows=(data.players||[]).map(dataPlayer).filter(p=>Number(p?.defaultPositionId)===16).map(p=>{
+    const stat=seasonStat(p,year),raw=stat?.appliedTotal,gp=Number(stat?.stats?.[210]),avg=stat?.appliedAverage,total=raw==null?NaN:Number(raw);
+    return {id:String(p.id),points:byPpg?(gp>0?total/gp:(avg!=null?Number(avg):NaN)):total};
+  }).filter(p=>Number.isFinite(p.points)).sort((a,b)=>b.points-a.points);
   if(rows.length<20)return null;
-  return new Map(rows.map((r,i)=>[r.id,i+1]));
+  return new Map(rows.map((r,i)=>[r.id,byPpg?1+rows.filter(x=>x.points>r.points+1e-8).length:i+1]));
  })().catch(()=>null);
- rankingCache.set(year,promise);return promise;
+ rankingCache.set(cacheKey,promise);return promise;
 }
 async function schedule(teamId,year){
  if(!teamId)return new Map();const key=teamId+':'+year;
@@ -81,11 +85,11 @@ async function renderHistory(name,id,team,target){
  if(!target)return;target.innerHTML='<div class="unified-profile-loading">Loading defense history…</div>';
  const seasons=await Promise.all(years.map(year=>season(id,team,year)));
  if(!alive(target,name))return;
- const rows=seasons.filter(Boolean),boards=await Promise.all(rows.map(row=>row.year===2026?Promise.resolve(null):ranks(row.year)));
+ const rows=seasons.filter(Boolean),[boards,ppgRanks]=await Promise.all([Promise.all(rows.map(row=>row.year===2026?Promise.resolve(null):ranks(row.year))),Promise.all(rows.map(row=>ranks(row.year,true)))]);
  if(!alive(target,name))return;
- target.innerHTML=rows.length?'<div class="player-history-card"><div class="player-history-head"><div>Year</div><div>Team</div><div>Finish</div><div>GP</div><div>PPG</div><div>Pts</div></div>'+rows.map((row,i)=>{
+ target.innerHTML=rows.length?'<div class="player-history-card player-history-seven"><div class="player-history-head"><div>Year</div><div>Team</div><div>GP</div><div>Finish</div><div>PPG</div><div class="player-history-ppg-rank-head">PPG Rank</div><div>Pts</div></div>'+rows.map((row,i)=>{
   const src=logo(row.team),rank=boards[i]?.get(String(defenseId(id,team)));
-  return '<div class="player-history-row" data-defense-year="'+row.year+'" role="button" tabindex="0"><div class="player-history-year">› '+row.year+'</div><div class="player-history-team">'+(src?'<img class="player-history-team-logo" src="'+src+'" alt="'+esc(row.team)+' logo" loading="lazy">':'')+'<span class="full">'+esc(row.team)+'</span><span class="abbr">'+esc(row.team)+'</span></div><div class="player-history-finish">'+(rank||'—')+'</div><div class="player-history-games">'+row.gp+'</div><div class="player-history-ppg">'+fmt(row.ppg)+'</div><div class="player-history-points">'+fmt(row.points)+'</div></div>';
+  return '<div class="player-history-row" data-defense-year="'+row.year+'" role="button" tabindex="0"><div class="player-history-year">› '+row.year+'</div><div class="player-history-team">'+(src?'<img class="player-history-team-logo" src="'+src+'" alt="'+esc(row.team)+' logo" loading="lazy">':'')+'<span class="full">'+esc(row.team)+'</span><span class="abbr">'+esc(row.team)+'</span></div><div class="player-history-games">'+row.gp+'</div><div class="player-history-finish">'+(rank||'—')+'</div><div class="player-history-ppg">'+fmt(row.ppg)+'</div><div class="player-history-ppg-rank-cell">'+(ppgRanks[i]?.get(String(defenseId(id,team)))?'D/ST'+ppgRanks[i].get(String(defenseId(id,team))):'—')+'</div><div class="player-history-points">'+fmt(row.points)+'</div></div>';
  }).join('')+'<div class="player-history-note">Finish = ESPN D/ST rank by season fantasy points. Current season is not yet final. Tap a season for its game log.</div></div>':'<div class="player-history-empty">No ESPN defense history available.</div>';
  target.querySelectorAll('[data-defense-year]').forEach(el=>{
   const open=()=>{selectedYears.set(playerKey(id,team),Number(el.dataset.defenseYear));const gameLog=document.getElementById('unifiedGameLogPanel');if(gameLog)gameLog.dataset.ready='0';document.querySelector('[data-profile-tab="gamelog"]')?.click();};

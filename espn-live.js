@@ -2081,6 +2081,41 @@ window.ShuaEspnLive={
   getHistoricalCareer,
   getCompleteCareer,
   async getCareerSeasonBoard(year){return Number(year)===SEASON?ensureCurrentRows():fetchHistoricalSeason(Number(year));},
+  async getCareerPpgRank(row){
+    const year=Number(row.year),pos=String(row.position||'').toUpperCase(),key=nameKey(row.name);
+    const ppg=p=>{
+      const gp=Number(p.gamesPlayed??p.games);
+      if(!(gp>0))return null;
+      if(p.points!=null&&p.points!==''&&Number.isFinite(Number(p.points)))return Number(p.points)/gp;
+      const avg=p.ppg??p.average;
+      return avg!=null&&avg!==''&&Number.isFinite(Number(avg))?Number(avg):null;
+    };
+    let pool=[];
+    if(year===SEASON)pool=await ensureCurrentRows();
+    else{
+      const index=await loadHistoricalIndex();
+      for(const [k,meta] of Object.entries(index)){
+        const h=Array.isArray(meta.history)?meta.history.find(x=>Number(x.year)===year):null;
+        if(h)pool.push({...h,name:h.name||meta.name||k,position:h.position||meta.position});
+      }
+    }
+    const compute=list=>{
+      const unique=new Map();
+      for(const p of list){
+        if(String(p.position||'').toUpperCase()!==pos||ppg(p)===null)continue;
+        const k=nameKey(p.name)||String(p.id);
+        if(!unique.has(k))unique.set(k,p);
+      }
+      const players=[...unique.values()];
+      const target=players.find(p=>row.id!=null&&String(p.id)===String(row.id))||players.find(p=>nameKey(p.name)===key);
+      if(!target||players.length<2)return null;
+      const value=ppg(target);
+      return 1+players.filter(p=>ppg(p)>value+1e-8).length;
+    };
+    let result=compute(pool);
+    if(result===null&&year!==SEASON)result=compute(await fetchHistoricalSeason(year));
+    return result;
+  },
   getPlayerHeadshotUrl(player){return playerFaceCandidates(player)[0]||''},
   getPlayerHeadshotUrls(player){return playerFaceCandidates(player)},
   getTeamLogoUrl(team){return historicalTeamLogoUrl(team)},

@@ -1,0 +1,19 @@
+name: Verify History PPG column
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'player-history.js'
+      - 'espn-live.js'
+      - 'scripts/history-ppg-check.mjs'
+      - '.github/workflows/verify-history-ppg.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: node --check player-history.js && node --check espn-live.js && node --check kicker-profile.js && node --check defense-profile.js
+      - run: google-chrome --version && node scripts/history-ppg-check.mjs

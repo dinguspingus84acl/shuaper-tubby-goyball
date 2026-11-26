@@ -20,7 +20,7 @@ body.shua-clean #shuaCleanNav .shua-brand-dot{color:#67e4b8!important}
 body.shua-clean .player-history-card{border-color:#50748b68!important;background:#081d2e!important}
 body.shua-clean .player-history-head,
 body.shua-clean .player-history-row{
-  grid-template-columns:66px minmax(125px,1.35fr) 67px 47px 78px 98px;
+  grid-template-columns:66px minmax(125px,1.35fr) 47px 67px 78px 98px;
   column-gap:9px!important;padding:10px 13px!important;
 }
 body.shua-clean .player-history-head{background:#123047!important;color:#a8c7d7!important;font-size:10px!important}
@@ -36,7 +36,7 @@ body.shua-clean .player-history-row.open{box-shadow:inset 3px 0 #6be0b4}
 @media(max-width:620px){
   body.shua-clean .player-history-head,
   body.shua-clean .player-history-row{
-    grid-template-columns:60px 58px 43px 32px minmax(45px,1fr) minmax(58px,1.1fr);
+    grid-template-columns:60px 58px 32px 43px minmax(45px,1fr) minmax(58px,1.1fr);
     column-gap:4px!important;padding:9px 5px!important;
   }
   body.shua-clean .player-history-head{font-size:9px!important;letter-spacing:0!important}

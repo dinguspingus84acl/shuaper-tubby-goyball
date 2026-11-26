@@ -606,7 +606,7 @@ async function toggleSeasonDetail(rowEl,row){
 function readPlayerCache(player){
   try{
     const data=JSON.parse(localStorage.getItem('shuaEspnFinishHistory:'+player.id)||'null');
-    if(!data||data.version!==10||!Array.isArray(data.rows))return null;
+    if(!data||data.version!==11||!Array.isArray(data.rows))return null;
     if(Number(data.latestCompleted)!==LATEST_COMPLETED)return null;
     return data.rows;
   }catch(e){return null}
@@ -614,7 +614,7 @@ function readPlayerCache(player){
 function savePlayerCache(player,rows){
   try{
     localStorage.setItem('shuaEspnFinishHistory:'+player.id,JSON.stringify({
-      version:10,
+      version:11,
       latestCompleted:LATEST_COMPLETED,
       rows
     }));
@@ -632,6 +632,25 @@ async function mapLimited(items,limit,fn){
   }
   await Promise.all(Array.from({length:Math.min(limit,items.length)},worker));
   return out;
+}
+async function enrichPpgRanks(rows){
+  const input=rows.filter(Boolean);
+  return await mapLimited(input,4,async row=>{
+    if(row.ppgRank)return row;
+    const year=Number(row.year),pos=String(row.position||'').toUpperCase();
+    if(!Number.isFinite(year)||!pos)return row;
+    try{
+      const board=await fetchSeasonBoard(year);
+      const ppgRows=board.filter(x=>x.position===pos&&Number.isFinite(Number(x.ppg))&&Number(x.ppg)>=0&&Number(x.games)>0)
+        .sort((a,b)=>Number(b.ppg)-Number(a.ppg)||b.points-a.points||a.name.localeCompare(b.name));
+      let i=ppgRows.findIndex(x=>String(x.id)===String(row.id));
+      if(i<0){
+        const wanted=norm(row.name);
+        i=ppgRows.findIndex(x=>norm(x.name)===wanted);
+      }
+      return {...row,ppgRank:i>=0?i+1:null};
+    }catch(e){return row}
+  });
 }
 function renderRows(player,rows,target){
   const good=rows.filter(Boolean).sort((a,b)=>b.year-a.year);
@@ -683,7 +702,8 @@ async function render(name,target){
         if(career?.length){
           const completed=career.filter(r=>Number(r.year)<=LATEST_COMPLETED);
           if(completed.length){
-            renderRows({name,id:career[0].id,position:career[0].position},career,target);
+            const enriched=await enrichPpgRanks(career);
+            renderRows({name,id:career[0].id,position:career[0].position},enriched,target);
             return;
           }
           partialCareer=career;
@@ -693,7 +713,8 @@ async function render(name,target){
       try{
         const historical=await window.ShuaEspnLive.getHistoricalCareer(name);
         if(historical?.length){
-          renderRows({name,id:historical[0].id,position:historical[0].position},historical,target);
+          const enriched=await enrichPpgRanks(historical);
+          renderRows({name,id:historical[0].id,position:historical[0].position},enriched,target);
           return;
         }
       }catch(e){}
@@ -701,7 +722,8 @@ async function render(name,target){
     const player=await resolvePlayer(name);
     if(!player){
       if(partialCareer.length){
-        renderRows({name,id:partialCareer[0].id,position:partialCareer[0].position},partialCareer,target);
+        const enriched=await enrichPpgRanks(partialCareer);
+        renderRows({name,id:partialCareer[0].id,position:partialCareer[0].position},enriched,target);
         return;
       }
       target.innerHTML='<div class="player-history-empty player-history-error">Could not match this player to historical or ESPN data.</div>';
@@ -709,20 +731,25 @@ async function render(name,target){
     }
     const cached=readPlayerCache(player);
     if(cached?.length){
-      renderRows(player,mergeHistoryYears(partialCareer,cached),target);
+      const merged=mergeHistoryYears(partialCareer,cached);
+      const enriched=await enrichPpgRanks(merged);
+      renderRows(player,enriched,target);
       return;
     }
     const good=await loadFastHistory(player);
     if(!good.length){
       if(partialCareer.length){
-        renderRows(player,partialCareer,target);
+        const enriched=await enrichPpgRanks(partialCareer);
+        renderRows(player,enriched,target);
         return;
       }
       target.innerHTML='<div class="player-history-empty">No completed ESPN fantasy seasons found for this player.</div>';
       return;
     }
-    if(good.every(r=>r.rank))savePlayerCache(player,good);
-    renderRows(player,mergeHistoryYears(partialCareer,good),target);
+    const merged=mergeHistoryYears(partialCareer,good);
+    const enriched=await enrichPpgRanks(merged);
+    if(enriched.every(r=>r.rank&&r.ppgRank))savePlayerCache(player,enriched);
+    renderRows(player,enriched,target);
   }catch(e){
     target.innerHTML='<div class="player-history-empty player-history-error">Could not load player history right now.</div>';
   }

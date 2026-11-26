@@ -40,6 +40,17 @@ style.textContent +=
 'body .player-history-seven .player-history-head,body .player-history-seven .player-history-row{grid-template-columns:64px minmax(76px,1.25fr) 38px 58px 58px 66px 76px!important;column-gap:6px!important;box-sizing:border-box}'+
 'body .player-history-seven .player-history-head>div,body .player-history-seven .player-history-row>div{min-width:0}'+
 '@media(max-width:700px){body .player-history-seven .player-history-head,body .player-history-seven .player-history-row{grid-template-columns:minmax(40px,1fr) minmax(38px,1.05fr) minmax(23px,.58fr) minmax(36px,.88fr) minmax(34px,.88fr) minmax(44px,1.05fr) minmax(44px,1.12fr)!important;column-gap:3px!important;padding:9px 5px!important}.player-history-seven .player-history-team .full{display:none}.player-history-seven .player-history-team .abbr{display:inline}.player-history-seven .player-history-team{gap:2px!important}.player-history-seven .player-history-team-logo{width:14px!important;height:14px!important;flex-basis:14px!important}.player-history-seven .player-history-year{gap:2px!important;font-size:.78rem!important}.player-history-seven .player-history-head{font-size:9px!important;letter-spacing:0!important}.player-history-seven .player-history-ppg-rank-cell,.player-history-seven .player-history-ppg,.player-history-seven .player-history-points,.player-history-seven .player-history-finish,.player-history-seven .player-history-games{font-size:.82rem!important}}';
+style.textContent +=
+'#unifiedHistoryPanel .player-history-card.player-history-seven{container-type:inline-size}'+
+'#modal .player-history-card.player-history-seven>.player-history-head,#modal .player-history-card.player-history-seven>.player-history-row{display:grid!important;grid-template-columns:minmax(40px,1fr) minmax(36px,1.25fr) minmax(23px,.6fr) minmax(36px,.9fr) minmax(34px,.9fr) minmax(42px,1.05fr) minmax(43px,1.12fr)!important;column-gap:3px!important;padding:9px 5px!important;width:100%!important;box-sizing:border-box!important;align-items:center!important}'+
+'#modal .player-history-seven>.player-history-head>div,#modal .player-history-seven>.player-history-row>div{min-width:0!important;justify-self:stretch;box-sizing:border-box!important}'+
+'#modal .player-history-seven>.player-history-head>div:nth-child(n+3),#modal .player-history-seven>.player-history-row>div:nth-child(n+3){text-align:center!important}'+
+'#modal .player-history-seven>.player-history-head{font-size:9px!important;letter-spacing:0!important;line-height:1.15}'+
+'#modal .player-history-seven .player-history-team .full{display:none!important}#modal .player-history-seven .player-history-team .abbr{display:inline!important;font-size:.7rem!important}'+
+'#modal .player-history-seven .player-history-team{gap:2px!important}#modal .player-history-seven .player-history-team-logo{width:14px!important;height:14px!important;flex:0 0 14px!important}'+
+'#modal .player-history-seven .player-history-year{font-size:.78rem!important;gap:2px!important;white-space:nowrap}'+
+'#modal .player-history-seven .player-history-ppg-rank-cell,#modal .player-history-seven .player-history-finish,#modal .player-history-seven .player-history-games,#modal .player-history-seven .player-history-ppg,#modal .player-history-seven .player-history-points{font-size:.81rem!important;font-variant-numeric:tabular-nums;white-space:nowrap}'+
+'@container (min-width:500px){#modal .player-history-seven>.player-history-head,#modal .player-history-seven>.player-history-row{grid-template-columns:60px minmax(88px,1.4fr) 38px 54px 58px 66px 70px!important;column-gap:6px!important;padding:10px 9px!important}#modal .player-history-seven .player-history-head{font-size:10px!important}#modal .player-history-seven .player-history-team .full{display:inline!important}#modal .player-history-seven .player-history-team .abbr{display:none!important}}';
 document.head.appendChild(style);
 
 function escHistory(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
@@ -667,6 +678,12 @@ async function enrichPpgRanks(rows){
   return await mapLimited(rows.filter(Boolean),4,async row=>{
     const year=Number(row.year);
     if(!Number.isFinite(year)||!row.position)return {...row,ppgRank:null};
+    try{
+      if(window.ShuaEspnLive?.getCareerPpgRank){
+        const rank=await window.ShuaEspnLive.getCareerPpgRank(row);
+        if(rank!==null&&Number.isFinite(rank))return {...row,ppgRank:rank};
+      }
+    }catch(e){}
     try{
       if(window.ShuaEspnLive?.getCareerSeasonBoard){
         const board=await window.ShuaEspnLive.getCareerSeasonBoard(year);

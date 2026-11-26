@@ -28,14 +28,15 @@ style.textContent=
 '.player-history-head{color:#7f93aa;font-size:.62rem;font-weight:950;text-transform:uppercase;letter-spacing:.055em;background:#061522}'+
 '.player-history-row{border-top:1px solid #ffffff10;min-height:46px;cursor:pointer;transition:background .12s ease}.player-history-row:hover,.player-history-row.open{background:#0b2139}'+
 '.player-history-year{font-weight:1000;font-size:.94rem}'+
-'.player-history-team{display:flex;align-items:center;gap:7px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-history-team-logo{width:20px;height:20px;object-fit:contain;flex:0 0 20px}.player-history-team{font-size:.88rem}.player-history-team .abbr{display:none}.player-history-finish{font-weight:1000;font-size:1.08rem}.player-history-games{text-align:center;font-size:.94rem;font-weight:1000;color:#fff}.player-history-ppg,.player-history-points{text-align:right;font-size:.98rem;color:#fff;font-weight:1000}.player-history-year{display:flex;align-items:center;gap:6px}.player-history-chevron{display:inline-block;color:#7f93aa;transition:transform .14s ease}.player-history-row.open .player-history-chevron{transform:rotate(90deg)}'+
+'.player-history-team{display:flex;align-items:center;gap:7px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-history-team-logo{width:20px;height:20px;object-fit:contain;flex:0 0 20px}.player-history-team{font-size:.88rem}.player-history-team .abbr{display:none}.player-history-finish{font-weight:1000;font-size:1.08rem}.player-history-games{text-align:center;font-size:.94rem;font-weight:1000;color:#fff}.player-history-ppg,.player-history-points{text-align:right;font-size:.98rem;color:#fff;font-weight:1000}.player-history-ppg-rank{display:block;margin-top:2px;color:#7f93aa;font-size:.52rem;font-weight:900;line-height:1.1;white-space:nowrap}.player-history-year{display:flex;align-items:center;gap:6px}.player-history-chevron{display:inline-block;color:#7f93aa;transition:transform .14s ease}.player-history-row.open .player-history-chevron{transform:rotate(90deg)}'+
 
 '.player-history-detail{display:none;border-top:1px solid #ffffff12;background:#061522;padding:9px 10px}.player-history-detail.open{display:block}.player-history-detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.player-history-detail-stat{border:1px solid #ffffff12;background:#07182a;border-radius:8px;padding:9px}.player-history-detail-stat span{display:block;color:#7f93aa;font-size:.56rem;font-weight:850;text-transform:uppercase;letter-spacing:.04em}.player-history-detail-stat b{display:block;color:#fff;font-size:.9rem;margin-top:3px}.player-history-detail-loading{color:#7f93aa;font-size:.62rem;padding:4px}.player-history-note{padding:10px 12px;color:#7f93aa;font-size:.58rem;line-height:1.45;border-top:1px solid #ffffff10}'+
 '.player-history-empty{padding:14px 4px;color:#7f93aa;font-size:.66rem}'+
 '.player-history-error{color:#ff8b9d}'+
-'@media(max-width:620px){.player-history-head,.player-history-row{grid-template-columns:62px 58px 46px 38px minmax(54px,1fr) minmax(62px,1.08fr);padding:9px 6px;gap:4px}.player-history-row{min-height:48px}.player-history-year{position:relative;z-index:2;white-space:nowrap;gap:4px;font-size:.88rem}.player-history-team{min-width:0;gap:4px;overflow:hidden;font-size:.76rem}.player-history-team-logo{width:16px;height:16px;flex-basis:16px}.player-history-team .full{display:none}.player-history-team .abbr{display:inline;font-size:.74rem}.player-history-head{font-size:.56rem}.player-history-finish{font-size:.94rem}.player-history-games{font-size:.84rem}.player-history-ppg,.player-history-points{font-size:.88rem;font-weight:1000;color:#fff}.player-history-detail{padding:8px 6px}.player-history-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}';
+'@media(max-width:620px){.player-history-head,.player-history-row{grid-template-columns:62px 58px 46px 38px minmax(54px,1fr) minmax(62px,1.08fr);padding:9px 6px;gap:4px}.player-history-row{min-height:48px}.player-history-year{position:relative;z-index:2;white-space:nowrap;gap:4px;font-size:.88rem}.player-history-team{min-width:0;gap:4px;overflow:hidden;font-size:.76rem}.player-history-team-logo{width:16px;height:16px;flex-basis:16px}.player-history-team .full{display:none}.player-history-team .abbr{display:inline;font-size:.74rem}.player-history-head{font-size:.56rem}.player-history-finish{font-size:.94rem}.player-history-games{font-size:.84rem}.player-history-ppg,.player-history-points{font-size:.88rem;font-weight:1000;color:#fff}.player-history-ppg-rank{font-size:.48rem}.player-history-detail{padding:8px 6px}.player-history-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}';
 document.head.appendChild(style);
 
+function escHistory(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function statSource(s){return Number(s?.statSourceId ?? s?.statTypeId ?? -1)}
 function splitType(s){return Number(s?.statSplitTypeId ?? (Number(s?.scoringPeriodId||0)===0?0:1))}
 function deepPlayer(entry){return entry?.player || entry?.playerPoolEntry?.player || entry?.playerPoolEntry || entry}
@@ -304,7 +305,11 @@ async function fastHistoryRow(player,year){
       const ranked=board.filter(x=>x.position===pos).sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name));
       const i=ranked.findIndex(x=>String(x.id)===String(row.id));
       const rank=i>=0?i+1:null;
-      return {year,id:row.id,name:row.name,position:pos,rank,teamId:row.teamId,team:row.team,teamAbbr:row.teamAbbr,games:row.games,ppg:row.ppg,points:row.points};
+      const ppgRanked=board.filter(x=>x.position===pos&&Number.isFinite(Number(x.ppg))&&Number(x.ppg)>=0&&Number(x.games)>0)
+        .sort((a,b)=>Number(b.ppg)-Number(a.ppg)||b.points-a.points||a.name.localeCompare(b.name));
+      const pi=ppgRanked.findIndex(x=>String(x.id)===String(row.id));
+      const ppgRank=pi>=0?pi+1:null;
+      return {year,id:row.id,name:row.name,position:pos,rank,ppgRank,teamId:row.teamId,team:row.team,teamAbbr:row.teamAbbr,games:row.games,ppg:row.ppg,points:row.points};
     }
   }catch(e){}
   try{
@@ -341,7 +346,14 @@ async function rankSeason(playerSeason){
       const n=norm(row.name);
       i=posRows.findIndex(x=>norm(x.name)===n);
     }
-    if(i>=0)return {year,id:row.id,name:row.name,position:targetPosition,rank:i+1,teamId:row.teamId,team:row.team,teamAbbr:row.teamAbbr,games:row.games,ppg:row.ppg,points:row.points};
+    const ppgRows=board.filter(x=>x.position===targetPosition&&Number.isFinite(Number(x.ppg))&&Number(x.ppg)>=0&&Number(x.games)>0)
+      .sort((a,b)=>Number(b.ppg)-Number(a.ppg)||b.points-a.points||a.name.localeCompare(b.name));
+    let pi=ppgRows.findIndex(x=>String(x.id)===String(row.id));
+    if(pi<0){
+      const n=norm(row.name);
+      pi=ppgRows.findIndex(x=>norm(x.name)===n);
+    }
+    if(i>=0)return {year,id:row.id,name:row.name,position:targetPosition,rank:i+1,ppgRank:pi>=0?pi+1:null,teamId:row.teamId,team:row.team,teamAbbr:row.teamAbbr,games:row.games,ppg:row.ppg,points:row.points};
   }catch(e){}
 
   try{
@@ -354,10 +366,17 @@ async function rankSeason(playerSeason){
         const n=norm(row.name);
         i=posRows.findIndex(x=>norm(x.name)===n);
       }
-      if(i>=0)return {year,id:row.id,name:row.name,position:targetPosition,rank:i+1,teamId:row.teamId,team:row.team,teamAbbr:row.teamAbbr,games:row.games,ppg:row.ppg,points:row.points};
+      const ppgRows=board.filter(x=>x.position===targetPosition&&Number.isFinite(Number(x.ppg))&&Number(x.ppg)>=0&&Number(x.games)>0)
+        .sort((a,b)=>Number(b.ppg)-Number(a.ppg)||b.points-a.points||a.name.localeCompare(b.name));
+      let pi=ppgRows.findIndex(x=>String(x.id)===String(row.id));
+      if(pi<0){
+        const n=norm(row.name);
+        pi=ppgRows.findIndex(x=>norm(x.name)===n);
+      }
+      if(i>=0)return {year,id:row.id,name:row.name,position:targetPosition,rank:i+1,ppgRank:pi>=0?pi+1:null,teamId:row.teamId,team:row.team,teamAbbr:row.teamAbbr,games:row.games,ppg:row.ppg,points:row.points};
     }
   }catch(e){}
-  return {year,id:row.id,name:row.name,position:targetPosition,rank:null,teamId:row.teamId,team:row.team,teamAbbr:row.teamAbbr,games:row.games,ppg:row.ppg,points:row.points};
+  return {year,id:row.id,name:row.name,position:targetPosition,rank:null,ppgRank:null,teamId:row.teamId,team:row.team,teamAbbr:row.teamAbbr,games:row.games,ppg:row.ppg,points:row.points};
 }
 
 function weekStat(stats,year,week){
@@ -587,7 +606,7 @@ async function toggleSeasonDetail(rowEl,row){
 function readPlayerCache(player){
   try{
     const data=JSON.parse(localStorage.getItem('shuaEspnFinishHistory:'+player.id)||'null');
-    if(!data||data.version!==9||!Array.isArray(data.rows))return null;
+    if(!data||data.version!==10||!Array.isArray(data.rows))return null;
     if(Number(data.latestCompleted)!==LATEST_COMPLETED)return null;
     return data.rows;
   }catch(e){return null}
@@ -595,7 +614,7 @@ function readPlayerCache(player){
 function savePlayerCache(player,rows){
   try{
     localStorage.setItem('shuaEspnFinishHistory:'+player.id,JSON.stringify({
-      version:9,
+      version:10,
       latestCompleted:LATEST_COMPLETED,
       rows
     }));
@@ -630,7 +649,7 @@ function renderRows(player,rows,target){
           '<div class="player-history-team">'+teamLogoHtml(r.teamAbbr||r.team)+'<span class="full">'+historyTeamName(r.teamAbbr||r.team)+'</span><span class="abbr">'+historyTeamAbbr(r.teamAbbr||r.team)+'</span></div>'+
           '<div class="player-history-finish">'+(r.rank?r.rank:'—')+'</div>'+
           '<div class="player-history-games">'+(r.games!=null&&r.games!==''&&Number.isFinite(Number(r.games))?Number(r.games):'—')+'</div>'+
-          '<div class="player-history-ppg">'+ppg+'</div>'+
+          '<div class="player-history-ppg">'+ppg+(r.ppgRank?'<span class="player-history-ppg-rank">'+escHistory((r.position||'')+' #'+r.ppgRank+' by PPG')+'</span>':'')+'</div>'+
           '<div class="player-history-points">'+(r.points!=null&&r.points!==''&&Number.isFinite(Number(r.points))?Number(r.points).toFixed(1):'—')+'</div>'+
         '</div><div class="player-history-detail" data-detail-index="'+i+'"></div>';
       }).join('')+

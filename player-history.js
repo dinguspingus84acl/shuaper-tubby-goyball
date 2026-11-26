@@ -34,6 +34,12 @@ style.textContent=
 '.player-history-empty{padding:14px 4px;color:#7f93aa;font-size:.66rem}'+
 '.player-history-error{color:#ff8b9d}'+
 '@media(max-width:620px){.player-history-head,.player-history-row{grid-template-columns:62px 58px 38px 46px minmax(54px,1fr) minmax(62px,1.08fr);padding:9px 6px;gap:4px}.player-history-row{min-height:48px}.player-history-year{position:relative;z-index:2;white-space:nowrap;gap:4px;font-size:.88rem}.player-history-team{min-width:0;gap:4px;overflow:hidden;font-size:.76rem}.player-history-team-logo{width:16px;height:16px;flex-basis:16px}.player-history-team .full{display:none}.player-history-team .abbr{display:inline;font-size:.74rem}.player-history-head{font-size:.56rem}.player-history-finish{font-size:.94rem}.player-history-games{font-size:.84rem}.player-history-ppg,.player-history-points{font-size:.88rem;font-weight:1000;color:#fff}.player-history-ppg-rank{font-size:.48rem}.player-history-detail{padding:8px 6px}.player-history-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}';
+style.textContent +=
+'.player-history-seven .player-history-ppg-rank-cell{font-weight:1000;font-size:.94rem;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums;color:inherit}'+
+'.player-history-seven .player-history-ppg-rank-head{text-align:center;line-height:1.2}'+
+'body .player-history-seven .player-history-head,body .player-history-seven .player-history-row{grid-template-columns:64px minmax(76px,1.25fr) 38px 58px 58px 66px 76px!important;column-gap:6px!important;box-sizing:border-box}'+
+'body .player-history-seven .player-history-head>div,body .player-history-seven .player-history-row>div{min-width:0}'+
+'@media(max-width:700px){body .player-history-seven .player-history-head,body .player-history-seven .player-history-row{grid-template-columns:minmax(40px,1fr) minmax(38px,1.05fr) minmax(23px,.58fr) minmax(36px,.88fr) minmax(34px,.88fr) minmax(44px,1.05fr) minmax(44px,1.12fr)!important;column-gap:3px!important;padding:9px 5px!important}.player-history-seven .player-history-team .full{display:none}.player-history-seven .player-history-team .abbr{display:inline}.player-history-seven .player-history-team{gap:2px!important}.player-history-seven .player-history-team-logo{width:14px!important;height:14px!important;flex-basis:14px!important}.player-history-seven .player-history-year{gap:2px!important;font-size:.78rem!important}.player-history-seven .player-history-head{font-size:9px!important;letter-spacing:0!important}.player-history-seven .player-history-ppg-rank-cell,.player-history-seven .player-history-ppg,.player-history-seven .player-history-points,.player-history-seven .player-history-finish,.player-history-seven .player-history-games{font-size:.82rem!important}}';
 document.head.appendChild(style);
 
 function escHistory(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
@@ -633,23 +639,45 @@ async function mapLimited(items,limit,fn){
   await Promise.all(Array.from({length:Math.min(limit,items.length)},worker));
   return out;
 }
+function historyPpg(row){
+  const explicit=row.ppg??row.average;
+  const games=Number(row.gamesPlayed??row.games);
+  if(!(games>0))return null;
+  const points=row.points;
+  if(points!=null&&points!==''&&Number.isFinite(Number(points)))return Number(points)/games;
+  return explicit!=null&&explicit!==''&&Number.isFinite(Number(explicit))?Number(explicit):null;
+}
+function rankHistoryPpg(board,row){
+  const pos=String(row.position||'').toUpperCase();
+  const key=n=>norm(n).replace(/kennethwalkeriii$/,'kennethwalker');
+  const unique=new Map();
+  for(const p of board||[]){
+    if(String(p.position||'').toUpperCase()!==pos||historyPpg(p)===null)continue;
+    const k=key(p.name)||String(p.id);
+    if(!unique.has(k))unique.set(k,p);
+  }
+  const pool=[...unique.values()];
+  const match=pool.find(x=>row.id!=null&&String(x.id)===String(row.id))||pool.find(x=>key(x.name)===key(row.name));
+  if(!match)return null;
+  const value=historyPpg(match);
+  if(value===null)return null;
+  return 1+pool.filter(x=>historyPpg(x)>value+1e-8).length;
+}
 async function enrichPpgRanks(rows){
-  const input=rows.filter(Boolean);
-  return await mapLimited(input,4,async row=>{
-    if(row.ppgRank)return row;
-    const year=Number(row.year),pos=String(row.position||'').toUpperCase();
-    if(!Number.isFinite(year)||!pos)return row;
+  return await mapLimited(rows.filter(Boolean),4,async row=>{
+    const year=Number(row.year);
+    if(!Number.isFinite(year)||!row.position)return {...row,ppgRank:null};
+    try{
+      if(window.ShuaEspnLive?.getCareerSeasonBoard){
+        const board=await window.ShuaEspnLive.getCareerSeasonBoard(year);
+        const ppgRank=rankHistoryPpg(board,row);
+        if(ppgRank!==null)return {...row,ppgRank};
+      }
+    }catch(e){}
     try{
       const board=await fetchSeasonBoard(year);
-      const ppgRows=board.filter(x=>x.position===pos&&Number.isFinite(Number(x.ppg))&&Number(x.ppg)>=0&&Number(x.games)>0)
-        .sort((a,b)=>Number(b.ppg)-Number(a.ppg)||b.points-a.points||a.name.localeCompare(b.name));
-      let i=ppgRows.findIndex(x=>String(x.id)===String(row.id));
-      if(i<0){
-        const wanted=norm(row.name);
-        i=ppgRows.findIndex(x=>norm(x.name)===wanted);
-      }
-      return {...row,ppgRank:i>=0?i+1:null};
-    }catch(e){return row}
+      return {...row,ppgRank:rankHistoryPpg(board,row)};
+    }catch(e){return {...row,ppgRank:null}}
   });
 }
 function renderRows(player,rows,target){
@@ -659,8 +687,8 @@ function renderRows(player,rows,target){
     return;
   }
   target.innerHTML=
-    '<div class="player-history-card">'+
-      '<div class="player-history-head"><div>Year</div><div>Team</div><div style="text-align:center">GP</div><div>Finish</div><div style="text-align:right">PPG</div><div style="text-align:right">Pts</div></div>'+
+    '<div class="player-history-card player-history-seven">'+
+      '<div class="player-history-head"><div>Year</div><div>Team</div><div style="text-align:center">GP</div><div>Finish</div><div style="text-align:right">PPG</div><div class="player-history-ppg-rank-head">PPG Rank</div><div style="text-align:right">Pts</div></div>'+
       good.map((r,i)=>{
         const ppg=r.ppg!=null&&r.ppg!==''&&Number.isFinite(Number(r.ppg))?Number(r.ppg).toFixed(1):((r.games&&r.points)?(r.points/r.games).toFixed(1):'—');
         return '<div class="player-history-row" data-history-index="'+i+'" role="button" tabindex="0">'+
@@ -668,7 +696,8 @@ function renderRows(player,rows,target){
           '<div class="player-history-team">'+teamLogoHtml(r.teamAbbr||r.team)+'<span class="full">'+historyTeamName(r.teamAbbr||r.team)+'</span><span class="abbr">'+historyTeamAbbr(r.teamAbbr||r.team)+'</span></div>'+
           '<div class="player-history-games">'+(r.games!=null&&r.games!==''&&Number.isFinite(Number(r.games))?Number(r.games):'—')+'</div>'+
           '<div class="player-history-finish">'+(r.rank?r.rank:'—')+'</div>'+
-          '<div class="player-history-ppg">'+ppg+(r.ppgRank?'<span class="player-history-ppg-rank">'+escHistory((r.position||'')+' #'+r.ppgRank+' by PPG')+'</span>':'')+'</div>'+
+          '<div class="player-history-ppg">'+ppg+'</div>'+
+          '<div class="player-history-ppg-rank-cell">'+(r.ppgRank?escHistory((r.position||'')+r.ppgRank):'—')+'</div>'+
           '<div class="player-history-points">'+(r.points!=null&&r.points!==''&&Number.isFinite(Number(r.points))?Number(r.points).toFixed(1):'—')+'</div>'+
         '</div><div class="player-history-detail" data-detail-index="'+i+'"></div>';
       }).join('')+

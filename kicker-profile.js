@@ -114,8 +114,9 @@ async function getSchedule(teamId,year){
  })().catch(()=>new Map());
  scheduleCache.set(key,promise);return promise;
 }
-async function getKickerRanks(year){
- if(kickerRanksCache.has(year))return kickerRanksCache.get(year);
+async function getKickerRanks(year,byPpg=false){
+ const cacheKey=year+':'+(byPpg?'ppg':'total');
+ if(kickerRanksCache.has(cacheKey))return kickerRanksCache.get(cacheKey);
  const promise=(async()=>{
   const filter={players:{filterSlotIds:{value:[17]},filterStatsForSourceIds:{value:[0]},filterStatsForSplitTypeIds:{value:[0]},filterStatsForTopScoringPeriodIds:{value:20,additionalValue:['00'+year]},sortAppliedStatTotal:{sortAsc:false,sortPriority:1,value:'00'+year},limit:250,offset:0}};
   const url='https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/'+year+'/segments/0/leaguedefaults/3?scoringPeriodId=0&view=kona_player_info';
@@ -128,14 +129,16 @@ async function getKickerRanks(year){
     const p=entry.player||entry.playerPoolEntry?.player;
     if(Number(p?.defaultPositionId)!==5)return null;
     const stat=(p.stats||[]).find(s=>Number(s.seasonId)===year&&Number(s.statSourceId)===0&&Number(s.statSplitTypeId)===0);
-    const total=Number(stat?.appliedTotal);
-    return stat&&Number.isFinite(total)?{id:String(p.id),total}:null;
+    const raw=stat?.appliedTotal,gp=Number(stat?.stats?.[210]),avg=stat?.appliedAverage;
+    const total=raw==null?NaN:Number(raw);
+    const value=byPpg?(gp>0?total/gp:(avg!=null?Number(avg):NaN)):total;
+    return stat&&Number.isFinite(value)?{id:String(p.id),total:value}:null;
    }).filter(Boolean).sort((a,b)=>b.total-a.total);
    if(board.length<10)return null;
-   return new Map(board.map((p,i)=>[p.id,i+1]));
+   return new Map(board.map((p,i)=>[p.id,byPpg?1+board.filter(x=>x.total>p.total+1e-8).length:i+1]));
   }finally{clearTimeout(timeout)}
  })().catch(()=>null);
- kickerRanksCache.set(year,promise);return promise;
+ kickerRanksCache.set(cacheKey,promise);return promise;
 }
 function summary(s){return '<div class="kp-summary"><div class="kp-stat"><small>Fantasy points</small><strong>'+pts(s?.points)+'</strong></div><div class="kp-stat"><small>Games</small><strong>'+(s?.gp??'—')+'</strong></div><div class="kp-stat"><small>Points / game</small><strong>'+pts(s?.ppg)+'</strong></div></div>';}
 async function showTab(tab){
@@ -175,12 +178,12 @@ async function renderHistory(name,id,target){
  const results=await Promise.all(seasons.map(year=>getSeason(id,year)));
  if(!profileAlive(target,name))return;
  const rows=results.filter(Boolean);
- const ranks=await Promise.all(rows.map(r=>r.year===2026?Promise.resolve(null):getKickerRanks(r.year)));
+ const [ranks,ppgRanks]=await Promise.all([Promise.all(rows.map(r=>r.year===2026?Promise.resolve(null):getKickerRanks(r.year))),Promise.all(rows.map(r=>getKickerRanks(r.year,true)))]);
  if(!profileAlive(target,name))return;
- target.innerHTML=rows.length?'<div class="player-history-card"><div class="player-history-head"><div>Year</div><div>Team</div><div>Finish</div><div>GP</div><div>PPG</div><div>Pts</div></div>'+rows.map((r,i)=>{
+ target.innerHTML=rows.length?'<div class="player-history-card player-history-seven"><div class="player-history-head"><div>Year</div><div>Team</div><div>GP</div><div>Finish</div><div>PPG</div><div class="player-history-ppg-rank-head">PPG Rank</div><div>Pts</div></div>'+rows.map((r,i)=>{
   const src=logo(r.team),rank=ranks[i]?.get(String(id));
   const team='<div class="player-history-team">'+(src?'<img class="player-history-team-logo" src="'+src+'" alt="'+esc(r.team)+' logo" loading="lazy">':'')+'<span class="full">'+esc(r.team)+'</span><span class="abbr">'+esc(r.team)+'</span></div>';
-  return '<div class="player-history-row" data-kicker-history-year="'+r.year+'" role="button" tabindex="0"><div class="player-history-year">› '+r.year+'</div>'+team+'<div class="player-history-finish">'+(rank?rank:'—')+'</div><div class="player-history-games">'+r.gp+'</div><div class="player-history-ppg">'+pts(r.ppg)+'</div><div class="player-history-points">'+pts(r.points)+'</div></div>';
+  return '<div class="player-history-row" data-kicker-history-year="'+r.year+'" role="button" tabindex="0"><div class="player-history-year">› '+r.year+'</div>'+team+'<div class="player-history-games">'+r.gp+'</div><div class="player-history-finish">'+(rank?rank:'—')+'</div><div class="player-history-ppg">'+pts(r.ppg)+'</div><div class="player-history-ppg-rank-cell">'+(ppgRanks[i]?.get(String(id))?'K'+ppgRanks[i].get(String(id)):'—')+'</div><div class="player-history-points">'+pts(r.points)+'</div></div>';
  }).join('')+'<div class="player-history-note">Finish = ESPN kicker rank by season fantasy points. The current season has no final finish. Tap a season for its game log.</div></div>':'<div class="player-history-empty">No ESPN kicking seasons found.</div>';
  target.querySelectorAll('[data-kicker-history-year]').forEach(row=>{
   const go=()=>{selectedYears.set(String(id),Number(row.dataset.kickerHistoryYear));document.querySelector('[data-profile-tab="gamelog"]')?.click()};

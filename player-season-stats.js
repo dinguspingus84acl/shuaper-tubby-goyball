@@ -58,6 +58,25 @@ style.textContent=`
  .ps-value{min-height:24px;font-size:.76rem}
 }
 `;
+// The site's mobile ranking layout globally hides thead and stacks table cells.
+style.textContent += `
+body #modal .profile #unifiedPlayerStatsPanel{width:100%!important;max-width:100%!important;min-width:0!important;overflow:visible!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-shell{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;max-width:100%!important;min-width:0!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table-wrap{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:auto!important;overflow-y:hidden!important;touch-action:pan-x pan-y!important}
+body #modal .profile #unifiedPlayerStatsPanel table.ps-table{display:table!important;width:var(--ps-width)!important;min-width:var(--ps-width)!important;max-width:none!important;table-layout:fixed!important;border-collapse:separate!important;border-spacing:0!important;margin:0!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table colgroup{display:table-column-group!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table col{display:table-column!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table thead{display:table-header-group!important;visibility:visible!important;opacity:1!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table tbody{display:table-row-group!important;padding:0!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table tr{display:table-row!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table :is(th,td){display:table-cell!important;visibility:visible!important;white-space:nowrap!important;vertical-align:middle!important;text-align:center!important;float:none!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table :is(th,td)::before{content:none!important;display:none!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-group-head{text-align:left!important;font-size:.68rem!important;color:#a8c7d7!important;background:#0b1a2b!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-stat-head{font-size:.65rem!important;color:#eff5ff!important;background:#0b1a2b!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-year-cell{position:sticky!important;left:0!important;z-index:6!important;text-align:left!important;background:#0b1a2b!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-year-cell:after{content:''!important;display:block!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-value{display:flex!important}
+`;
 document.head.appendChild(style);
 function teamCell(r){
  const team=String(r.teamAbbr||r.team||'');

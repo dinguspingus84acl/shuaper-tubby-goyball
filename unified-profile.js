@@ -1616,7 +1616,7 @@ function installPhoneSwipeDismiss(){
  if(!sheet||sheet.dataset.phoneSwipeDismiss==='5')return;
  sheet.dataset.phoneSwipeDismiss='5';
  let gesture=null,settling=false;
- const ignore='button,input,select,textarea,a,svg,.st-chart,.st-table-wrap,[data-st-chart-host],.espn-game-log-table-wrap,.espn-game-log-table';
+ const ignore='button,input,select,textarea,a,svg,.st-chart,.st-table-wrap,[data-st-chart-host],.espn-game-log-table-wrap,.espn-game-log-table,.ps-table-wrap,.ps-table';
  const width=()=>sheet.clientWidth||window.innerWidth||375;
  const reducedMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  const settleVertical=dismiss=>{

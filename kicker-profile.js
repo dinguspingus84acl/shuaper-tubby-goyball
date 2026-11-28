@@ -180,11 +180,11 @@ async function renderHistory(name,id,target){
  const rows=results.filter(Boolean);
  const [ranks,ppgRanks]=await Promise.all([Promise.all(rows.map(r=>r.year===2026?Promise.resolve(null):getKickerRanks(r.year))),Promise.all(rows.map(r=>getKickerRanks(r.year,true)))]);
  if(!profileAlive(target,name))return;
- target.innerHTML=rows.length?'<div class="player-history-card player-history-seven"><div class="player-history-head"><div>Year</div><div>Team</div><div>GP</div><div>Finish</div><div>PPG</div><div class="player-history-ppg-rank-head">PPG Rank</div><div>Pts</div></div>'+rows.map((r,i)=>{
+ target.innerHTML=rows.length?'<div class="player-history-card player-history-seven"><div class="player-history-head"><div>Year</div><div>Team</div><div>GP</div><div>Rank</div><div>PPG</div><div class="player-history-ppg-rank-head">PPG Rank</div><div>Pts</div></div>'+rows.map((r,i)=>{
   const src=logo(r.team),rank=ranks[i]?.get(String(id));
   const team='<div class="player-history-team">'+(src?'<img class="player-history-team-logo" src="'+src+'" alt="'+esc(r.team)+' logo" loading="lazy">':'')+'<span class="full">'+esc(r.team)+'</span><span class="abbr">'+esc(r.team)+'</span></div>';
   return '<div class="player-history-row" data-kicker-history-year="'+r.year+'" role="button" tabindex="0"><div class="player-history-year">› '+r.year+'</div>'+team+'<div class="player-history-games">'+r.gp+'</div><div class="player-history-finish">'+(rank?rank:'—')+'</div><div class="player-history-ppg">'+pts(r.ppg)+'</div><div class="player-history-ppg-rank-cell">'+(ppgRanks[i]?.get(String(id))?'K'+ppgRanks[i].get(String(id)):'—')+'</div><div class="player-history-points">'+pts(r.points)+'</div></div>';
- }).join('')+'<div class="player-history-note">Finish = ESPN kicker rank by season fantasy points. The current season has no final finish. Tap a season for its game log.</div></div>':'<div class="player-history-empty">No ESPN kicking seasons found.</div>';
+ }).join('')+'<div class="player-history-note">Rank = ESPN kicker rank by season fantasy points. The current season has no final finish. Tap a season for its game log.</div></div>':'<div class="player-history-empty">No ESPN kicking seasons found.</div>';
  target.querySelectorAll('[data-kicker-history-year]').forEach(row=>{
   const go=()=>{selectedYears.set(String(id),Number(row.dataset.kickerHistoryYear));document.querySelector('[data-profile-tab="gamelog"]')?.click()};
   row.addEventListener('click',go);

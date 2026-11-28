@@ -8,63 +8,109 @@ const statKeys=['passAtt','completions','passYds','passTD','interceptions','rush
 const fmt=(v,d=0)=>num(v)===null?'—':num(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 const ratio=(a,b,scale=1)=>num(a)!==null&&num(b)>0?num(a)/num(b)*scale:null;
 const gp=r=>num(r.gamesPlayed??r.gp??r.games);
-const col=(label,key,d=0)=>({label,get:r=>fmt(r[key],d)});
-const calc=(label,fn,d=1)=>({label,get:r=>fmt(fn(r),d)});
-const gpCol=calc('GP',gp,0);
-const passing=[gpCol,col('CMP','completions'),col('ATT','passAtt'),col('YDS','passYds'),col('TD','passTD'),col('INT','interceptions'),calc('CMP%',r=>ratio(r.completions,r.passAtt,100))];
-const rushing=[gpCol,col('CAR','rushAtt'),col('YDS','rushYds'),col('TD','rushTD'),calc('YPC',r=>ratio(r.rushYds,r.rushAtt))];
-const receiving=[gpCol,col('TGT','targets'),col('REC','receptions'),col('YDS','recYds'),col('TD','recTD'),calc('Y/R',r=>ratio(r.recYds,r.receptions)),calc('CATCH%',r=>ratio(r.receptions,r.targets,100))];
-const fantasy=[gpCol,col('PTS','points',1),calc('PPG',r=>num(r.ppg??r.average)??ratio(r.points,gp(r))),col('FL','fumblesLost')];
+const col=(label,key,d=0,lower=false)=>({label,key,d,lower,value:r=>num(r[key])});
+const calc=(label,key,fn,d=1,lower=false)=>({label,key,d,lower,value:fn});
+const passing=[col('CMP','completions'),col('ATT','passAtt'),col('YD','passYds'),calc('CMP%','completionPct',r=>ratio(r.completions,r.passAtt,100),1),calc('YPA','passYpa',r=>ratio(r.passYds,r.passAtt),2),col('TD','passTD'),col('INT','interceptions',0,true)];
+const rushing=[col('ATT','rushAtt'),col('YD','rushYds'),calc('YPC','rushYpc',r=>ratio(r.rushYds,r.rushAtt),2),col('TD','rushTD')];
+const receiving=[col('TAR','targets'),col('REC','receptions'),col('YD','recYds'),calc('YPT','recYpt',r=>ratio(r.recYds,r.targets),2),calc('YPC','recYpc',r=>ratio(r.recYds,r.receptions),2),col('TD','recTD'),calc('CATCH%','catchPct',r=>ratio(r.receptions,r.targets,100),1)];
+const fantasy=[calc('GM','gp',gp,0),col('FPTS','points',1),calc('PPG','ppg',r=>num(r.ppg??r.average)??ratio(r.points,gp(r)))];
+const ranks=[col('PPR','rank',0,true),col('PPG','ppgRank',0,true)];
+const misc=[col('FL','fumblesLost',0,true)];
+const allCols=[...fantasy,...ranks,...passing,...rushing,...receiving,...misc];
 const style=document.createElement('style');
+style.id='playerSeasonStatsStyles';
 style.textContent=`
-#unifiedPlayerStatsPanel .ps-shell,.ps-shell{display:grid;gap:12px;min-width:0}
-.ps-block{background:#07182a;border:1px solid #ffffff18;border-radius:10px;overflow:hidden}
-.ps-heading{margin:0;padding:10px 11px;background:#112c40;color:#e9f4ff;font-size:.79rem;font-weight:950}
-.ps-table-wrap{width:100%;overflow-x:auto;touch-action:pan-x pan-y}
-.ps-table{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
-.ps-table th,.ps-table td{padding:9px 3px;text-align:center;white-space:nowrap;line-height:1.2;border-bottom:1px solid #ffffff10}
-.ps-table th{font-size:.59rem;color:#a8c7d7;background:#0b2235;font-weight:900}
-.ps-table td{font-size:.77rem;color:#edf6ff;font-weight:850}
-.ps-table tbody tr:last-child td{border-bottom:0}
-.ps-table tbody tr:nth-child(even){background:#ffffff03}
-.ps-table th:first-child,.ps-table td:first-child{width:64px;text-align:left;padding-left:9px}
-.ps-year{display:flex;align-items:center;gap:4px;font-size:.79rem}
-.ps-team{display:flex;align-items:center;gap:3px;margin-top:4px;color:#9cb4c6;font-size:.57rem}
-.ps-team img{width:15px;height:15px;object-fit:contain}
-.ps-note{font-size:.6rem;color:#9cb4c6;line-height:1.45;padding:3px 4px}
+#unifiedPlayerStatsPanel,.ps-shell{min-width:0;max-width:100%;box-sizing:border-box}
+.ps-shell{display:grid;gap:8px;padding:5px 2px}
+.ps-heading{margin:0 0 2px;padding:0 4px;color:#a8c7d7;font-size:.8rem;font-weight:950;text-transform:uppercase;letter-spacing:.03em}
+.ps-table-wrap{width:100%;max-width:100%;min-width:0;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain;touch-action:pan-x pan-y!important;-webkit-overflow-scrolling:touch;scrollbar-width:thin;border-radius:6px}
+.ps-table{width:max-content!important;min-width:100%;max-width:none!important;border-collapse:separate!important;border-spacing:0;table-layout:fixed;font-variant-numeric:tabular-nums;background:#0b1a2b}
+.ps-table :is(th,td){box-sizing:border-box;width:66px;min-width:66px;padding:2px 2px!important;text-align:center;white-space:nowrap;line-height:1.15;border:0!important;vertical-align:middle}
+.ps-table .ps-group-head{padding:6px 4px 5px!important;text-align:left;color:#a8c7d7;font-size:.68rem;font-weight:950;text-transform:uppercase}
+.ps-table .ps-stat-head{font-size:.61rem;color:#eff5ff;font-weight:950;padding:3px 2px!important}
+.ps-table .ps-team-cell{width:53px;min-width:53px}
+.ps-table .ps-year-cell{position:sticky!important;left:0!important;z-index:4;width:52px!important;min-width:52px!important;text-align:left;padding:2px 5px!important;background:#0b1a2b!important;color:#a8c7d7;font-size:.82rem;font-weight:950}
+.ps-table thead .ps-year-cell{z-index:5}
+.ps-table .ps-year-cell:after{content:'';position:absolute;top:0;bottom:0;right:-1px;width:1px;background:#5b718b35}
+.ps-value{display:flex;align-items:center;justify-content:center;min-height:28px;border-radius:3px;background:#e1eaf5;color:#263343;font-size:.8rem;font-weight:950;padding:3px 2px}
+.ps-value.good{background:#bddda1;color:#293e28}
+.ps-value.mid{background:#ffdf86;color:#4e4128}
+.ps-value.low{background:#ee999a;color:#523435}
+.ps-value.empty{background:#e1eaf5;color:#79879a}
+.ps-team{display:flex;align-items:center;justify-content:center;gap:3px;color:#e5effb;font-size:.66rem;font-weight:900}
+.ps-team img{width:17px;height:17px;object-fit:contain}
+.ps-table .ps-group-start{padding-left:9px!important;width:73px;min-width:73px}
+.ps-note{font-size:.58rem;color:#9cb4c6;line-height:1.45;padding:0 4px}
+.ps-legend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.56rem;color:#a8c7d7;padding:0 4px}
+.ps-legend span{display:inline-flex;align-items:center;gap:4px}
+.ps-legend i{display:inline-block;width:9px;height:9px;border-radius:2px}
+.ps-legend .good{background:#bddda1}.ps-legend .mid{background:#ffdf86}.ps-legend .low{background:#ee999a}
+#modal .profile:has(#unifiedPlayerStatsPanel:not([hidden])){touch-action:pan-x pan-y!important}
 #modal .profile #unifiedProfileTabs:has([data-profile-tab="stats"]){grid-template-columns:repeat(7,minmax(0,1fr))!important}
 @media(max-width:760px){
  #modal .profile #unifiedProfileTabs:has([data-profile-tab="stats"]){grid-template-columns:repeat(4,minmax(0,1fr))!important;overflow:visible!important}
  #modal .profile #unifiedProfileTabs:has([data-profile-tab="stats"]) .unified-profile-tab{font-size:.62rem!important;padding:7px 2px!important;white-space:nowrap}
- .ps-table th:first-child,.ps-table td:first-child{width:47px;padding-left:5px}
- .ps-table td{font-size:.7rem;padding:9px 1px}
- .ps-table th{font-size:.53rem;padding:8px 1px}
- .ps-year{font-size:.72rem}.ps-team{font-size:.52rem}
- .ps-team img{width:13px;height:13px}
- .ps-table{min-width:300px}
+ .ps-table :is(th,td){width:63px;min-width:63px}
+ .ps-table .ps-year-cell{width:47px!important;min-width:47px!important;font-size:.77rem}
+ .ps-table .ps-group-start{width:70px;min-width:70px}
+ .ps-value{min-height:24px;font-size:.76rem}
 }
 `;
 document.head.appendChild(style);
-function seasonCell(r){
+function teamCell(r){
  const team=String(r.teamAbbr||r.team||'');
  const logo=window.ShuaEspnLive?.getTeamLogoUrl?.(team)||'';
- return '<div class="ps-year">'+esc(r.year)+'</div><div class="ps-team">'+(logo?'<img src="'+esc(logo)+'" alt="">':'')+esc(team)+'</div>';
+ return '<div class="ps-team">'+(logo?'<img src="'+esc(logo)+'" alt="">':'')+esc(team)+'</div>';
 }
-function table(title,cols,rows){
- return '<section class="ps-block"><h3 class="ps-heading">'+esc(title)+'</h3><div class="ps-table-wrap"><table class="ps-table"><thead><tr><th>Year</th>'+cols.map(c=>'<th>'+esc(c.label)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr><td>'+seasonCell(r)+'</td>'+cols.map(c=>'<td>'+esc(c.get(r))+'</td>').join('')+'</tr>').join('')+'</tbody></table></div></section>';
+function colorFor(value,values,lower=false){
+ if(value===null||!values.length)return '';
+ // Ties get the midpoint of their group rather than an arbitrary ordering.
+ const better=values.filter(v=>lower?v<value:v>value).length;
+ const equal=values.filter(v=>Math.abs(v-value)<1e-8).length;
+ const pct=(better+equal/2)/values.length;
+ return pct<=1/3?'good':pct>=2/3?'low':'mid';
+}
+function enrichRow(r,board){
+ const pool=(board||[]).filter(p=>p.position===r.position&&gp(p)>0);
+ if(pool.length<2)return r;
+ const rankFor=fn=>{
+  const value=fn(r);
+  return value===null?null:1+pool.filter(p=>fn(p)!==null&&fn(p)>value+1e-8).length;
+ };
+ const ppg=p=>num(p.ppg??p.average)??ratio(p.points,gp(p));
+ const row={...r,rank:rankFor(p=>num(p.points)),ppgRank:rankFor(ppg)};
+ const colors={};
+ for(const c of allCols){
+  const v=c.value(row);
+  if(v===null||c.key==='rank'||c.key==='ppgRank')continue;
+  const vals=pool.map(c.value).filter(x=>x!==null);
+  colors[c.key]=colorFor(v,vals,c.lower);
+ }
+ for(const k of ['rank','ppgRank'])if(num(row[k])!==null){
+  colors[k]=colorFor(row[k],Array.from({length:pool.length},(_,i)=>i+1),true);
+ }
+ return {...row,psColors:colors};
 }
 function build(rows,pos){
- const has=k=>rows.some(r=>num(r[k])!==null&&num(r[k])!==0);
  if(!rows.length)return '<div class="unified-profile-loading">No season statistics available.</div>';
+ const has=k=>rows.some(r=>num(r[k])!==null&&num(r[k])!==0);
  const special=['K','D/ST'].includes(pos);
- const sections=[];
+ const groups=[{label:'Fantasy',cols:fantasy}];
  if(!special){
-  if(pos==='QB'||has('passAtt'))sections.push(table('Passing',passing,rows));
-  if(['QB','RB'].includes(pos)||has('rushAtt'))sections.push(table('Rushing',rushing,rows));
-  if(['RB','WR','TE'].includes(pos)||has('targets')||has('receptions'))sections.push(table('Receiving',receiving,rows));
+  groups.push({label:'Position Rank',cols:ranks});
+  if(pos==='QB'||has('passAtt'))groups.push({label:'Passing',cols:passing});
+  if(['QB','RB'].includes(pos)||has('rushAtt'))groups.push({label:'Rushing',cols:rushing});
+  if(['RB','WR','TE'].includes(pos)||has('targets')||has('receptions'))groups.push({label:'Receiving',cols:receiving});
+  groups.push({label:'Misc',cols:misc});
  }
- sections.push(table('Fantasy',special?fantasy.slice(0,3):fantasy,rows));
- return '<div class="ps-shell">'+sections.join('')+'<div class="ps-note">Regular season totals. Current season is in progress. — means unavailable.'+(special?' Kicker and defense coverage currently includes fantasy points and games.':'')+'</div></div>';
+ const cols=groups.flatMap(g=>g.cols.map((c,i)=>({...c,start:i===0})));
+ const groupHead='<tr><th class="ps-year-cell" rowspan="2" scope="col">Year</th><th class="ps-team-cell" rowspan="2" scope="col">Team</th>'+groups.map(g=>'<th class="ps-group-head ps-group-start" colspan="'+g.cols.length+'" scope="colgroup">'+esc(g.label)+'</th>').join('')+'</tr>';
+ const statHead='<tr>'+cols.map(c=>'<th scope="col" class="ps-stat-head'+(c.start?' ps-group-start':'')+'">'+esc(c.label)+'</th>').join('')+'</tr>';
+ const body=rows.map(r=>'<tr><th scope="row" class="ps-year-cell">'+esc(r.year)+'</th><td class="ps-team-cell">'+teamCell(r)+'</td>'+cols.map(c=>{
+  const v=c.value(r),color=v===null?'empty':(r.psColors?.[c.key]||'');
+  return '<td'+(c.start?' class="ps-group-start"':'')+'><span class="ps-value '+esc(color)+'">'+fmt(v,c.d)+'</span></td>';
+ }).join('')+'</tr>').join('');
+ return '<div class="ps-shell"><h3 class="ps-heading">Career</h3><div class="ps-table-wrap" tabindex="0" role="region" aria-label="Career statistics, scroll horizontally"><table class="ps-table" aria-label="Season by season statistics"><thead>'+groupHead+statHead+'</thead><tbody>'+body+'</tbody></table></div><div class="ps-legend"><span><i class="good"></i>Top third</span><span><i class="mid"></i>Middle third</span><span><i class="low"></i>Bottom third</span></div><div class="ps-note">Compared with players at the same position in each season. Current season totals are year-to-date. — means unavailable.'+(special?' Kicker and defense coverage includes fantasy scoring only.':'')+'</div></div>';
 }
 async function load(name,seed){
  const api=window.ShuaEspnLive;
@@ -81,12 +127,12 @@ async function load(name,seed){
   while(true){
    const i=next++;if(i>=career.length)return;
    const r=career[i];
-   if(statKeys.every(k=>num(r[k])!==null)){out[i]=r;continue}
    try{
     const list=await api.getCareerSeasonBoard(r.year);
     const row=list.find(p=>p.position===r.position&&String(p.id)===String(r.id))||
      list.find(p=>p.position===r.position&&norm(p.name)===norm(r.name||name));
-    out[i]=row?{...r,...row,year:r.year,teamAbbr:row.team||r.teamAbbr}:r;
+    const merged=row?{...r,...row,year:r.year,teamAbbr:row.team||r.teamAbbr}:r;
+    out[i]=row?enrichRow(merged,list):merged;
    }catch(e){out[i]=r}
   }
  }

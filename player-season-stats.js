@@ -83,39 +83,42 @@ function teamCell(r){
  const logo=window.ShuaEspnLive?.getTeamLogoUrl?.(team)||'';
  return '<div class="ps-team">'+(logo?'<img src="'+esc(logo)+'" alt="">':'')+esc(team)+'</div>';
 }
-function colorFor(value,values,lower=false){
- if(value===null||!values.length)return '';
- // Ties get the midpoint of their group rather than an arbitrary ordering.
- const better=values.filter(v=>lower?v<value:v>value).length;
- const equal=values.filter(v=>Math.abs(v-value)<1e-8).length;
- const pct=(better+equal/2)/values.length;
- return pct<=1/3?'good':pct>=2/3?'low':'mid';
+function rankLimits(position){
+ const pos=String(position||'').toUpperCase();
+ return pos==='QB'||pos==='TE'?[12,24]:pos==='RB'||pos==='WR'?[15,30]:null;
+}
+function rankColor(rank,position){
+ const limits=rankLimits(position),n=num(rank);
+ return !limits||n===null||n<1?'':n<=limits[0]?'good':n<=limits[1]?'mid':'low';
+}
+function statRank(value,values,lower=false){
+ if(value===null||!values.length)return null;
+ // Equal values share the same competition rank.
+ return 1+values.filter(v=>lower?v<value-1e-8:v>value+1e-8).length;
 }
 function enrichRow(r,board){
  const pool=(board||[]).filter(p=>p.position===r.position&&gp(p)>0);
  if(pool.length<2)return r;
- const rankFor=fn=>{
-  const value=fn(r);
-  return value===null?null:1+pool.filter(p=>fn(p)!==null&&fn(p)>value+1e-8).length;
- };
+ const rankFor=fn=>statRank(fn(r),pool.map(fn).filter(v=>v!==null));
  const ppg=p=>num(p.ppg??p.average)??ratio(p.points,gp(p));
  const row={...r,rank:rankFor(p=>num(p.points)),ppgRank:rankFor(ppg)};
- const colors={};
+ const colors={},statRanks={};
  for(const c of allCols){
   const v=c.value(row);
-  if(v===null||c.key==='rank'||c.key==='ppgRank')continue;
-  const vals=pool.map(c.value).filter(x=>x!==null);
-  colors[c.key]=colorFor(v,vals,c.lower);
+  if(v===null)continue;
+  const rank=c.key==='rank'||c.key==='ppgRank'?v:statRank(v,pool.map(c.value).filter(x=>x!==null),c.lower);
+  statRanks[c.key]=rank;
+  colors[c.key]=rankColor(rank,row.position);
  }
- for(const k of ['rank','ppgRank'])if(num(row[k])!==null){
-  colors[k]=colorFor(row[k],Array.from({length:pool.length},(_,i)=>i+1),true);
- }
- return {...row,psColors:colors};
+ return {...row,psColors:colors,psRanks:statRanks};
 }
 function build(rows,pos){
  if(!rows.length)return '<div class="unified-profile-loading">No season statistics available.</div>';
  const has=k=>rows.some(r=>num(r[k])!==null&&num(r[k])!==0);
  const special=['K','D/ST'].includes(pos);
+ const limits=rankLimits(pos);
+ const legend=limits?'<div class="ps-legend"><span><i class="good"></i>1–'+limits[0]+'</span><span><i class="mid"></i>'+(limits[0]+1)+'–'+limits[1]+'</span><span><i class="low"></i>'+(limits[1]+1)+'+</span></div>':'';
+
  const groups=[{label:'Fantasy',cols:fantasy}];
  if(!special){
   groups.push({label:'Position Rank',cols:ranks});
@@ -130,10 +133,12 @@ function build(rows,pos){
  const groupHead='<tr><th class="ps-year-cell" rowspan="2" scope="col">Year</th><th class="ps-team-cell" rowspan="2" scope="col">Team</th>'+groups.map(g=>'<th class="ps-group-head ps-group-start" colspan="'+g.cols.length+'" scope="colgroup">'+esc(g.label)+'</th>').join('')+'</tr>';
  const statHead='<tr>'+cols.map(c=>'<th scope="col" class="ps-stat-head'+(c.start?' ps-group-start':'')+'">'+esc(c.label)+'</th>').join('')+'</tr>';
  const body=rows.map(r=>'<tr><th scope="row" class="ps-year-cell">'+esc(r.year)+'</th><td class="ps-team-cell">'+teamCell(r)+'</td>'+cols.map(c=>{
-  const v=c.value(r),color=v===null?'empty':(r.psColors?.[c.key]||'');
-  return '<td'+(c.start?' class="ps-group-start"':'')+'><span class="ps-value '+esc(color)+'">'+fmt(v,c.d)+'</span></td>';
+  const v=c.value(r),rank=r.psRanks?.[c.key]??((c.key==='rank'||c.key==='ppgRank')?v:null);
+  const color=v===null?'empty':(r.psColors?.[c.key]||rankColor(rank,r.position));
+  const title=rank!=null?' title="'+esc(r.position+' '+c.label+' rank: '+rank)+'"':'';
+  return '<td'+(c.start?' class="ps-group-start"':'')+'><span class="ps-value '+esc(color)+'"'+title+'>'+fmt(v,c.d)+'</span></td>';
  }).join('')+'</tr>').join('');
- return '<div class="ps-shell"><h3 class="ps-heading">Career</h3><div class="ps-table-wrap" tabindex="0" role="region" aria-label="Career statistics, scroll horizontally"><table class="ps-table" style="--ps-width:'+width+'px" aria-label="Season by season statistics">'+colgroup+'<thead>'+groupHead+statHead+'</thead><tbody>'+body+'</tbody></table></div><div class="ps-legend"><span><i class="good"></i>Top third</span><span><i class="mid"></i>Middle third</span><span><i class="low"></i>Bottom third</span></div><div class="ps-note">Compared with players at the same position in each season. Current season totals are year-to-date. — means unavailable.'+(special?' Kicker and defense coverage includes fantasy scoring only.':'')+'</div></div>';
+ return '<div class="ps-shell"><h3 class="ps-heading">Career</h3><div class="ps-table-wrap" tabindex="0" role="region" aria-label="Career statistics, scroll horizontally"><table class="ps-table" style="--ps-width:'+width+'px" aria-label="Season by season statistics">'+colgroup+'<thead>'+groupHead+statHead+'</thead><tbody>'+body+'</tbody></table></div>'+legend+'<div class="ps-note">Colors reflect each statistic’s rank among players at the same position in that season. Current season totals are year-to-date. — means unavailable.'+(special?' Kicker and defense coverage includes fantasy scoring only.':'')+'</div></div>';
 }
 async function load(name,seed){
  const api=window.ShuaEspnLive;

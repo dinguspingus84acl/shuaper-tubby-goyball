@@ -77,6 +77,13 @@ body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-year-cell{position:s
 body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-year-cell:after{content:''!important;display:block!important}
 body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-value{display:flex!important}
 `;
+// Explicit rank bands take precedence over the site's general stat-cell styles.
+style.textContent += `
+body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-value[data-rank-band="good"]{background:#bddda1!important;color:#293e28!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-value[data-rank-band="mid"]{background:#ffdf86!important;color:#4e4128!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-value[data-rank-band="low"]{background:#ee999a!important;color:#523435!important}
+body #modal .profile #unifiedPlayerStatsPanel .ps-table .ps-value[data-rank-band="neutral"]{background:#e1eaf5!important;color:#526176!important}
+`;
 document.head.appendChild(style);
 function teamCell(r){
  const team=String(r.teamAbbr||r.team||'');
@@ -134,9 +141,9 @@ function build(rows,pos){
  const statHead='<tr>'+cols.map(c=>'<th scope="col" class="ps-stat-head'+(c.start?' ps-group-start':'')+'">'+esc(c.label)+'</th>').join('')+'</tr>';
  const body=rows.map(r=>'<tr><th scope="row" class="ps-year-cell">'+esc(r.year)+'</th><td class="ps-team-cell">'+teamCell(r)+'</td>'+cols.map(c=>{
   const v=c.value(r),rank=r.psRanks?.[c.key]??((c.key==='rank'||c.key==='ppgRank')?v:null);
-  const color=v===null?'empty':(r.psColors?.[c.key]||rankColor(rank,r.position));
-  const title=rank!=null?' title="'+esc(r.position+' '+c.label+' rank: '+rank)+'"':'';
-  return '<td'+(c.start?' class="ps-group-start"':'')+'><span class="ps-value '+esc(color)+'"'+title+'>'+fmt(v,c.d)+'</span></td>';
+  const color=v===null?'neutral':(rankColor(rank,r.position||pos)||'neutral');
+  const title=rank!=null?' title="'+esc((r.position||pos)+' '+c.label+' rank: '+rank)+'" data-stat-rank="'+esc(rank)+'"':'';
+  return '<td'+(c.start?' class="ps-group-start"':'')+'><span class="ps-value '+esc(color)+'" data-stat-key="'+esc(c.key)+'" data-rank-band="'+color+'"'+title+'>'+fmt(v,c.d)+'</span></td>';
  }).join('')+'</tr>').join('');
  return '<div class="ps-shell"><h3 class="ps-heading">Career</h3><div class="ps-table-wrap" tabindex="0" role="region" aria-label="Career statistics, scroll horizontally"><table class="ps-table" style="--ps-width:'+width+'px" aria-label="Season by season statistics">'+colgroup+'<thead>'+groupHead+statHead+'</thead><tbody>'+body+'</tbody></table></div>'+legend+'<div class="ps-note">Colors reflect each statistic’s rank among players at the same position in that season. Current season totals are year-to-date. — means unavailable.'+(special?' Kicker and defense coverage includes fantasy scoring only.':'')+'</div></div>';
 }

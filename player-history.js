@@ -54,8 +54,7 @@ style.textContent +=
 // The expanded season already identifies the player and year in its parent row.
 // Keep this scoped to History, including category changes and embedded snap-rate views.
 style.textContent +=
-'.player-history-detail .espn-game-log-title,.player-history-detail .espn-game-log-year-row,.player-history-detail .espn-game-log-summary>strong{display:none!important}'+
-'.player-history-detail .espn-game-log-summary{margin-top:0!important}';
+'.player-history-detail .espn-game-log-title,.player-history-detail .espn-game-log-year-row,.player-history-detail .espn-game-log-summary{display:none!important}';
 document.head.appendChild(style);
 
 function escHistory(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
@@ -710,7 +709,7 @@ function renderRows(player,rows,target){
   }
   target.innerHTML=
     '<div class="player-history-card player-history-seven">'+
-      '<div class="player-history-head"><div>Year</div><div>Team</div><div style="text-align:center">GP</div><div>Finish</div><div style="text-align:right">PPG</div><div class="player-history-ppg-rank-head">PPG Rank</div><div style="text-align:right">Pts</div></div>'+
+      '<div class="player-history-head"><div>Year</div><div>Team</div><div style="text-align:center">GP</div><div>Rank</div><div style="text-align:right">PPG</div><div class="player-history-ppg-rank-head">PPG Rank</div><div style="text-align:right">Pts</div></div>'+
       good.map((r,i)=>{
         const ppg=r.ppg!=null&&r.ppg!==''&&Number.isFinite(Number(r.ppg))?Number(r.ppg).toFixed(1):((r.games&&r.points)?(r.points/r.games).toFixed(1):'—');
         return '<div class="player-history-row" data-history-index="'+i+'" role="button" tabindex="0">'+

@@ -1280,6 +1280,7 @@ function ensureUi(){
     ['overview','Overview'],
     ['gamelog','Game Log'],
     ['history','History'],
+    ['stats','Stats'],
     ['performance','Analytics']
   ].map(([k,l])=>'<button type="button" class="unified-profile-tab" data-profile-tab="'+k+'">'+l+'</button>').join('');
 
@@ -1289,6 +1290,7 @@ function ensureUi(){
     '<div id="unifiedOverviewPanel" class="unified-profile-panel" data-profile-panel="overview"></div>'+
     '<div id="unifiedGameLogPanel" class="unified-profile-panel" data-profile-panel="gamelog" hidden></div>'+ 
     '<div id="unifiedHistoryPanel" class="unified-profile-panel" data-profile-panel="history" hidden></div>'+ 
+    '<div id="unifiedPlayerStatsPanel" class="unified-profile-panel" data-profile-panel="stats" hidden></div>'+
     '<div id="unifiedPerformancePanel" class="unified-profile-panel" data-profile-panel="performance" hidden></div>';
 
   const profileTop=document.getElementById('profileTop');
@@ -1310,7 +1312,7 @@ function ensureUi(){
 function activateTab(key){
   if(key==='notes')key='overview';
   if(key==='snaps')key='gamelog'; // Migrate previously saved Snap Rates tab choices.
-  if(!['overview','gamelog','history','performance'].includes(key))key='overview';
+  if(!['overview','gamelog','history','stats','performance'].includes(key))key='overview';
   preferredProfileTab=key;
   try{sessionStorage.setItem('shuaProfileTab',key)}catch(e){}
   const tabs=document.querySelectorAll('[data-profile-tab]');
@@ -1325,6 +1327,7 @@ function activateTab(key){
   }
   if(key==='gamelog')loadGameLog(name);
   if(key==='history')loadHistory(name);
+  if(key==='stats')loadPlayerSeasonStats(name);
   if(key==='performance')document.getElementById('modal')?.dispatchEvent(new CustomEvent('shuaPerformanceTabActive',{detail:{name}}));
 }
 function renderOverviewRanks(name){
@@ -1386,6 +1389,18 @@ async function loadHistory(name){
   }else{
     panel.innerHTML='<div class="unified-profile-loading">ESPN history is unavailable right now.</div>';
   }
+}
+async function loadPlayerSeasonStats(name){
+  const panel=document.getElementById('unifiedPlayerStatsPanel');
+  if(!panel)return;
+  if(panel.dataset.loadedFor===norm(name)&&panel.dataset.ready==='1')return;
+  panel.dataset.loadedFor=norm(name);
+  panel.dataset.ready='0';
+  const seed=activeSeed||playerByName(name)||basePositionPlayer(name)||null;
+  if(window.ShuaPlayerSeasonStats?.render){
+    await window.ShuaPlayerSeasonStats.render(name,panel,seed);
+    if(panel.dataset.loadedFor===norm(name))panel.dataset.ready='1';
+  }else panel.textContent='Season statistics unavailable.';
 }
 async function loadGameLog(name){
   const panel=document.getElementById('unifiedGameLogPanel');
@@ -1479,6 +1494,9 @@ async function paintSwipeProfilePanel(player,view,panel,preview,targetId){
         await window.ShuaDefenseProfile.renderHistory(name,player.id,player.team,panel);
       else if(window.ShuaPlayerHistory?.render)await window.ShuaPlayerHistory.render(name,panel);
       else throw new Error('History unavailable');
+    }else if(view==='stats'){
+      if(window.ShuaPlayerSeasonStats?.render)await window.ShuaPlayerSeasonStats.render(name,panel,player);
+      else throw new Error('Season stats unavailable');
     }else if(view==='performance'){
       if(['K','D/ST'].includes(player.position)){
         panel.textContent='Season analytics are unavailable for this position.';
@@ -1719,7 +1737,9 @@ function prepareUnified(name,seed=null){
   if(gp){gp.dataset.loadedFor='';gp.dataset.ready='0';gp.innerHTML=''}
   const hp=document.getElementById('unifiedHistoryPanel');
   if(hp){hp.dataset.loadedFor='';hp.dataset.ready='0';hp.innerHTML=''}
-  activateTab(['K','D/ST'].includes(seed?.position)?'overview':preferredProfileTab||'overview');
+  const sp=document.getElementById('unifiedPlayerStatsPanel');
+  if(sp){sp.dataset.loadedFor='';sp.dataset.ready='0';sp.dataset.psToken='';sp.innerHTML=''}
+  activateTab(['K','D/ST'].includes(seed?.position)&&preferredProfileTab!=='stats'?'overview':preferredProfileTab||'overview');
   if(!['K','D/ST'].includes(seed?.position))warmAdjacentProfiles(name);
 }
 async function openByName(name,seed=null){

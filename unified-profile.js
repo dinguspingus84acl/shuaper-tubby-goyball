@@ -503,6 +503,22 @@ style.textContent += `
  .featured-player-profile .player-depth-chart-button{min-height:35px;font-size:.7rem;padding:7px 9px}
 }
 `;
+// History keeps the existing compact player header, not the controls, pinned.
+style.textContent += `
+body #modal .profile:has(#unifiedHistoryPanel:not([hidden])) > #featuredPlayerCard{
+  position:sticky!important;top:0!important;z-index:45!important;
+  isolation:isolate;box-shadow:0 5px 14px #0007;
+}
+body #modal .profile:has(#unifiedHistoryPanel:not([hidden])) > #playerStickyIdentity{
+  display:none!important;
+}
+body #modal .profile:has(#unifiedHistoryPanel:not([hidden])) > :is(#unifiedProfileTabs,#rankingPlayerNav,#playerDepthAction){
+  position:relative!important;top:auto!important;bottom:auto!important;z-index:1!important;
+}
+body #modal .profile #unifiedHistoryPanel :is(.espn-game-log-controls,.espn-game-log-tabs,.espn-game-log-year-row){
+  position:static!important;top:auto!important;bottom:auto!important;z-index:auto!important;box-shadow:none!important;
+}
+`;
 document.head.appendChild(style);
 
 function playerByName(name){

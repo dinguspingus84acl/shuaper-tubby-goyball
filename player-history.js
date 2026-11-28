@@ -51,6 +51,11 @@ style.textContent +=
 '#modal .player-history-seven .player-history-year{font-size:.78rem!important;gap:2px!important;white-space:nowrap}'+
 '#modal .player-history-seven .player-history-ppg-rank-cell,#modal .player-history-seven .player-history-finish,#modal .player-history-seven .player-history-games,#modal .player-history-seven .player-history-ppg,#modal .player-history-seven .player-history-points{font-size:.81rem!important;font-variant-numeric:tabular-nums;white-space:nowrap}'+
 '@container (min-width:500px){#modal .player-history-seven>.player-history-head,#modal .player-history-seven>.player-history-row{grid-template-columns:60px minmax(88px,1.4fr) 38px 54px 58px 66px 70px!important;column-gap:6px!important;padding:10px 9px!important}#modal .player-history-seven .player-history-head{font-size:10px!important}#modal .player-history-seven .player-history-team .full{display:inline!important}#modal .player-history-seven .player-history-team .abbr{display:none!important}}';
+// The expanded season already identifies the player and year in its parent row.
+// Keep this scoped to History, including category changes and embedded snap-rate views.
+style.textContent +=
+'.player-history-detail .espn-game-log-title,.player-history-detail .espn-game-log-year-row,.player-history-detail .espn-game-log-summary>strong{display:none!important}'+
+'.player-history-detail .espn-game-log-summary{margin-top:0!important}';
 document.head.appendChild(style);
 
 function escHistory(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}

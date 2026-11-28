@@ -121,5 +121,5 @@ const style=document.createElement('style');style.textContent=`
 #unifiedGameLogPanel .defense-log-table th:nth-child(2),#unifiedGameLogPanel .defense-log-table td:nth-child(2){width:auto!important;min-width:0!important}
 #unifiedGameLogPanel .defense-log-table th:last-child,#unifiedGameLogPanel .defense-log-table td:last-child{width:88px!important;text-align:right!important;padding-right:14px!important}
 `;document.head.append(style);
-window.ShuaDefenseProfile={renderOverview,renderHistory,renderGameLog};
+window.ShuaDefenseProfile={renderOverview,renderHistory,renderGameLog,async getSeasonStats(id,team){return (await Promise.all(years.map(year=>season(id,team,year)))).filter(Boolean)}};
 })();

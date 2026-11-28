@@ -1,0 +1,17 @@
+name: Verify career Stats horizontal scrolling
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'player-season-stats.js'
+      - 'scripts/career-grid-check.mjs'
+      - '.github/workflows/verify-career-grid.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: node --check player-season-stats.js && node scripts/career-grid-check.mjs

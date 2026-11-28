@@ -518,6 +518,19 @@ body #modal .profile:has(#unifiedHistoryPanel:not([hidden])) > :is(#unifiedProfi
 body #modal .profile #unifiedHistoryPanel :is(.espn-game-log-controls,.espn-game-log-tabs,.espn-game-log-year-row){
   position:static!important;top:auto!important;bottom:auto!important;z-index:auto!important;box-shadow:none!important;
 }
+/* Use the profile sheet as the only scroll container; the weekly headings
+   remain directly below the measured player header until their table ends. */
+body #modal .profile #unifiedProfilePanels:has(#unifiedHistoryPanel:not([hidden])),
+body #modal .profile #unifiedHistoryPanel,
+body #modal .profile #unifiedHistoryPanel :is(.player-history-card,.player-history-detail,.espn-game-log-table-wrap,.espn-game-log-snap-view,.espn-game-log-table){
+  overflow:visible!important;
+}
+body #modal .profile #unifiedHistoryPanel .espn-game-log-table thead th{
+  position:sticky!important;top:var(--history-player-header-height,91px)!important;
+  left:auto!important;right:auto!important;z-index:30!important;
+  background:#193749!important;
+  box-shadow:0 2px 0 #52768a!important;
+}
 `;
 document.head.appendChild(style);
 
@@ -1163,8 +1176,24 @@ async function openPlayerComparison(a,b){
   if(overlay.hidden)return;
   grid.innerHTML=compareCardHtml(locals[0],snaps[0])+compareCardHtml(locals[1],snaps[1]);
 }
+let historyHeaderObserver=null;
+function measureHistoryHeader(box){
+  historyHeaderObserver?.disconnect();
+  const hero=box.querySelector('#featuredPlayerCard');
+  if(!hero)return;
+  const syncHeight=()=>{
+    const height=hero.getBoundingClientRect().height;
+    if(height>0)box.style.setProperty('--history-player-header-height',Math.ceil(height)+'px');
+  };
+  syncHeight();
+  if(typeof ResizeObserver==='function'){
+    historyHeaderObserver=new ResizeObserver(syncHeight);
+    historyHeaderObserver.observe(hero);
+  }
+}
 function ensureStickyIdentity(name){
   const box=document.querySelector('#modal .profile');if(!box)return;
+  measureHistoryHeader(box);
   let bar=document.getElementById('playerStickyIdentity');
   if(!bar){
     bar=document.createElement('div');bar.id='playerStickyIdentity';bar.className='player-sticky-identity';

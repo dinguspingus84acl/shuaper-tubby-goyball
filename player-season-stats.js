@@ -24,7 +24,8 @@ style.textContent=`
 .ps-shell{display:grid;gap:8px;padding:5px 2px}
 .ps-heading{margin:0 0 2px;padding:0 4px;color:#a8c7d7;font-size:.8rem;font-weight:950;text-transform:uppercase;letter-spacing:.03em}
 .ps-table-wrap{width:100%;max-width:100%;min-width:0;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain;touch-action:pan-x pan-y!important;-webkit-overflow-scrolling:touch;scrollbar-width:thin;border-radius:6px}
-.ps-table{width:max-content!important;min-width:100%;max-width:none!important;border-collapse:separate!important;border-spacing:0;table-layout:fixed;font-variant-numeric:tabular-nums;background:#0b1a2b}
+.ps-table{width:var(--ps-width)!important;min-width:100%;max-width:none!important;border-collapse:separate!important;border-spacing:0;table-layout:fixed;font-variant-numeric:tabular-nums;background:#0b1a2b}
+.ps-table col.ps-year-col{width:52px}.ps-table col.ps-team-col{width:53px}.ps-table col.ps-stat-col{width:66px}.ps-table col.ps-start-col{width:73px}
 .ps-table :is(th,td){box-sizing:border-box;width:66px;min-width:66px;padding:2px 2px!important;text-align:center;white-space:nowrap;line-height:1.15;border:0!important;vertical-align:middle}
 .ps-table .ps-group-head{padding:6px 4px 5px!important;text-align:left;color:#a8c7d7;font-size:.68rem;font-weight:950;text-transform:uppercase}
 .ps-table .ps-stat-head{font-size:.61rem;color:#eff5ff;font-weight:950;padding:3px 2px!important}
@@ -50,6 +51,7 @@ style.textContent=`
 @media(max-width:760px){
  #modal .profile #unifiedProfileTabs:has([data-profile-tab="stats"]){grid-template-columns:repeat(4,minmax(0,1fr))!important;overflow:visible!important}
  #modal .profile #unifiedProfileTabs:has([data-profile-tab="stats"]) .unified-profile-tab{font-size:.62rem!important;padding:7px 2px!important;white-space:nowrap}
+ .ps-table col.ps-year-col{width:47px}.ps-table col.ps-stat-col{width:63px}.ps-table col.ps-start-col{width:70px}
  .ps-table :is(th,td){width:63px;min-width:63px}
  .ps-table .ps-year-cell{width:47px!important;min-width:47px!important;font-size:.77rem}
  .ps-table .ps-group-start{width:70px;min-width:70px}
@@ -104,13 +106,15 @@ function build(rows,pos){
   groups.push({label:'Misc',cols:misc});
  }
  const cols=groups.flatMap(g=>g.cols.map((c,i)=>({...c,start:i===0})));
+ const width=105+cols.reduce((n,c)=>n+(c.start?73:66),0);
+ const colgroup='<colgroup><col class="ps-year-col"><col class="ps-team-col">'+cols.map(c=>'<col class="'+(c.start?'ps-start-col':'ps-stat-col')+'">').join('')+'</colgroup>';
  const groupHead='<tr><th class="ps-year-cell" rowspan="2" scope="col">Year</th><th class="ps-team-cell" rowspan="2" scope="col">Team</th>'+groups.map(g=>'<th class="ps-group-head ps-group-start" colspan="'+g.cols.length+'" scope="colgroup">'+esc(g.label)+'</th>').join('')+'</tr>';
  const statHead='<tr>'+cols.map(c=>'<th scope="col" class="ps-stat-head'+(c.start?' ps-group-start':'')+'">'+esc(c.label)+'</th>').join('')+'</tr>';
  const body=rows.map(r=>'<tr><th scope="row" class="ps-year-cell">'+esc(r.year)+'</th><td class="ps-team-cell">'+teamCell(r)+'</td>'+cols.map(c=>{
   const v=c.value(r),color=v===null?'empty':(r.psColors?.[c.key]||'');
   return '<td'+(c.start?' class="ps-group-start"':'')+'><span class="ps-value '+esc(color)+'">'+fmt(v,c.d)+'</span></td>';
  }).join('')+'</tr>').join('');
- return '<div class="ps-shell"><h3 class="ps-heading">Career</h3><div class="ps-table-wrap" tabindex="0" role="region" aria-label="Career statistics, scroll horizontally"><table class="ps-table" aria-label="Season by season statistics"><thead>'+groupHead+statHead+'</thead><tbody>'+body+'</tbody></table></div><div class="ps-legend"><span><i class="good"></i>Top third</span><span><i class="mid"></i>Middle third</span><span><i class="low"></i>Bottom third</span></div><div class="ps-note">Compared with players at the same position in each season. Current season totals are year-to-date. — means unavailable.'+(special?' Kicker and defense coverage includes fantasy scoring only.':'')+'</div></div>';
+ return '<div class="ps-shell"><h3 class="ps-heading">Career</h3><div class="ps-table-wrap" tabindex="0" role="region" aria-label="Career statistics, scroll horizontally"><table class="ps-table" style="--ps-width:'+width+'px" aria-label="Season by season statistics">'+colgroup+'<thead>'+groupHead+statHead+'</thead><tbody>'+body+'</tbody></table></div><div class="ps-legend"><span><i class="good"></i>Top third</span><span><i class="mid"></i>Middle third</span><span><i class="low"></i>Bottom third</span></div><div class="ps-note">Compared with players at the same position in each season. Current season totals are year-to-date. — means unavailable.'+(special?' Kicker and defense coverage includes fantasy scoring only.':'')+'</div></div>';
 }
 async function load(name,seed){
  const api=window.ShuaEspnLive;

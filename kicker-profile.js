@@ -212,5 +212,5 @@ async function renderGameLog(name,id,target){
  const control=target.querySelector('.espn-game-log-year-select');
  if(control)control.onchange=()=>{selectedYears.set(String(id),Number(control.value));renderGameLog(name,id,target)};
 }
-window.ShuaKickerProfile={open,close,renderOverview,renderHistory,renderGameLog};
+window.ShuaKickerProfile={open,close,renderOverview,renderHistory,renderGameLog,async getSeasonStats(id){return (await Promise.all(seasons.map(year=>getSeason(id,year)))).filter(Boolean)}};
 })();

@@ -44,7 +44,7 @@ window.ShuaEspnLive={${method},getCompleteCareer:async()=>fixture.career,getCare
  const rows=[...panel.querySelectorAll('.player-history-row')];
  if(!head||rows.length!==2)throw Error('History did not render: '+panel.textContent);
  const labels=[...head.children].map(x=>x.textContent.trim());
- if(labels.join('|')!=='Year|Team|GP|Finish|PPG|PPG Rank|Pts')throw Error(labels.join('|'));
+ if(labels.join('|')!=='Year|Team|GP|Rank|PPG|PPG Rank|Pts')throw Error(labels.join('|'));
  const ranks=[];
  for(const row of rows){
    if(row.children.length!==7)throw Error('row does not have seven cells');
